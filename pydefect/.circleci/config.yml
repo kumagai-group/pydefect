@@ -1,0 +1,28 @@
+version: 2
+
+jobs:
+  build:
+    branches:
+      only:
+        - master
+    working_directory: ~/pydefect
+    docker:
+      - image: circleci/python:3.7.7
+        user: root
+    steps:
+      - checkout
+#      - run:
+#          command: |
+#            echo 'PMG_DEFAULT_FUNCTIONAL: PBE_54' >> $HOME/.pmgrc.yaml
+#            echo "PMG_MAPI_KEY: ${PMG_MAPI_KEY}" >> $HOME/.pmgrc.yaml
+      - run:
+          command: |
+            sudo pip install --upgrade pip
+            sudo pip install -r requirements.txt
+            sudo pip install --quiet pytest
+            pytest pydefect/tests
+
+#            pytest vise --cov=vise --cov-report=xml --cov=vise tests/
+#       - codecov/upload:
+#          file: ./coverage.out
+
