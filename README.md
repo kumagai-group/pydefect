@@ -1,1 +1,1 @@
-# pydetect
+# pydefect
