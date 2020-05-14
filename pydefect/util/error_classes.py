@@ -8,3 +8,7 @@ class PydefectError(Exception):
 
 class NoSupercellError(PydefectError):
     pass
+
+
+class NotPrimitiveError(PydefectError):
+    pass

@@ -45,7 +45,6 @@ def test_f_centering(bcc):
 
 """
 TODO
-- check the matrix
 - 
 
 DONE
