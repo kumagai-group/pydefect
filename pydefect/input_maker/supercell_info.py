@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pymatgen import Structure, Element
 from monty.json import MSONable
 
+from pydefect.util.structure_tools import Distances
+
 
 @dataclass
 class Site(MSONable):
@@ -19,5 +21,13 @@ class SupercellInfo(MSONable):
     transform_matrix: List[List[int]]
     sites: Dict[str, Site]
 
+    @property
+    def coords(self):
+        result = {}
+        for name, site in self.sites.items():
+            coord = list(self.structure[site.equivalent_atoms[0]].frac_coords)
+            distances = Distances(self.structure, coord)
+            result[name] = distances.coord_distances()
 
+        return result
 
