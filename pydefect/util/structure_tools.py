@@ -6,6 +6,8 @@ from typing import List, Dict
 import numpy as np
 from pymatgen import Structure
 
+from pydefect.defaults import defaults
+
 
 class Distances:
     def __init__(self,
@@ -29,8 +31,10 @@ class Distances:
     def shortest_distance(self) -> float:
         return min(self.distances())
 
-    def coord_distances(self, cutoff_distance_factor: float
-                        ) -> Dict[str, List[float]]:
+    def coord_distances(
+            self,
+            cutoff_distance_factor: float = defaults.cutoff_distance_factor
+    ) -> Dict[str, List[float]]:
         cutoff = self.shortest_distance * cutoff_distance_factor
 
         elements = [element.specie.name for element in self.structure]
