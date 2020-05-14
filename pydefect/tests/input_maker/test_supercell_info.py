@@ -9,11 +9,8 @@ from pydefect.tests.helpers.assertion import assert_msonable
 
 @pytest.fixture
 def site():
-    return Site(element=Element.H,
-                wyckoff_letter="a",
+    return Site(wyckoff_letter="a",
                 site_symmetry="m3m",
-                cutoff_radius=2.0,
-                coordination={"O": [1.2, 1.3]},
                 equivalent_atoms=[0, 1, 2, 3])
 
 
@@ -30,7 +27,9 @@ def test_supercell_info(site, monoclinic):
 
 """
 TODO
-- Hold some info
+- Evaluate coords at Site
+- Implement print info
+- Generate default defect.in
 
 DONE
 """

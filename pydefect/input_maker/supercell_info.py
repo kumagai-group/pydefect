@@ -8,11 +8,8 @@ from monty.json import MSONable
 
 @dataclass
 class Site(MSONable):
-    element: Element
     wyckoff_letter: str
     site_symmetry: str
-    cutoff_radius: float
-    coordination: Dict[str, List[float]]
     equivalent_atoms: List[int]
 
 
