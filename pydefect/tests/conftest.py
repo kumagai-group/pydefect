@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from pathlib import Path
+import os
+import sys
 from math import sqrt
+from pathlib import Path
 
 import pytest
 from pymatgen import Lattice, Structure
+
+sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 
 
 @pytest.fixture(scope="session")
