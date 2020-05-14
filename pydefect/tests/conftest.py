@@ -103,3 +103,20 @@ def tetra_close_to_cubic():
     coords = [[0.0, 0.0, 0.0]]
     return Structure(lattice=lattice, species=["H"], coords=coords)
 
+
+@pytest.fixture
+def monoclinic_supercell():
+    lattice = Lattice.orthorhombic(5, 6, 7)
+    coords = [
+        [0.0, 0.0, 0.0],
+        [0.5, 0.5, 0.0],
+        [0.5, 0.0, 0.5],
+        [0.0, 0.5, 0.5],
+
+        [0.0, 0.0, 0.5],
+        [0.0, 0.5, 0.0],
+        [0.5, 0.0, 0.0],
+        [0.5, 0.5, 0.5],
+    ]
+    return Structure(lattice=lattice, species=["H"] * 4 + ["He"] * 4,
+                     coords=coords)

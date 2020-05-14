@@ -8,24 +8,6 @@ from pydefect.util.structure_tools import Distances
 from pymatgen import Lattice, Structure
 
 
-@pytest.fixture
-def monoclinic_supercell():
-    lattice = Lattice.orthorhombic(5, 6, 7)
-    coords = [
-        [0.0, 0.0, 0.0],
-        [0.5, 0.5, 0.0],
-        [0.5, 0.0, 0.5],
-        [0.0, 0.5, 0.5],
-
-        [0.0, 0.0, 0.5],
-        [0.0, 0.5, 0.0],
-        [0.5, 0.0, 0.0],
-        [0.5, 0.5, 0.5],
-              ]
-    return Structure(lattice=lattice, species=["H"] * 4 + ["He"] * 4,
-                     coords=coords)
-
-
 def test_distances(monoclinic_supercell):
     distances = Distances(monoclinic_supercell, coord=[0.25, 0.25, 0.25])
     np.testing.assert_almost_equal(distances.distances(), [5.2440442 / 2] * 8)
