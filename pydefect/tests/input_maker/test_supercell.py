@@ -6,9 +6,8 @@ from math import sqrt
 from pymatgen import Lattice, Structure
 
 from pydefect.input_maker.supercell import (
-    Supercell, Supercells, TetragonalSupercells, RhombohedralSupercells,
-    CreateSupercell)
-from pydefect.util.error_classes import NoSupercellError, NotPrimitiveError
+    Supercell, Supercells, TetragonalSupercells, RhombohedralSupercells)
+from pydefect.util.error_classes import SupercellError
 
 
 @pytest.fixture
@@ -49,7 +48,7 @@ def test_supercells_raise_no_supercell_error(simple_cubic):
     supercells = Supercells(input_structure=simple_cubic,
                             min_num_atoms=10,
                             max_num_atoms=10)
-    with pytest.raises(NoSupercellError):
+    with pytest.raises(SupercellError):
         print(supercells.most_isotropic_supercell)
 
 
@@ -93,65 +92,5 @@ def test_next_x_y_combination():
     assert TetragonalSupercells.next_x_y_combination(25) in [(2, 3), (1, 5)]
 
 
-@pytest.fixture
-def tetra_close_to_cubic():
-    lattice = Lattice.tetragonal(1.001 * 10 / sqrt(2), 10)
-    coords = [[0.0, 0.0, 0.0]]
-    results = Structure(lattice=lattice, species=["H"], coords=coords)
-
-    return results
 
 
-def test_create_supercell_tetragonal(tetra_close_to_cubic):
-    cs = CreateSupercell(tetra_close_to_cubic)
-    actual = cs.supercell.matrix
-    expected =[[ 5,  5,  0],
-               [-5,  5,  0],
-               [ 0,  0,  5]]
-    np.testing.assert_array_equal(actual, expected)
-
-
-def test_create_supercell(a_centered_orthorhombic):
-    cs = CreateSupercell(a_centered_orthorhombic)
-    actual_lattice = cs.conv_structure.lattice
-    expected = Lattice.orthorhombic(1, 4, 6)
-    assert actual_lattice == expected
-
-    actual = cs.supercell.matrix
-    expected =[[6,  0,  0],
-               [0,  2,  0],
-               [0,  0,  1]]
-    np.testing.assert_array_equal(actual, expected)
-
-
-def test_create_supercell_raise_not_primitive_error(bcc):
-    with pytest.raises(NotPrimitiveError):
-        CreateSupercell(input_structure=bcc)
-
-
-def test_create_supercell_matrix(a_centered_orthorhombic):
-    matrix = [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
-    cs = CreateSupercell(a_centered_orthorhombic, matrix=matrix)
-    actual = cs.supercell.matrix
-    np.testing.assert_array_equal(actual, matrix)
-
-
-"""
-TODO
-
-
-DONE
-- Expand for rhombohedral cell.
-- Expand for tetragonal cell.
-- Input of structure and trans_mat returns supercell
-- Return isotropy
-- Return average angle
-- Recommend the least isotropic supercell of simple cubic within a given number of atom range.
-  When the isotropy is the same, smallest supercell is returned.
-- Check max_num_atoms
-- Raise NoSupercellError 
-
-REJECT
-+ Allow to write the supercell down a file.
-    -> Structure already has to, which should be used.
-"""

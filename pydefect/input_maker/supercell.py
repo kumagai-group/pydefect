@@ -4,16 +4,13 @@
 from copy import deepcopy
 from functools import reduce
 from itertools import product
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 
 import numpy as np
 from numpy.linalg import det
-from pymatgen.analysis.structure_matcher import StructureMatcher
 from pymatgen import Structure
 
-from vise.util.structure_symmetrizer import StructureSymmetrizer
-from pydefect.util.error_classes import NoSupercellError, NotPrimitiveError
-from pydefect.util.centering import Centering
+from pydefect.util.error_classes import SupercellError
 
 
 class Supercell:
@@ -64,7 +61,7 @@ class Supercells:
         try:
             return min(self.supercells, key=lambda s: s.isotropy)
         except ValueError:
-            raise NoSupercellError
+            raise SupercellError
 
 
 class RhombohedralSupercells(Supercells):
@@ -119,28 +116,3 @@ class TetragonalSupercells(Supercells):
         return sorted(filtered, key=lambda u: pairs[u])[0]
 
 
-class CreateSupercell:
-    def __init__(self,
-                 input_structure: Structure,
-                 matrix: Optional[List[List[int]]] = None,
-                 **superell_kwargs):
-        symmetrizer = StructureSymmetrizer(input_structure)
-
-        if input_structure.lattice != symmetrizer.primitive.lattice:
-            raise NotPrimitiveError
-
-        self.conv_structure = symmetrizer.conventional
-        crystal_system, center = str(symmetrizer.bravais)
-        centering = Centering(center)
-        self.conv_multiplicity = centering.conv_multiplicity
-
-        if matrix:
-            self.supercell = Supercell(self.conv_structure, matrix)
-        else:
-            if crystal_system == "t":
-                supercells = TetragonalSupercells(self.conv_structure,
-                                                  **superell_kwargs)
-            else:
-                supercells = Supercells(self.conv_structure, **superell_kwargs)
-
-            self.supercell = supercells.most_isotropic_supercell

@@ -6,9 +6,11 @@ class PydefectError(Exception):
     pass
 
 
-class NoSupercellError(PydefectError):
+class SupercellError(PydefectError):
     pass
 
 
 class NotPrimitiveError(PydefectError):
     pass
+
+
