@@ -20,17 +20,14 @@ def test_data_files():
 def simple_cubic():
     lattice = Lattice.cubic(1.0)
     coords = [[0.0, 0.0, 0.0]]
-    results = Structure(lattice=lattice, species=["H"], coords=coords)
-
-    return results
+    return Structure(lattice=lattice, species=["H"], coords=coords)
 
 
 @pytest.fixture(scope="session")
 def monoclinic():
     lattice = Lattice.monoclinic(3, 4, 5, 100)
     coords = [[0.0, 0.0, 0.0]]
-    structure = Structure(lattice=lattice, species=["H"], coords=coords)
-    return structure
+    return Structure(lattice=lattice, species=["H"], coords=coords)
 
 
 @pytest.fixture(scope="session")
@@ -41,34 +38,30 @@ def complex_monoclinic():
               [0.9, 0.0, 0.0],
               [0.2, 0.0, 0.0],
               [0.8, 0.0, 0.0]]
-    structure = Structure(lattice=lattice,
+    return Structure(lattice=lattice,
                           species=["H", "He", "He", "He", "He"],
                           coords=coords)
-    return structure
 
 
 @pytest.fixture(scope="session")
 def rhombohedral():
     lattice = Lattice.rhombohedral(a=1, alpha=45)
     coords = [[0.0, 0.0, 0.0]]
-    structure = Structure(lattice=lattice, species=["H"], coords=coords)
-    return structure
+    return Structure(lattice=lattice, species=["H"], coords=coords)
 
 
 @pytest.fixture(scope="session")
 def elongated_tetragonal():
     lattice = Lattice.tetragonal(a=1, c=3 * sqrt(2))
     coords = [[0.0, 0.0, 0.0]]
-    structure = Structure(lattice=lattice, species=["H"], coords=coords)
-    return structure
+    return Structure(lattice=lattice, species=["H"], coords=coords)
 
 
 @pytest.fixture(scope="session")
 def elongated_tetragonal():
     lattice = Lattice.tetragonal(a=1, c=3 * sqrt(2))
     coords = [[0.0, 0.0, 0.0]]
-    structure = Structure(lattice=lattice, species=["H"], coords=coords)
-    return structure
+    return Structure(lattice=lattice, species=["H"], coords=coords)
 
 
 @pytest.fixture(scope="session")
@@ -80,31 +73,33 @@ def a_centered_orthorhombic():
               [0.0, 0.3, 0.0],
               [0.0, 0.0, 0.3]]
 
-    structure = Structure(lattice=lattice, species=["H"] * 3, coords=coords)
-    return structure
+    return Structure(lattice=lattice, species=["H"] * 3, coords=coords)
 
 
 @pytest.fixture(scope="session")
 def c_centered_monoclinic():
     lattice = Lattice.monoclinic(3, 4, 5, 100)
     coords = [[0.0, 0.0, 0.0], [0.5, 0.5, 0.0]]
-    structure = Structure(lattice=lattice, species=["H", "H"], coords=coords)
-    return structure
+    return Structure(lattice=lattice, species=["H", "H"], coords=coords)
 
 
 @pytest.fixture(scope="session")
 def fcc():
     lattice = Lattice.cubic(1.0)
     coords = [[0.0, 0.0, 0.0], [0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.0, 0.5, 0.5]]
-    results = Structure(lattice=lattice, species=["H"] * 4, coords=coords)
-
-    return results
+    return Structure(lattice=lattice, species=["H"] * 4, coords=coords)
 
 
 @pytest.fixture(scope="session")
 def bcc():
     lattice = Lattice.cubic(1.0)
     coords = [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]]
-    results = Structure(lattice=lattice, species=["H"] * 2, coords=coords)
+    return Structure(lattice=lattice, species=["H"] * 2, coords=coords)
 
-    return results
+
+@pytest.fixture
+def tetra_close_to_cubic():
+    lattice = Lattice.tetragonal(1.001 * 10 / sqrt(2), 10)
+    coords = [[0.0, 0.0, 0.0]]
+    return Structure(lattice=lattice, species=["H"], coords=coords)
+
