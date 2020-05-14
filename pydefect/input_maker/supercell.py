@@ -4,7 +4,7 @@
 from copy import deepcopy
 from functools import reduce
 from itertools import product
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import numpy as np
 from numpy.linalg import det
@@ -14,6 +14,7 @@ from pymatgen import Structure
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 from pydefect.util.error_classes import NoSupercellError, NotPrimitiveError
 from pydefect.util.centering import Centering
+
 
 class Supercell:
     def __init__(self, input_structure: Structure, matrix: List[List[int]]):
@@ -36,7 +37,7 @@ class Supercells:
     def __init__(self,
                  input_structure: Structure,
                  min_num_atoms: int = 50,
-                 max_num_atoms: int = 400):
+                 max_num_atoms: int = 250):
         self.input_structure = input_structure
         min_det = min_num_atoms / len(input_structure) - 1e-5
         max_det = max_num_atoms / len(input_structure) + 1e-5
@@ -118,11 +119,11 @@ class TetragonalSupercells(Supercells):
         return sorted(filtered, key=lambda u: pairs[u])[0]
 
 
-class CreateSupercells:
+class CreateSupercell:
     def __init__(self,
                  input_structure: Structure,
-                 min_num_atoms: int = 50,
-                 max_num_atoms: int = 400):
+                 matrix: Optional[List[List[int]]] = None,
+                 **superell_kwargs):
         symmetrizer = StructureSymmetrizer(input_structure)
 
         if input_structure.lattice != symmetrizer.primitive.lattice:
@@ -133,10 +134,13 @@ class CreateSupercells:
         centering = Centering(center)
         self.conv_multiplicity = centering.conv_multiplicity
 
-        if crystal_system == "t":
-            supercells = TetragonalSupercells
+        if matrix:
+            self.supercell = Supercell(self.conv_structure, matrix)
         else:
-            supercells = Supercells
+            if crystal_system == "t":
+                supercells = TetragonalSupercells(self.conv_structure,
+                                                  **superell_kwargs)
+            else:
+                supercells = Supercells(self.conv_structure, **superell_kwargs)
 
-        self.supercells = supercells(self.conv_structure,
-                                     min_num_atoms, max_num_atoms)
+            self.supercell = supercells.most_isotropic_supercell

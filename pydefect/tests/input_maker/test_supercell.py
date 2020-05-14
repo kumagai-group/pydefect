@@ -7,7 +7,7 @@ from pymatgen import Lattice, Structure
 
 from pydefect.input_maker.supercell import (
     Supercell, Supercells, TetragonalSupercells, RhombohedralSupercells,
-    CreateSupercells)
+    CreateSupercell)
 from pydefect.util.error_classes import NoSupercellError, NotPrimitiveError
 
 
@@ -102,31 +102,38 @@ def tetra_close_to_cubic():
     return results
 
 
-def test_create_supercells_tetragonal(tetra_close_to_cubic):
-    cs = CreateSupercells(tetra_close_to_cubic)
-    actual = cs.supercells.most_isotropic_supercell.matrix
+def test_create_supercell_tetragonal(tetra_close_to_cubic):
+    cs = CreateSupercell(tetra_close_to_cubic)
+    actual = cs.supercell.matrix
     expected =[[ 5,  5,  0],
                [-5,  5,  0],
                [ 0,  0,  5]]
     np.testing.assert_array_equal(actual, expected)
 
 
-def test_create_supercells(a_centered_orthorhombic):
-    cs = CreateSupercells(a_centered_orthorhombic)
+def test_create_supercell(a_centered_orthorhombic):
+    cs = CreateSupercell(a_centered_orthorhombic)
     actual_lattice = cs.conv_structure.lattice
     expected = Lattice.orthorhombic(1, 4, 6)
     assert actual_lattice == expected
 
-    actual = cs.supercells.most_isotropic_supercell.matrix
-    expected =[[11,  0,  0],
-               [ 0,  3,  0],
-               [ 0,  0,  2]]
+    actual = cs.supercell.matrix
+    expected =[[6,  0,  0],
+               [0,  2,  0],
+               [0,  0,  1]]
     np.testing.assert_array_equal(actual, expected)
 
 
-def test_create_supercells_raise_not_primitive_error(bcc):
+def test_create_supercell_raise_not_primitive_error(bcc):
     with pytest.raises(NotPrimitiveError):
-        CreateSupercells(input_structure=bcc)
+        CreateSupercell(input_structure=bcc)
+
+
+def test_create_supercell_matrix(a_centered_orthorhombic):
+    matrix = [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
+    cs = CreateSupercell(a_centered_orthorhombic, matrix=matrix)
+    actual = cs.supercell.matrix
+    np.testing.assert_array_equal(actual, matrix)
 
 
 """
