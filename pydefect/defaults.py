@@ -14,7 +14,7 @@ class Defaults:
     def __init__(self):
         self._symmetry_length_tolerance = 0.01
         self._symmetry_angle_tolerance = 5.0
-        self._cutoff_distance_factor = 1.5
+        self._cutoff_distance_factor = 1.7
         self._kpoint_density = 5.0
         self._band_gap_criterion = 0.2  # in eV
         self._integer_criterion = 0.1
