@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from typing import List
-import numpy as np
 from collections import defaultdict
+from typing import List, Dict
+
+import numpy as np
 from pymatgen import Structure
 
 
@@ -13,7 +14,7 @@ class Distances:
         self.structure = structure
         self.coord = coord
 
-    def distances(self, remove_self=True):
+    def distances(self, remove_self=True) -> List[float]:
         result = []
         for frac_coord in self.structure.frac_coords:
             lattice = self.structure.lattice
@@ -25,10 +26,11 @@ class Distances:
         return result
 
     @property
-    def shortest_distance(self):
+    def shortest_distance(self) -> float:
         return min(self.distances())
 
-    def coord_distances(self, cutoff_distance_factor):
+    def coord_distances(self, cutoff_distance_factor: float
+                        ) -> Dict[str, List[float]]:
         cutoff = self.shortest_distance * cutoff_distance_factor
 
         elements = [element.specie.name for element in self.structure]
