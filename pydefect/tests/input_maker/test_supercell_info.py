@@ -72,10 +72,10 @@ Fractional coordinates: 0.0000000  0.0000000  0.5000000
 
 """
 TODO
-- Add spacegroup to Supercell Info
-- Implement print info
 - Generate default defect.in
 
 DONE
 - Evaluate coords at Site
+- Add spacegroup to Supercell Info
+- Implement print info
 """

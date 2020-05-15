@@ -45,11 +45,11 @@ class SupercellInfo(MSONable):
         return "{0[0]:9.7f}  {0[1]:9.7f}  {0[2]:9.7f}".format(frac_coords)
 
     @staticmethod
-    def _name_to_element(name):
+    def _stripe_numbers(name):
         return ''.join([i for i in name if i.isalpha()])
 
     def _elect_neg(self, name):
-        element = self._name_to_element(name)
+        element = self._stripe_numbers(name)
         try:
             return electronegativity[element]
         except KeyError:
@@ -57,7 +57,7 @@ class SupercellInfo(MSONable):
             return 0.0
 
     def _oxi_state(self, name):
-        element = self._name_to_element(name)
+        element = self._stripe_numbers(name)
         try:
             return oxidation_state[element]
         except KeyError:
@@ -76,7 +76,7 @@ class SupercellInfo(MSONable):
             lines.append(f"         Site symmetry: {site.site_symmetry}")
             lines.append(f"         Cutoff radius: {cutoff}")
             lines.append(f"          Coordination: {distances}")
-            lines.append(f"      Equivalent atoms: " f"{site.equivalent_atoms}")
+            lines.append(f"      Equivalent atoms: {site.equivalent_atoms}")
             lines.append(f"Fractional coordinates: {self._frac_coords(site)}")
             lines.append(f"     Electronegativity: {self._elect_neg(name)}")
             lines.append(f"       Oxidation state: {self._oxi_state(name)}")
