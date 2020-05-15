@@ -38,6 +38,11 @@ def test_defect_name_from_str():
     assert actual == expected
 
 
+def test_defect_name_specie():
+    name = DefectName.from_str("Va_O1_1")
+    assert name.species == "Va_O1"
+
+
 """
 TODO
 - 

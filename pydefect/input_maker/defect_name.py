@@ -20,9 +20,14 @@ class DefectName(MSONable):
     def __hash__(self):
         return hash(str(self))
 
+    @property
+    def species(self):
+        return "_".join([self.in_atom, self.out_atom])
+
     @classmethod
     def from_str(cls, string) -> "DefectName":
         name = string.split("_")
         assert len(name) == 3
         return cls(in_atom=name[0], out_atom=name[1], charge=int(name[2]))
+
 
