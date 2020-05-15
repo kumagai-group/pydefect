@@ -13,6 +13,7 @@ logger = get_logger(__name__)
 
 @dataclass
 class Site(MSONable):
+    element: str
     wyckoff_letter: str
     site_symmetry: str
     equivalent_atoms: List[int]

@@ -67,7 +67,8 @@ class CreateSupercell:
             element_idx_dict[element] += 1
             index = str(element_idx_dict[str(element)])
             name = element + index
-            sites[name] = Site(wyckoff_letter=wyckoffs[repr_idx],
+            sites[name] = Site(element=element,
+                               wyckoff_letter=wyckoffs[repr_idx],
                                site_symmetry=site_symmetries[repr_idx],
                                equivalent_atoms=[s[0] for s in equiv_site_list])
 

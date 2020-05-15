@@ -10,7 +10,8 @@ from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 @pytest.fixture
 def site():
-    return Site(wyckoff_letter="a",
+    return Site(element="H",
+                wyckoff_letter="a",
                 site_symmetry="m3m",
                 equivalent_atoms=[0, 1, 2, 3])
 
@@ -19,11 +20,11 @@ def test_site(site):
     assert_msonable(site)
 
 
-@pytest.fixture
+@pytest.fixture()
 def supercell_info(ortho_conventional):
-    sites = {"H1": Site(wyckoff_letter="a", site_symmetry="mmm",
+    sites = {"H1": Site(element="H", wyckoff_letter="a", site_symmetry="mmm",
                         equivalent_atoms=[0, 1, 2, 3]),
-             "He1": Site(wyckoff_letter="b", site_symmetry="mmm",
+             "He1": Site(element="He", wyckoff_letter="b", site_symmetry="mmm",
                          equivalent_atoms=[4, 5, 6, 7])}
     return SupercellInfo(ortho_conventional,
                          "Fmmm",
@@ -72,7 +73,7 @@ Fractional coordinates: 0.0000000  0.0000000  0.5000000
 
 """
 TODO
-- Generate default defect.in
+- Generate default defect_in.yaml
 
 DONE
 - Evaluate coords at Site
