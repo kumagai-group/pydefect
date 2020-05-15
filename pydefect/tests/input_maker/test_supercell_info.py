@@ -39,9 +39,8 @@ def test_supercell_info(supercell_info):
 
 
 def test_supercell_info_distances(supercell_info):
-    coords = supercell_info.coords
-    assert coords["H1"] == {"H": [3.91], "He": [2.5, 3.0, 3.5]}
-    assert coords["He1"] == {"H": [2.5, 3.0, 3.5], "He": [3.91]}
+    assert supercell_info.coords("H1") == ({"H": [3.91], "He": [2.5, 3.0, 3.5]}, 4.25)
+    assert supercell_info.coords("He1") == ({"H": [2.5, 3.0, 3.5], "He": [3.91]}, 4.25)
 
 
 def test_supercell_info_str(supercell_info):

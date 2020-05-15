@@ -4,7 +4,7 @@ from typing import List, Tuple, Optional, Dict
 from dataclasses import dataclass
 from pymatgen import Structure, Element
 from monty.json import MSONable
-
+from numpy.linalg import det
 from pydefect.util.structure_tools import Distances
 
 
@@ -22,13 +22,9 @@ class SupercellInfo(MSONable):
     transform_matrix: List[List[int]]
     sites: Dict[str, Site]
 
-    @property
-    def coords(self):
-        result = {}
-        for name, site in self.sites.items():
-            coord = list(self.structure[site.equivalent_atoms[0]].frac_coords)
-            distances = Distances(self.structure, coord)
-            result[name] = distances.coord_distances()
-
-        return result
+    def coords(self, name):
+        site = self.sites[name]
+        coord = list(self.structure[site.equivalent_atoms[0]].frac_coords)
+        distances = Distances(self.structure, coord)
+        return distances.coord_distances_and_cutoff()
 
