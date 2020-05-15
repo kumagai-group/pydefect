@@ -105,7 +105,7 @@ def tetra_close_to_cubic():
 
 
 @pytest.fixture
-def monoclinic_supercell():
+def ortho_conventional():
     lattice = Lattice.orthorhombic(5, 6, 7)
     coords = [
         [0.0, 0.0, 0.0],

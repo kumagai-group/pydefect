@@ -44,6 +44,35 @@ def test_supercell_info_distances(supercell_info):
     assert coords["He1"] == {"H": [2.5, 3.0, 3.5], "He": [3.91]}
 
 
+def test_supercell_info_str(supercell_info):
+    expected = """  Space group: Fm-3m
+
+Transformation matrix: 1 0 0  0 1 0  0 0 1
+Cell multiplicity: 1
+
+   Irreducible element: H1
+        Wyckoff letter: a
+         Site symmetry: mmm
+         Cutoff radius: 2.76
+          Coordination: O: 2.12 2.12 2.12 2.12 2.12 2.12
+      Equivalent atoms: 0..26
+Fractional coordinates: 0.0000000  0.0000000  0.0000000
+     Electronegativity: 1.31
+       Oxidation state: 2
+
+   Irreducible element: O1
+        Wyckoff letter: b
+         Site symmetry: m-3m
+         Cutoff radius: 2.76
+          Coordination: Mg: 2.12 2.12 2.12 2.12 2.12 2.12
+      Equivalent atoms: 27..53
+Fractional coordinates: 0.1666667  0.1666667  0.1666667
+     Electronegativity: 3.44
+       Oxidation state: -2
+"""
+    assert str(supercell_info) == expected
+
+
 """
 TODO
 - Add spacegroup to Supercell Info
