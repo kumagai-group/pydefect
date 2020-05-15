@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from collections import defaultdict
-from typing import List, Dict
+from typing import List, Dict,Tuple
 
 import numpy as np
 from pymatgen import Structure
@@ -31,10 +31,10 @@ class Distances:
     def shortest_distance(self) -> float:
         return min(self.distances())
 
-    def coord_distances(
+    def coord_distances_and_cutoff(
             self,
             cutoff_distance_factor: float = defaults.cutoff_distance_factor
-    ) -> Dict[str, List[float]]:
+    ) -> Tuple[Dict[str, List[float]], float]:
         cutoff = self.shortest_distance * cutoff_distance_factor
 
         elements = [element.specie.name for element in self.structure]
@@ -48,4 +48,4 @@ class Distances:
         for element, distances in unsorted_distances.items():
             result[element] = sorted(distances)
 
-        return result
+        return result, round(cutoff, 3)
