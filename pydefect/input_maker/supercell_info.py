@@ -18,6 +18,7 @@ class Site(MSONable):
 @dataclass
 class SupercellInfo(MSONable):
     structure: Structure
+    space_group: str
     transform_matrix: List[List[int]]
     sites: Dict[str, Site]
 

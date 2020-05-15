@@ -22,6 +22,7 @@ class CreateSupercell:
                  **supercell_kwargs):
         symmetrizer = StructureSymmetrizer(input_structure)
         self.sg = symmetrizer.sg_number
+        self.sg_symbol = symmetrizer.spglib_sym_data["international"]
         if input_structure.lattice != symmetrizer.primitive.lattice:
             raise NotPrimitiveError
 
@@ -71,6 +72,7 @@ class CreateSupercell:
                                equivalent_atoms=[s[0] for s in equiv_site_list])
 
         self.supercell_info = SupercellInfo(self.supercell.structure,
+                                            self.sg_symbol,
                                             self.transform_matrix,
                                             sites)
 
