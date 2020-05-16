@@ -21,7 +21,7 @@ class DefectName(MSONable):
         return hash(str(self))
 
     @property
-    def species(self):
+    def name_wo_charge(self):
         return "_".join([self.in_atom, self.out_atom])
 
     @classmethod

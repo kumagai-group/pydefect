@@ -15,7 +15,7 @@ from pydefect.util.centering import Centering
 from pydefect.input_maker.supercell_info import SupercellInfo, Site
 
 
-class CreateSupercell:
+class SupercellMaker:
     def __init__(self,
                  input_structure: Structure,
                  matrix: Optional[List[List[int]]] = None,

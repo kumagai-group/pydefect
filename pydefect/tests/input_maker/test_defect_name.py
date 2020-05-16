@@ -40,7 +40,7 @@ def test_defect_name_from_str():
 
 def test_defect_name_specie():
     name = DefectName.from_str("Va_O1_1")
-    assert name.species == "Va_O1"
+    assert name.name_wo_charge == "Va_O1"
 
 
 """
