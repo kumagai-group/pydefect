@@ -9,20 +9,20 @@ logger = get_logger(__name__)
 
 rcore = loadfn(Path(__file__).parent / "rcore.yaml")
 
+electroneg_data = loadfn(Path(__file__).parent / "electronegativity.yaml")
+oxi_state_data = loadfn(Path(__file__).parent / "oxidation_state.yaml")
+
 
 def electronegativity(element):
-    yaml_data = loadfn(Path(__file__).parent / "electronegativity.yaml")
-    try:
-        return yaml_data[element]
-    except KeyError:
-        logger.info(f"Electronegativity of {element} is set to 0.0.")
-        return None
+    if element not in electroneg_data:
+        logger.info(f"Electronegativity of {element} is set to None.")
+        electroneg_data[element] = None
+    return electroneg_data[element]
 
 
 def oxidation_state(element):
-    yaml_data = loadfn(Path(__file__).parent / "oxidation_state.yaml")
-    try:
-        return yaml_data[element]
-    except KeyError:
+    if element not in oxi_state_data:
         logger.info(f"Oxidation state of {element} is set to 0.")
-        return 0
+        oxi_state_data[element] = 0
+    return oxi_state_data[element]
+
