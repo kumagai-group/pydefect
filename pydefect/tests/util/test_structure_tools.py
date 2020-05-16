@@ -22,11 +22,12 @@ def test_shortest_distances(ortho_conventional):
     assert distances.shortest_distance == 2.5
 
 
-def test_coord_distances(ortho_conventional):
+def test_coord_distances(mocker, ortho_conventional):
+    mock = mocker.patch("pydefect.util.structure_tools.defaults")
+    mock.cutoff_distance_factor = 3.9051248 / 2.5 + 1e-5  # = 1.562
     distances = Distances(ortho_conventional, coord=[0.5, 0.5, 0.5])
-    cutoff_distance_factor = 3.9051248 / 2.5 + 1e-5
 
-    actual = distances.coord_distances_and_cutoff(cutoff_distance_factor)
+    actual = distances.coord_distances_and_cutoff()
     expected = {"H": [2.5, 3.0, 3.5], "He": [3.91]}, 3.905
     assert actual == expected
 

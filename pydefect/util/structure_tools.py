@@ -31,12 +31,9 @@ class Distances:
     def shortest_distance(self) -> float:
         return min(self.distances())
 
-    def coord_distances_and_cutoff(
-            self,
-            cutoff_distance_factor: float = defaults.cutoff_distance_factor
-    ) -> Tuple[Dict[str, List[float]], float]:
-        cutoff = self.shortest_distance * cutoff_distance_factor
-
+    def coord_distances_and_cutoff(self
+                                   ) -> Tuple[Dict[str, List[float]], float]:
+        cutoff = self.shortest_distance * defaults.cutoff_distance_factor
         elements = [element.specie.name for element in self.structure]
         e_d = zip(elements, self.distances(False))
 
