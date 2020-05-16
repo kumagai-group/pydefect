@@ -9,6 +9,8 @@ import pytest
 from pymatgen import Lattice, Structure
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
+# Need the following the share the fixture
+from pydefect.tests.input_maker.test_supercell_info import supercell_info
 
 
 @pytest.fixture(scope="session")
