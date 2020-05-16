@@ -65,7 +65,7 @@ Fractional coordinates: 0.0000000  0.0000000  0.0000000
           Coordination: {'H': [2.5, 3.0, 3.5], 'He': [3.91]}
       Equivalent atoms: [4, 5, 6, 7]
 Fractional coordinates: 0.0000000  0.0000000  0.5000000
-     Electronegativity: 0.0
+     Electronegativity: None
        Oxidation state: 0
 """
     assert str(supercell_info) == expected

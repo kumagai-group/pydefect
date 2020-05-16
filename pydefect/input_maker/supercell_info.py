@@ -8,6 +8,8 @@ from numpy.linalg import det
 from pydefect.util.structure_tools import Distances
 from pydefect.database.database import electronegativity, oxidation_state
 from vise.util.logger import get_logger
+
+
 logger = get_logger(__name__)
 
 
@@ -49,22 +51,6 @@ class SupercellInfo(MSONable):
     def _stripe_numbers(name):
         return ''.join([i for i in name if i.isalpha()])
 
-    def _elect_neg(self, name):
-        element = self._stripe_numbers(name)
-        try:
-            return electronegativity[element]
-        except KeyError:
-            logger.info(f"Electronegativity of {element} is set to 0.0.")
-            return 0.0
-
-    def _oxi_state(self, name):
-        element = self._stripe_numbers(name)
-        try:
-            return oxidation_state[element]
-        except KeyError:
-            logger.info(f"Oxidation state of {element} is set to 0.")
-            return 0
-
     def __str__(self):
         lines = [f"  Space group: {self.space_group}",
                  f"Transformation matrix: {self._transform_matrix_str}",
@@ -72,6 +58,7 @@ class SupercellInfo(MSONable):
 
         for name, site in self.sites.items():
             distances, cutoff = self.coords(name)
+            elem = self._stripe_numbers(name)
             lines.append(f"   Irreducible element: {name}")
             lines.append(f"        Wyckoff letter: {site.wyckoff_letter}")
             lines.append(f"         Site symmetry: {site.site_symmetry}")
@@ -79,8 +66,8 @@ class SupercellInfo(MSONable):
             lines.append(f"          Coordination: {distances}")
             lines.append(f"      Equivalent atoms: {site.equivalent_atoms}")
             lines.append(f"Fractional coordinates: {self._frac_coords(site)}")
-            lines.append(f"     Electronegativity: {self._elect_neg(name)}")
-            lines.append(f"       Oxidation state: {self._oxi_state(name)}")
+            lines.append(f"     Electronegativity: {electronegativity(elem)}")
+            lines.append(f"       Oxidation state: {oxidation_state(elem)}")
             lines.append("")
 
         return "\n".join(lines)
