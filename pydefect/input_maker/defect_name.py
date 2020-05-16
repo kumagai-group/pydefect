@@ -8,7 +8,8 @@ from typing import Union
 from monty.json import MSONable
 
 
-@dataclass()
+# eq and frozen must be True for unsafe_hash=False condition.
+@dataclass(frozen=True)
 class DefectName(MSONable):
     in_atom: str
     out_atom: str
@@ -16,9 +17,6 @@ class DefectName(MSONable):
 
     def __str__(self):
         return "_".join([self.in_atom, self.out_atom, str(self.charge)])
-
-    def __hash__(self):
-        return hash(str(self))
 
     @property
     def name_wo_charge(self):
