@@ -16,7 +16,7 @@ def site():
                 equivalent_atoms=[0, 1, 2, 3])
 
 
-def test_site(site):
+def test_msonable(site):
     assert_msonable(site)
 
 

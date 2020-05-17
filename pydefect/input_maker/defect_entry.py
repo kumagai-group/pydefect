@@ -7,7 +7,7 @@ from monty.json import MSONable
 from pymatgen import IStructure
 
 
-@dataclass
+@dataclass(frozen=True)
 class DefectEntry(MSONable):
     name: str
     charge: int

@@ -121,4 +121,4 @@ def ortho_conventional():
         [0.5, 0.5, 0.5],
     ]
     return IStructure(lattice=lattice, species=["H"] * 4 + ["He"] * 4,
-                     coords=coords)
+                      coords=coords)

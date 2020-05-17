@@ -13,7 +13,7 @@ from vise.util.logger import get_logger
 logger = get_logger(__name__)
 
 
-@dataclass
+@dataclass(frozen=True)
 class Site(MSONable):
     element: str
     wyckoff_letter: str
@@ -21,7 +21,7 @@ class Site(MSONable):
     equivalent_atoms: List[int]
 
 
-@dataclass
+@dataclass(frozen=True)
 class SupercellInfo(MSONable):
     structure: IStructure
     space_group: str
