@@ -30,7 +30,10 @@ class SimpleDefect(Defect):
 
     @property
     def in_atom(self):
-        return self.name.split("_")[0]
+        result = self.name.split("_")[0]
+        if result == "Va":
+            return
+        return result
 
     @property
     def out_atom(self):

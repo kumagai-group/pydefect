@@ -38,6 +38,7 @@ def test_simple_defect():
     expected = Defect("Va_O1", (1, 2))
     assert defect.name == expected.name
     assert defect.charge_list == expected.charge_list
+    assert defect.in_atom is None
 
 
 """
