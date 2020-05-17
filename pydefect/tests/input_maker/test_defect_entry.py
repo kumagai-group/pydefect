@@ -39,6 +39,10 @@ def test_hashable(defect_entry):
     d = {defect_entry: 1}
 
 
+def test_perturbed_site_indices(defect_entry):
+    assert defect_entry.perturbed_site_indices == [3, 4, 5]
+
+
 """
 TODO
 - Store basic info for a single input defect initial structure.
