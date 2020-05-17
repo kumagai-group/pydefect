@@ -5,11 +5,11 @@ from typing import Iterator, Set as typeSet
 
 from monty.serialization import loadfn, dumpfn
 
-from pydefect.input_maker.defect import Defect
+from pydefect.input_maker.defect import SimpleDefect
 
 
 class DefectSet(Set):
-    def __init__(self, defects: typeSet[Defect]):
+    def __init__(self, defects: typeSet[SimpleDefect]):
         self.defects = defects
 
     def __contains__(self, defect: object) -> bool:
@@ -28,7 +28,10 @@ class DefectSet(Set):
     @classmethod
     def from_yaml(cls, filename: str = "defect_in.yaml") -> "DefectSet":
         d = loadfn(filename)
-        names = {Defect(name, tuple(charges)) for name, charges in d.items()}
+        names = set()
+        for name, charges in d.items():
+            in_name, out_name = name.split("_")
+            names.add(SimpleDefect(in_name, out_name, tuple(charges)))
         return cls(names)
 
 

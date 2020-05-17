@@ -38,8 +38,8 @@ def test_from_file(defect_set, tmpdir):
 Va_O1: [1] 
 """)
     defect_set = DefectSet.from_yaml("tmp.yaml")
-    print(defect_set)
     assert isinstance(defect_set, DefectSet)
+    assert defect_set == simple_defects
 
 
 def test_charge_set():
