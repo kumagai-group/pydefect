@@ -6,6 +6,7 @@ from pymatgen import IStructure, Lattice
 
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.defaults import defaults
+from pydefect.tests.helpers.assertion import assert_msonable
 
 # "H" at [0.0, 0.0, 0.0] is removed here.
 coords = \
@@ -30,10 +31,12 @@ def defect_entry():
                        initial_site_symmetry="m-3m")
 
 
-def test_defect_entry(defect_entry):
-    assert defect_entry.name == "Va_O1"
+def test_msonable(defect_entry):
+    assert_msonable(defect_entry)
 
 
+def test_hashable(defect_entry):
+    d = {defect_entry: 1}
 
 
 """
