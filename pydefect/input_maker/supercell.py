@@ -8,13 +8,13 @@ from typing import List, Tuple
 
 import numpy as np
 from numpy.linalg import det
-from pymatgen import Structure
+from pymatgen import IStructure
 
 from pydefect.util.error_classes import SupercellError
 
 
 class Supercell:
-    def __init__(self, input_structure: Structure, matrix: List[List[int]]):
+    def __init__(self, input_structure: IStructure, matrix: List[List[int]]):
         self.matrix = matrix
         self.structure = input_structure * matrix
         self.lattice = self.structure.lattice
@@ -32,7 +32,7 @@ class Supercell:
 
 class Supercells:
     def __init__(self,
-                 input_structure: Structure,
+                 input_structure: IStructure,
                  min_num_atoms: int = 50,
                  max_num_atoms: int = 250):
         self.input_structure = input_structure

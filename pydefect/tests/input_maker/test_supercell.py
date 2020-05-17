@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 from math import sqrt
-from pymatgen import Lattice, Structure
+from pymatgen import Lattice, IStructure
 
 from pydefect.input_maker.supercell import (
     Supercell, Supercells, TetragonalSupercells, RhombohedralSupercells)
@@ -14,7 +14,7 @@ from pydefect.util.error_classes import SupercellError
 def simple_cubic_supercell():
     lattice = Lattice.orthorhombic(2.0, 1.0, 1.0)
     coords = [[0.0, 0.0, 0.0], [0.5, 0.0, 0.0]]
-    results = Structure(lattice=lattice, species=["H", "H"], coords=coords)
+    results = IStructure(lattice=lattice, species=["H", "H"], coords=coords)
 
     return results
 

@@ -3,7 +3,7 @@
 
 from typing import Optional, List
 import numpy as np
-from pymatgen import Structure
+from pymatgen import IStructure
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 from itertools import groupby
 from collections import defaultdict
@@ -17,7 +17,7 @@ from pydefect.input_maker.supercell_info import SupercellInfo, Site
 
 class SupercellMaker:
     def __init__(self,
-                 input_structure: Structure,
+                 input_structure: IStructure,
                  matrix: Optional[List[List[int]]] = None,
                  **supercell_kwargs):
         symmetrizer = StructureSymmetrizer(input_structure)

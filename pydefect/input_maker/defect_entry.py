@@ -4,15 +4,15 @@
 from dataclasses import dataclass
 
 from monty.json import MSONable
-from pymatgen import Structure
+from pymatgen import IStructure
 
 
 @dataclass
 class DefectEntry(MSONable):
     name: str
     charge: int
-    initial_structure: Structure
-    perturbed_initial_structure: Structure
+    initial_structure: IStructure
+    perturbed_initial_structure: IStructure
     initial_site_symmetry: str
 
 

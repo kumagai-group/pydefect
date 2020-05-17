@@ -2,7 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from typing import List, Tuple, Optional, Dict
 from dataclasses import dataclass
-from pymatgen import Structure, Element
+from pymatgen import IStructure, Element
 from monty.json import MSONable
 from numpy.linalg import det
 from pydefect.util.structure_tools import Distances
@@ -23,7 +23,7 @@ class Site(MSONable):
 
 @dataclass
 class SupercellInfo(MSONable):
-    structure: Structure
+    structure: IStructure
     space_group: str
     transform_matrix: List[List[int]]
     sites: Dict[str, Site]

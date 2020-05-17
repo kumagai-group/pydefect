@@ -2,8 +2,8 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import pytest
+from pymatgen import IStructure, Lattice
 
-from pymatgen import Structure, Lattice
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.defaults import defaults
 
@@ -15,9 +15,9 @@ perturbed_coords = \
     [[0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.0, 0.5, 0.5],
      [0.0, 0.0, 0.501], [0.0, 0.501, 0.0], [0.501, 0.0, 0.0], [0.5, 0.5, 0.5]]
 
-rocksalt = Structure(
+rocksalt = IStructure(
     Lattice.cubic(10.0), ["H"] * 3 + ["He"] * 4, coords)
-perturbed_rocksalt = Structure(
+perturbed_rocksalt = IStructure(
     Lattice.cubic(10.0), ["H"] * 3 + ["He"] * 4, perturbed_coords)
 
 
