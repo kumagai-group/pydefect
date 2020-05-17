@@ -3,14 +3,13 @@
 import numpy as np
 import pytest
 
+from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entries_maker import (
     DefectEntriesMaker, copy_to_structure, to_istructure, add_atom_to_structure,
     perturb_structure, random_3d_vector)
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
-from pydefect.defaults import defaults
-
 from pydefect.input_maker.supercell_info import SupercellInfo, Site
 
 
