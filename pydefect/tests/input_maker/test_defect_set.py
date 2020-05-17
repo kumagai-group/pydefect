@@ -5,36 +5,41 @@ import pytest
 
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.defect_set_maker import charge_set
-from pydefect.input_maker.defect_name import DefectName
+from pydefect.input_maker.defect import SimpleDefect
 
 
-names = [DefectName.from_str("Va_O1_1"), DefectName.from_str("N_O1_0")]
+simple_defects = {SimpleDefect(None, "O1", [1]), SimpleDefect("N", "O1", [0, 1])}
 
 
 @pytest.fixture
 def defect_set():
-    return DefectSet(names=names)
+    return DefectSet(defects=simple_defects)
 
 
-def test_set_names(defect_set):
-    assert defect_set.names[0] == names[0]
+def test_defect_set(defect_set):
+    assert SimpleDefect(None, "O1", [1]) in defect_set
+    assert len(defect_set) == 2
+    for defect in defect_set:
+        defect
 
 
-def test_to_file(defect_set, tmpdir):
+def test_to_yaml(defect_set, tmpdir):
     tmpdir.chdir()
-    defect_set.to_file("tmp")
-    expected = """Va_O1_1
-N_O1_0"""
-    assert tmpdir.join("tmp").read() == expected
+    defect_set.to_yaml("tmp.yaml")
+    expected = """N_O1: [0, 1]
+Va_O1: [1]
+"""
+    assert tmpdir.join("tmp.yaml").read() == expected
 
 
 def test_from_file(defect_set, tmpdir):
     tmpdir.chdir()
-    tmpdir.join("tmp").write("""Va_O1_1
-N_O1_0""")
-    defect_set = DefectSet.from_file("tmp")
+    tmpdir.join("tmp.yaml").write("""N_O1: [0, 1]
+Va_O1: [1] 
+""")
+    defect_set = DefectSet.from_yaml("tmp.yaml")
+    print(defect_set)
     assert isinstance(defect_set, DefectSet)
-    assert defect_set.names == names
 
 
 def test_charge_set():

@@ -4,7 +4,7 @@ from itertools import product
 from typing import Dict, List
 
 from pydefect.database.database import oxidation_state, electronegativity
-from pydefect.input_maker.defect_name import DefectName
+from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.supercell_info import SupercellInfo
 
@@ -40,31 +40,29 @@ class DefectSetMaker:
 
     def _create_vacancy_set(self):
         result = []
-        for name, site in self.supercell_info.sites.items():
+        for out_name, site in self.supercell_info.sites.items():
             oxi_state = self._oxidation_state(site.element)
-            for charge in charge_set(oxi_state):
-                result.append(DefectName("Va", name, charge))
+            result.append(SimpleDefect(None, out_name, charge_set(oxi_state)))
 
         return result
 
     def _create_substitutional_set(self):
         result = []
         subs = self._dopants + self._host_elements
-        for sub_element, (name, site) \
+        for in_name, (out_name, site) \
                 in product(subs, self.supercell_info.sites.items()):
             host_element = site.element
-            sub_en = electronegativity(sub_element)
+            sub_en = electronegativity(in_name)
             host_en = electronegativity(host_element)
-            are_same_elem = sub_element == host_element
+            are_same_elem = in_name == host_element
             if None in (sub_en, host_en) or are_same_elem or \
                     abs(sub_en - host_en) > self._ele_neg_diff:
                 continue
 
-            sub_oxi_state = self._oxidation_state(sub_element)
-            host_oxi_state = self._oxidation_state(host_element)
-            oxi_state_diff = sub_oxi_state - host_oxi_state
-            for charge in charge_set(oxi_state_diff):
-                result.append(DefectName(sub_element, name, charge))
+            sub_oxi = self._oxidation_state(in_name)
+            host_oxi = self._oxidation_state(host_element)
+            oxi_diff = sub_oxi - host_oxi
+            result.append(SimpleDefect(in_name, out_name, charge_set(oxi_diff)))
 
         return result
 
