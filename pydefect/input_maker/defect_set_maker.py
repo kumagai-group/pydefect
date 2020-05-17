@@ -29,25 +29,25 @@ class DefectSetMaker:
             return oxidation_state(element)
 
     @property
-    def _host_elements(self):
+    def _host_elements(self) -> List[str]:
         species_set = set(self.supercell_info.structure.species)
         return [str(specie) for specie in species_set]
 
     def _create_defect_set(self):
         result = self._create_vacancy_set()
-        result.extend(self._create_substitutional_set())
+        result.update(self._create_substitutional_set())
         return DefectSet(result)
 
     def _create_vacancy_set(self):
-        result = []
+        result = set()
         for out_name, site in self.supercell_info.sites.items():
             oxi_state = self._oxidation_state(site.element)
-            result.append(SimpleDefect(None, out_name, charge_set(oxi_state)))
+            result.add(SimpleDefect(None, out_name, charge_set(oxi_state)))
 
         return result
 
     def _create_substitutional_set(self):
-        result = []
+        result = set()
         subs = self._dopants + self._host_elements
         for in_name, (out_name, site) \
                 in product(subs, self.supercell_info.sites.items()):
@@ -62,7 +62,7 @@ class DefectSetMaker:
             sub_oxi = self._oxidation_state(in_name)
             host_oxi = self._oxidation_state(host_element)
             oxi_diff = sub_oxi - host_oxi
-            result.append(SimpleDefect(in_name, out_name, charge_set(oxi_diff)))
+            result.add(SimpleDefect(in_name, out_name, charge_set(oxi_diff)))
 
         return result
 
