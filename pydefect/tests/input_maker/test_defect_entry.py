@@ -26,9 +26,9 @@ perturbed_rocksalt = IStructure(
 def defect_entry():
     return DefectEntry(name="Va_O1",
                        charge=1,
-                       initial_structure=rocksalt,
-                       perturbed_initial_structure=perturbed_rocksalt,
-                       initial_site_symmetry="m-3m")
+                       structure=rocksalt,
+                       perturbed_structure=perturbed_rocksalt,
+                       site_symmetry="m-3m")
 
 
 def test_msonable(defect_entry):
@@ -48,18 +48,5 @@ TODO
 - Store basic info for a single input defect initial structure.
 - create prior_info
 - from structure
-o                name: str,
-?                defect_type: DefectType,
-o                initial_structure: Structure,
-o                perturbed_initial_structure: Structure,
-o                removed_atoms: list,
-o                inserted_atoms: list,
-x                changes_of_num_elements: dict,
-o                charge: int,
-o                initial_site_symmetry: str,
-o                cutoff: float,
-x                neighboring_sites: list,
-x                annotation: Optional[str] = None,
-x                multiplicity: Optional[int] = None):
 DONE
 """

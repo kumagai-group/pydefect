@@ -27,9 +27,9 @@ class DefectEntriesMaker:
                 self.defect_entries.add(
                     DefectEntry(name=defect.name,
                                 charge=charge,
-                                initial_structure=structure,
-                                perturbed_initial_structure=perturbed_structure,
-                                initial_site_symmetry=site.site_symmetry))
+                                structure=structure,
+                                perturbed_structure=perturbed_structure,
+                                site_symmetry=site.site_symmetry))
 
     def _create_defect_structures(self,
                                   defect: SimpleDefect,

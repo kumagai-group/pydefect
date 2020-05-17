@@ -5,7 +5,7 @@ from typing import Iterator, List
 from typing import Set as typeSet
 
 from monty.serialization import loadfn, dumpfn
-from pydefect.input_maker.defect import screen_simple_defect, Defect
+from pydefect.input_maker.defect import screen_simple_defect
 
 from pydefect.input_maker.defect import SimpleDefect
 

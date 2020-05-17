@@ -3,7 +3,7 @@
 
 from dataclasses import dataclass
 import re
-from typing import Union, List
+from typing import Union, List, Optional
 
 from monty.json import MSONable
 
@@ -40,7 +40,8 @@ class SimpleDefect(Defect):
         return self.name.split("_")[1]
 
 
-def screen_simple_defect(defect: SimpleDefect, keywords: List[str]):
+def screen_simple_defect(defect: SimpleDefect, keywords: List[str]
+                         ) -> Optional[SimpleDefect]:
     charges = []
     for charge in defect.charges:
         full_name = "_".join([defect.name, str(charge)])

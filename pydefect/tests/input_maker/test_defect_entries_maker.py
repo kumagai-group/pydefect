@@ -58,10 +58,10 @@ def test_defect_entries_maker_insert_host_atoms(cubic_supercell_info, mocker):
 
     for defect_entry in maker.defect_entries:
         if defect_entry.name == "H_He1":
-            actual = defect_entry.initial_structure[0].frac_coords
+            actual = defect_entry.structure[0].frac_coords
             np.testing.assert_array_equal(actual, [0.25, 0.0, 0.0])
         if defect_entry.name == "He_H1":
-            actual = defect_entry.initial_structure[31].frac_coords
+            actual = defect_entry.structure[31].frac_coords
             np.testing.assert_array_equal(actual, [0.0, 0.0, 0.0])
 
 
