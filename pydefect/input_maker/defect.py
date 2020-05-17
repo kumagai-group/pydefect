@@ -39,3 +39,14 @@ class SimpleDefect(Defect):
     def out_atom(self):
         return self.name.split("_")[1]
 
+
+def screen_defect(defect, keywords):
+    charges = []
+    for charge in defect.charges:
+        full_name = "_".join([defect.name, str(charge)])
+        if any([re.search(keyword, full_name) for keyword in keywords]):
+            charges.append(charge)
+    if charges:
+        return Defect(defect.name, tuple(charges))
+    else:
+        return

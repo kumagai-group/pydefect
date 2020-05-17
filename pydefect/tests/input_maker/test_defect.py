@@ -4,7 +4,7 @@
 import pytest
 
 
-from pydefect.input_maker.defect import Defect, SimpleDefect
+from pydefect.input_maker.defect import Defect, SimpleDefect, screen_defect
 from pydefect.tests.helpers.assertion import assert_msonable
 
 
@@ -41,11 +41,18 @@ def test_simple_defect():
     assert defect.in_atom is None
 
 
+def test_screen_defect():
+    defect = SimpleDefect(None, "O1", [1, 2])
+    assert screen_defect(defect, ["Va_O1"]) == Defect("Va_O1", (1, 2))
+    assert screen_defect(defect, ["Va_O1_1"]) == Defect("Va_O1", (1,))
+    assert screen_defect(defect, ["Va_N1"]) is None
+
+
 """
 TODO
-- DefectCharge
-- Defect
-- SimpleDefect
+- Function that returns the screened defect from given keywords.
 
 DONE
+- Defect
+- SimpleDefect
 """
