@@ -15,6 +15,7 @@ class Defaults:
         self._symmetry_length_tolerance = 0.01
         self._symmetry_angle_tolerance = 5.0
         self._cutoff_distance_factor = 1.7
+        self._displace_distance = 0.2
         self._kpoint_density = 5.0
         self._band_gap_criterion = 0.2  # in eV
         self._integer_criterion = 0.1
@@ -42,6 +43,10 @@ class Defaults:
     @property
     def cutoff_distance_factor(self):
         return self._cutoff_distance_factor
+
+    @property
+    def displace_distance(self):
+        return self._displace_distance
 
     @property
     def kpoint_density(self):
