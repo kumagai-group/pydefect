@@ -3,9 +3,9 @@
 
 import pytest
 
-from pydefect.input_maker.defect_set import DefectSet
+from pydefect.input_maker.defect_set import DefectSet, screen_defect_set
 from pydefect.input_maker.defect_set_maker import charge_set
-from pydefect.input_maker.defect import SimpleDefect
+from pydefect.input_maker.defect import SimpleDefect, Defect
 
 
 simple_defects = {SimpleDefect(None, "O1", [1]), SimpleDefect("N", "O1", [0, 1])}
@@ -48,6 +48,11 @@ def test_charge_set():
     assert charge_set(-3) == [-3, -2, -1, 0, 1]
     assert charge_set(-2) == [-2, -1, 0]
 
+
+def test_screen_defect_set(defect_set):
+    actual = screen_defect_set(defect_set, ["N_O1_1"])
+    expected = {Defect("N_O1", (1,))}
+    assert actual == expected
 
 """
 TODO
