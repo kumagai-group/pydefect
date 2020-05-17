@@ -5,7 +5,7 @@ from typing import Iterator, List
 from typing import Set as typeSet
 
 from monty.serialization import loadfn, dumpfn
-from pydefect.input_maker.defect import screen_defect, Defect
+from pydefect.input_maker.defect import screen_simple_defect, Defect
 
 from pydefect.input_maker.defect import SimpleDefect
 
@@ -40,7 +40,7 @@ class DefectSet(Set):
 def screen_defect_set(defect_set: DefectSet, keywords: List[str]):
     result = set()
     for defect in defect_set:
-        screened = screen_defect(defect, keywords)
+        screened = screen_simple_defect(defect, keywords)
         if screened:
             result.add(screened)
-    return result
+    return DefectSet(result)

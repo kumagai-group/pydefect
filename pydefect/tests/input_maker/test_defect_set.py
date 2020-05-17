@@ -19,6 +19,7 @@ def defect_set():
 def test_defect_set(defect_set):
     assert SimpleDefect(None, "O1", [1]) in defect_set
     assert len(defect_set) == 2
+    # test iterable
     for defect in defect_set:
         defect
 
@@ -51,8 +52,8 @@ def test_charge_set():
 
 def test_screen_defect_set(defect_set):
     actual = screen_defect_set(defect_set, ["N_O1_1"])
-    expected = {Defect("N_O1", (1,))}
-    assert actual == expected
+    expected = {SimpleDefect("N", "O1", [1])}
+    assert actual == DefectSet(expected)
 
 """
 TODO
