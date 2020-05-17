@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import numpy as np
+import pytest
 
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entries_maker import (
@@ -9,49 +10,59 @@ from pydefect.input_maker.defect_entries_maker import (
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.defaults import defaults
-from pymatgen import Site
+
+from pydefect.input_maker.supercell_info import SupercellInfo, Site
 
 
-def test_defect_entries_maker(supercell_info, ortho_conventional, mocker):
+@pytest.fixture
+def cubic_supercell_info(cubic_supercell):
+    sites = {"H1": Site(element="H", wyckoff_letter="a", site_symmetry="m-3m",
+                        equivalent_atoms=list(range(32))),
+             "He1": Site(element="He", wyckoff_letter="b", site_symmetry="m-3m",
+                         equivalent_atoms=list(range(32, 64)))}
+    return SupercellInfo(cubic_supercell,
+                         "Fm-3m",
+                         [[2, 0, 0], [0, 2, 0], [0, 0, 2]], sites)
+
+
+def test_defect_entries_maker(cubic_supercell_info, cubic_supercell, mocker):
     mock = mocker.patch("pydefect.input_maker.defect_entries_maker.defaults")
     mock.displace_distance = 0.0
-    defect_set = DefectSet(defects={SimpleDefect(None, "H1", [0, 1]),
+    defect_set = DefectSet(defects={SimpleDefect(None, "H1", [1]),
                                     SimpleDefect("Ne", "He1", [0])})
-    maker = DefectEntriesMaker(supercell_info, defect_set)
+    maker = DefectEntriesMaker(cubic_supercell_info, defect_set)
 
-    va_h1_str = copy_to_structure(ortho_conventional)
+    va_h1_str = cubic_supercell.copy()
     va_h1_str.pop(0)
     va_h1_str = to_istructure(va_h1_str)
 
-    ne_he1_str = copy_to_structure(ortho_conventional)
-    coords = ne_he1_str.pop(4).frac_coords
+    ne_he1_str = cubic_supercell.copy()
+    coords = ne_he1_str.pop(32).frac_coords
     ne_he1_str.append("Ne", coords)
     ne_he1_str = to_istructure(ne_he1_str)
 
     defect_entries = {
-        DefectEntry("Ne_He1", 0, ne_he1_str, ne_he1_str.copy(), "mmm"),
-        DefectEntry("Va_H1", 0, va_h1_str, va_h1_str.copy(), "mmm"),
-        DefectEntry("Va_H1", 1, va_h1_str, va_h1_str.copy(), "mmm"),
+        DefectEntry("Ne_He1", 0, ne_he1_str, ne_he1_str.copy(), "m-3m"),
+        DefectEntry("Va_H1", 1, va_h1_str, va_h1_str.copy(), "m-3m"),
     }
 
     assert maker.defect_entries == defect_entries
 
 
-def test_defect_entries_maker_insert_host_atoms(supercell_info, mocker):
+def test_defect_entries_maker_insert_host_atoms(cubic_supercell_info, mocker):
     mock = mocker.patch("pydefect.input_maker.defect_entries_maker.defaults")
     mock.displace_distance = 0.0
 
     defect_set = DefectSet(defects={SimpleDefect("He", "H1", [0]),
                                     SimpleDefect("H", "He1", [0])})
-    maker = DefectEntriesMaker(supercell_info, defect_set)
+    maker = DefectEntriesMaker(cubic_supercell_info, defect_set)
 
     for defect_entry in maker.defect_entries:
         if defect_entry.name == "H_He1":
             actual = defect_entry.initial_structure[0].frac_coords
-            np.testing.assert_array_equal(actual, [0.0, 0.0, 0.5])
+            np.testing.assert_array_equal(actual, [0.25, 0.0, 0.0])
         if defect_entry.name == "He_H1":
-            print(defect_entry.initial_structure)
-            actual = defect_entry.initial_structure[3].frac_coords
+            actual = defect_entry.initial_structure[31].frac_coords
             np.testing.assert_array_equal(actual, [0.0, 0.0, 0.0])
 
 
@@ -92,11 +103,14 @@ def test_random_3d_vector():
     assert np.linalg.norm(actual) <= 1.0
     assert len(actual) == 3
 
+    actual = random_3d_vector(0.0)
+    assert np.linalg.norm(actual) == 0.0
+
 """
 TODO
-- Take SupercellInfo and DefectSet, return List[DefectEntry]
-- Insert host antisite atoms to the middle of structure 
 - Set cutoff  properly.
 
 DONE
+- Take SupercellInfo and DefectSet, return List[DefectEntry]
+- Insert host antisite atoms to the middle of structure 
 """

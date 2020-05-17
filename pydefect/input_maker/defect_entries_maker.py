@@ -19,8 +19,9 @@ class DefectEntriesMaker:
 
         for defect in defect_set:
             site = supercell_info.sites[defect.out_atom]
+            _, cutoff = supercell_info.coords(defect.out_atom)
             structure, perturbed_structure = \
-                self._create_defect_structure(defect, site, 1.0)
+                self._create_defect_structure(defect, site, cutoff)
 
             for charge in defect.charges:
                 self.defect_entries.add(DefectEntry(
@@ -101,4 +102,4 @@ def random_3d_vector(distance):
     x = np.sin(theta) * np.cos(phi)
     y = np.sin(theta) * np.sin(phi)
     z = np.cos(theta)
-    return np.array([x, y, z]) * np.random.uniform(distance)
+    return np.array([x, y, z]) * np.random.uniform(high=distance)
