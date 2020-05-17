@@ -33,3 +33,10 @@ def test_defect_set_maker_electroneg_diff(supercell_info):
         SimpleDefect(None, "H1", [-1, 0, 1]),
         SimpleDefect(None, "He1", [0]),
     }
+
+
+def test_defect_set_maker_screening(supercell_info):
+    defect_maker = DefectSetMaker(supercell_info, keywords=["Va_H1"])
+    expected = {SimpleDefect(None, "H1", [-1, 0, 1])}
+    assert defect_maker.defect_set.defects == expected
+
