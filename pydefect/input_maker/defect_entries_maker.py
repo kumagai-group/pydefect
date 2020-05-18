@@ -83,7 +83,7 @@ def perturb_structure(structure: Structure, center: List[float], cutoff: float
     neighboring_atoms = structure.get_sites_in_sphere(
         pt=cartesian_coords, r=cutoff, include_index=True)
 
-    assert cutoff < min(structure.lattice.lengths) / 2.0
+#    assert cutoff < min(structure.lattice.lengths) / 2.0
 
     # neighboring_atom is composed of (PeriodicSite, distance, index)
     for _, _, site_index in neighboring_atoms:
