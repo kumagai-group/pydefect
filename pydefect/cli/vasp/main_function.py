@@ -41,4 +41,4 @@ def make_defect_entries(args):
         dir_path = Path(defect_entry.full_name)
         dir_path.mkdir()
         defect_entry.perturbed_structure.to(filename=dir_path / "POSCAR")
-        defect_entry.to_json()
+        defect_entry.to_json_file(filename=dir_path / "defect_entry.json")
