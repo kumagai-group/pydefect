@@ -26,6 +26,13 @@ def simple_cubic():
 
 
 @pytest.fixture(scope="session")
+def simple_cubic_2x1x1():
+    lattice = Lattice.orthorhombic(2.0, 1.0, 1.0)
+    coords = [[0.0, 0.0, 0.0], [0.5, 0.0, 0.0]]
+    return IStructure(lattice=lattice, species=["H", "H"], coords=coords)
+
+
+@pytest.fixture(scope="session")
 def monoclinic():
     lattice = Lattice.monoclinic(3, 4, 5, 100)
     coords = [[0.0, 0.0, 0.0]]

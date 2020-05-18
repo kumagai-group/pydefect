@@ -10,19 +10,10 @@ from pydefect.input_maker.supercell import (
 from pydefect.util.error_classes import SupercellError
 
 
-@pytest.fixture
-def simple_cubic_supercell():
-    lattice = Lattice.orthorhombic(2.0, 1.0, 1.0)
-    coords = [[0.0, 0.0, 0.0], [0.5, 0.0, 0.0]]
-    results = IStructure(lattice=lattice, species=["H", "H"], coords=coords)
-
-    return results
-
-
-def test_supercell(simple_cubic, simple_cubic_supercell):
+def test_supercell(simple_cubic, simple_cubic_2x1x1):
     matrix = [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
     supercell = Supercell(input_structure=simple_cubic, matrix=matrix)
-    assert supercell.structure == simple_cubic_supercell
+    assert supercell.structure == simple_cubic_2x1x1
 
     average = (2 + 1 + 1) / 3
     expected = (abs(2 - average) + abs(1 - average) * 2) / 3 / average
