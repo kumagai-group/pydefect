@@ -4,6 +4,7 @@
 import pytest
 from pydefect.input_maker.supercell_info import Site
 from pydefect.tests.helpers.assertion import assert_msonable
+from pydefect.tests.helpers.assertion import assert_json_roundtrip
 
 
 @pytest.fixture
@@ -55,11 +56,8 @@ Fractional coordinates: 0.0000000  0.0000000  0.5000000
     assert str(supercell_info) == expected
 
 
-def test_from_json(tmpdir, supercell_info):
-    tmpdir.chdir()
-    supercell_info.to_json_file()
-    actual = supercell_info.from_json_file().as_dict()
-    assert actual == supercell_info.as_dict()
+def test_json_round_trip(supercell_info, tmpdir):
+    assert_json_roundtrip(supercell_info, tmpdir)
 
 
 """
