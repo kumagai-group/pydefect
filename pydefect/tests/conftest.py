@@ -33,6 +33,20 @@ def simple_cubic_2x1x1():
 
 
 @pytest.fixture(scope="session")
+def simple_cubic_2x2x2():
+    lattice = Lattice.cubic(2.0)
+    coords = [[0.0, 0.0, 0.0],
+              [0.5, 0.5, 0.0],
+              [0.5, 0.0, 0.5],
+              [0.0, 0.5, 0.5],
+              [0.0, 0.0, 0.5],
+              [0.0, 0.5, 0.0],
+              [0.5, 0.0, 0.0],
+              [0.5, 0.5, 0.5]]
+    return IStructure(lattice=lattice, species=["H"] * 8, coords=coords)
+
+
+@pytest.fixture(scope="session")
 def monoclinic():
     lattice = Lattice.monoclinic(3, 4, 5, 100)
     coords = [[0.0, 0.0, 0.0]]
