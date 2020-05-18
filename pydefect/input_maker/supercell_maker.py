@@ -86,4 +86,5 @@ class SupercellMaker:
 
     @property
     def transform_matrix(self):
-        return np.dot(self.conv_trans_mat, self.supercell.matrix).tolist()
+        matrix = np.dot(self.conv_trans_mat, self.supercell.matrix).astype(int)
+        return matrix.tolist()
