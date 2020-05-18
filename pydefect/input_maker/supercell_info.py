@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from pathlib import Path
 from typing import List, Tuple, Optional, Dict
 from dataclasses import dataclass
 from pymatgen import IStructure, Element
 from monty.json import MSONable
+from monty.serialization import loadfn
 from numpy.linalg import det
 from pydefect.util.structure_tools import Distances
 from pydefect.database.database import electronegativity, oxidation_state
@@ -71,3 +73,10 @@ class SupercellInfo(MSONable):
             lines.append("")
 
         return "\n".join(lines)
+
+    def to_json_file(self, filename="supercell_info.json"):
+        Path(filename).write_text(self.to_json())
+
+    @staticmethod
+    def from_json_file(filename="supercell_info.json"):
+        return loadfn(filename)

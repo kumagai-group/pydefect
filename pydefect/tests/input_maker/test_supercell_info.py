@@ -29,9 +29,6 @@ def supercell_info(ortho_conventional):
     return SupercellInfo(ortho_conventional,
                          "Fmmm",
                          [[1, 0, 0], [0, 1, 0], [0, 0, 1]], sites)
-#
-# def test(ortho_conventional):
-#     print(StructureSymmetrizer(ortho_conventional).spglib_sym_data)
 
 
 def test_supercell_info(supercell_info):
@@ -71,9 +68,16 @@ Fractional coordinates: 0.0000000  0.0000000  0.5000000
     assert str(supercell_info) == expected
 
 
+def test_from_json(tmpdir, supercell_info):
+    tmpdir.chdir()
+    supercell_info.to_json_file()
+    actual = supercell_info.from_json_file().as_dict()
+    assert actual == supercell_info.as_dict()
+
+
 """
 TODO
-- Generate default defect_in.yaml
+- Implement from_json
 
 DONE
 - Evaluate coords at Site
