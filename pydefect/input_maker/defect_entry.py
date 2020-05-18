@@ -22,3 +22,7 @@ class DefectEntry(MSONable):
             if (s1.frac_coords != s2.frac_coords).any():
                 result.append(i)
         return result
+
+    @property
+    def full_name(self):
+        return "_".join([self.name, str(self.charge)])
