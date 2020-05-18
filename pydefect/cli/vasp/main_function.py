@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from pathlib import Path
 
+from pydefect.cli.main_tools import sanitize_matrix
 from pydefect.input_maker.defect_entries_maker import DefectEntriesMaker
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.defect_set_maker import DefectSetMaker
@@ -11,7 +12,8 @@ from pydefect.input_maker.supercell_maker import SupercellMaker
 
 def make_supercell(args):
     if args.matrix:
-        maker = SupercellMaker(args.unitcell, args.matrix)
+        matrix = sanitize_matrix(args.matrix)
+        maker = SupercellMaker(args.unitcell, matrix)
     else:
         kwargs = {}
         if args.min_num_atoms:

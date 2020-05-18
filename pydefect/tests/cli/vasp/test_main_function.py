@@ -13,7 +13,7 @@ from pydefect.input_maker.supercell_info import SupercellInfo
 
 
 def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
-    matrix = [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
+    matrix = [2, 1, 1]
     args = Namespace(unitcell=simple_cubic, matrix=matrix, min_num_atoms=None, max_num_atoms=None)
 
     tmpdir.chdir()
@@ -21,7 +21,7 @@ def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
     info = SupercellInfo.from_json_file("supercell_info.json")
     assert IStructure.from_file("SPOSCAR") == simple_cubic_2x1x1
     assert info.structure == simple_cubic_2x1x1
-    assert info.transform_matrix == matrix
+    assert info.transform_matrix == [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
 
 
 def test_make_recommended_supercell(simple_cubic, simple_cubic_2x2x2, tmpdir):
