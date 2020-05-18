@@ -2,7 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from itertools import product
 from typing import Dict, List
-import re
+
 from pydefect.database.database import oxidation_state, electronegativity
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_set import DefectSet, screen_defect_set
@@ -10,12 +10,13 @@ from pydefect.input_maker.supercell_info import SupercellInfo
 
 
 class DefectSetMaker:
-    def __init__(self, supercell_info: SupercellInfo,
+    def __init__(self,
+                 supercell_info: SupercellInfo,
                  overwritten_oxi_states: Dict[str, int] = None,
                  dopants: List[str] = None,
                  ele_neg_diff: float = 2.0,
-                 keywords: List[str] = None,
-                 ):
+                 keywords: List[str] = None):
+
         self.supercell_info = supercell_info
         self._overwritten_oxi_states = overwritten_oxi_states or {}
         self._dopants = dopants or []

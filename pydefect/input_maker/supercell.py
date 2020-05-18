@@ -113,6 +113,6 @@ class TetragonalSupercells(Supercells):
         pairs = {(x, y): x * x * 2 ** y
                  for x, y in product(range(1, 10), range(8))}
         filtered = {k: v for k, v in pairs.items() if v > num}
-        return sorted(filtered, key=lambda u: pairs[u])[0]
+        return next(iter(sorted(filtered, key=lambda u: pairs[u])))
 
 
