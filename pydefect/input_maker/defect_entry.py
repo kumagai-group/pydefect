@@ -2,7 +2,10 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 from dataclasses import dataclass
+from pathlib import Path
+
 from monty.json import MSONable
+from monty.serialization import loadfn
 from pymatgen import IStructure
 
 
@@ -26,3 +29,10 @@ class DefectEntry(MSONable):
     @property
     def full_name(self):
         return "_".join([self.name, str(self.charge)])
+
+    def to_json_file(self, filename="supercell_info.json") -> None:
+        Path(filename).write_text(self.to_json())
+
+    @staticmethod
+    def from_json_file(filename="supercell_info.json") -> "SupercellInfo":
+        return loadfn(filename)

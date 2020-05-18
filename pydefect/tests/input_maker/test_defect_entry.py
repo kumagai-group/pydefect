@@ -5,8 +5,8 @@ import pytest
 from pymatgen import IStructure, Lattice
 
 from pydefect.input_maker.defect_entry import DefectEntry
-from pydefect.defaults import defaults
-from pydefect.tests.helpers.assertion import assert_msonable
+from pydefect.tests.helpers.assertion import assert_json_roundtrip, \
+    assert_msonable
 
 # "H" at [0.0, 0.0, 0.0] is removed here.
 coords = \
@@ -45,6 +45,10 @@ def test_perturbed_site_indices(defect_entry):
 
 def test_full_name(defect_entry):
     assert defect_entry.full_name == "Va_O1_1"
+
+
+def test_json(defect_entry, tmpdir):
+    assert_json_roundtrip(defect_entry, tmpdir)
 
 
 """
