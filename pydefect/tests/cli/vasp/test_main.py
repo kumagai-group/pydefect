@@ -41,42 +41,39 @@ def test_make_supercell_w_options(mocker):
     mock.from_file.assert_called_once_with("POSCAR-tmp")
 
 
-# def test_vasp_set_w_options():
-#     parsed_args = parse_args(["vs",
-#                               "--poscar", "POSCAR-tmp",
-#                               "-t", "band",
-#                               "-x", "pbesol",
-#                               "-k", "4.2",
-#                               "--potcar", "Mg_pv", "O_h",
-#                               "-c", "10",
-#                               "--user_incar_settings", "LREAD", "F",
-#                               "-d", "c",
-#                               "--vasprun", "vasprun_1",
-#                               "--outcar", "OUTCAR_1",
-#                               "--options", "encut", "800",
-#                               "--uniform_kpt_mode",
-#                               "--file_transfer_type", "WAVECAR", "C",
-#                               ])
-#
-#     expected = Namespace(
-#         poscar=Path("POSCAR-tmp"),
-#         task=Task.band,
-#         xc=Xc.pbesol,
-#         kpt_density=4.2,
-#         overridden_potcar=["Mg_pv", "O_h"],
-#         charge=10.0,
-#         user_incar_settings=["LREAD", "F"],
-#         prev_dir=Path("c"),
-#         vasprun=Path("vasprun_1"),
-#         outcar=Path("OUTCAR_1"),
-#         options=["encut", "800"],
-#         uniform_kpt_mode=True,
-#         file_transfer_type=["WAVECAR", "C"],
-#         func=parsed_args.func,
-#     )
-#
-#     assert parsed_args == expected
-#
+def test_make_defect_set_wo_options():
+    parsed_args = parse_args(["mds"])
+    expected = Namespace(
+        oxi_states=None,
+        dopants=None,
+        kwargs=None,
+        func=parsed_args.func,
+    )
+    assert parsed_args == expected
+
+
+def test_make_defect_set_w_options():
+    parsed_args = parse_args(["mds",
+                              "-o", "He", "1",
+                              "-d", "Li",
+                              "-k", "Li_H1", "Va_H1_0"])
+    expected = Namespace(
+        oxi_states=["He", "1"],
+        dopants=["Li"],
+        kwargs=["Li_H1", "Va_H1_0"],
+        func=parsed_args.func,
+    )
+    assert parsed_args == expected
+
+
+def test_make_defect_entries():
+    parsed_args = parse_args(["mde"])
+    expected = Namespace(
+        func=parsed_args.func,
+    )
+    assert parsed_args == expected
+
+
 
 """
 TODO
