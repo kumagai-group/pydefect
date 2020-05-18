@@ -8,9 +8,10 @@ from pathlib import Path
 import pytest
 from pymatgen import Lattice, IStructure, Structure
 
+from pydefect.input_maker.supercell_info import Site, SupercellInfo
+
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 # Need the following the share the fixture
-from pydefect.tests.input_maker.test_supercell_info import supercell_info
 
 
 @pytest.fixture(scope="session")
@@ -120,14 +121,14 @@ def bcc():
     return IStructure(lattice=lattice, species=["H"] * 2, coords=coords)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def tetra_close_to_cubic():
     lattice = Lattice.tetragonal(1.001 * 10 / sqrt(2), 10)
     coords = [[0.0, 0.0, 0.0]]
     return IStructure(lattice=lattice, species=["H"], coords=coords)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def ortho_conventional():
     lattice = Lattice.orthorhombic(5, 6, 7)
     coords = [
@@ -145,7 +146,7 @@ def ortho_conventional():
                       coords=coords)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def cubic_supercell():
     lattice = Lattice.cubic(10)
     coords = [
@@ -216,3 +217,14 @@ def cubic_supercell():
     ]
     return Structure(lattice=lattice, species=["H"] * 32 + ["He"] * 32,
                      coords=coords)
+
+
+@pytest.fixture(scope="session")
+def supercell_info(ortho_conventional):
+    sites = {"H1": Site(element="H", wyckoff_letter="a", site_symmetry="mmm",
+                        equivalent_atoms=[0, 1, 2, 3]),
+             "He1": Site(element="He", wyckoff_letter="b", site_symmetry="mmm",
+                         equivalent_atoms=[4, 5, 6, 7])}
+    return SupercellInfo(ortho_conventional,
+                         "Fmmm",
+                         [[1, 0, 0], [0, 1, 0], [0, 0, 1]], sites)

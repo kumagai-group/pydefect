@@ -2,10 +2,8 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import pytest
-from pymatgen import Element
-from pydefect.input_maker.supercell_info import Site, SupercellInfo
+from pydefect.input_maker.supercell_info import Site
 from pydefect.tests.helpers.assertion import assert_msonable
-from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 
 @pytest.fixture
@@ -18,17 +16,6 @@ def site():
 
 def test_msonable(site):
     assert_msonable(site)
-
-
-@pytest.fixture()
-def supercell_info(ortho_conventional):
-    sites = {"H1": Site(element="H", wyckoff_letter="a", site_symmetry="mmm",
-                        equivalent_atoms=[0, 1, 2, 3]),
-             "He1": Site(element="He", wyckoff_letter="b", site_symmetry="mmm",
-                         equivalent_atoms=[4, 5, 6, 7])}
-    return SupercellInfo(ortho_conventional,
-                         "Fmmm",
-                         [[1, 0, 0], [0, 1, 0], [0, 0, 1]], sites)
 
 
 def test_supercell_info(supercell_info):
