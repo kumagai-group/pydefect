@@ -3,8 +3,13 @@
 
 import pytest
 
-from pydefect.analyzer.defect_energy import DefectEnergy, CrossPoints, \
-    DefectEnergies
+from pydefect.analyzer.defect_energy import (
+    SingleDefectEnergy, DefectEnergy, CrossPoints, DefectEnergies)
+from pydefect.tests.helpers.assertion import assert_msonable
+
+
+def test_single_defect_energy():
+    assert_msonable(SingleDefectEnergy(name="Va_O1", charge=0, energy=1.0))
 
 
 @pytest.fixture

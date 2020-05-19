@@ -5,15 +5,15 @@ from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
+from monty.json import MSONable
 from scipy.spatial import HalfspaceIntersection
 
 
-# @dataclass
-# class DefectEnergy(MSONable):
-#     name: str
-#     charge: List[int]
-#     energy: List[float]
-#     shallow: List[bool]
+@dataclass
+class SingleDefectEnergy(MSONable):
+    name: str
+    charge: int
+    energy: float
 
 
 @dataclass
