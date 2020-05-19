@@ -5,12 +5,16 @@ from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
-from monty.json import MSONable
 from scipy.spatial import HalfspaceIntersection
 
 
+# @dataclass
+# class DefectEnergy(MSONable):
+
+
+
 @dataclass
-class DefectEnergy(MSONable):
+class DefectEnergy:
     name: str
     charges: List[int]
     energies: List[float]
@@ -47,7 +51,7 @@ class DefectEnergy(MSONable):
 
 
 @dataclass
-class CrossPoints(MSONable):
+class CrossPoints:
     inner_cross_points: List[List[float]]
     boundary_points: List[List[float]]
 

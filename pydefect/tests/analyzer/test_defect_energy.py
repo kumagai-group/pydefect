@@ -5,7 +5,6 @@ import pytest
 
 from pydefect.analyzer.defect_energy import DefectEnergy, CrossPoints, \
     DefectEnergies
-from pydefect.tests.helpers.assertion import assert_msonable
 
 
 @pytest.fixture
@@ -16,10 +15,6 @@ def defect_energy():
                         corrections=[1, 0, 0],
                         shallow=[False, False, False],
                         )
-
-
-def test_defect_energy_msonable(defect_energy):
-    assert_msonable(defect_energy)
 
 
 def test_corrected_energies(defect_energy):
@@ -37,10 +32,6 @@ def cross_points():
     inner_cross_points = [[2, 20], [3, 30], [4, 40]]
     boundary_points = [[1, 10], [5, 50]]
     return CrossPoints(inner_cross_points, boundary_points)
-
-
-def test_cross_points_msonable(cross_points):
-    assert_msonable(cross_points)
 
 
 def test_cross_points(cross_points):
@@ -62,11 +53,10 @@ def test_defect_energies(defect_energy):
 
 """
 TODO
-- Correction.
-
 - Evaluate the crossing points at given Fermi level range.
 
-- Draw a single defect
 
 DONE
+- Draw a single defect
+- Correction.
 """
