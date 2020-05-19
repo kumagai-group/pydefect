@@ -5,11 +5,12 @@ from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
+from monty.json import MSONable
 from scipy.spatial import HalfspaceIntersection
 
 
 @dataclass
-class DefectEnergy:
+class DefectEnergy(MSONable):
     name: str
     charges: List[int]
     energies: List[float]
@@ -42,22 +43,22 @@ class DefectEnergy:
             elif y > large_minus_number:
                 boundary_points.append([x, y])
 
-        all_points = boundary_points + inner_cross_points
-
-        return (sorted(all_points, key=lambda v: v[0]),
-                sorted(inner_cross_points, key=lambda v: v[0]),
-                sorted(boundary_points, key=lambda v: v[0]))
+        return CrossPoints(inner_cross_points, boundary_points)
 
 
 @dataclass
-class CrossPoints:
+class CrossPoints(MSONable):
     inner_cross_points: List[List[float]]
     boundary_points: List[List[float]]
 
     @property
-    def all_points(self):
+    def all_sorted_points(self):
         return sorted(self.boundary_points + self.inner_cross_points,
                       key=lambda v: v[0])
+
+    @property
+    def t_all_sorted_points(self):
+        return np.transpose(np.array(self.all_sorted_points)).tolist()
 
     @property
     def t_inner_cross_points(self):
@@ -78,31 +79,9 @@ class DefectEnergies:
 
     def plot(self):
         for de in self.defect_energies:
-            all_pts, cross_pts, boundaries = de.cross_points(self.vbm, self.cbm)
-            xs, ys = np.transpose(np.array(all_pts)).tolist()
-            plt.plot(xs, ys)
-            xs, ys = np.transpose(np.array(cross_pts)).tolist()
-            plt.scatter(xs, ys, marker="o")
+            cp = de.cross_points(self.vbm, self.cbm)
+            plt.plot(*cp.t_all_sorted_points)
+            plt.scatter(*cp.t_inner_cross_points, marker="o")
+            plt.scatter(*cp.t_boundary_points)
 
         return plt
-
-        # # Add points between x_min and x_max
-        # for cp, charges in zip(tl["cross_points"], tl["charges"]):
-        #     if x_min < cp[0] - self.vbm < x_max:
-        #         cross_points.append([cp[0] - self.vbm, cp[1]])
-        #         # need to sort the charge.
-        #         charge_set.add(sorted(charges)[1])
-        #         y_min, y_max = min([cp[1], y_min]), max([cp[1], y_max])
-        #         ax.scatter(x=cp[0] - self.vbm,
-        #                    y=cp[1],
-        #                    marker='o',
-        #                    color=color[i])
-
-        # # Add the plot point at x_max
-        # charge, y = \
-        #     min_e_at_ef(self.defect_energies[name], x_max + self.vbm)
-        # cross_points.append([x_max, y])
-        # charge_set.add(charge)
-        # y_min, y_max = min([y, y_min]), max([y, y_max])
-        # if min(charge_set) > 0:
-        #     ax.plot(x_max, y, marker="o", mec=color[i], mfc="white")

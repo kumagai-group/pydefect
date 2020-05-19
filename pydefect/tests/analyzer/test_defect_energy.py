@@ -5,6 +5,7 @@ import pytest
 
 from pydefect.analyzer.defect_energy import DefectEnergy, CrossPoints, \
     DefectEnergies
+from pydefect.tests.helpers.assertion import assert_msonable
 
 
 @pytest.fixture
@@ -17,24 +18,34 @@ def defect_energy():
                         )
 
 
+def test_defect_energy_msonable(defect_energy):
+    assert_msonable(defect_energy)
+
+
 def test_corrected_energies(defect_energy):
     assert defect_energy.corrected_energies == [6, 3, -4]
 
 
 def test_defect_energy_cross_points(defect_energy):
     actual = defect_energy.cross_points(1, 6)
-    expected = ([[1.0, -2.0], [5.0, 6.0], [6.0, 6.0]],
-                [[5.0, 6.0]],
-                [[1.0, -2.0], [6.0, 6.0]])
+    expected = CrossPoints([[5.0, 6.0]], [[1.0, -2.0], [6.0, 6.0]])
     assert actual == expected
 
 
-def test_cross_points():
+@pytest.fixture
+def cross_points():
     inner_cross_points = [[2, 20], [3, 30], [4, 40]]
     boundary_points = [[1, 10], [5, 50]]
-    cross_points = CrossPoints(inner_cross_points, boundary_points)
+    return CrossPoints(inner_cross_points, boundary_points)
 
-    assert cross_points.all_points == [[1, 10], [2, 20], [3, 30], [4, 40], [5, 50]]
+
+def test_cross_points_msonable(cross_points):
+    assert_msonable(cross_points)
+
+
+def test_cross_points(cross_points):
+    assert cross_points.all_sorted_points == [[1, 10], [2, 20], [3, 30], [4, 40], [5, 50]]
+    assert cross_points.t_all_sorted_points == [[1, 2, 3, 4, 5], [10, 20, 30, 40, 50]]
     assert cross_points.t_inner_cross_points == [[2, 3, 4], [20, 30, 40]]
     assert cross_points.t_boundary_points == [[1, 5], [10, 50]]
 
