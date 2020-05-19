@@ -10,7 +10,10 @@ from scipy.spatial import HalfspaceIntersection
 
 # @dataclass
 # class DefectEnergy(MSONable):
-
+#     name: str
+#     charge: List[int]
+#     energy: List[float]
+#     shallow: List[bool]
 
 
 @dataclass
@@ -18,17 +21,11 @@ class DefectEnergy:
     name: str
     charges: List[int]
     energies: List[float]
-    corrections: List[float]
-    shallow: List[bool]
-
-    @property
-    def corrected_energies(self):
-        return [e + c for e, c in zip(self.energies, self.corrections)]
 
     def cross_points(self, ef_min, ef_max):
         large_minus_number = -1e4
         half_spaces = []
-        for charge, energy in zip(self.charges, self.corrected_energies):
+        for charge, energy in zip(self.charges, self.energies):
             half_spaces.append([-charge, 1, -energy])
 
         half_spaces.append([-1, 0, ef_min])

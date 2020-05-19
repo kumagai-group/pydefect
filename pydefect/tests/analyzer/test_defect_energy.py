@@ -11,14 +11,7 @@ from pydefect.analyzer.defect_energy import DefectEnergy, CrossPoints, \
 def defect_energy():
     return DefectEnergy(name="Va_O1",
                         charges=[0, 1, 2],
-                        energies=[5, 3, -4],
-                        corrections=[1, 0, 0],
-                        shallow=[False, False, False],
-                        )
-
-
-def test_corrected_energies(defect_energy):
-    assert defect_energy.corrected_energies == [6, 3, -4]
+                        energies=[6, 3, -4])
 
 
 def test_defect_energy_cross_points(defect_energy):
