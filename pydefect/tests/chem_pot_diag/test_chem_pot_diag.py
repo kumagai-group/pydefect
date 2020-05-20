@@ -27,12 +27,23 @@ def test_chem_pot_diag(cpd):
                                          [[0.0, -3.0], [-1.5, 0.0]])
 
 
+def test_chem_pot_diag_min_energy(cpd):
+    assert cpd.min_rel_energies == -3.3
+
+
 def test_cpd_plot_info(cpd):
     cpd_plot_info = CpdPlotInfo(cpd, target=Composition("H2O"), min_range=-10)
     assert cpd_plot_info.comp_vertices == {'H2': [[0.0, -10.0], [0.0, -3.0]],
                                            'H2O': [[0.0, -3.0], [-1.5, 0.0]],
                                            'O2': [[-10.0, 0.0], [-1.5, 0.0]]}
     assert cpd_plot_info.target_vertices == {"A": [0.0, -3.0], "B": [-1.5, 0.0]}
+
+
+def test_cpd_plot_info_with_defaults(cpd):
+    cpd_plot_info = CpdPlotInfo(cpd)
+    assert cpd_plot_info.comp_vertices == {'H2': [[0.0, -3.0], [0.0, -3.3]],
+                                           'H2O': [[-1.5, 0.0], [0.0, -3.0]],
+                                           'O2': [[-3.3, 0.0], [-1.5, 0.0]]}
 
 """
 TODO

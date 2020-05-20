@@ -57,6 +57,10 @@ class ChemPotDiag:
 
         return result
 
+    @property
+    def min_rel_energies(self):
+        return round(min(sum([list(l) for l in self.vertex_coords], [])) * 1.1, ndigits=4)
+
     def get_half_space_intersection(self, min_range):
         half_spaces = []
         for c, e in self.rel_energies.items():
@@ -77,16 +81,19 @@ class CpdPlotInfo:
                  cpd: ChemPotDiag,
                  target: Optional[Composition] = None,
                  min_range: Optional[float] = None):
-        self._cpd = cpd
-        self.comp_vertices = self._get_comp_vertices(min_range)
-        self.target = target.reduced_formula
+        self.cpd = cpd
+        self.target = target.reduced_formula if target else None
+        self.min_range = min_range or self.cpd.min_rel_energies
+
+        self.dim = cpd.dim
+        self.comp_vertices = self._get_comp_vertices(self.min_range)
 
     def _get_comp_vertices(self, min_range):
-        hs = self._cpd.get_half_space_intersection(min_range)
+        hs = self.cpd.get_half_space_intersection(min_range)
         intersections = hs.intersections.tolist()
         result = {}
-        for c, e in self._cpd.rel_energies.items():
-            frac_comp = self._cpd.frac_composition(c)
+        for c, e in self.cpd.rel_energies.items():
+            frac_comp = self.cpd.frac_composition(c)
 
             def on_the_composition(coord):
                 diff = sum([x * y for x, y in zip(frac_comp, coord)]) - e
