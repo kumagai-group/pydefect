@@ -10,20 +10,21 @@ from scipy.spatial.qhull import HalfspaceIntersection
 class ChemPotDiag:
     def __init__(self, energies: Dict[Composition, float]):
         self.abs_energies = {c: e / c.num_atoms for c, e in energies.items()}
-        self.vertex_elements = self._get_vertices()
+        self.vertex_elements = self._get_vertex_elements()
         self.dim = len(self.vertex_elements)
         self.offset_to_abs = self._get_offset_to_abs()
         self.rel_energies = self._get_rel_energies()
         self.vertex_coords = self._get_vertex_coords()
 
-    def _get_vertices(self):
+    def _get_vertex_elements(self):
         elements = sum(list(c.elements for c in self.abs_energies.keys()), [])
-        return sorted(list(set(elements)))
+        sorted_elements = sorted(list(set(elements)))
+        return [str(e) for e in sorted_elements]
 
     def _get_offset_to_abs(self):
         result = []
         for vertex_element in self.vertex_elements:
-            target = Composition(str(vertex_element)).reduced_formula
+            target = Composition(vertex_element).reduced_formula
             candidates = filter(lambda x: x[0].reduced_formula == target,
                                 self.abs_energies.items())
             result.append(min([x[1] for x in candidates]))
