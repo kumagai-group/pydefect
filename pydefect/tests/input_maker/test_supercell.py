@@ -2,8 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import numpy as np
 import pytest
-from math import sqrt
-from pymatgen import Lattice, IStructure
+from pymatgen import Element
 
 from pydefect.input_maker.supercell import (
     Supercell, Supercells, TetragonalSupercells, RhombohedralSupercells)
@@ -18,6 +17,14 @@ def test_supercell(simple_cubic, simple_cubic_2x1x1):
     average = (2 + 1 + 1) / 3
     expected = (abs(2 - average) + abs(1 - average) * 2) / 3 / average
     assert supercell.isotropy == expected
+
+
+def test_supercell_species_order(complex_monoclinic):
+    matrix = [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
+    supercell = Supercell(input_structure=complex_monoclinic, matrix=matrix)
+    actual = [e.specie for e in supercell.structure]
+    expected = [Element.H] * 2 + [Element.He] * 8
+    assert actual == expected
 
 
 def test_supercell_average_angle(monoclinic):
