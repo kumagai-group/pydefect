@@ -7,12 +7,15 @@ import numpy as np
 from pymatgen import Composition
 from scipy.spatial.qhull import HalfspaceIntersection
 
+from pydefect.error import PydefectError
+
 alphabets = list(string.ascii_uppercase)
 
 
 class ChemPotDiag:
     def __init__(self, energies: Dict[Composition, float]):
-        self.abs_energies = {c: e / c.num_atoms for c, e in energies.items()}
+        self.abs_energies = {c.reduced_composition: e / c.num_atoms
+                             for c, e in energies.items()}
         self.compounds = self.abs_energies.keys()
         self.vertex_elements = self._get_vertex_elements()
         self.dim = len(self.vertex_elements)
@@ -22,16 +25,18 @@ class ChemPotDiag:
 
     def _get_vertex_elements(self):
         elements = sum(list(c.elements for c in self.compounds), [])
-        sorted_elements = sorted(list(set(elements)))
-        return [str(e) for e in sorted_elements]
+        return sorted(list(set(elements)))
 
     def _get_offset_to_abs(self):
         result = []
         for vertex_element in self.vertex_elements:
-            target = Composition(vertex_element).reduced_formula
-            candidates = filter(lambda x: x[0].reduced_formula == target,
+            target = Composition({vertex_element: 1.0}).reduced_composition
+            candidates = filter(lambda x: x[0] == target,
                                 self.abs_energies.items())
-            result.append(min([x[1] for x in candidates]))
+            try:
+                result.append(min([x[1] for x in candidates]))
+            except ValueError:
+                raise NoElementEnergyError
         return result
 
     def _get_rel_energies(self):
@@ -82,7 +87,7 @@ class CpdPlotInfo:
                  target: Optional[Composition] = None,
                  min_range: Optional[float] = None):
         self.cpd = cpd
-        self.target = target.reduced_formula if target else None
+        self.target = target.reduced_composition if target else None
         self.min_range = min_range or self.cpd.min_rel_energies
 
         self.dim = cpd.dim
@@ -103,10 +108,23 @@ class CpdPlotInfo:
                       for i in intersections if on_the_composition(i)]
 
             if coords:
-                result[c.reduced_formula] = coords
+                result[c] = coords
 
         return result
 
     @property
+    def comp_centers(self):
+        return {c: np.average(np.array(v), axis=0).tolist()
+                for c, v in self.comp_vertices.items()}
+
+    def atomic_fractions(self, composition: Composition):
+        return [composition.get_atomic_fraction(e)
+                for e in self.cpd.vertex_elements]
+
+    @property
     def target_vertices(self):
         return dict(zip(alphabets, self.comp_vertices[self.target]))
+
+
+class NoElementEnergyError(PydefectError):
+    pass
