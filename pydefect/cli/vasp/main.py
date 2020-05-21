@@ -18,9 +18,7 @@ def parse_args(args):
         description="""                            
     pydefect is a package that helps researchers to do first-principles point 
     defect calculations with the VASP code.""",
-        epilog=f"""                                 
-    Author: Yu Kumagai
-    Version: {__version__}""",
+        epilog=f"Author: Yu Kumagai Version: {__version__}",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     subparsers = parser.add_subparsers()
