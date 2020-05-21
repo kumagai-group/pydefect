@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from dataclasses import dataclass
 from typing import List
 
 import numpy as np
-from dataclasses import dataclass
-
 from pymatgen import IStructure
 
 
-@dataclass()
+@dataclass
 class CalcResults:
     structure: IStructure
     site_symmetry: str
