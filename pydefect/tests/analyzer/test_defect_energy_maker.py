@@ -6,6 +6,7 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import SingleDefectEnergy
 from pydefect.analyzer.defect_energy_maker import SingleDefectEnergyMaker, \
     num_atom_differences, reservoir_energy
+from pydefect.corrections.manual_correction import ManualCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
 
 
@@ -26,8 +27,9 @@ def test_single_defect_energy_maker(mocker):
     maker = SingleDefectEnergyMaker(perfect=perfect,
                                     defect=defect,
                                     defect_entry=defect_entry,
-                                    abs_chem_pot={Element.H: 100})
-    energy = 3.0 - 1.0 - 100
+                                    abs_chem_pot={Element.H: 100},
+                                    correction=ManualCorrection(7.0))
+    energy = (3.0 + 7.0) - 1.0 - 100
 
     assert isinstance(maker.single_defect_energy, SingleDefectEnergy)
     assert maker.single_defect_energy == SingleDefectEnergy(name, charge, energy)

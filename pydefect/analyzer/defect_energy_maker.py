@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from typing import Dict
+from typing import Dict, Optional
 
 from pymatgen import Element, IStructure
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import SingleDefectEnergy
+from pydefect.corrections.abs_correction import Correction
+from pydefect.corrections.manual_correction import NoCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
 
 
@@ -14,11 +16,12 @@ class SingleDefectEnergyMaker:
                  perfect: CalcResults,
                  defect: CalcResults,
                  defect_entry: DefectEntry,
-                 abs_chem_pot: Dict[Element, float]):
+                 abs_chem_pot: Dict[Element, float],
+                 correction: Optional[Correction] = NoCorrection):
         name = defect_entry.name
         charge = defect_entry.charge
         n_diffs = num_atom_differences(defect.structure, perfect.structure)
-        energy = (defect.energy - perfect.energy
+        energy = (defect.energy + correction.correction_energy - perfect.energy
                   + reservoir_energy(n_diffs, abs_chem_pot))
         self.single_defect_energy = SingleDefectEnergy(name, charge, energy)
 
