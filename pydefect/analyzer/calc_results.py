@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Optional
 
-import numpy as np
+from monty.json import MSONable
+from monty.serialization import loadfn
 from pymatgen import IStructure
 
 
 @dataclass
-class CalcResults:
+class CalcResults(MSONable):
     structure: IStructure
     site_symmetry: str
     energy: float
     magnetization: float
-    eigenvalues: np.array
     kpoint_coords: List[List[float]]
     kpoint_weights: List[float]
     electrostatic_potential: List[float]
@@ -23,3 +24,9 @@ class CalcResults:
     electronic_conv: Optional[bool] = None
     ionic_conv: Optional[bool] = None
 
+    def to_json_file(self, filename: str = "calc_results.json") -> None:
+        Path(filename).write_text(self.to_json())
+
+    @classmethod
+    def from_json_file(cls, filename: str = "calc_results.json"):
+        return loadfn(filename)
