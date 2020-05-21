@@ -18,7 +18,7 @@ energies = {Composition("H"): 0.0,
 
 @pytest.fixture
 def cpd():
-    return ChemPotDiag(energies)
+    return ChemPotDiag(energies, target=Composition("H2"))
 
 
 def test_chem_pot_diag(cpd):
@@ -27,6 +27,7 @@ def test_chem_pot_diag(cpd):
     assert cpd.rel_energies[Composition("H2O")] == (-2.0 - 1.0) / 3
     np.testing.assert_array_almost_equal(cpd.vertex_coords,
                                          [[0.0, -3.0], [-1.5, 0.0]])
+    np.testing.assert_array_almost_equal(cpd.target_vertices["A"], [0.0, -3.0])
 
 
 def test_cpd_plot_info_lacking_element_data():
@@ -42,13 +43,13 @@ def test_chem_pot_diag_min_energy(cpd):
 
 @pytest.fixture(scope="session")
 def cpd_plot_info():
-    cpd = ChemPotDiag(energies)
-    return CpdPlotInfo(cpd, target=Composition("H2"), min_range=-10)
+    cpd = ChemPotDiag(energies, target=Composition("H2O"))
+    return CpdPlotInfo(cpd, min_range=-10)
 
 
 @pytest.fixture
 def cpd_plot_info_wo_min_range(cpd):
-    return CpdPlotInfo(cpd, target=Composition("H4O2"))
+    return CpdPlotInfo(cpd)
 
 
 def test_cpd_plot_info(cpd_plot_info):
@@ -59,7 +60,6 @@ def test_cpd_plot_info(cpd_plot_info):
                                           Composition('H2O'): [-0.75, -1.5],
                                           Composition('O2'): [-5.75, 0.0]}
     assert cpd_plot_info.atomic_fractions(Composition('H2O')) == [2 / 3, 1 / 3]
-    assert cpd_plot_info.target_vertices == {"A": [0.0, -3.0]}
 
 
 def test_cpd_plot_info_with_defaults(cpd_plot_info_wo_min_range):

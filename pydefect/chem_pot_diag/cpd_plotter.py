@@ -95,7 +95,8 @@ class ChemPotDiagPlotter(ABC):
         pass
 
     def _text_color(self, composition):
-        if self.info.target and composition == self.info.target:
+        print(composition, self.info.cpd.target)
+        if self.info.cpd.target and composition == self.info.cpd.target:
             return self._mpl_defaults.target_comp_text_color
         return self._mpl_defaults.comp_text_color
 
@@ -106,8 +107,8 @@ class ChemPotDiagPlotter(ABC):
         self._ax.set_title(title)
 
     def _add_alphabet_labels(self):
-        if self.info.target:
-            for label, cp in self.info.target_vertices.items():
+        if self.info.cpd.target:
+            for label, cp in self.info.cpd.target_vertices.items():
                 self._ax.text(*transpose(cp), label, **self._mpl_defaults.alphabet_label)
 
 
@@ -167,7 +168,6 @@ class ChemPotDiag3DPlotter(ChemPotDiagPlotter):
         pass
 
     def draw_simplex(self, composition):
-        print(composition, type(composition))
         vertex_coords = self.info.comp_vertices[composition]
         atomic_fractions = self.info.atomic_fractions(composition)
         face = Poly3DCollection([sort_coords(np.array(vertex_coords))])

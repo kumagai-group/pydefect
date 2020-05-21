@@ -24,8 +24,8 @@ energies = {Composition("H"): 0.0,
 
 @pytest.fixture
 def cpd_3d_info():
-    cpd = ChemPotDiag(energies)
-    return CpdPlotInfo(cpd, target=Composition("H2O"))
+    cpd = ChemPotDiag(energies, target=Composition("H2O"))
+    return CpdPlotInfo(cpd)
 
 
 @pytest.mark.skipif(False, reason="")
