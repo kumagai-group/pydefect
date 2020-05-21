@@ -15,8 +15,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 
 
 @pytest.fixture(scope="session")
-def test_data_files():
-    return Path(__file__).parent / "test_data_files"
+def vasp_files():
+    return Path(__file__).parent / "vasp_files"
 
 
 @pytest.fixture(scope="session")
@@ -63,8 +63,8 @@ def complex_monoclinic():
               [0.2, 0.0, 0.0],
               [0.8, 0.0, 0.0]]
     return IStructure(lattice=lattice,
-                          species=["H", "He", "He", "He", "He"],
-                          coords=coords)
+                      species=["H", "He", "He", "He", "He"],
+                      coords=coords)
 
 
 @pytest.fixture(scope="session")
