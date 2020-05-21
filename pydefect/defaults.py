@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
-from monty.design_patterns import singleton
 from pathlib import Path
-from vise.input_set.datasets.potcar_set import PotcarSet
-from vise.input_set.task import Task
-from vise.input_set.xc import Xc
+
+from monty.design_patterns import singleton
 from vise.user_settings import UserSettings
 
 
 @singleton
 class Defaults:
     def __init__(self):
-        self._symmetry_length_tolerance = 0.01
+        self._symmetry_length_tolerance = 0.1
         self._symmetry_angle_tolerance = 5.0
         self._cutoff_distance_factor = 1.7
         self._displace_distance = 0.2
