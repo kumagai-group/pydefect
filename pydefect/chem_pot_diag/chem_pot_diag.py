@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import string
+from itertools import chain
 from typing import Dict, Optional
 
 import numpy as np
@@ -69,7 +70,7 @@ class ChemPotDiag:
 
     @property
     def min_rel_energies(self):
-        return round(min(sum([list(l) for l in self.vertex_coords], [])) * 1.1, ndigits=4)
+        return min(chain(*self.vertex_coords))
 
     def get_half_space_intersection(self, min_range):
         half_spaces = []
@@ -93,13 +94,18 @@ class ChemPotDiag:
         return {next(label): c for c in self.vertex_coords
                 if on_composition(fractions, c, energy)}
 
+    def abs_chem_pot_dict(self, label):
+        rel_chem_pots = self.target_vertices[label]
+        abs_chem_pots = [x + y for x, y in zip(rel_chem_pots, self.offset_to_abs)]
+        return dict(zip(self.vertex_elements, abs_chem_pots))
+
 
 class CpdPlotInfo:
     def __init__(self,
                  cpd: ChemPotDiag,
                  min_range: Optional[float] = None):
         self.cpd = cpd
-        self.min_range = min_range or self.cpd.min_rel_energies
+        self.min_range = min_range or self.cpd.min_rel_energies * 1.1
 
         self.dim = cpd.dim
         self.comp_vertices = self._get_comp_vertices(self.min_range)

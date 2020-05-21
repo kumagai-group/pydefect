@@ -30,6 +30,10 @@ def test_chem_pot_diag(cpd):
     np.testing.assert_array_almost_equal(cpd.target_vertices["A"], [0.0, -3.0])
 
 
+def test_abs_chem_pots(cpd):
+    assert cpd.abs_chem_pot_dict("A") == {Element.H: 0.0, Element.O: -3.0 + 1.0}
+
+
 def test_cpd_plot_info_lacking_element_data():
     new_energies = deepcopy(energies)
     new_energies[Composition("MgO")] = -3.0
@@ -38,7 +42,7 @@ def test_cpd_plot_info_lacking_element_data():
 
 
 def test_chem_pot_diag_min_energy(cpd):
-    assert cpd.min_rel_energies == -3.3
+    assert cpd.min_rel_energies == -3
 
 
 @pytest.fixture(scope="session")
