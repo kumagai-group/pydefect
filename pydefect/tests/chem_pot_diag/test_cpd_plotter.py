@@ -9,6 +9,9 @@ from pydefect.chem_pot_diag.cpd_plotter import (
     ChemPotDiag2DPlotter, transpose, sort_coords, ChemPotDiag3DPlotter)
 
 
+# For fixture
+
+
 @pytest.mark.skipif(False, reason="")
 def test_cpd_2d_draw(cpd_plot_info):
     plotter = ChemPotDiag2DPlotter(cpd_plot_info)
