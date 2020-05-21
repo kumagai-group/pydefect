@@ -95,7 +95,6 @@ class ChemPotDiagPlotter(ABC):
         pass
 
     def _text_color(self, composition):
-        print(composition, self.info.cpd.target)
         if self.info.cpd.target and composition == self.info.cpd.target:
             return self._mpl_defaults.target_comp_text_color
         return self._mpl_defaults.comp_text_color
@@ -109,7 +108,8 @@ class ChemPotDiagPlotter(ABC):
     def _add_alphabet_labels(self):
         if self.info.cpd.target:
             for label, cp in self.info.cpd.target_vertices.items():
-                self._ax.text(*transpose(cp), label, **self._mpl_defaults.alphabet_label)
+                self._ax.text(*transpose(cp), label,
+                              **self._mpl_defaults.alphabet_label)
 
 
 def transpose(target_list) -> list:
@@ -142,8 +142,6 @@ class ChemPotDiag2DPlotter(ChemPotDiagPlotter):
         vertex_coords = self.info.comp_vertices[composition]
         plt.plot(*transpose(vertex_coords), **self._mpl_defaults.simplex_2d)
 
-        return vertex_coords
-
 
 class ChemPotDiag3DPlotter(ChemPotDiagPlotter):
     def _add_ax(self):
@@ -170,11 +168,11 @@ class ChemPotDiag3DPlotter(ChemPotDiagPlotter):
     def draw_simplex(self, composition):
         vertex_coords = self.info.comp_vertices[composition]
         atomic_fractions = self.info.atomic_fractions(composition)
+
         face = Poly3DCollection([sort_coords(np.array(vertex_coords))])
         face.set_color(self._3d_simplex_color(atomic_fractions))
         face.set_edgecolor("black")
         self._ax.add_collection3d(face)
-        return vertex_coords
 
     def _3d_simplex_color(self, atomic_fractions):
         return [(f + 1.5) / 2.5 for f in atomic_fractions]
