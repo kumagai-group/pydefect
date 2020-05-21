@@ -6,7 +6,7 @@ from pymatgen import Element, IStructure
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import SingleDefectEnergy
-from pydefect.corrections.abs_correction import Correction
+from pydefect.corrections.abstract_correction import Correction
 from pydefect.corrections.manual_correction import NoCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
 

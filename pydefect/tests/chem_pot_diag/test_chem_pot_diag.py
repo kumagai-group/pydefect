@@ -45,7 +45,7 @@ def test_chem_pot_diag_min_energy(cpd):
     assert cpd.min_rel_energies == -3
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def cpd_plot_info():
     cpd = ChemPotDiag(energies, target=Composition("H2O"))
     return CpdPlotInfo(cpd, min_range=-10)
