@@ -9,24 +9,25 @@ from pydefect.chem_pot_diag.cpd_plotter import (
     ChemPotDiag2DPlotter, transpose, sort_coords, ChemPotDiag3DPlotter)
 
 
-# For fixture
-
-
 @pytest.mark.skipif(False, reason="")
-def test_cpd_2d_draw(cpd_plot_info):
+def test_cpd_2d_draw():
+    energies = {Composition("H"): 0.0,
+                Composition("O"): 1.0,
+                Composition("H4O2"): -4.0}
+    cpd = ChemPotDiag(energies, target=Composition("H2O"))
+    cpd_plot_info = CpdPlotInfo(cpd, min_range=-10)
+
     plotter = ChemPotDiag2DPlotter(cpd_plot_info)
     plotter.draw_diagram().show()
 
 
-energies = {Composition("H"): 0.0,
-            Composition("O"): 1.0,
-            Composition("H2O"): -2.0,
-            Composition("Mg"): 0.0,
-            Composition("MgO"): -3.0}
-
-
 @pytest.fixture
 def cpd_3d_info():
+    energies = {Composition("H"): 0.0,
+                Composition("O"): 1.0,
+                Composition("H2O"): -2.0,
+                Composition("Mg"): 0.0,
+                Composition("MgO"): -3.0}
     cpd = ChemPotDiag(energies, target=Composition("H2O"))
     return CpdPlotInfo(cpd)
 
