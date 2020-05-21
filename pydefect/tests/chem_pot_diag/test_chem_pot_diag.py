@@ -43,7 +43,7 @@ def test_chem_pot_diag_min_energy(cpd):
 @pytest.fixture(scope="session")
 def cpd_plot_info():
     cpd = ChemPotDiag(energies)
-    return CpdPlotInfo(cpd, target=Composition("H2O"), min_range=-10)
+    return CpdPlotInfo(cpd, target=Composition("H2"), min_range=-10)
 
 
 @pytest.fixture
@@ -59,7 +59,7 @@ def test_cpd_plot_info(cpd_plot_info):
                                           Composition('H2O'): [-0.75, -1.5],
                                           Composition('O2'): [-5.75, 0.0]}
     assert cpd_plot_info.atomic_fractions(Composition('H2O')) == [2 / 3, 1 / 3]
-    assert cpd_plot_info.target_vertices == {"A": [0.0, -3.0], "B": [-1.5, 0.0]}
+    assert cpd_plot_info.target_vertices == {"A": [0.0, -3.0]}
 
 
 def test_cpd_plot_info_with_defaults(cpd_plot_info_wo_min_range):

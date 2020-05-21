@@ -123,7 +123,9 @@ class CpdPlotInfo:
 
     @property
     def target_vertices(self):
-        return dict(zip(alphabets, self.comp_vertices[self.target]))
+        label = iter(alphabets)
+        vertices = self.comp_vertices[self.target]
+        return {next(label): c for c in vertices if min(c) != self.min_range}
 
 
 class NoElementEnergyError(PydefectError):
