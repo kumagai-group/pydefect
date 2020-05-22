@@ -1,9 +1,31 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-
+import pytest
 from pymatgen import Structure
 
-from pydefect.analyzer.defect_structure import symmetrize_defect_structure
+from pydefect.analyzer.defect_structure import symmetrize_defect_structure, \
+    DefectStructure
+from pydefect.tests.helpers.assertion import assert_msonable
+
+
+@pytest.fixture
+def defect_structure(cubic_supercell_w_vacancy,
+                     cubic_supercell_w_vacancy_w_perturb):
+    return DefectStructure(name="test",
+                           charge=1,
+                           initial_structure=cubic_supercell_w_vacancy,
+                           final_structure=cubic_supercell_w_vacancy_w_perturb,
+                           initial_symmetry="m-3m",
+                           final_symmetry="4mm",
+                           defect_center=[0.0, 0.0, 0.0])
+
+
+def test_defect_structure_msonable(defect_structure):
+    assert_msonable(defect_structure)
+
+
+def test_defect_structure_anchor_atom_index(defect_structure):
+    assert defect_structure.anchor_atom_index == 6
 
 
 def test_symmetrize_defect_structure():
@@ -43,12 +65,9 @@ Direct
     assert actual == expected
 
 
-
-
-
 """
 TODO
--
+- Add anchor_atom_index
 
 DONE
 """
