@@ -3,10 +3,11 @@
 from dataclasses import dataclass
 
 import numpy as np
+from monty.json import MSONable
 
 
 @dataclass
-class Unitcell:
+class Unitcell(MSONable):
     vbm: float
     cbm: float
     ele_dielectric_const: np.array
