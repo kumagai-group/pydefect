@@ -28,7 +28,8 @@ def defect_entry():
                        charge=1,
                        structure=rocksalt,
                        perturbed_structure=perturbed_rocksalt,
-                       site_symmetry="m-3m")
+                       site_symmetry="m-3m",
+                       defect_center=[0, 0, 0])
 
 
 def test_msonable(defect_entry):
@@ -49,6 +50,10 @@ def test_full_name(defect_entry):
 
 def test_json(defect_entry, tmpdir):
     assert_json_roundtrip(defect_entry, tmpdir)
+
+
+def test_anchor_atom_index(defect_entry):
+    assert defect_entry.anchor_atom_index == 6
 
 
 """
