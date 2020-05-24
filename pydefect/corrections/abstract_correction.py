@@ -2,10 +2,9 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 from abc import ABC, abstractmethod
-import json
 from pathlib import Path
 
-from monty.json import MSONable, MontyEncoder
+from monty.json import MSONable
 from monty.serialization import loadfn
 
 
@@ -15,9 +14,9 @@ class Correction(ABC, MSONable):
     def correction_energy(self):
         pass
 
-    def to_json_file(self, filename: str) -> None:
+    def to_json_file(self, filename: str = "correction.json") -> None:
         Path(filename).write_text(self.to_json())
 
     @classmethod
-    def load_json(cls, filename):
+    def from_json_file(cls, filename: str = "correction.json"):
         return loadfn(filename)
