@@ -25,10 +25,10 @@ def parse_args(args):
 
     # -- make_supercell ------------------------------------------------
     parser_make_supercell = subparsers.add_parser(
-        name="make_supercell",
+        name="supercell",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['ms'])
+        aliases=['s'])
 
     parser_make_supercell.add_argument(
         "-p", "--unitcell",
@@ -52,10 +52,10 @@ def parse_args(args):
 
     # -- make_defect_set ------------------------------------------------
     parser_make_defect_set = subparsers.add_parser(
-        name="make_defect_set",
+        name="defect_set",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['mds'])
+        aliases=['ds'])
 
     parser_make_defect_set.add_argument(
         "-o", "--oxi_states",
@@ -74,10 +74,10 @@ def parse_args(args):
 
     # -- make_defect_entries ------------------------------------------------
     parser_make_defect_entries = subparsers.add_parser(
-        name="make_defect_entries",
+        name="defect_entries",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['mde'])
+        aliases=['de'])
 
     parser_make_defect_entries.set_defaults(func=make_defect_entries)
     return parser.parse_args(args)

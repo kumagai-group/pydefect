@@ -7,7 +7,7 @@ from pydefect.cli.vasp.main import parse_args
 
 def test_make_supercell_wo_options(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.IStructure")
-    parsed_args = parse_args(["ms"])
+    parsed_args = parse_args(["s"])
     # func is a pointer so need to point the same address.
     expected = Namespace(
         unitcell=mock.from_file.return_value,
@@ -22,7 +22,7 @@ def test_make_supercell_wo_options(mocker):
 
 def test_make_supercell_w_options(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.IStructure")
-    parsed_args = parse_args(["ms",
+    parsed_args = parse_args(["s",
                               "-p", "POSCAR-tmp",
                               "--matrix", "1", "2", "3",
                               "--min_num_atoms", "1000",
@@ -42,7 +42,7 @@ def test_make_supercell_w_options(mocker):
 
 
 def test_make_defect_set_wo_options():
-    parsed_args = parse_args(["mds"])
+    parsed_args = parse_args(["ds"])
     expected = Namespace(
         oxi_states=None,
         dopants=None,
@@ -53,7 +53,7 @@ def test_make_defect_set_wo_options():
 
 
 def test_make_defect_set_w_options():
-    parsed_args = parse_args(["mds",
+    parsed_args = parse_args(["ds",
                               "-o", "He", "1",
                               "-d", "Li",
                               "-k", "Li_H1", "Va_H1_0"])
@@ -67,7 +67,7 @@ def test_make_defect_set_w_options():
 
 
 def test_make_defect_entries():
-    parsed_args = parse_args(["mde"])
+    parsed_args = parse_args(["de"])
     expected = Namespace(
         func=parsed_args.func,
     )
