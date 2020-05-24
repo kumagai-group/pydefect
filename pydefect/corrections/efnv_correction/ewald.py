@@ -65,60 +65,14 @@ class Ewald(MSONable):
         self.mod_ewald_param = self.ewald_param / self.cube_root_vol * self.root_epsilon
         # 2nd term in Eq.(14) in YK2014, caused by finite gaussian charge.
         self.diff_pot = -0.25 / self.volume / self.mod_ewald_param ** 2
-    #
-    # @property
-    # def ewald_param(self):
-    #     """Get optimized ewald parameter.
-    #
-    #     determine initial ewald parameter to satisfy following:
-    #     max_int(Real) = max_int(Reciprocal)
-    #     in neighbor_lattices function.
-    #
-    #     Left term:
-    #     max_int(Real) = 2 * x * Y  / l_r, where x, Y, and l_r are ewald,
-    #     prod_cutoff_fwhm, and axis length of real lattice, respectively.
-    #
-    #     Right term:
-    #     max_int(reciprocal) = Y  / (x * l_g)
-    #     where l_g is axis length of reciprocal lattice, respectively.
-    #     Then, x = sqrt(l_g / l_r / 2)
-    #     gmean : geometric mean,  (a1 * a2 * a3)^(1/3)
-    #
-    #     initial_ewald_param (float):
-    #         Initial guess of parameter.
-    #     convergence (float):
-    #         If 1/convergence < n_(real)/n_(reciprocal) < convergence,
-    #         where n_(real) and n_(reciprocal) is number of real lattices
-    #         and reciprocal lattices, finishes optimization and
-    #         returns ewald_param.
-    #     accuracy (float):
-    #         product of cutoff radius of G-vector and gaussian FWHM.
-    #         Increasing this value, calculation will be more accurate, but slower.
-    #     """
-    #     l_r = mstats.gmean([norm(v) for v in self.lattice])
-    #     l_g = mstats.gmean([norm(v) for v in self.rec_lattice])
-    #     return sqrt(l_g / l_r / 2) * self.cube_root_vol / self.root_epsilon
-        #
-        # for i in range(10):
-        #     mod_ewald_param = ewald_param / cube_root_vol * root_epsilon
-        #
-        #     max_r_vector_norm = accuracy / mod_ewald_param
-        #     real_num = grid_number(lattice, max_r_vector_norm)
-        #
-        #     max_g_vector_norm = 2 * mod_ewald_param * accuracy
-        #     rec_num = grid_number(reciprocal_lattice, max_g_vector_norm)
-        #     print(real_num, rec_num)
-        #
-        #     if 1 / convergence < real_num / rec_num < convergence:
-        #         return cls(lattice, dielectric_tensor, ewald_param, accuracy)
-        #     else:
-        #         ewald_param *= (real_num / rec_num) ** (1 / 6)
-        # else:
-        #     raise ValueError("The initial ewald param may not be adequate.")
+
+    @property
+    def self_pot(self):
+        return - self.mod_ewald_param / (2.0 * pi * sqrt(pi * self.det_epsilon))
 
     def ewald_real(self, include_self: bool, shift: List[float]) -> float:
         summed = 0
-        print(len(self.r_lattice_set(include_self, shift)))
+#        print(len(self.r_lattice_set(include_self, shift)))
         for r in self.r_lattice_set(include_self, shift):
             root_r_inv_epsilon_r = sqrt(reduce(dot, [r.T, self.epsilon_inv, r]))
             summed += erfc(self.mod_ewald_param * root_r_inv_epsilon_r) / root_r_inv_epsilon_r
@@ -127,7 +81,7 @@ class Ewald(MSONable):
     def ewald_rec(self, coord) -> float:
         cart_coord = dot(coord, self.lattice)
         summed = 0
-        print(len(self.g_lattice_set()))
+#        print(len(self.g_lattice_set()))
         for g in self.g_lattice_set():
             g_epsilon_g = reduce(dot, [g.T, self.dielectric_tensor, g])
             summed += (exp(- g_epsilon_g / 4 / self.mod_ewald_param ** 2)
