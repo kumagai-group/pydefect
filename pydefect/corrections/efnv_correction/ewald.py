@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from dataclasses import dataclass
+from functools import reduce
 from math import sqrt, pow, ceil
+from typing import List, Optional
 
 import numpy as np
 from monty.json import MSONable
-from numpy import dot, cross, pi
+from numpy import cross, sqrt, dot, pi, exp, cos
 from numpy.linalg import norm, inv, det
-from pymatgen import IStructure
+from scipy.special import erfc
 from scipy.stats import mstats
 
 
@@ -28,7 +29,6 @@ def grid_number(lattice_vectors: np.ndarray, max_length: float):
     return a[0] * a[1] * a[2]
 
 
-@dataclass
 class Ewald(MSONable):
     """Container class for anisotropic Ewald parameter and related properties
 
@@ -38,75 +38,130 @@ class Ewald(MSONable):
         product of cutoff radius of G-vector and gaussian FWHM. Increasing this
         value, calculation will be more accurate, but slower.
     """
-    lattice: np.ndarray
-    dielectric_tensor: np.ndarray
-    ewald_param: float
-    accuracy: float
 
-    @property
-    def reciprocal_lattice(self):
-        return inv(self.lattice).T * 2 * pi
+    def __init__(self, lattice: np.ndarray,
+                 dielectric_tensor: np.ndarray,
+                 accuracy: float,
+                 ewald_param: Optional[float] = None):
+        self.lattice = lattice
+        self.rec_lattice = inv(self.lattice).T * 2 * pi
+        self.volume = det(self.lattice)
+        self.cube_root_vol = pow(self.volume, 1 / 3)
 
-    @property
-    def volume(self):
-        return det(self.lattice)
+        self.dielectric_tensor = dielectric_tensor
+        self.det_epsilon = det(self.dielectric_tensor)
+        self.root_epsilon = sqrt(self.det_epsilon)
+        self.epsilon_inv = inv(self.dielectric_tensor)
 
-
-def make_ewald(structure: IStructure,
-               dielectric_tensor: np.ndarray,
-               convergence: float = 1.05,
-               accuracy: float = 25.0):
-    """Get optimized ewald parameter.
-
-    determine initial ewald parameter to satisfy following:
-    max_int(Real) = max_int(Reciprocal)
-    in neighbor_lattices function.
-
-    Left term:
-    max_int(Real) = 2 * x * Y  / l_r, where x, Y, and l_r are ewald,
-    prod_cutoff_fwhm, and axis length of real lattice, respectively.
-
-    Right term:
-    max_int(reciprocal) = Y  / (x * l_g)
-    where l_g is axis length of reciprocal lattice, respectively.
-    Then, x = sqrt(l_g / l_r / 2)
-    gmean : geometric mean,  (a1 * a2 * a3)^(1/3)
-
-    initial_ewald_param (float):
-        Initial guess of parameter.
-    convergence (float):
-        If 1/convergence < n_(real)/n_(reciprocal) < convergence,
-        where n_(real) and n_(reciprocal) is number of real lattices
-        and reciprocal lattices, finishes optimization and
-        returns ewald_param.
-    accuracy (float):
-        product of cutoff radius of G-vector and gaussian FWHM.
-        Increasing this value, calculation will be more accurate, but slower.
-    """
-    root_det_dielectric = np.sqrt(np.linalg.det(dielectric_tensor))
-    lattice = structure.lattice.matrix
-    reciprocal_lattice = structure.lattice.reciprocal_lattice.matrix
-    cube_root_vol = pow(structure.lattice.volume, 1 / 3)
-
-    l_r = mstats.gmean([norm(v) for v in lattice])
-    l_g = mstats.gmean([norm(v) for v in reciprocal_lattice])
-    ewald_param = sqrt(l_g / l_r / 2) * cube_root_vol / root_det_dielectric
-
-    for i in range(10):
-        ewald = ewald_param / cube_root_vol * root_det_dielectric
-
-        max_r_vector_norm = accuracy / ewald
-        real_num = grid_number(lattice, max_r_vector_norm)
-
-        max_g_vector_norm = 2 * ewald * accuracy
-        rec_num = grid_number(reciprocal_lattice, max_g_vector_norm)
-
-        if 1 / convergence < real_num / rec_num < convergence:
-            return Ewald(lattice, dielectric_tensor, ewald_param, accuracy)
+        self.accuracy = accuracy
+        if ewald_param:
+            self.ewald_param = ewald_param
         else:
-            ewald_param *= (real_num / rec_num) ** (1 / 6)
-    else:
-        raise ValueError("The initial ewald param may not be adequate.")
+            l_r = mstats.gmean([norm(v) for v in self.lattice])
+            l_g = mstats.gmean([norm(v) for v in self.rec_lattice])
+            self.ewald_param = sqrt(l_g / l_r / 2) * self.cube_root_vol / self.root_epsilon
 
+        # Modified Ewald parameter which is the gamma in the Eqs in YK2014.
+        self.mod_ewald_param = self.ewald_param / self.cube_root_vol * self.root_epsilon
+        # 2nd term in Eq.(14) in YK2014, caused by finite gaussian charge.
+        self.diff_pot = -0.25 / self.volume / self.mod_ewald_param ** 2
+    #
+    # @property
+    # def ewald_param(self):
+    #     """Get optimized ewald parameter.
+    #
+    #     determine initial ewald parameter to satisfy following:
+    #     max_int(Real) = max_int(Reciprocal)
+    #     in neighbor_lattices function.
+    #
+    #     Left term:
+    #     max_int(Real) = 2 * x * Y  / l_r, where x, Y, and l_r are ewald,
+    #     prod_cutoff_fwhm, and axis length of real lattice, respectively.
+    #
+    #     Right term:
+    #     max_int(reciprocal) = Y  / (x * l_g)
+    #     where l_g is axis length of reciprocal lattice, respectively.
+    #     Then, x = sqrt(l_g / l_r / 2)
+    #     gmean : geometric mean,  (a1 * a2 * a3)^(1/3)
+    #
+    #     initial_ewald_param (float):
+    #         Initial guess of parameter.
+    #     convergence (float):
+    #         If 1/convergence < n_(real)/n_(reciprocal) < convergence,
+    #         where n_(real) and n_(reciprocal) is number of real lattices
+    #         and reciprocal lattices, finishes optimization and
+    #         returns ewald_param.
+    #     accuracy (float):
+    #         product of cutoff radius of G-vector and gaussian FWHM.
+    #         Increasing this value, calculation will be more accurate, but slower.
+    #     """
+    #     l_r = mstats.gmean([norm(v) for v in self.lattice])
+    #     l_g = mstats.gmean([norm(v) for v in self.rec_lattice])
+    #     return sqrt(l_g / l_r / 2) * self.cube_root_vol / self.root_epsilon
+        #
+        # for i in range(10):
+        #     mod_ewald_param = ewald_param / cube_root_vol * root_epsilon
+        #
+        #     max_r_vector_norm = accuracy / mod_ewald_param
+        #     real_num = grid_number(lattice, max_r_vector_norm)
+        #
+        #     max_g_vector_norm = 2 * mod_ewald_param * accuracy
+        #     rec_num = grid_number(reciprocal_lattice, max_g_vector_norm)
+        #     print(real_num, rec_num)
+        #
+        #     if 1 / convergence < real_num / rec_num < convergence:
+        #         return cls(lattice, dielectric_tensor, ewald_param, accuracy)
+        #     else:
+        #         ewald_param *= (real_num / rec_num) ** (1 / 6)
+        # else:
+        #     raise ValueError("The initial ewald param may not be adequate.")
 
+    def ewald_real(self, include_self: bool, shift: List[float]) -> float:
+        summed = 0
+        print(len(self.r_lattice_set(include_self, shift)))
+        for r in self.r_lattice_set(include_self, shift):
+            root_r_inv_epsilon_r = sqrt(reduce(dot, [r.T, self.epsilon_inv, r]))
+            summed += erfc(self.mod_ewald_param * root_r_inv_epsilon_r) / root_r_inv_epsilon_r
+        return summed / (4 * pi * self.root_epsilon)
+
+    def ewald_rec(self, coord) -> float:
+        cart_coord = dot(coord, self.lattice)
+        summed = 0
+        print(len(self.g_lattice_set()))
+        for g in self.g_lattice_set():
+            g_epsilon_g = reduce(dot, [g.T, self.dielectric_tensor, g])
+            summed += (exp(- g_epsilon_g / 4 / self.mod_ewald_param ** 2)
+                       / g_epsilon_g * cos(dot(g, cart_coord)))
+        return summed / self.volume
+
+    def r_lattice_set(self,
+                      include_self: bool = True,
+                      shift: List[float] = None) -> np.ndarray:
+        xyz = self.xyz(self.r_vector_nums, shift)
+        if not include_self:
+            xyz = np.delete(xyz, int((len(xyz) - 1) / 2), 0)
+        return dot(xyz, self.lattice)
+
+    def g_lattice_set(self) -> np.ndarray:
+        xyz = self.xyz(self.g_vector_nums)
+        xyz = np.delete(xyz, int((len(xyz) - 1) / 2), 0)
+        return dot(xyz, self.rec_lattice)
+
+    @staticmethod
+    def xyz(nums: List[int], shift: List[float] = None) -> np.ndarray:
+        shift = shift or [0, 0, 0]
+        x = np.arange(-nums[0], nums[0] + 1, 1) - shift[0]
+        y = np.arange(-nums[1], nums[1] + 1, 1) - shift[1]
+        z = np.arange(-nums[2], nums[2] + 1, 1) - shift[2]
+        return np.array(np.meshgrid(x, y, z)).T.reshape(-1, 3)
+
+    @property
+    def r_vector_nums(self) -> List[int]:
+        max_length = self.accuracy / self.mod_ewald_param
+        return [ceil(max_length / norm(self.lattice[i])) for i in range(3)]
+
+    @property
+    def g_vector_nums(self) -> List[int]:
+        max_length = 2 * self.mod_ewald_param * self.accuracy
+        return [ceil(max_length / norm(self.rec_lattice[i])) for i in range(3)]
 
