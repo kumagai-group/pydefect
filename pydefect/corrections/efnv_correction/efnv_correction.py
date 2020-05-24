@@ -20,6 +20,8 @@ class ExtendedFnvCorrection(Correction, MSONable):
     defect_region_radius (float):
         Maximum radius of a sphere touching to the lattice plane, used
         for defining the outside region of the defect.
+
+    Add units of length and potential
     """
     charge: int
     point_charge_correction: float
@@ -28,6 +30,8 @@ class ExtendedFnvCorrection(Correction, MSONable):
     distances: List[float]
     site_ele_pot: List[float]
     point_charge_pot: List[float]
+    length_unit: str
+    potential_unit: str
     additional_correction: float = 0.0
 
     @property

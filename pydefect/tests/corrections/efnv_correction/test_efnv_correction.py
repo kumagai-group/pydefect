@@ -17,6 +17,8 @@ def efnv_correction():
                                  distances=[1.999, 2.0001, 3.0],
                                  site_ele_pot=[1.0, 1.5, 2.0],
                                  point_charge_pot=[0.1, 0.2, 0.3],
+                                 length_unit="Å",
+                                 potential_unit="V",
                                  additional_correction=100)
 
 
