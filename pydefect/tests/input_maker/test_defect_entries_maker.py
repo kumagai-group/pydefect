@@ -41,8 +41,8 @@ def test_defect_entries_maker(cubic_supercell_info, cubic_supercell, mocker):
     ne_he1_str = to_istructure(ne_he1_str)
 
     defect_entries = {
-        DefectEntry("Ne_He1", 0, ne_he1_str, ne_he1_str.copy(), "m-3m"),
-        DefectEntry("Va_H1", 1, va_h1_str, va_h1_str.copy(), "m-3m"),
+        DefectEntry("Ne_He1", 0, ne_he1_str, ne_he1_str.copy(), "m-3m", (0.25, 0.0, 0.0)),
+        DefectEntry("Va_H1", 1, va_h1_str, va_h1_str.copy(), "m-3m", (0.0, 0.0, 0.0)),
     }
 
     assert maker.defect_entries == defect_entries

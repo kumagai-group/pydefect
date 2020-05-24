@@ -20,7 +20,7 @@ class DefectEntriesMaker:
         for defect in defect_set:
             site = supercell_info.sites[defect.out_atom]
             _, cutoff = supercell_info.coords(defect.out_atom)
-            structure, perturbed_structure = \
+            structure, perturbed_structure, coords = \
                 self._create_defect_structures(defect, site, cutoff)
 
             for charge in defect.charges:
@@ -29,13 +29,15 @@ class DefectEntriesMaker:
                                 charge=charge,
                                 structure=structure,
                                 perturbed_structure=perturbed_structure,
-                                site_symmetry=site.site_symmetry))
+                                site_symmetry=site.site_symmetry,
+                                defect_center=coords))
 
     def _create_defect_structures(self,
                                   defect: SimpleDefect,
                                   site: Site,
                                   cutoff: float
-                                  ) -> Tuple[IStructure, IStructure]:
+                                  ) -> Tuple[IStructure, IStructure,
+                                             Tuple[float, float, float]]:
         structure = copy_to_structure(self.supercell_info.structure)
 
         removed_site_index = site.equivalent_atoms[0]
@@ -46,7 +48,7 @@ class DefectEntriesMaker:
             add_atom_to_structure(structure, defect.in_atom, coords)
             add_atom_to_structure(perturbed_structure, defect.in_atom, coords)
 
-        return to_istructure(structure), to_istructure(perturbed_structure)
+        return to_istructure(structure), to_istructure(perturbed_structure), tuple(coords)
 
 
 def copy_to_structure(structure: IStructure) -> Structure:

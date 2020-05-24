@@ -29,7 +29,7 @@ def defect_entry():
                        structure=rocksalt,
                        perturbed_structure=perturbed_rocksalt,
                        site_symmetry="m-3m",
-                       defect_center=[0, 0, 0])
+                       defect_center=(0, 0, 0))
 
 
 def test_msonable(defect_entry):

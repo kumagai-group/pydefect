@@ -2,7 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import Tuple
 
 import numpy as np
 from monty.json import MSONable
@@ -17,7 +17,7 @@ class DefectEntry(MSONable):
     structure: IStructure
     perturbed_structure: IStructure
     site_symmetry: str
-    defect_center: List[float]
+    defect_center: Tuple[float, float, float]
 
     @property
     def anchor_atom_index(self):
@@ -44,9 +44,9 @@ class DefectEntry(MSONable):
     def full_name(self):
         return "_".join([self.name, str(self.charge)])
 
-    def to_json_file(self, filename="supercell_info.json") -> None:
+    def to_json_file(self, filename="defect_entry.json") -> None:
         Path(filename).write_text(self.to_json())
 
     @staticmethod
-    def from_json_file(filename="supercell_info.json") -> "SupercellInfo":
+    def from_json_file(filename="defect_entry.json") -> "DefectEntry":
         return loadfn(filename)
