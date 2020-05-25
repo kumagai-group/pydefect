@@ -6,17 +6,8 @@ import pytest
 from numpy import pi, sqrt, exp, cos
 from scipy.special import erfc
 
-from pydefect.corrections.efnv_correction.ewald import Ewald, \
-    calc_max_sphere_radius
+from pydefect.corrections.efnv_correction.ewald import Ewald
 from pydefect.tests.helpers.assertion import assert_msonable
-
-
-def test_calc_max_sphere_radius():
-    lattice_vectors_1 = np.array([[5, 0, 0], [0, 10, 0], [0, 0, 20]])
-    assert calc_max_sphere_radius(lattice_vectors_1) == 10.0
-
-    lattice_vectors_2 = np.array([[10, 0, 0], [0, 10, 0], [10, 10, 10]])
-    assert calc_max_sphere_radius(lattice_vectors_2) == 5.0
 
 
 @pytest.fixture

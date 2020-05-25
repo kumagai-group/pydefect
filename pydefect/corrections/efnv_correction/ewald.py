@@ -6,22 +6,10 @@ from typing import List, Optional
 
 import numpy as np
 from monty.json import MSONable
-from numpy import cross, sqrt, dot, pi, exp, cos
+from numpy import sqrt, dot, pi, exp, cos
 from numpy.linalg import norm, inv, det
 from scipy.special import erfc
 from scipy.stats import mstats
-
-
-def calc_max_sphere_radius(lattice_vectors: np.ndarray) -> float:
-    """ Calculate three distances between two parallel planes using
-        (a_i x a_j) . a_k / |a_i . a_j|
-    """
-    distances = np.zeros(3, dtype=float)
-    for i in range(3):
-        a_i_a_j = cross(lattice_vectors[i - 2], lattice_vectors[i - 1])
-        a_k = lattice_vectors[i]
-        distances[i] = abs(dot(a_i_a_j, a_k)) / norm(a_i_a_j)
-    return max(distances) / 2.0
 
 
 def grid_number(lattice_vectors: np.ndarray, max_length: float):
@@ -39,9 +27,10 @@ class Ewald(MSONable):
         value, calculation will be more accurate, but slower.
     """
 
-    def __init__(self, lattice: np.ndarray,
+    def __init__(self,
+                 lattice: np.ndarray,
                  dielectric_tensor: np.ndarray,
-                 accuracy: float,
+                 accuracy: float = 20,
                  ewald_param: Optional[float] = None):
         self.lattice = lattice
         self.rec_lattice = inv(self.lattice).T * 2 * pi
@@ -66,13 +55,23 @@ class Ewald(MSONable):
         # 2nd term in Eq.(14) in YK2014, caused by finite gaussian charge.
         self.diff_pot = -0.25 / self.volume / self.mod_ewald_param ** 2
 
+    def atomic_site_potential(self, rel_coord):
+        real_part = self.ewald_real(include_self=True, shift=rel_coord)
+        rec_part = self.ewald_rec(rel_coord)
+        return real_part + rec_part + self.diff_pot
+
+    @property
+    def lattice_energy(self):
+        real_part = self.ewald_real(include_self=False, shift=[0, 0, 0])
+        rec_part = self.ewald_rec([0, 0, 0])
+        return (real_part + rec_part + self.diff_pot + self.self_pot) / 2
+
     @property
     def self_pot(self):
         return - self.mod_ewald_param / (2.0 * pi * sqrt(pi * self.det_epsilon))
 
     def ewald_real(self, include_self: bool, shift: List[float]) -> float:
         summed = 0
-#        print(len(self.r_lattice_set(include_self, shift)))
         for r in self.r_lattice_set(include_self, shift):
             root_r_inv_epsilon_r = sqrt(reduce(dot, [r.T, self.epsilon_inv, r]))
             summed += erfc(self.mod_ewald_param * root_r_inv_epsilon_r) / root_r_inv_epsilon_r
@@ -81,7 +80,6 @@ class Ewald(MSONable):
     def ewald_rec(self, coord) -> float:
         cart_coord = dot(coord, self.lattice)
         summed = 0
-#        print(len(self.g_lattice_set()))
         for g in self.g_lattice_set():
             g_epsilon_g = reduce(dot, [g.T, self.dielectric_tensor, g])
             summed += (exp(- g_epsilon_g / 4 / self.mod_ewald_param ** 2)
