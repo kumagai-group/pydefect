@@ -14,6 +14,7 @@ class Defaults:
         self._symmetry_angle_tolerance = 5.0
         self._cutoff_distance_factor = 1.7
         self._displace_distance = 0.2
+        self._same_distance_criterion = 0.1
         self._kpoint_density = 5.0
         self._band_gap_criterion = 0.2  # in eV
         self._integer_criterion = 0.1
@@ -22,7 +23,7 @@ class Defaults:
         self._vasprun = "vasprun.xml"
         self._procar = "PROCAR"
 
-        user_settings = UserSettings(yaml_filename="vise.yaml")
+        user_settings = UserSettings(yaml_filename="pydefect.yaml")
         self.yaml_files = user_settings.yaml_files_from_root_dir
         self.user_settings = user_settings.user_settings
 
@@ -45,6 +46,10 @@ class Defaults:
     @property
     def displace_distance(self):
         return self._displace_distance
+
+    @property
+    def same_distance_criterion(self):
+        return self._same_distance_criterion
 
     @property
     def kpoint_density(self):
