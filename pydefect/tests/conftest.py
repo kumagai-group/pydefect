@@ -16,7 +16,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 
 @pytest.fixture(scope="session")
 def vasp_files():
-    return Path(__file__).parent / "vasp_files"
+    return Path(__file__).parent / "cli" / "vasp" / "vasp_files"
 
 
 @pytest.fixture(scope="session")
@@ -217,6 +217,20 @@ def cubic_supercell():
     ]
     return Structure(lattice=lattice, species=["H"] * 32 + ["He"] * 32,
                      coords=coords)
+
+
+@pytest.fixture(scope="session")
+def cubic_supercell_w_vacancy(cubic_supercell):
+    result = cubic_supercell.copy()
+    result.remove_sites([0])
+    return result
+
+
+@pytest.fixture(scope="session")
+def cubic_supercell_w_vacancy_w_perturb(cubic_supercell_w_vacancy):
+    result = cubic_supercell_w_vacancy.copy()
+    result.translate_sites([0], [0.0, 0.0, 0.1])
+    return result
 
 
 @pytest.fixture(scope="session")
