@@ -4,7 +4,7 @@ from pymatgen import IStructure, Lattice, Element
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import SingleDefectEnergy
-from pydefect.analyzer.make_defect_energy import SingleDefectEnergyMaker, \
+from pydefect.analyzer.make_defect_energy import make_single_defect_energy, \
     num_atom_differences, reservoir_energy
 from pydefect.corrections.manual_correction import ManualCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
@@ -24,15 +24,15 @@ def test_single_defect_energy_maker(mocker):
     defect_entry.name = name
     defect_entry.charge = charge
 
-    maker = SingleDefectEnergyMaker(perfect=perfect,
-                                    defect=defect,
-                                    defect_entry=defect_entry,
-                                    abs_chem_pot={Element.H: 100},
-                                    correction=ManualCorrection(7.0))
+    single_defect_energy = make_single_defect_energy(perfect=perfect,
+                                                     defect=defect,
+                                                     defect_entry=defect_entry,
+                                                     abs_chem_pot={Element.H: 100},
+                                                     correction=ManualCorrection(7.0))
     energy = (3.0 + 7.0) - 1.0 - 100
 
-    assert isinstance(maker.single_defect_energy, SingleDefectEnergy)
-    assert maker.single_defect_energy == SingleDefectEnergy(name, charge, energy)
+    assert isinstance(single_defect_energy, SingleDefectEnergy)
+    assert single_defect_energy == SingleDefectEnergy(name, charge, energy)
 
 
 def test_reservoir_energy():
@@ -47,10 +47,3 @@ def test_num_atom_diff():
     s2 = IStructure(Lattice.cubic(1), ["H", "Li"], [[0] * 3] * 2)
     assert num_atom_differences(s1, s2) == {Element.He: 1, Element.Li: -1}
 
-
-"""
-TODO
-- Add num_atom_differences
-
-DONE
-"""

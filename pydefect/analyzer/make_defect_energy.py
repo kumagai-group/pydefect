@@ -11,19 +11,17 @@ from pydefect.corrections.manual_correction import NoCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
 
 
-class SingleDefectEnergyMaker:
-    def __init__(self,
-                 perfect: CalcResults,
-                 defect: CalcResults,
-                 defect_entry: DefectEntry,
-                 abs_chem_pot: Dict[Element, float],
-                 correction: Optional[Correction] = NoCorrection):
-        name = defect_entry.name
-        charge = defect_entry.charge
-        n_diffs = num_atom_differences(defect.structure, perfect.structure)
-        energy = (defect.energy + correction.correction_energy - perfect.energy
-                  + reservoir_energy(n_diffs, abs_chem_pot))
-        self.single_defect_energy = SingleDefectEnergy(name, charge, energy)
+def make_single_defect_energy(perfect: CalcResults,
+                              defect: CalcResults,
+                              defect_entry: DefectEntry,
+                              abs_chem_pot: Dict[Element, float],
+                              correction: Optional[Correction] = NoCorrection):
+    name = defect_entry.name
+    charge = defect_entry.charge
+    n_diffs = num_atom_differences(defect.structure, perfect.structure)
+    energy = (defect.energy + correction.correction_energy - perfect.energy
+              + reservoir_energy(n_diffs, abs_chem_pot))
+    return SingleDefectEnergy(name, charge, energy)
 
 
 def reservoir_energy(diffs: Dict[Element, int],
