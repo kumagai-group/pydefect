@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from collections import defaultdict
-from typing import List, Dict,Tuple
+from typing import List, Dict, Tuple
 
 import numpy as np
-from pymatgen import Structure
+from pymatgen import Structure, Element
 
 from pydefect.defaults import defaults
 
@@ -16,11 +16,14 @@ class Distances:
         self.structure = structure
         self.coord = coord
 
-    def distances(self, remove_self=True) -> List[float]:
+    def distances(self, remove_self=True, specie=None) -> List[float]:
         result = []
-        for frac_coord in self.structure.frac_coords:
-            lattice = self.structure.lattice
-            distance, _ = lattice.get_distance_and_image(frac_coord, self.coord)
+        lattice = self.structure.lattice
+        for site in self.structure:
+            if specie and Element(specie) != site.specie:
+                continue
+            distance, _ = \
+                lattice.get_distance_and_image(site.frac_coords, self.coord)
             if remove_self and distance < 1e-5:
                 continue
             result.append(distance)

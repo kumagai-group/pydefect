@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
-import pytest
 import numpy as np
 
 from pydefect.util.structure_tools import Distances
-from pymatgen import Lattice, Structure
 
 
 def test_distances(ortho_conventional):
@@ -15,6 +13,12 @@ def test_distances(ortho_conventional):
     distances = Distances(ortho_conventional, coord=[0.5, 0.5, 0.5])
     expected = [5.2440442, 3.5, 3.0, 2.5, 3.9051248, 4.3011626, 4.6097722]
     np.testing.assert_almost_equal(distances.distances(), expected)
+
+
+def test_distances_w_specie(ortho_conventional):
+    distances = Distances(ortho_conventional, coord=[0.25, 0.25, 0.0])
+    expected = [4.00780488547035, 1.9525624189766637, 1.9525624189766635, 4.007804885470349]
+    np.testing.assert_almost_equal(distances.distances(specie="He"), expected)
 
 
 def test_shortest_distances(ortho_conventional):
