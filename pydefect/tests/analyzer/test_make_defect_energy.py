@@ -4,7 +4,7 @@ from pymatgen import IStructure, Lattice, Element
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import SingleDefectEnergy
-from pydefect.analyzer.defect_energy_maker import SingleDefectEnergyMaker, \
+from pydefect.analyzer.make_defect_energy import SingleDefectEnergyMaker, \
     num_atom_differences, reservoir_energy
 from pydefect.corrections.manual_correction import ManualCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
