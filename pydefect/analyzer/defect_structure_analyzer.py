@@ -21,36 +21,48 @@ class DefectStructureAnalyzer:
         self._defective_structure = defective_structure
         self._perfect_structure = perfect_structure
 
-        d_to_p = []
-        for site in defective_structure:
-            distances = Distances(perfect_structure, site.frac_coords)
-            d_to_p.append(distances.mapped_atom_idx(specie=site.specie))
+    @property
+    def atom_mapping(self):
+        return {d: p for d, p in enumerate(self.d_to_p)
+                if d not in self.inserted_indices}
 
-        p_to_d = []
-        for site in perfect_structure:
-            distances = Distances(defective_structure, site.frac_coords)
-            p_to_d.append(distances.mapped_atom_idx(specie=site.specie))
-
-        inserted_indices = []
-        for d, p in enumerate(d_to_p):
+    @property
+    def vacancy_indices(self):
+        result = []
+        for p, d in enumerate(self.p_to_d):
             try:
-                if p_to_d[p] != d:
-                    inserted_indices.append(d)
+                if self.d_to_p[d] != p:
+                    result.append(p)
             except (IndexError, TypeError):
-                inserted_indices.append(d)
-        self.inserted_indices = sorted(inserted_indices)
+                result.append(p)
+        return sorted(result)
 
-        vacancy_indices = []
-        for p, d in enumerate(p_to_d):
+    @property
+    def inserted_indices(self):
+        result = []
+        for d, p in enumerate(self.d_to_p):
             try:
-                if d_to_p[d] != p:
-                    vacancy_indices.append(p)
+                if self.p_to_d[p] != d:
+                    result.append(d)
             except (IndexError, TypeError):
-                vacancy_indices.append(p)
-        self.vacancy_indices = sorted(vacancy_indices)
+                result.append(d)
+        return sorted(result)
 
-        self.atom_mapping = \
-            {d: p for d, p in enumerate(d_to_p) if d not in inserted_indices}
+    @property
+    def p_to_d(self):
+        result = []
+        for site in self._perfect_structure:
+            distances = Distances(self._defective_structure, site.frac_coords)
+            result.append(distances.mapped_atom_idx(specie=site.specie))
+        return result
+
+    @property
+    def d_to_p(self):
+        result = []
+        for site in self._defective_structure:
+            distances = Distances(self._perfect_structure, site.frac_coords)
+            result.append(distances.mapped_atom_idx(specie=site.specie))
+        return result
 
     @property
     def defect_center_coord(self):
