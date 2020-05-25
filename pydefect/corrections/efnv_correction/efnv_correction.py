@@ -26,28 +26,33 @@ class ExtendedFnvCorrection(Correction, MSONable):
     charge: int
     point_charge_correction: float
     defect_region_radius: float
-    species: List[str]
-    distances: List[float]
-    site_ele_pot: List[float]
-    point_charge_pot: List[float]
+    sites: List["DefectSite"]
     length_unit: str
     potential_unit: str
     additional_correction: float = 0.0
 
     @property
-    def diff_pot(self):
-        return [e - p for e, p in zip(self.site_ele_pot, self.point_charge_pot)]
-
-    @property
-    def ave_pot_diff(self):
-        return np.mean([p for p, d in zip(self.diff_pot, self.distances)
-                        if d > self.defect_region_radius])
+    def average_potential_diff(self):
+        return np.mean([s.diff_pot for s in self.sites
+                        if s.distance > self.defect_region_radius])
 
     @property
     def alignment_correction(self) -> float:
-        return - self.ave_pot_diff * self.charge
+        return - self.average_potential_diff * self.charge
 
     @property
     def correction_energy(self) -> float:
         return (self.point_charge_correction + self.alignment_correction
                 + self.additional_correction)
+
+
+@dataclass
+class DefectSite(MSONable):
+    specie: str
+    distance: float
+    potential: float
+    pc_potential: float
+
+    @property
+    def diff_pot(self):
+        return self.potential - self.pc_potential
