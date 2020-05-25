@@ -17,7 +17,7 @@ class CalcResults(MSONable):
     magnetization: float
     kpoint_coords: List[List[float]]
     kpoint_weights: List[float]
-    electrostatic_potential: List[float]
+    potentials: List[float]
     vbm_info: float
     cbm_info: float
     fermi_level: float
