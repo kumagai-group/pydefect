@@ -18,6 +18,10 @@ class Defaults:
         self._kpoint_density = 5.0
         self._band_gap_criterion = 0.2  # in eV
         self._integer_criterion = 0.1
+        self._defect_energy_colors = \
+            ["xkcd:blue", "xkcd:brown", "xkcd:crimson", "xkcd:darkgreen",
+             "xkcd:gold", "xkcd:magenta", "xkcd:orange", "xkcd:darkblue",
+             "xkcd:navy", "xkcd:red", "xkcd:olive", "xkcd:black", "xkcd:indigo"]
         self._outcar = "OUTCAR"
         self._contcar = "CONTCAR"
         self._vasprun = "vasprun.xml"
@@ -62,6 +66,10 @@ class Defaults:
     @property
     def integer_criterion(self):
         return self._integer_criterion
+
+    @property
+    def defect_energy_colors(self):
+        return self._defect_energy_colors
 
     @property
     def outcar(self):
