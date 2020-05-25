@@ -61,6 +61,12 @@ class DefectStructureAnalyzer:
             coords.append(self._defective_structure[i].frac_coords)
         return np.average(coords, axis=0)
 
+    def distance_from_center(self, index):
+        frac_coords = self._defective_structure[index].frac_coords
+        result, _ = self._defective_structure.lattice.get_distance_and_image(
+            self.defect_center_coord, frac_coords)
+        return result
+
 
 def symmetrize_defect_structure(structure: IStructure,
                                 anchor_atom_idx: int,

@@ -37,9 +37,13 @@ def test_atom_mapping_to_perfect(structure_analyzer):
     assert structure_analyzer.inserted_indices == [0]
 
 
-def test_defect_structure_analyzer(structure_analyzer):
+def test_defect_structure_analyzer_defect_center(structure_analyzer):
     expected = np.array([0.25, 0.5, 0.5])
     assert (structure_analyzer.defect_center_coord == expected).all()
+
+
+def test_defect_structure_analyzer_distance(structure_analyzer):
+    assert structure_analyzer.distance_from_center(4) == 5 / 4
 
 
 def test_symmetrize_defect_structure():
