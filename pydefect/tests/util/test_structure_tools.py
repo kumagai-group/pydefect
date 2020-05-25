@@ -16,9 +16,16 @@ def test_distances(ortho_conventional):
 
 
 def test_distances_w_specie(ortho_conventional):
-    distances = Distances(ortho_conventional, coord=[0.25, 0.25, 0.0])
-    expected = [4.00780488547035, 1.9525624189766637, 1.9525624189766635, 4.007804885470349]
-    np.testing.assert_almost_equal(distances.distances(specie="He"), expected)
+    distances = Distances(ortho_conventional, coord=[0.25, 0.26, 0.0])
+    expected = [float("inf")] * 4 + [4.030645109656765, 1.9068560512005097, 1.9990247622278219, 3.985737071107425]
+    np.testing.assert_equal(distances.distances(remove_self=False, specie="He"), expected)
+
+
+def test_distances_mapped_atom_idx(ortho_conventional):
+    distances = Distances(ortho_conventional, coord=[0.0, 0.0, 0.49])
+    assert distances.mapped_atom_idx(specie="He") == 4
+    distances = Distances(ortho_conventional, coord=[0.251, 0.25, 0.25])
+    assert distances.mapped_atom_idx(specie="H") is None
 
 
 def test_shortest_distances(ortho_conventional):

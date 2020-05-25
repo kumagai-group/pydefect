@@ -21,6 +21,7 @@ class Distances:
         lattice = self.structure.lattice
         for site in self.structure:
             if specie and Element(specie) != site.specie:
+                result.append(float("inf"))
                 continue
             distance, _ = \
                 lattice.get_distance_and_image(site.frac_coords, self.coord)
@@ -29,6 +30,13 @@ class Distances:
             result.append(distance)
 
         return result
+
+    def mapped_atom_idx(self, specie):
+        distances = self.distances(remove_self=False, specie=specie)
+        sorted_dists = sorted(distances)
+        if sorted_dists[1] - sorted_dists[0] < defaults.same_distance_criterion:
+            return None
+        return np.argmin(distances)
 
     @property
     def shortest_distance(self) -> float:
