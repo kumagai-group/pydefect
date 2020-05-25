@@ -2,24 +2,44 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import numpy as np
+from pymatgen import IStructure, Lattice
 
+from pydefect.analyzer.calc_results import CalcResults
+from pydefect.corrections.efnv_correction.efnv_correction import DefectSite
 from pydefect.corrections.efnv_correction.make_efnv_correction import \
-    calc_max_sphere_radius
+    calc_max_sphere_radius, make_efnv_correction
 
 
-# @pytest.fixture
-# def pot():
-    # ewald = Ewald(lattice=np.array([[10, 0, 0], [0, 10, 0], [0, 0, 10]]),
-    #               dielectric_tensor=np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]]),
-    #               accuracy=5)
-    # return AnisotropicPotential(defect_coord=np.array([0.0, 0.0, 0.0]),
-    #                             target_coords=np.array([[0.5, 0.5, 0.5]]),
-    #                             ewald=ewald)
+def test_pot(mocker):
+    mock_perfect = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_defect = mocker.Mock(spec=CalcResults, autospec=True)
 
+    mock_perfect.structure = IStructure(
+        Lattice.cubic(10), species=["H"] + ["He"] * 3,
+        coords=[[0, 0, 0], [1/2, 1/2, 0], [1/2, 0, 1/2], [0, 1/2, 1/2]])
+    mock_defect.structure = IStructure(
+        Lattice.cubic(10), species=["He"] * 3,
+        coords=[[1/2, 1/2, 0], [1/2, 0, 1/2], [0, 1/2, 1/2]])
+    mock_perfect.potentials = [3.0, 4.0, 5.0, 6.0]
+    mock_defect.potentials = [14.0, 25.0, 36.0]
 
-# def test_pot(pot):
-#     assert pot.lattice_energy * 180.95128169876497 == -2.0428038899554415
+    mock_ewald = mocker.patch("pydefect.corrections.efnv_correction.make_efnv_correction.Ewald")
+    ewald = mocker.Mock()
+    ewald.lattice_energy = 1e3
+    ewald.atomic_site_potential.return_value = 1e4
+    mock_ewald.return_value = ewald
 
+    efnvc = make_efnv_correction(charge=2,
+                                 calc_results=mock_defect,
+                                 perfect_calc_results=mock_perfect,
+                                 dielectric_tensor=np.eye(3))
+
+    assert efnvc.charge == 2
+    assert efnvc.point_charge_correction == -4e3
+    assert efnvc.defect_region_radius == 5.0
+    assert efnvc.sites == [DefectSite("He", 5 * np.sqrt(2), 10.0, 2e4),
+                           DefectSite("He", 5 * np.sqrt(2), 20.0, 2e4),
+                           DefectSite("He", 5 * np.sqrt(2), 30.0, 2e4)]
 
 
 def test_calc_max_sphere_radius():

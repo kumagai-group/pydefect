@@ -10,10 +10,9 @@ from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection, DefectSite
 from pydefect.corrections.efnv_correction.ewald import Ewald
-from pydefect.input_maker.defect_entry import DefectEntry
 
 
-def make_efnv_correction(defect_entry: DefectEntry,
+def make_efnv_correction(charge: int,
                          calc_results: CalcResults,
                          perfect_calc_results: CalcResults,
                          dielectric_tensor: np.array):
@@ -25,21 +24,21 @@ def make_efnv_correction(defect_entry: DefectEntry,
         elementary_charge * 1e10 / epsilon_0 = 180.95128169876497
         to make potential in V.
     """
+    assert calc_results.structure.lattice == perfect_calc_results.structure.lattice
 
     structure_analyzer = DefectStructureAnalyzer(
         calc_results.structure, perfect_calc_results.structure)
     defect_coord = structure_analyzer.defect_center_coord
-    lattice = calc_results.structure.lattice
+    lattice = calc_results.structure.lattice.matrix
     ewald = Ewald(lattice, dielectric_tensor)
-    charge = defect_entry.charge
     point_charge_correction = - ewald.lattice_energy * charge ** 2
 
     sites = []
-    for d, p in enumerate(structure_analyzer.atom_mapping):
-        specie = calc_results.structure[d].specie
+    for d, p in structure_analyzer.atom_mapping.items():
+        specie = str(calc_results.structure[d].specie)
         distance = structure_analyzer.distance_from_center(d)
-        potential = (calc_results.electrostatic_potential[d] -
-                     perfect_calc_results.electrostatic_potential[p])
+        potential = (calc_results.potentials[d] -
+                     perfect_calc_results.potentials[p])
 
         coord = calc_results.structure[d].frac_coords
         rel_coord = [x - y for x, y in zip(coord, defect_coord)]
