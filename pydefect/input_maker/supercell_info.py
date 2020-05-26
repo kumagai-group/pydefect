@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
-from pathlib import Path
 from typing import List, Dict
 
 from monty.json import MSONable
-from monty.serialization import loadfn
 from numpy.linalg import det
 from pymatgen import IStructure
 from vise.util.logger import get_logger
 
 from pydefect.database.database import electronegativity, oxidation_state
+from pydefect.util.mix_in import ToJsonFileMixIn
 from pydefect.util.structure_tools import Distances
 
 logger = get_logger(__name__)
