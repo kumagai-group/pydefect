@@ -4,12 +4,7 @@
 import pytest
 
 from pydefect.analyzer.defect_energy import (
-    SingleDefectEnergy, DefectEnergy, CrossPoints, DefectEnergies)
-from pydefect.tests.helpers.assertion import assert_msonable
-
-
-def test_single_defect_energy():
-    assert_msonable(SingleDefectEnergy(name="Va_O1", charge=0, energy=1.0))
+    DefectEnergy, CrossPoints)
 
 
 @pytest.fixture
@@ -38,15 +33,6 @@ def test_cross_points(cross_points):
     assert cross_points.t_inner_cross_points == [[2, 3, 4], [20, 30, 40]]
     assert cross_points.t_boundary_points == [[1, 5], [10, 50]]
 
-
-def test_defect_energies(defect_energy):
-    defect_energies = DefectEnergies([defect_energy],
-                                     vbm=1.0,
-                                     cbm=6.0,
-                                     supercell_vbm=1.5,
-                                     supercell_cbm=5.5)
-    plt = defect_energies.plot()
-    plt.show()
 
 
 """

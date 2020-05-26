@@ -3,14 +3,12 @@
 from dataclasses import dataclass
 from typing import List
 
-import matplotlib.pyplot as plt
 import numpy as np
-from monty.json import MSONable
 from scipy.spatial import HalfspaceIntersection
 
 
 @dataclass
-class SingleDefectEnergy(MSONable):
+class SingleDefectEnergy:
     name: str
     charge: int
     energy: float
@@ -70,19 +68,3 @@ class CrossPoints:
         return np.transpose(np.array(self.boundary_points)).tolist()
 
 
-@dataclass
-class DefectEnergies:
-    defect_energies: List[DefectEnergy]
-    vbm: float
-    cbm: float
-    supercell_vbm: float
-    supercell_cbm: float
-
-    def plot(self):
-        for de in self.defect_energies:
-            cp = de.cross_points(self.vbm, self.cbm)
-            plt.plot(*cp.t_all_sorted_points)
-            plt.scatter(*cp.t_inner_cross_points, marker="o")
-            plt.scatter(*cp.t_boundary_points)
-
-        return plt
