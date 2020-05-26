@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from argparse import Namespace
+from pathlib import Path
+
+from pymatgen import Composition
 
 from pydefect.cli.vasp.main import parse_args
 from pydefect.defaults import defaults
@@ -43,6 +46,27 @@ def test_make_poscars_w_options():
     expected = Namespace(
         elements=["Mg", "O"],
         e_above_hull=0.1,
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
+def test_cpd_wo_options():
+    parsed_args = parse_args(["cpd",
+                              "-d", "Mg", "O"])
+    expected = Namespace(
+        vasp_dirs=[Path("Mg"), Path("O")],
+        target=None,
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
+def test_cpd_w_options():
+    parsed_args = parse_args(["cpd",
+                              "-d", "Mg", "O",
+                              "-t", "MgO"])
+    expected = Namespace(
+        vasp_dirs=[Path("Mg"), Path("O")],
+        target=Composition("MgO"),
         func=parsed_args.func)
     assert parsed_args == expected
 

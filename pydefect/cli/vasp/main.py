@@ -4,12 +4,14 @@
 
 import argparse
 import sys
+from pathlib import Path
 
-from pymatgen import IStructure
+from pymatgen import IStructure, Composition
 from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
-    make_defect_entries, make_unitcell, make_competing_phase_dirs
+    make_defect_entries, make_unitcell, make_competing_phase_dirs, \
+    make_chem_pot_diag
 from pydefect.defaults import defaults
 from pydefect.version import __version__
 
@@ -65,6 +67,24 @@ def parse_args(args):
         type=float)
 
     parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
+
+    # -- cpd ------------------------------------------------
+    parser_make_poscars = subparsers.add_parser(
+        name="cpd",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['cpd'])
+
+    parser_make_poscars.add_argument(
+        "-d", "--vasp_dirs",
+        required=True,
+        nargs="+",
+        type=Path)
+    parser_make_poscars.add_argument(
+        "-t", "--target",
+        type=Composition)
+
+    parser_make_poscars.set_defaults(func=make_chem_pot_diag)
 
     # -- supercell ------------------------------------------------
     parser_supercell = subparsers.add_parser(
