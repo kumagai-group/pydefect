@@ -1,0 +1,83 @@
+H2:
+  vib:
+    - 6332
+  rot:
+    - 85.3
+  mag_degeneracy:
+    1
+  sym_num:
+    2
+
+
+O2:
+  vib:
+    - 2256
+  rot:
+    - 2.07
+  mag_degeneracy:
+    3
+  sym_num:
+    2
+
+N2:
+  vib:
+    - 3374
+  rot:
+    - 2.88
+  mag_degeneracy:
+    1
+  sym_num:
+    2
+
+#F2:
+#  vib:
+#  rot:
+#  mag_degeneracy:
+#    1
+#  sym_num:
+#    2
+
+NH3:
+  vib:
+    - 4800
+    - 1360
+    - 4880
+    - 4880
+    - 2330
+    - 2330
+  rot:
+    - 13.6
+    - 13.6
+    - 8.92
+  mag_degeneracy:
+    1
+  sym_num:
+    3
+
+NO2:
+  vib:
+    - 1900
+    - 1080
+    - 2330
+  rot:
+    - 11.5
+    - 0.624
+    - 0.590
+  mag_degeneracy:
+    1
+  sym_num:
+    2
+
+H2O:
+  vib:
+    - 5360
+    - 5160
+    - 2290
+  rot:
+    - 40.1
+    - 20.9
+    - 13.4
+  mag_degeneracy:
+    1
+  sym_num:
+    2
