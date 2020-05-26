@@ -16,7 +16,7 @@ class SingleDefectEnergy:
 
 
 @dataclass
-class DefectEnergy(MSONable):
+class DefectEnergy:
     name: str
     charges: List[int]
     energies: List[float]
