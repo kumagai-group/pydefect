@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from pathlib import Path
 from typing import List
 
 from pymatgen import Element, MPRester
 
 elements = [e.name for e in Element]
-mol_dir = Path(__file__).parent / ".." / "chem_pot_diag" / "molecules"
 
 
 class MpQuery:

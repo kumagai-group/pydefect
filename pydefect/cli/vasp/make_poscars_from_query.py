@@ -7,8 +7,9 @@ from typing import List
 import yaml
 from pymatgen import Composition
 
-from pydefect.chem_pot_diag.gas import MOLECULE_DATA
-from pydefect.util.mp_tools import mol_dir
+from pydefect.cli.vasp.molecules.molecules import MOLECULE_DATA
+
+mol_dir = Path(__file__).parent / "molecules"
 
 
 def make_poscars_from_query(materials_query: List[dict], path: Path) -> None:

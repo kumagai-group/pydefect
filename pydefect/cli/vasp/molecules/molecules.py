@@ -13,7 +13,7 @@ McQuarrie and Simon, Phys. Chem. A molecular approach.
 
 logger = get_logger(__name__)
 
-with open(Path(__file__).parent / "molecules" / "molecule_data.yaml", 'r') as f:
+with open(Path(__file__).parent / "molecule_data.yaml", 'r') as f:
     MOLECULE_DATA = yaml.safe_load(f)
 
 
