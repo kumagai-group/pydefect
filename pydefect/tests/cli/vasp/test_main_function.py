@@ -10,7 +10,7 @@ from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
-    make_defect_entries, make_unitcell
+    make_defect_entries, make_unitcell, make_competing_phase_dirs
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_set import DefectSet
 
@@ -31,6 +31,17 @@ def test_make_unitcell(mocker):
     mock.assert_called_once_with(vasprun_band=vasprun_band_mock,
                                  outcar_band=outcar_band_mock,
                                  outcar_dielectric=outcar_dielectric_mock)
+
+
+def test_make_competing_phase_dirs(mocker):
+    args = Namespace(elements=["Mg", "O"],
+                     e_above_hull=0.1)
+    mock = mocker.patch("pydefect.cli.vasp.main_function.MpQuery")
+    mock_make = mocker.patch("pydefect.cli.vasp.main_function.make_poscars_from_query")
+    make_competing_phase_dirs(args)
+    mock.assert_called_once_with(element_list=args.elements,
+                                 e_above_hull=args.e_above_hull)
+    mock_make.assert_called_once_with(materials_query=mock.return_value.materials, path=Path.cwd())
 
 
 def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):

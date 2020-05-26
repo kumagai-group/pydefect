@@ -8,12 +8,14 @@ from vise.util.logger import get_logger
 
 from pydefect.cli.main_tools import sanitize_matrix
 from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
+from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
 from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entries_maker import DefectEntriesMaker
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_maker import SupercellMaker
+from pydefect.util.mp_tools import MpQuery
 
 logger = get_logger(__name__)
 
@@ -23,6 +25,11 @@ def make_unitcell(args):
                                        outcar_band=args.outcar_band,
                                        outcar_dielectric=args.outcar_dielectric)
     unitcell.to_json_file()
+
+
+def make_competing_phase_dirs(args):
+    query = MpQuery(element_list=args.elements, e_above_hull=args.e_above_hull)
+    make_poscars_from_query(materials_query=query.materials, path=Path.cwd())
 
 
 def make_supercell(args):
