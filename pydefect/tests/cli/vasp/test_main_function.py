@@ -3,24 +3,34 @@
 from argparse import Namespace
 from pathlib import Path
 
+import numpy as np
 from monty.serialization import loadfn
 from pymatgen import IStructure
+from pymatgen.io.vasp import Vasprun, Outcar
 
+from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
-    make_defect_entries
+    make_defect_entries, make_unitcell
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_set import DefectSet
 
 
-#
-# def test_make_unitcell(mocker):
-#     vasprun_band_mock = mocker.Mock(spec=Vasprun, autospec=True)
-#     outcar_band_mock = mocker.Mock(spec=Outcar, autospec=True)
-#     outcar_dielectric_mock = mocker.Mock(spec=Outcar, autospec=True)
-#     args = Namespace(vasprun_band=vasprun_band_mock,
-#                      outcar_band=outcar_band_mock,
-#                      outcar_dielectric=outcar_dielectric_mock)
-#     make_unitcell(args)
+def test_make_unitcell(mocker):
+    vasprun_band_mock = mocker.Mock(spec=Vasprun, autospec=True)
+    outcar_band_mock = mocker.Mock(spec=Outcar, autospec=True)
+    outcar_dielectric_mock = mocker.Mock(spec=Outcar, autospec=True)
+    args = Namespace(vasprun_band=vasprun_band_mock,
+                     outcar_band=outcar_band_mock,
+                     outcar_dielectric=outcar_dielectric_mock)
+    mock = mocker.patch("pydefect.cli.vasp.main_function.make_unitcell_from_vasp")
+    mock.return_value = Unitcell(vbm=1.0,
+                                 cbm=2.0,
+                                 ele_dielectric_const=np.eye(3),
+                                 ion_dielectric_const=np.eye(3))
+    make_unitcell(args)
+    mock.assert_called_once_with(vasprun_band=vasprun_band_mock,
+                                 outcar_band=outcar_band_mock,
+                                 outcar_dielectric=outcar_dielectric_mock)
 
 
 def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
@@ -77,13 +87,6 @@ def test_make_calc_results(tmpdir):
     args = Namespace(dirs=[Path("a"), Path("b")])
     Path("a").name
 
-
-def test():
-    class A:
-        def __init__(self):
-            print(str(self.__class__.__name__))
-
-    print(A())
 
 """
 TODO
