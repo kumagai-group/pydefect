@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from collections import defaultdict
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 import numpy as np
 from pymatgen import Structure, Element
@@ -31,7 +31,7 @@ class Distances:
 
         return result
 
-    def mapped_atom_idx(self, specie):
+    def mapped_atom_idx(self, specie: str) -> Optional[int]:
         distances = self.distances(remove_self=False, specie=specie)
         sorted_dists = sorted(distances)
         if sorted_dists[1] - sorted_dists[0] < defaults.same_distance_criterion:
