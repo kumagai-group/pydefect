@@ -4,13 +4,14 @@ import numpy as np
 import pytest
 
 from pydefect.analyzer.unitcell import Unitcell
-from pydefect.tests.helpers.assertion import assert_msonable
+from pydefect.tests.helpers.assertion import assert_msonable, \
+    assert_json_roundtrip
 
 
 @pytest.fixture
 def unitcell():
-    ele = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    ion = np.array([[10, 20, 30], [40, 50, 60], [70, 80, 90]])
+    ele = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    ion = [[10, 20, 30], [40, 50, 60], [70, 80, 90]]
     return Unitcell(vbm=0.1, cbm=5.1,
                     ele_dielectric_const=ele, ion_dielectric_const=ion)
 
@@ -23,3 +24,6 @@ def test_unitcell(unitcell):
 def test_msonable(unitcell):
     assert_msonable(unitcell)
 
+
+def test_json_round_trip(unitcell, tmpdir):
+    assert_json_roundtrip(unitcell, tmpdir)
