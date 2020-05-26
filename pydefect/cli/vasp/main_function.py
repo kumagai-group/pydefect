@@ -3,8 +3,7 @@
 from pathlib import Path
 
 from monty.serialization import loadfn
-from parsevasp.outcar import Outcar
-from pymatgen.io.vasp import Vasprun
+from pymatgen.io.vasp import Vasprun, Outcar
 from vise.util.logger import get_logger
 
 from pydefect.cli.main_tools import sanitize_matrix
