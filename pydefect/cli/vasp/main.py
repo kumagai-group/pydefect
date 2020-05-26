@@ -6,9 +6,10 @@ import argparse
 import sys
 
 from pymatgen import IStructure
+from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
-    make_defect_entries
+    make_defect_entries, make_unitcell
 from pydefect.version import __version__
 
 
@@ -23,32 +24,54 @@ def parse_args(args):
 
     subparsers = parser.add_subparsers()
 
-    # -- make_supercell ------------------------------------------------
-    parser_make_supercell = subparsers.add_parser(
+    # -- unitcell ------------------------------------------------
+    parser_unitcell = subparsers.add_parser(
+        name="unitcell",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['u'])
+
+    parser_unitcell.add_argument(
+        "-vb", "--vasprun_band",
+        required=True,
+        type=Vasprun)
+    parser_unitcell.add_argument(
+        "-ob", "--outcar_band",
+        required=True,
+        type=Outcar)
+    parser_unitcell.add_argument(
+        "-od", "--outcar_dielectric",
+        required=True,
+        type=Outcar)
+
+    parser_unitcell.set_defaults(func=make_unitcell)
+
+    # -- supercell ------------------------------------------------
+    parser_supercell = subparsers.add_parser(
         name="supercell",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['s'])
 
-    parser_make_supercell.add_argument(
+    parser_supercell.add_argument(
         "-p", "--unitcell",
         default="POSCAR",
         type=IStructure.from_file)
-    parser_make_supercell.add_argument(
+    parser_supercell.add_argument(
         "--matrix",
         default=None,
         nargs="+",
         type=int)
-    parser_make_supercell.add_argument(
+    parser_supercell.add_argument(
         "--min_num_atoms",
         default=50,
         type=int)
-    parser_make_supercell.add_argument(
+    parser_supercell.add_argument(
         "--max_num_atoms",
         default=300,
         type=int)
 
-    parser_make_supercell.set_defaults(func=make_supercell)
+    parser_supercell.set_defaults(func=make_supercell)
 
     # -- make_defect_set ------------------------------------------------
     parser_make_defect_set = subparsers.add_parser(

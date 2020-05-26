@@ -5,6 +5,26 @@ from argparse import Namespace
 from pydefect.cli.vasp.main import parse_args
 
 
+def test_unitcell(mocker):
+    mock = mocker.patch("pydefect.cli.vasp.main.Vasprun")
+    mock_outcar = mocker.patch("pydefect.cli.vasp.main.Outcar")
+    parsed_args = parse_args(["u",
+                              "-vb", "vasprun.xml",
+                              "-ob", "OUTCAR-1",
+                              "-od", "OUTCAR-2"])
+    # func is a pointer so need to point the same address.
+    expected = Namespace(
+        vasprun_band=mock.return_value,
+        outcar_band=mock_outcar.return_value,
+        outcar_dielectric=mock_outcar.return_value,
+        func=parsed_args.func,
+    )
+    assert parsed_args == expected
+    mock.assert_called_once_with("vasprun.xml")
+    mock_outcar.assert_any_call("OUTCAR-1")
+    mock_outcar.assert_called_with("OUTCAR-2")
+
+
 def test_make_supercell_wo_options(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.IStructure")
     parsed_args = parse_args(["s"])
@@ -26,9 +46,7 @@ def test_make_supercell_w_options(mocker):
                               "-p", "POSCAR-tmp",
                               "--matrix", "1", "2", "3",
                               "--min_num_atoms", "1000",
-                              "--max_num_atoms", "2000",
-                              ]
-                             )
+                              "--max_num_atoms", "2000"])
     # func is a pointer so need to point the same address.
     expected = Namespace(
         unitcell=mock.from_file.return_value,
