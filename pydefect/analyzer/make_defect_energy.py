@@ -15,29 +15,29 @@ def make_single_defect_energy(perfect: CalcResults,
                               defect: CalcResults,
                               defect_entry: DefectEntry,
                               abs_chem_pot: Dict[Element, float],
-                              correction: Optional[Correction] = NoCorrection):
-    name = defect_entry.name
-    charge = defect_entry.charge
+                              correction: Optional[Correction] = NoCorrection
+                              ) -> SingleDefectEnergy:
     n_diffs = num_atom_differences(defect.structure, perfect.structure)
-    energy = (defect.energy + correction.correction_energy - perfect.energy
+    energy = (defect.energy - perfect.energy
+              + correction.correction_energy
               + reservoir_energy(n_diffs, abs_chem_pot))
-    return SingleDefectEnergy(name, charge, energy)
+    return SingleDefectEnergy(defect_entry.name, defect_entry.charge, energy)
 
 
 def reservoir_energy(diffs: Dict[Element, int],
-                     abs_chem_pot: Dict[Element, float]):
+                     abs_chem_pot: Dict[Element, float]) -> float:
     return sum([diff * abs_chem_pot[elem] for elem, diff in diffs.items()])
 
 
 def num_atom_differences(structure: IStructure,
                          ref_structure: IStructure) -> Dict[Element, int]:
-    c1 = structure.composition.as_dict()
-    c2 = ref_structure.composition.as_dict()
+    target_composition = structure.composition.as_dict()
+    reference_composition = ref_structure.composition.as_dict()
     result = {}
-    for k in set(c1.keys()) | set(c2.keys()):
-        diff = int(c1[k] - c2[k])
-        if diff:
-            result[Element(k)] = diff
+    for k in set(target_composition.keys()) | set(reference_composition.keys()):
+        n_atom_diff = int(target_composition[k] - reference_composition[k])
+        if n_atom_diff:
+            result[Element(k)] = n_atom_diff
     return result
 
 

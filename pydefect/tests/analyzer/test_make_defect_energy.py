@@ -24,11 +24,12 @@ def test_single_defect_energy_maker(mocker):
     defect_entry.name = name
     defect_entry.charge = charge
 
-    single_defect_energy = make_single_defect_energy(perfect=perfect,
-                                                     defect=defect,
-                                                     defect_entry=defect_entry,
-                                                     abs_chem_pot={Element.H: 100},
-                                                     correction=ManualCorrection(7.0))
+    single_defect_energy = \
+        make_single_defect_energy(perfect=perfect,
+                                  defect=defect,
+                                  defect_entry=defect_entry,
+                                  abs_chem_pot={Element.H: 100},
+                                  correction=ManualCorrection(7.0))
     energy = (3.0 + 7.0) - 1.0 - 100
 
     assert isinstance(single_defect_energy, SingleDefectEnergy)
