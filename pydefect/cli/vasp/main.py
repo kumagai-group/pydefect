@@ -9,7 +9,8 @@ from pymatgen import IStructure
 from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
-    make_defect_entries, make_unitcell
+    make_defect_entries, make_unitcell, make_competing_phase_dirs
+from pydefect.defaults import defaults
 from pydefect.version import __version__
 
 
@@ -45,6 +46,25 @@ def parse_args(args):
         type=Outcar)
 
     parser_unitcell.set_defaults(func=make_unitcell)
+
+    # -- make_poscars ------------------------------------------------
+    parser_make_poscars = subparsers.add_parser(
+        name="make_poscars",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['mp'])
+
+    parser_make_poscars.add_argument(
+        "-e", "--elements",
+        required=True,
+        nargs="+",
+        type=str)
+    parser_make_poscars.add_argument(
+        "--e_above_hull",
+        default=defaults.e_above_hull,
+        type=float)
+
+    parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
 
     # -- supercell ------------------------------------------------
     parser_supercell = subparsers.add_parser(

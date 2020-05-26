@@ -3,6 +3,7 @@
 from argparse import Namespace
 
 from pydefect.cli.vasp.main import parse_args
+from pydefect.defaults import defaults
 
 
 def test_unitcell(mocker):
@@ -23,6 +24,27 @@ def test_unitcell(mocker):
     mock.assert_called_once_with("vasprun.xml")
     mock_outcar.assert_any_call("OUTCAR-1")
     mock_outcar.assert_called_with("OUTCAR-2")
+
+
+def test_make_poscars_wo_options():
+    parsed_args = parse_args(["mp",
+                              "-e", "Mg", "O"])
+    expected = Namespace(
+        elements=["Mg", "O"],
+        e_above_hull=defaults.e_above_hull,
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
+def test_make_poscars_w_options():
+    parsed_args = parse_args(["mp",
+                              "-e", "Mg", "O",
+                              "--e_above_hull", "0.1"])
+    expected = Namespace(
+        elements=["Mg", "O"],
+        e_above_hull=0.1,
+        func=parsed_args.func)
+    assert parsed_args == expected
 
 
 def test_make_supercell_wo_options(mocker):
