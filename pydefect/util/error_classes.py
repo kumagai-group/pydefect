@@ -14,3 +14,5 @@ class NotPrimitiveError(PydefectError):
     pass
 
 
+class CpdNotSupportedError(Exception):
+    pass

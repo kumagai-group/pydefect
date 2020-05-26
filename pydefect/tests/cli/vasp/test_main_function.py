@@ -5,12 +5,14 @@ from pathlib import Path
 
 import numpy as np
 from monty.serialization import loadfn
-from pymatgen import IStructure
+from pymatgen import IStructure, Composition
 from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
-    make_defect_entries, make_unitcell, make_competing_phase_dirs
+    make_defect_entries, make_unitcell, make_competing_phase_dirs, \
+    make_chem_pot_diag
+from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_set import DefectSet
 
@@ -31,6 +33,39 @@ def test_make_unitcell(mocker):
     mock.assert_called_once_with(vasprun_band=vasprun_band_mock,
                                  outcar_band=outcar_band_mock,
                                  outcar_dielectric=outcar_dielectric_mock)
+
+
+def test_make_chem_pot_diag(mocker, tmpdir):
+    def side_effect(key):
+        mock_vasprun = mocker.Mock()
+        if key == Path("Mg") / defaults.vasprun:
+            mock_vasprun.final_structure.composition = Composition("Mg2")
+            mock_vasprun.final_energy = -10
+        elif key == Path("O") / defaults.vasprun:
+            mock_vasprun.final_structure.composition = Composition("O2")
+            mock_vasprun.final_energy = -20
+        elif key == Path("MgO") / defaults.vasprun:
+            mock_vasprun.final_structure.composition = Composition("MgO")
+            mock_vasprun.final_energy = -30
+        elif key == Path("Al") / defaults.vasprun:
+            mock_vasprun.final_structure.composition = Composition("Al")
+            mock_vasprun.final_energy = 0
+        elif key == Path("MgAl2O4") / defaults.vasprun:
+            mock_vasprun.final_structure.composition = Composition("MgAl2O4")
+            mock_vasprun.final_energy = -70
+        else:
+            raise ValueError
+        return mock_vasprun
+
+    tmpdir.chdir()
+    mock = mocker.patch("pydefect.cli.vasp.main_function.Vasprun", side_effect=side_effect)
+    args = Namespace(vasp_dirs=[Path("Mg"), Path("MgO"), Path("O")],
+                     target=Composition("MgO"))
+    make_chem_pot_diag(args)
+
+    args_2 = Namespace(vasp_dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
+                       target=Composition("MgO"))
+    make_chem_pot_diag(args_2)
 
 
 def test_make_competing_phase_dirs(mocker):
