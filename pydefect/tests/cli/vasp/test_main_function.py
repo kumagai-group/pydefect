@@ -8,10 +8,11 @@ from monty.serialization import loadfn
 from pymatgen import IStructure, Composition
 from pymatgen.io.vasp import Vasprun, Outcar
 
+from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
-    make_chem_pot_diag
+    make_chem_pot_diag, make_calc_results
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_set import DefectSet
@@ -129,9 +130,20 @@ def test_make_defect_entries(tmpdir, supercell_info):
     assert file_names == {"POSCAR", "defect_entry.json"}
 
 
-def test_make_calc_results(tmpdir):
-    args = Namespace(dirs=[Path("a"), Path("b")])
-    Path("a").name
+def test_make_calc_results(tmpdir, mocker):
+    tmpdir.chdir()
+    mock = mocker.patch("pydefect.cli.vasp.main_function.make_calc_results_from_vasp")
+    mock_vasprun = mocker.patch("pydefect.cli.vasp.main_function.Vasprun")
+    mock_outcar = mocker.patch("pydefect.cli.vasp.main_function.Outcar")
+    mock_calc_results = mocker.Mock(spec=CalcResults)
+    mock.return_value = mock_calc_results
+    args = Namespace(dirs=[Path("a")])
+    make_calc_results(args)
+
+    mock_vasprun.assert_called_with(Path("a") / defaults.vasprun)
+    mock_outcar.assert_called_with(Path("a") / defaults.outcar)
+    mock.assert_called_with(vasprun=mock_vasprun.return_value, outcar=mock_outcar.return_value)
+    mock_calc_results.to_json_file.assert_called_with(filename=Path("a") / "calc_results.json")
 
 
 """
