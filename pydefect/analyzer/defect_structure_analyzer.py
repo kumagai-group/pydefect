@@ -27,6 +27,22 @@ class DefectStructureAnalyzer:
                 if d not in self.inserted_indices}
 
     @property
+    def p_to_d(self):
+        result = []
+        for site in self._perfect_structure:
+            distances = Distances(self._defective_structure, site.frac_coords)
+            result.append(distances.mapped_atom_idx(specie=site.specie))
+        return result
+
+    @property
+    def d_to_p(self):
+        result = []
+        for site in self._defective_structure:
+            distances = Distances(self._perfect_structure, site.frac_coords)
+            result.append(distances.mapped_atom_idx(specie=site.specie))
+        return result
+
+    @property
     def vacancy_indices(self):
         result = []
         for p, d in enumerate(self.p_to_d):
@@ -47,22 +63,6 @@ class DefectStructureAnalyzer:
             except (IndexError, TypeError):
                 result.append(d)
         return sorted(result)
-
-    @property
-    def p_to_d(self):
-        result = []
-        for site in self._perfect_structure:
-            distances = Distances(self._defective_structure, site.frac_coords)
-            result.append(distances.mapped_atom_idx(specie=site.specie))
-        return result
-
-    @property
-    def d_to_p(self):
-        result = []
-        for site in self._defective_structure:
-            distances = Distances(self._perfect_structure, site.frac_coords)
-            result.append(distances.mapped_atom_idx(specie=site.specie))
-        return result
 
     @property
     def defect_center_coord(self):
