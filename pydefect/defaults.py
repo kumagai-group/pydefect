@@ -12,6 +12,7 @@ class Defaults:
     def __init__(self):
         self._symmetry_length_tolerance = 0.1
         self._symmetry_angle_tolerance = 5.0
+        self._e_above_hull = 1e-5
         self._cutoff_distance_factor = 1.7
         self._displace_distance = 0.2
         self._same_distance_criterion = 0.1
@@ -42,6 +43,10 @@ class Defaults:
     @property
     def symmetry_angle_tolerance(self):
         return self._symmetry_angle_tolerance
+
+    @property
+    def e_above_hull(self):
+        return self._e_above_hull
 
     @property
     def cutoff_distance_factor(self):

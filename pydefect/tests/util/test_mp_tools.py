@@ -2,6 +2,7 @@
 
 # from vise.util.mp_tools import make_poscars_from_mp
 # .testing import ViseTest
+import pytest
 
 from pydefect.util.mp_tools import elements, MpQuery
 
@@ -12,6 +13,7 @@ def test_elements():
     assert elements[-1] == "Og"
 
 
+@pytest.mark.skip()
 def test_mp_actual_query():
     element_list = ["Mg", "O"]
     mp_query = MpQuery(element_list=element_list,

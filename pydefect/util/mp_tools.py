@@ -4,14 +4,17 @@ from typing import List
 
 from pymatgen import Element, MPRester
 
+from pydefect.defaults import defaults
+
 elements = [e.name for e in Element]
 
 
 class MpQuery:
     def __init__(self,
                  element_list: List[str],
+                 e_above_hull: float = defaults.e_above_hull,
                  properties: List[str] = None,
-                 e_above_hull: float = 1e-5):
+                 ):
 
         self.element_list = element_list
         self.properties = (properties or
