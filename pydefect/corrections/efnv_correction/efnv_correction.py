@@ -10,7 +10,7 @@ from pydefect.corrections.abstract_correction import Correction
 
 
 @dataclass
-class ExtendedFnvCorrection(Correction, MSONable):
+class ExtendedFnvCorrection(Correction):
     """
     species: Species except for the defect. e.g., ["Mg", "Mg", ..., "O", ..]
     atomic_coords: Fractional coordinates except for the defect.
