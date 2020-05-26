@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import List
 
 import numpy as np
+from monty.json import MSONable
 from scipy.spatial import HalfspaceIntersection
 
 
@@ -15,7 +16,7 @@ class SingleDefectEnergy:
 
 
 @dataclass
-class DefectEnergy:
+class DefectEnergy(MSONable):
     name: str
     charges: List[int]
     energies: List[float]
