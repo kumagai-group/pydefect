@@ -24,7 +24,7 @@ class Site(MSONable):
 
 
 @dataclass(frozen=True)
-class SupercellInfo(MSONable):
+class SupercellInfo(MSONable, ToJsonFileMixIn):
     structure: IStructure
     space_group: str
     transform_matrix: List[List[int]]
@@ -73,10 +73,3 @@ class SupercellInfo(MSONable):
             lines.append("")
 
         return "\n".join(lines)
-
-    def to_json_file(self, filename="supercell_info.json") -> None:
-        Path(filename).write_text(self.to_json())
-
-    @staticmethod
-    def from_json_file(filename="supercell_info.json") -> "SupercellInfo":
-        return loadfn(filename)

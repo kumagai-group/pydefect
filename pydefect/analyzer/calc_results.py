@@ -6,7 +6,7 @@ from typing import List, Optional
 from monty.json import MSONable
 from pymatgen import IStructure
 
-from pydefect.mix_in import ToJsonFileMixIn
+from pydefect.util.mix_in import ToJsonFileMixIn
 
 
 @dataclass

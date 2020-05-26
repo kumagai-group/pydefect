@@ -16,4 +16,4 @@ def assert_json_roundtrip(obj, tmpdir):
     tmpdir.chdir()
     obj.to_json_file("a.json")
     actual = loadfn("a.json")
-    assert actual == obj
+    assert actual.as_dict() == obj.as_dict()

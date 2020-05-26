@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Tuple
 
 import numpy as np
 from monty.json import MSONable
-from monty.serialization import loadfn
 from pymatgen import IStructure
+
+from pydefect.util.mix_in import ToJsonFileMixIn
 
 
 @dataclass(frozen=True)
-class DefectEntry(MSONable):
+class DefectEntry(MSONable, ToJsonFileMixIn):
     name: str
     charge: int
     structure: IStructure
@@ -44,9 +44,3 @@ class DefectEntry(MSONable):
     def full_name(self):
         return "_".join([self.name, str(self.charge)])
 
-    def to_json_file(self, filename="defect_entry.json") -> None:
-        Path(filename).write_text(self.to_json())
-
-    @staticmethod
-    def from_json_file(filename="defect_entry.json") -> "DefectEntry":
-        return loadfn(filename)

@@ -32,10 +32,6 @@ def defect_entry():
                        defect_center=(0, 0, 0))
 
 
-def test_msonable(defect_entry):
-    assert_msonable(defect_entry)
-
-
 def test_hashable(defect_entry):
     d = {defect_entry: 1}
 
@@ -48,12 +44,16 @@ def test_full_name(defect_entry):
     assert defect_entry.full_name == "Va_O1_1"
 
 
-def test_json(defect_entry, tmpdir):
-    assert_json_roundtrip(defect_entry, tmpdir)
-
-
 def test_anchor_atom_index(defect_entry):
     assert defect_entry.anchor_atom_index == 6
+
+
+def test_msonable(defect_entry):
+    assert_msonable(defect_entry)
+
+
+def test_json_roundtrip(defect_entry, tmpdir):
+    assert_json_roundtrip(defect_entry, tmpdir)
 
 
 """
