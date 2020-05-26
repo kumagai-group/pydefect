@@ -3,6 +3,7 @@
 import json
 
 from monty.json import MSONable, MontyDecoder
+from monty.serialization import loadfn
 
 
 def assert_msonable(obj):
@@ -13,6 +14,6 @@ def assert_msonable(obj):
 
 def assert_json_roundtrip(obj, tmpdir):
     tmpdir.chdir()
-    obj.to_json_file()
-    actual = obj.from_json_file().as_dict()
-    assert actual == obj.as_dict()
+    obj.to_json_file("a.json")
+    actual = loadfn("a.json")
+    assert actual == obj
