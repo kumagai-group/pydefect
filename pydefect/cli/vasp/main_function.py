@@ -98,13 +98,13 @@ def make_calc_results(args):
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
         try:
-            dft_results = make_calc_results_from_vasp(
+            calc_results = make_calc_results_from_vasp(
                 vasprun=Vasprun(d / defaults.vasprun),
                 outcar=Outcar(d / defaults.outcar))
         except IOError:
             logger.warning(f"Parsing data in {d} failed.")
             continue
-        dft_results.to_json_file(filename=Path(d) / "calc_results.json")
+        calc_results.to_json_file(filename=Path(d) / "calc_results.json")
 
 
 def make_correction(args):
