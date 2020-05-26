@@ -2,6 +2,7 @@
 
 # from vise.util.mp_tools import make_poscars_from_mp
 # .testing import ViseTest
+
 from pydefect.util.mp_tools import elements, MpQuery
 
 
@@ -9,6 +10,13 @@ def test_elements():
     assert len(elements) == 118
     assert elements[0] == "H"
     assert elements[-1] == "Og"
+
+
+def test_mp_actual_query():
+    element_list = ["Mg", "O"]
+    mp_query = MpQuery(element_list=element_list,
+                       properties=["full_formula", "structure"])
+    print(mp_query.materials)
 
 
 def test_mp_query(mocker):
@@ -24,17 +32,6 @@ def test_mp_query(mocker):
                   "e_above_hull": {"$lte": 1e-5}},
         properties=["full_formula"])
     assert mp_query.materials == expected
-
-
-# def test(self):
-    #     make_poscars_from_mp(elements=["Mg", "O"])
-
-    # # uncomment these if one wants to check the created directories.
-    # def tearDown(self) -> None:
-    #     shutil.rmtree("mol_O2")
-    #     shutil.rmtree("mp-1265_MgO")
-    #     shutil.rmtree("mp-1094122_Mg")
-
 
 
 """

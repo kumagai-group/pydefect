@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
-from shutil import copyfile
 from typing import List
 
-import yaml
-from pymatgen import Element, MPRester, Composition
-
-from pydefect.chem_pot_diag.gas import MOLECULE_DATA
+from pymatgen import Element, MPRester
 
 elements = [e.name for e in Element]
 mol_dir = Path(__file__).parent / ".." / "chem_pot_diag" / "molecules"
@@ -30,36 +26,11 @@ class MpQuery:
         # API key is parsed via .pmgrc.yaml
 
         with MPRester() as m:
+            # Due to mp_decode=True by default, class objects are restored.
             self.materials = \
                 m.query(criteria={"elements": {"$in": element_list,
                                                "$nin": excluded},
                                   "e_above_hull": {"$lte": e_above_hull}},
                         properties=self.properties)
-
-
-def make_poscars(materials_query: List[dict], path: Path = Path.cwd()) -> None:
-
-    for m in materials_query:
-        reduced_formula = Composition(m["full_formula"]).reduced_formula
-
-        if reduced_formula in MOLECULE_DATA.keys():
-            dirname = path / f"mol_{reduced_formula}"
-            if not dirname.exists():
-                dirname.mkdir()
-                copyfile(mol_dir / reduced_formula / "POSCAR",
-                         dirname / "POSCAR")
-                copyfile(mol_dir / reduced_formula / "prior_info.yaml",
-                         dirname / "prior_info.yaml")
-
-        else:
-            m_path = path / f"{reduced_formula}_{m['task_id']}"
-            m_path.mkdir()
-            m.pop("structure").to(filename=m_path / "POSCAR")
-
-            d = {"total_magnetization": m["total_magnetization"],
-                 "band_gap": m["band_gap"],
-                 "data_source": m["task_id"]}
-
-            (m_path / "prior_info.yaml").write_text(yaml.dump(d))
 
 
