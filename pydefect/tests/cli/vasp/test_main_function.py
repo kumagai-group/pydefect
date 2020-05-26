@@ -3,13 +3,24 @@
 from argparse import Namespace
 from pathlib import Path
 
+from monty.serialization import loadfn
 from pymatgen import IStructure
 
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_set import DefectSet
-from pydefect.input_maker.supercell_info import SupercellInfo
+
+
+#
+# def test_make_unitcell(mocker):
+#     vasprun_band_mock = mocker.Mock(spec=Vasprun, autospec=True)
+#     outcar_band_mock = mocker.Mock(spec=Outcar, autospec=True)
+#     outcar_dielectric_mock = mocker.Mock(spec=Outcar, autospec=True)
+#     args = Namespace(vasprun_band=vasprun_band_mock,
+#                      outcar_band=outcar_band_mock,
+#                      outcar_dielectric=outcar_dielectric_mock)
+#     make_unitcell(args)
 
 
 def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
@@ -18,7 +29,7 @@ def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
 
     tmpdir.chdir()
     make_supercell(args)
-    info = SupercellInfo.from_json_file("supercell_info.json")
+    info = loadfn("supercell_info.json")
     assert IStructure.from_file("SPOSCAR") == simple_cubic_2x1x1
     assert info.structure == simple_cubic_2x1x1
     assert info.transform_matrix == [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
@@ -29,7 +40,7 @@ def test_make_recommended_supercell(simple_cubic, simple_cubic_2x2x2, tmpdir):
 
     tmpdir.chdir()
     make_supercell(args)
-    info = SupercellInfo.from_json_file("supercell_info.json")
+    info = loadfn("supercell_info.json")
     assert IStructure.from_file("SPOSCAR") == simple_cubic_2x2x2
     assert info.structure == simple_cubic_2x2x2
     assert info.transform_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
@@ -61,6 +72,18 @@ def test_make_defect_entries(tmpdir, supercell_info):
     file_names = {str(file_name.name) for file_name in Path("Va_He1_-1").glob("*")}
     assert file_names == {"POSCAR", "defect_entry.json"}
 
+
+def test_make_calc_results(tmpdir):
+    args = Namespace(dirs=[Path("a"), Path("b")])
+    Path("a").name
+
+
+def test():
+    class A:
+        def __init__(self):
+            print(str(self.__class__.__name__))
+
+    print(A())
 
 """
 TODO
