@@ -69,22 +69,22 @@ def parse_args(args):
     parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
 
     # -- cpd ------------------------------------------------
-    parser_make_poscars = subparsers.add_parser(
+    parser_cpd = subparsers.add_parser(
         name="cpd",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cpd'])
 
-    parser_make_poscars.add_argument(
+    parser_cpd.add_argument(
         "-d", "--vasp_dirs",
         required=True,
         nargs="+",
         type=Path)
-    parser_make_poscars.add_argument(
+    parser_cpd.add_argument(
         "-t", "--target",
         type=Composition)
 
-    parser_make_poscars.set_defaults(func=make_chem_pot_diag)
+    parser_cpd.set_defaults(func=make_chem_pot_diag)
 
     # -- supercell ------------------------------------------------
     parser_supercell = subparsers.add_parser(
@@ -113,36 +113,53 @@ def parse_args(args):
 
     parser_supercell.set_defaults(func=make_supercell)
 
-    # -- make_defect_set ------------------------------------------------
-    parser_make_defect_set = subparsers.add_parser(
+    # -- defect_set ------------------------------------------------
+    parser_defect_set = subparsers.add_parser(
         name="defect_set",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['ds'])
 
-    parser_make_defect_set.add_argument(
+    parser_defect_set.add_argument(
         "-o", "--oxi_states",
         nargs="+",
         type=str)
-    parser_make_defect_set.add_argument(
+    parser_defect_set.add_argument(
         "-d", "--dopants",
         nargs="+",
         type=str)
-    parser_make_defect_set.add_argument(
+    parser_defect_set.add_argument(
         "-k", "--kwargs",
         nargs="+",
         type=str)
 
-    parser_make_defect_set.set_defaults(func=make_defect_set)
+    parser_defect_set.set_defaults(func=make_defect_set)
 
-    # -- make_defect_entries ------------------------------------------------
-    parser_make_defect_entries = subparsers.add_parser(
+    # -- defect_entries ------------------------------------------------
+    parser_defect_entries = subparsers.add_parser(
         name="defect_entries",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['de'])
 
-    parser_make_defect_entries.set_defaults(func=make_defect_entries)
+    parser_defect_entries.set_defaults(func=make_defect_entries)
+
+    # -- calc_results ------------------------------------------------
+    parser_calc_results = subparsers.add_parser(
+        name="calc_results",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['cr'])
+
+    parser_calc_results.add_argument(
+        "-d", "--dirs",
+        required=True,
+        nargs="+",
+        type=Path)
+
+    parser_calc_results.set_defaults(func=make_defect_entries)
+
+    # ------------------------------------------------------------------------
     return parser.parse_args(args)
 
 

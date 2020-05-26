@@ -105,7 +105,7 @@ def test_make_supercell_w_options(mocker):
     mock.from_file.assert_called_once_with("POSCAR-tmp")
 
 
-def test_make_defect_set_wo_options():
+def test_defect_set_wo_options():
     parsed_args = parse_args(["ds"])
     expected = Namespace(
         oxi_states=None,
@@ -116,7 +116,7 @@ def test_make_defect_set_wo_options():
     assert parsed_args == expected
 
 
-def test_make_defect_set_w_options():
+def test_defect_set_w_options():
     parsed_args = parse_args(["ds",
                               "-o", "He", "1",
                               "-d", "Li",
@@ -130,7 +130,7 @@ def test_make_defect_set_w_options():
     assert parsed_args == expected
 
 
-def test_make_defect_entries():
+def test_defect_entries():
     parsed_args = parse_args(["de"])
     expected = Namespace(
         func=parsed_args.func,
@@ -138,6 +138,13 @@ def test_make_defect_entries():
     assert parsed_args == expected
 
 
+def test_calc_results():
+    parsed_args = parse_args(["cr", "-d", "Va_O1_0", "Va_O1_1"])
+    expected = Namespace(
+        dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        func=parsed_args.func,
+    )
+    assert parsed_args == expected
 
 """
 TODO
