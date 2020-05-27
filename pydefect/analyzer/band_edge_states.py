@@ -43,15 +43,18 @@ class EdgeState(MSONable, ExtendedEnum):
 
 @dataclass
 class EdgeCharacters(MSONable, ToJsonFileMixIn):
-    # [by spin][hob, lub]
-    edge_characters: List[Tuple["EdgeCharacter", "EdgeCharacter"]]
+    # [by spin]
+    edge_characters: List["EdgeCharacter"]
 
 
 @dataclass
 class EdgeCharacter(MSONable):
     """Code and its version dependent quantities. """
-    participation_ratio: float
-    energy: float
+    hob_p_ratio: float  # participation ratio
+    lub_p_ratio: float
+    hob_energy: float
+    lub_energy: float
     # {"Mn": [0.01, ..], "O": [0.03, 0.5]},
     # where lists contain s, p, d, (f) orbital components.
-    orbitals: Dict[str, List[float]]
+    hob_orbitals: Dict[str, List[float]]
+    lub_orbitals: Dict[str, List[float]]

@@ -51,13 +51,13 @@ def test_band_edge_states_to_json_file(band_edge_states, tmpdir):
 
 @pytest.fixture
 def edge_characters():
-    hob = EdgeCharacter(participation_ratio=0.1,
-                        energy=0.2,
-                        orbitals={"Mn": [0.5, 0.6]})
-    lub = EdgeCharacter(participation_ratio=0.3,
-                        energy=0.4,
-                        orbitals={"Mn": [0.7, 0.8]})
-    return EdgeCharacters(edge_characters=[(hob, lub)])
+    edge_character = EdgeCharacter(hob_p_ratio=0.1,
+                        lub_p_ratio=0.2,
+                        hob_energy=0.3,
+                        lub_energy=0.4,
+                        hob_orbitals={"Mn": [0.5, 0.6]},
+                        lub_orbitals={"Mn": [0.7, 0.8]})
+    return EdgeCharacters(edge_characters=[edge_character])
 
 
 def test_edge_characters_msonable(edge_characters):
