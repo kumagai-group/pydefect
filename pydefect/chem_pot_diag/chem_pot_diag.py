@@ -1,39 +1,46 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import string
+from dataclasses import dataclass
 from itertools import chain
 from typing import Dict, Optional
 
 import numpy as np
+from monty.json import MSONable
 from pymatgen import Composition
 from scipy.spatial.qhull import HalfspaceIntersection
 
 from pydefect.error import PydefectError
+from pydefect.util.mix_in import ToJsonFileMixIn
 
 alphabets = list(string.ascii_uppercase)
 
 
-class ChemPotDiag:
-    def __init__(self,
-                 energies: Dict[Composition, float],
-                 target: Optional[Composition] = None,
-                 ):
-        self.abs_energies = {c.reduced_composition: e / c.num_atoms
-                             for c, e in energies.items()}
-        self.compounds = self.abs_energies.keys()
-        self.vertex_elements = self._get_vertex_elements()
-        self.dim = len(self.vertex_elements)
-        self.offset_to_abs = self._get_offset_to_abs()
-        self.rel_energies = self._get_rel_energies()
-        self.vertex_coords = self._get_vertex_coords()
+@dataclass
+class ChemPotDiag(MSONable, ToJsonFileMixIn):
+    energies: Dict[str, float]
+    target: Optional[Composition] = None
 
-        self.target = target
+    @property
+    def abs_energies(self):
+        return {Composition(c).reduced_composition: e / Composition(c).num_atoms
+                for c, e in self.energies.items()}
 
-    def _get_vertex_elements(self):
+    @property
+    def compounds(self):
+        return self.abs_energies.keys()
+
+    @property
+    def vertex_elements(self):
         elements = sum(list(c.elements for c in self.compounds), [])
         return sorted(list(set(elements)))
 
-    def _get_offset_to_abs(self):
+    @property
+    def dim(self):
+        return len(self.vertex_elements)
+
+    @property
+    def offset_to_abs(self):
         result = []
         for vertex_element in self.vertex_elements:
             target = Composition({vertex_element: 1.0}).reduced_composition
@@ -45,7 +52,8 @@ class ChemPotDiag:
                 raise NoElementEnergyError
         return result
 
-    def _get_rel_energies(self):
+    @property
+    def rel_energies(self):
         result = {}
         for c, e in self.abs_energies.items():
             sub = sum(f * offset for f, offset
@@ -57,7 +65,8 @@ class ChemPotDiag:
     def atomic_fractions(self, c):
         return [c.fractional_composition[e] for e in self.vertex_elements]
 
-    def _get_vertex_coords(self):
+    @property
+    def vertex_coords(self):
         large_minus_number = -1e5
         hs = self.get_half_space_intersection(large_minus_number)
 

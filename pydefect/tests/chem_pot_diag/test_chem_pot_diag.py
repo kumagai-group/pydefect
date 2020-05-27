@@ -8,17 +8,24 @@ from pymatgen import Composition, Element
 
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
     NoElementEnergyError
-
 # When same keys are inserted, only the latter one is accepted.
-energies = {Composition("H"): 0.0,
-            Composition("O"): 0.5,
-            Composition("O"): 1.0,
-            Composition("H4O2"): -4.0}
+from pydefect.tests.helpers.assertion import assert_msonable, \
+    assert_json_roundtrip
+
+energies = {"H": 0.0, "O": 1.0, "H4O2": -4.0}
 
 
 @pytest.fixture
 def cpd():
     return ChemPotDiag(energies, target=Composition("H2"))
+
+
+def test_chem_pot_diag_assert_msonable(cpd):
+    assert_msonable(cpd)
+
+
+def test_chem_pot_diag_to_json_file(cpd, tmpdir):
+    assert_json_roundtrip(cpd, tmpdir)
 
 
 def test_chem_pot_diag(cpd):
@@ -38,7 +45,7 @@ def test_cpd_plot_info_lacking_element_data():
     new_energies = deepcopy(energies)
     new_energies[Composition("MgO")] = -3.0
     with pytest.raises(NoElementEnergyError):
-        ChemPotDiag(new_energies)
+        ChemPotDiag(new_energies).offset_to_abs
 
 
 def test_chem_pot_diag_min_energy(cpd):
