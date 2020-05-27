@@ -8,8 +8,8 @@ from pydefect.defaults import defaults
 
 
 def make_band_edge_state(target: EdgeCharacter, ref: EdgeCharacter) -> EdgeState:
-    hob_localized = target.hob_p_ratio > defaults.localized_ratio
-    lub_localized = target.lub_p_ratio > defaults.localized_ratio
+    hob_localized = target.hob_participation_ratio > defaults.localized_ratio
+    lub_localized = target.lub_participation_ratio > defaults.localized_ratio
 
     is_hob_near_cbm = (target.hob_bottom_e
                        > ref.cbm - defaults.similar_energy_criterion)
@@ -29,8 +29,6 @@ def make_band_edge_state(target: EdgeCharacter, ref: EdgeCharacter) -> EdgeState
 
     similar_vbm_o = are_orbitals_similar(target.vbm_orbitals, ref.vbm_orbitals)
     similar_cbm_o = are_orbitals_similar(target.cbm_orbitals, ref.cbm_orbitals)
-
-    print(hob_localized, lub_localized, is_hob_near_cbm, is_lub_near_vbm, similar_vbm_e, similar_cbm_e, similar_vbm_o, similar_cbm_o)
 
     if (hob_localized is False and lub_localized is False
             and similar_vbm_e and similar_cbm_e

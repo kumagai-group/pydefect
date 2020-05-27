@@ -58,5 +58,5 @@ class EdgeCharacter(MSONable):
     # where lists contain s, p, d, (f) orbital components.
     vbm_orbitals: Dict[str, List[float]]
     cbm_orbitals: Dict[str, List[float]]
-    hob_p_ratio: Optional[float] = None  # participation ratio
-    lub_p_ratio: Optional[float] = None
+    hob_participation_ratio: Optional[float] = None  # participation ratio
+    lub_participation_ratio: Optional[float] = None

@@ -51,8 +51,8 @@ def test_band_edge_states_to_json_file(band_edge_states, tmpdir):
 
 @pytest.fixture
 def edge_characters():
-    edge_character = EdgeCharacter(hob_p_ratio=0.1,
-                                   lub_p_ratio=0.2,
+    edge_character = EdgeCharacter(hob_participation_ratio=0.1,
+                                   lub_participation_ratio=0.2,
                                    hob_bottom_e=0.3,
                                    lub_top_e=0.4,
                                    vbm=0.5,
