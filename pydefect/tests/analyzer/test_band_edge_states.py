@@ -30,8 +30,15 @@ def test_band_edge_eigenvalues_to_json_file(band_edge_eigenvalues, tmpdir):
 
 @pytest.fixture
 def band_edge_states():
-    return BandEdgeStates([EdgeState.donor_phs, EdgeState.acceptor_phs],
+    return BandEdgeStates([EdgeState.donor_phs, EdgeState.no_in_gap],
                           method="manual")
+
+
+def test_band_edge_states_is_shallow(band_edge_states):
+    assert band_edge_states.is_shallow is True
+    actual = BandEdgeStates([EdgeState.localized_state, EdgeState.no_in_gap],
+                       method="manual")
+    assert actual.is_shallow is False
 
 
 def test_band_edge_states_msonable(band_edge_states):

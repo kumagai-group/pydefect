@@ -25,6 +25,10 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
     states: List["EdgeState"]  # by spin.
     method: str
 
+    @property
+    def is_shallow(self):
+        return any([s.is_shallow for s in self.states])
+
 
 class EdgeState(MSONable, ExtendedEnum):
     donor_phs = "Donor PHS"
