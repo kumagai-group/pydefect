@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 import numpy as np
 from monty.json import MSONable
@@ -33,8 +33,9 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
 class EdgeState(MSONable, ExtendedEnum):
     donor_phs = "Donor PHS"
     acceptor_phs = "Acceptor PHS"
-    localized_state = "Localized state"
+    in_gap_state = "In-gap state"
     no_in_gap = "No in-gap state"
+    unknown = "Unknown"
 
     @property
     def is_shallow(self):
@@ -43,18 +44,19 @@ class EdgeState(MSONable, ExtendedEnum):
 
 @dataclass
 class EdgeCharacters(MSONable, ToJsonFileMixIn):
-    # [by spin]
-    edge_characters: List["EdgeCharacter"]
+    edge_characters: List["EdgeCharacter"]  # [by spin]
 
 
 @dataclass
 class EdgeCharacter(MSONable):
     """Code and its version dependent quantities. """
-    hob_p_ratio: float  # participation ratio
-    lub_p_ratio: float
-    hob_energy: float
-    lub_energy: float
+    hob_bottom_e: float  # hob bottom energy
+    lub_top_e: float  # lub top energy
+    vbm: Optional[float]
+    cbm: Optional[float]
     # {"Mn": [0.01, ..], "O": [0.03, 0.5]},
     # where lists contain s, p, d, (f) orbital components.
-    hob_orbitals: Dict[str, List[float]]
-    lub_orbitals: Dict[str, List[float]]
+    vbm_orbitals: Dict[str, List[float]]
+    cbm_orbitals: Dict[str, List[float]]
+    hob_p_ratio: Optional[float] = None  # participation ratio
+    lub_p_ratio: Optional[float] = None
