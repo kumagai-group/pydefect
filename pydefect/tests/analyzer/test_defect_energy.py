@@ -4,7 +4,7 @@
 import pytest
 
 from pydefect.analyzer.defect_energy import (
-    DefectEnergy, CrossPoints)
+    DefectEnergy, CrossPoints, SingleDefectEnergy, make_defect_energies)
 
 
 @pytest.fixture
@@ -34,6 +34,18 @@ def test_cross_points(cross_points):
     assert cross_points.t_boundary_points == [[1, 5], [10, 50]]
 
 
+def test_generate_defect_energies():
+    defect_energies = [
+        SingleDefectEnergy("Va_O1", 0, 0),
+        SingleDefectEnergy("Va_Mg1", 0, 0),
+        SingleDefectEnergy("Va_O1", 1, 10),
+        SingleDefectEnergy("Va_Mg1", -1, -10),
+        SingleDefectEnergy("Va_O1", 2, 20),
+        SingleDefectEnergy("Va_Mg1", -2, -20)]
+    actual = make_defect_energies(defect_energies)
+    expected = [DefectEnergy("Va_Mg1", [0, -1, -2], [0, -10, -20]),
+                DefectEnergy("Va_O1", [0, 1, 2], [0, 10, 20])]
+    assert actual == expected
 
 """
 TODO

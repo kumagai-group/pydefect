@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
+from itertools import groupby
 from typing import List
 
 import numpy as np
-from monty.json import MSONable
 from scipy.spatial import HalfspaceIntersection
 
 
@@ -69,3 +69,15 @@ class CrossPoints:
         return np.transpose(np.array(self.boundary_points)).tolist()
 
 
+def make_defect_energies(single_energies: List[SingleDefectEnergy]
+                         ) -> List[DefectEnergy]:
+    sorted_energies = sorted(single_energies, key=lambda x: x.name)
+    result = []
+    for _, grouped_energies in groupby(sorted_energies, lambda x: x.name):
+        charges = []
+        energies = []
+        for single_energy in grouped_energies:
+            charges.append(single_energy.charge)
+            energies.append(single_energy.energy)
+        result.append(DefectEnergy(single_energy.name, charges, energies))
+    return result
