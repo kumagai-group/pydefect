@@ -18,6 +18,9 @@ class Defaults:
         self._same_distance_criterion = 0.1
         self._kpoint_density = 5.0
         self._band_gap_criterion = 0.2  # in eV
+        self._localized_ratio = 0.2
+        self._similar_orb_criterion = 0.12
+        self._similar_energy_criterion = 0.2  # in eV
         self._integer_criterion = 0.1
         self._defect_energy_colors = \
             ["xkcd:blue", "xkcd:brown", "xkcd:crimson", "xkcd:darkgreen",
@@ -63,6 +66,18 @@ class Defaults:
     @property
     def kpoint_density(self):
         return self._kpoint_density
+
+    @property
+    def localized_ratio(self):
+        return self._localized_ratio
+
+    @property
+    def similar_orb_criterion(self):
+        return self._similar_orb_criterion
+
+    @property
+    def similar_energy_criterion(self):
+        return self._similar_energy_criterion
 
     @property
     def band_gap_criterion(self):
