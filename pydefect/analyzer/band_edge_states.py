@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
 
-import numpy as np
 from monty.json import MSONable
 from vise.util.enum import ExtendedEnum
 
@@ -12,12 +11,8 @@ from pydefect.util.mix_in import ToJsonFileMixIn
 
 @dataclass
 class BandEdgeEigenvalues(MSONable, ToJsonFileMixIn):
-    energies: np.ndarray  # [spin, k-idx, band-idx]
-    occupations: np.ndarray  # [spin, k-idx, band-idx]
-    lowest_band_energy: float  # top of lowest band energy in this data
-    highest_band_energy: float  # bottom of highest band energy in this data
+    energies_and_occupations: List[List[List[float]]]  # [spin, k-idx, band-idx]
     kpt_coords: List[Tuple[float, float, float]]
-    kpt_weights: List[float]
 
 
 @dataclass

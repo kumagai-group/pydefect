@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
-import numpy as np
 import pytest
 
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues, \
@@ -12,12 +11,8 @@ from pydefect.tests.helpers.assertion import assert_msonable, \
 
 @pytest.fixture
 def band_edge_eigenvalues():
-    return BandEdgeEigenvalues(energies=np.array([[[0.0]]]),
-                               occupations=np.array([[[0.0]]]),
-                               lowest_band_energy=0.0,
-                               highest_band_energy=1.0,
-                               kpt_coords=[(0.0, 0.0, 0.0)],
-                               kpt_weights=[1.0])
+    return BandEdgeEigenvalues(energies_and_occupations=[[[0.0, 1.0]]],
+                               kpt_coords=[(0.0, 0.0, 0.0)])
 
 
 def test_band_edge_eigenvalues_msonable(band_edge_eigenvalues):

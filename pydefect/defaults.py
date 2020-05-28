@@ -21,6 +21,7 @@ class Defaults:
         self._localized_ratio = 0.2
         self._similar_orb_criterion = 0.12
         self._similar_energy_criterion = 0.2  # in eV
+        self._eigval_range = 3.0
         self._integer_criterion = 0.1
         self._defect_energy_colors = \
             ["xkcd:blue", "xkcd:brown", "xkcd:crimson", "xkcd:darkgreen",
@@ -78,6 +79,10 @@ class Defaults:
     @property
     def similar_energy_criterion(self):
         return self._similar_energy_criterion
+
+    @property
+    def eigval_range(self):
+        return self._eigval_range
 
     @property
     def band_gap_criterion(self):
