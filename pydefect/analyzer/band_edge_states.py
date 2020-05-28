@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from collections import Sequence
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
 
@@ -37,17 +38,30 @@ class EdgeState(MSONable, ExtendedEnum):
         return self in [self.acceptor_phs, self.donor_phs]
 
 
-@dataclass
-class EdgeCharacters(MSONable, ToJsonFileMixIn):
-    edge_characters: List["EdgeCharacter"]  # [by spin]
+class EdgeCharacters(Sequence, MSONable, ToJsonFileMixIn):
+    def __init__(self, edge_characters: List["EdgeCharacter"]):
+        self.list = edge_characters  # [by spin]
+
+    def __getitem__(self, item):
+        return self.list[item]
+
+    def __len__(self):
+        return len(self.list)
+
+    def as_dict(self):
+        return {"edge_characters": [ec.as_dict() for ec in self.list]}
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls([EdgeCharacter.from_dict(dd) for dd in d["edge_characters"]])
 
 
 @dataclass
 class EdgeCharacter(MSONable):
     """Code and its version dependent quantities. """
-    hob_bottom_e: float  # hob bottom energy
-    lub_top_e: float  # lub top energy
-    vbm: Optional[float]
+    hob_bottom_e: float  # Highest-occupied band
+    lub_top_e: float  # Lowest-unoccupied band
+    vbm: Optional[float]  # None for metals
     cbm: Optional[float]
     # {"Mn": [0.01, ..], "O": [0.03, 0.5]},
     # where lists contain s, p, d, (f) orbital components.

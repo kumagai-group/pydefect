@@ -54,7 +54,7 @@ def edge_characters():
                                    cbm=0.6,
                                    vbm_orbitals={"Mn": [0.5, 0.6]},
                                    cbm_orbitals={"Mn": [0.7, 0.8]})
-    return EdgeCharacters(edge_characters=[edge_character])
+    return EdgeCharacters([edge_character])
 
 
 def test_edge_characters_msonable(edge_characters):
