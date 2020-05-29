@@ -17,7 +17,6 @@ class MakeEdgeCharacters:
                  outcar: Outcar,
                  neighboring_atom_indices):
         self.orbs = procar.data
-        self.orb_types = procar.orbitals
         self.structure = vasprun.final_structure
         self.eigenvalues = eigenvalues_from_vasprun(vasprun)
         self.nelect = outcar.nelect
@@ -35,12 +34,15 @@ class MakeEdgeCharacters:
             cbm_band_idx = vbm_band_idx + 1
 
             vbm = np.amax(eigenvalues[:, vbm_band_idx], axis=0)
-            vbm_kpt_idx = np.argwhere(eigenvalues[:, vbm_band_idx] == vbm)[0]
+            vbm_kpt_idx = np.argwhere(eigenvalues[:, vbm_band_idx] == vbm)[0][0]
             hob_bottom_e = np.amin(eigenvalues[:, vbm_band_idx], axis=0)
 
             cbm = np.amin(eigenvalues[:, cbm_band_idx], axis=0)
-            cbm_kpt_idx = np.argwhere(eigenvalues[:, cbm_band_idx] == cbm)[0]
+            cbm_kpt_idx = np.argwhere(eigenvalues[:, cbm_band_idx] == cbm)[0][0]
             lub_top_e = np.amax(eigenvalues[:, cbm_band_idx], axis=0)
+
+            vbm_character = calc_orbital_character(self.orbs, self.structure, spin, vbm_kpt_idx, vbm_band_idx)
+            cbm_character = calc_orbital_character(self.orbs, self.structure, spin, cbm_kpt_idx, cbm_band_idx)
 
             if self.neighboring_atom_indices:
                 vbm_participation_ratio = calc_participation_ratio(self.orbs, spin, vbm_kpt_idx, vbm_band_idx, self.neighboring_atom_indices)
@@ -49,7 +51,7 @@ class MakeEdgeCharacters:
                 vbm_participation_ratio = None
                 cbm_participation_ratio = None
 
-            chars.append(EdgeCharacter(hob_bottom_e, lub_top_e, vbm, cbm, {}, {}, vbm_participation_ratio, cbm_participation_ratio))
+            chars.append(EdgeCharacter(hob_bottom_e, lub_top_e, vbm, cbm, vbm_character, cbm_character, vbm_participation_ratio, cbm_participation_ratio))
 
         return EdgeCharacters(chars)
 

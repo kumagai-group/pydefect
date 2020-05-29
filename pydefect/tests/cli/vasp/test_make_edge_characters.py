@@ -14,14 +14,34 @@ def make_edge_characters(mocker):
     mock_procar = mocker.Mock(spec=Procar, autospec=True)
     mock_vasprun = mocker.Mock(spec=Vasprun, autospec=True)
     mock_outcar = mocker.Mock(spec=Outcar, autospec=True)
-
-    mock_procar.data = {Spin.up: np.ndarray([])}
+#    mock_ratio = mocker.patch("pydefect.cli.vasp.make_edge_characters.calc_participation_ratio")
+    mock_procar.data = {Spin.up: np.array(
+        # 1st atom
+        # first k-index
+        [[[[0.0] * 15 + [0.1]] * 3,   # 1st band
+          [[0.1] * 16, [0.2] * 16, [1.0] * 16],
+          [[0.0] * 15 + [0.1]] * 3],  # 2nd band
+         # 2nd k-index      2nd k-index
+         [[[0.0] * 15 + [0.1]] * 3,
+          [[0.0] * 15 + [0.1]] * 3,
+          [[0.0] * 15 + [0.1]] * 3]]),
+    Spin.down: np.array(
+        # 1st atom
+        # first k-index
+        [[[[0.0] * 15 + [0.1]] * 3,   # 1st band
+          [[0.1] * 16, [0.2] * 16, [1.0] * 16],
+          [[0.0] * 15 + [0.1]] * 3],  # 2nd band
+         # 2nd k-index      2nd k-index
+         [[[0.0] * 15 + [0.1]] * 3,
+          [[0.0] * 15 + [0.1]] * 3,
+          [[0.0] * 15 + [0.1]] * 3]])}
+    mock_vasprun.final_structure = Structure(Lattice.cubic(1), species=["H", "H", "He"], coords=[[0] * 3] * 3)
     mock_vasprun.eigenvalues = {Spin.up: np.array([[[-3.01, 1.],
-                                                    [-2.99, 1.],
+                                                    [-2.90, 1.],  # vbm
                                                     [ 8.01, 0.]],
                                                    [[-3.01, 1.],
                                                     [-2.99, 1.],
-                                                    [ 7.99, 0.]]]),
+                                                    [ 7.90, 0.]]]), # cbm
                     # shift one band for testing magnetization
                                 Spin.down: np.array([[[-2.99, 1.],
                                                       [ 7.99, 0.],
@@ -32,14 +52,14 @@ def make_edge_characters(mocker):
     mock_outcar.nelect = 3.0
     mock_outcar.total_mag = 1
 
-    return MakeEdgeCharacters(mock_procar, mock_vasprun, mock_outcar)
+    return MakeEdgeCharacters(mock_procar, mock_vasprun, mock_outcar, [0, 1])
 
 
 def test_edge_characters(make_edge_characters):
     edge_characters = make_edge_characters.edge_characters
-    assert edge_characters[0].vbm == -2.99
+    assert edge_characters[0].vbm == -2.90
     assert edge_characters[0].hob_bottom_e == -2.99
-    assert edge_characters[0].cbm == 7.99
+    assert edge_characters[0].cbm == 7.90
     assert edge_characters[0].lub_top_e == 8.01
 
     assert edge_characters[1].vbm == -2.99
@@ -52,13 +72,13 @@ def test_calc_participation_ratio():
     # only a single atom
     actual = calc_participation_ratio(orbitals={Spin.up: np.array(
         # first k-index
-        [[[[0.0, 0.0, 0.1], [0.0, 0.0, 0.1]],   # 1st band
-          [[0.2, 0.2, 0.2], [0.3, 0.3, 0.3]]],  # 2nd band
+        [[[[0.0, 0.0, 0.1], [0.0, 0.0, 0.1], [0.0, 0.0, 0.1]],   # 1st band
+          [[0.2, 0.2, 0.2], [0.2, 0.2, 0.2], [0.3, 0.3, 0.3]]],  # 2nd band
          # 2nd k-index
-         [[[0.0, 0.0, 0.1], [0.0, 0.0, 0.1]],
-          [[0.0, 0.0, 0.1], [0.0, 0.0, 0.1]]]])},
-        spin=Spin.up, kpt_index=0, band_index=1, atom_indices=[0])
-    np.testing.assert_almost_equal(actual, 0.4)
+         [[[0.0, 0.0, 0.1], [0.0, 0.0, 0.1], [0.0, 0.0, 0.1]],
+          [[0.0, 0.0, 0.1], [0.0, 0.0, 0.1], [0.0, 0.0, 0.1]]]])},
+        spin=Spin.up, kpt_index=0, band_index=1, atom_indices=[0, 1])
+    np.testing.assert_almost_equal(actual, 1.2 / (1.2 + 0.9))
 
 
 def test_calc_orbital_character_azimuthal_false():
@@ -88,7 +108,7 @@ def test_calc_orbital_character_azimuthal_true():
           [[0.1] * 16, [0.2] * 16, [1.0] * 16]],  # 2nd band
          # 2nd k-index      2nd k-index
          [[[0.0] * 15 + [0.1]] * 3,
-          [[0.0] * 15 + [0.1]] * 3,]])}
+          [[0.0] * 15 + [0.1]] * 3]])}
 
     actual = calc_orbital_character(
         orbitals=azimuthal_orbitals,
