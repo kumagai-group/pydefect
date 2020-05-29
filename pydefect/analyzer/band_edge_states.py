@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from collections import Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
 
@@ -67,5 +67,5 @@ class EdgeCharacter(MSONable):
     # where lists contain s, p, d, (f) orbital components.
     vbm_orbitals: Dict[str, List[float]]
     cbm_orbitals: Dict[str, List[float]]
-    hob_participation_ratio: Optional[float] = None  # participation ratio
-    lub_participation_ratio: Optional[float] = None
+    vbm_participation_ratio: Optional[float] = None  # participation ratio
+    cbm_participation_ratio: Optional[float] = None

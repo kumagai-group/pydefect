@@ -10,8 +10,8 @@ from pydefect.analyzer.make_band_edge_state import make_band_edge_state, \
 
 @pytest.fixture
 def no_in_gap_character():
-    return EdgeCharacter(hob_participation_ratio=0.1,
-                         lub_participation_ratio=0.2,
+    return EdgeCharacter(vbm_participation_ratio=0.1,
+                         cbm_participation_ratio=0.2,
                          hob_bottom_e=-0.1,
                          lub_top_e=1.1,
                          vbm=0.0,
@@ -22,8 +22,8 @@ def no_in_gap_character():
 
 @pytest.fixture
 def donor_phs_character():
-    return EdgeCharacter(hob_participation_ratio=0.1,
-                         lub_participation_ratio=0.2,
+    return EdgeCharacter(vbm_participation_ratio=0.1,
+                         cbm_participation_ratio=0.2,
                          hob_bottom_e=0.9,
                          lub_top_e=1.1,
                          vbm=None,
@@ -34,8 +34,8 @@ def donor_phs_character():
 
 @pytest.fixture
 def acceptor_phs_character():
-    return EdgeCharacter(hob_participation_ratio=0.1,
-                         lub_participation_ratio=0.2,
+    return EdgeCharacter(vbm_participation_ratio=0.1,
+                         cbm_participation_ratio=0.2,
                          hob_bottom_e=-0.2,
                          lub_top_e=0.1,
                          vbm=None,
@@ -46,8 +46,8 @@ def acceptor_phs_character():
 
 @pytest.fixture
 def in_gap_state_character():
-    return EdgeCharacter(hob_participation_ratio=0.5,
-                         lub_participation_ratio=0.5,
+    return EdgeCharacter(vbm_participation_ratio=0.5,
+                         cbm_participation_ratio=0.5,
                          hob_bottom_e=0.4,
                          lub_top_e=0.6,
                          vbm=0.45,
@@ -58,8 +58,8 @@ def in_gap_state_character():
 
 @pytest.fixture
 def unknown_state_character():
-    return EdgeCharacter(hob_participation_ratio=0.1,
-                         lub_participation_ratio=0.2,
+    return EdgeCharacter(vbm_participation_ratio=0.1,
+                         cbm_participation_ratio=0.2,
                          hob_bottom_e=0.4,
                          lub_top_e=0.6,
                          vbm=0.45,
