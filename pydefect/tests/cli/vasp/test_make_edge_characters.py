@@ -2,11 +2,11 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import numpy as np
 import pytest
-from pymatgen import Spin
+from pymatgen import Spin, Structure, Lattice
 from pymatgen.io.vasp import Vasprun, Outcar, Procar
 
 from pydefect.cli.vasp.make_edge_characters import MakeEdgeCharacters, \
-    calc_participation_ratio
+    calc_participation_ratio, calc_orbital_character
 
 
 @pytest.fixture
@@ -49,6 +49,7 @@ def test_edge_characters(make_edge_characters):
 
 
 def test_calc_participation_ratio():
+    # only a single atom
     actual = calc_participation_ratio(orbitals={Spin.up: np.array(
         # first k-index
         [[[[0.0, 0.0, 0.1], [0.0, 0.0, 0.1]],   # 1st band
@@ -58,6 +59,44 @@ def test_calc_participation_ratio():
           [[0.0, 0.0, 0.1], [0.0, 0.0, 0.1]]]])},
         spin=Spin.up, kpt_index=0, band_index=1, atom_indices=[0])
     np.testing.assert_almost_equal(actual, 0.4)
+
+
+def test_calc_orbital_character_azimuthal_false():
+    spd_orbitals = {Spin.up: np.array(
+        # 1st atom
+        # first k-index
+        [[[[0.0, 0.0, 0.1], [0.0, 0.0, 0.1], [0.0, 0.0, 0.1]],   # 1st band
+          [[0.1, 0.1, 0.1], [0.2, 0.3, 0.4], [1.0, 1.1, 1.2]]],  # 2nd band
+         # 2nd k-index      2nd k-index
+         [[[0.0, 0.0, 0.1], [0.0, 0.0, 0.1], [0.0, 0.0, 0.1]],
+          [[0.0, 0.0, 0.1], [0.0, 0.0, 0.1], [0.0, 0.0, 0.1]]]])}
+
+    actual = calc_orbital_character(
+        orbitals=spd_orbitals,
+        structure=Structure(Lattice.cubic(1),
+                            species=["H", "H", "He"], coords=[[0] * 3] * 3),
+        spin=Spin.up, kpt_index=0, band_index=1)
+
+    assert actual == {"H": [0.3, 0.4, 0.5], "He": [1.0, 1.1, 1.2]}
+
+
+def test_calc_orbital_character_azimuthal_true():
+    azimuthal_orbitals = {Spin.up: np.array(
+        # 1st atom
+        # first k-index
+        [[[[0.0] * 15 + [0.1]] * 3,   # 1st band
+          [[0.1] * 16, [0.2] * 16, [1.0] * 16]],  # 2nd band
+         # 2nd k-index      2nd k-index
+         [[[0.0] * 15 + [0.1]] * 3,
+          [[0.0] * 15 + [0.1]] * 3,]])}
+
+    actual = calc_orbital_character(
+        orbitals=azimuthal_orbitals,
+        structure=Structure(Lattice.cubic(1),
+                            species=["H", "H", "He"], coords=[[0] * 3] * 3),
+        spin=Spin.up, kpt_index=0, band_index=1)
+
+    assert actual == {"H": [0.3, 0.9, 1.5, 2.1], "He": [1.0, 3.0, 5.0, 7.0]}
 
 
 """

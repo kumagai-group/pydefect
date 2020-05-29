@@ -15,14 +15,14 @@ class MakeEdgeCharacters:
                  procar: Procar,
                  vasprun: Vasprun,
                  outcar: Outcar,
-                 neighboring_atom_idxs):
+                 neighboring_atom_indices):
         self.orbs = procar.data
         self.orb_types = procar.orbitals
         self.structure = vasprun.final_structure
         self.eigenvalues = eigenvalues_from_vasprun(vasprun)
         self.nelect = outcar.nelect
         self.mag = outcar.total_mag if outcar.total_mag else 0.0
-        self.neighboring_atom_idxs = neighboring_atom_idxs
+        self.neighboring_atom_indices = neighboring_atom_indices
 
     @property
     def edge_characters(self):
@@ -42,9 +42,9 @@ class MakeEdgeCharacters:
             cbm_kpt_idx = np.argwhere(eigenvalues[:, cbm_band_idx] == cbm)[0]
             lub_top_e = np.amax(eigenvalues[:, cbm_band_idx], axis=0)
 
-            if self.neighboring_atom_idxs:
-                vbm_participation_ratio = calc_participation_ratio(self.orbs, spin, vbm_kpt_idx, vbm_band_idx, self.neighboring_atom_idxs)
-                cbm_participation_ratio = calc_participation_ratio(self.orbs, spin, cbm_kpt_idx, cbm_band_idx, self.neighboring_atom_idxs)
+            if self.neighboring_atom_indices:
+                vbm_participation_ratio = calc_participation_ratio(self.orbs, spin, vbm_kpt_idx, vbm_band_idx, self.neighboring_atom_indices)
+                cbm_participation_ratio = calc_participation_ratio(self.orbs, spin, cbm_kpt_idx, cbm_band_idx, self.neighboring_atom_indices)
             else:
                 vbm_participation_ratio = None
                 cbm_participation_ratio = None
@@ -79,33 +79,46 @@ def calc_participation_ratio(orbitals: Dict[Spin, np.ndarray],
 def calc_orbital_character(orbitals,
                            structure: Structure,
                            spin: Spin,
-                           band_index: int,
-                           kpoint_index: int):
+                           kpt_index: int,
+                           band_index: int):
+    """ Consider the two pattern of orbitals.
+
+    LORBIT 10 -> consider only "s", "p", "d" orbitals
+    LORBIT >=11 -> consider "s", "px", "py", "pz",.. orbitals
+
+
+    When
+
     """
-    Consider the two pattern of orbitals.
-
-
-    """
-
-    orbital_components = {}
 
     def projection_sum(atom_indices: tuple, first: int, last: int):
         end = last + 1
-        procar_sum = np.sum(orbitals[spin][kpoint_index, band_index, atom_indices, first:end])
+        procar_sum = np.sum(orbitals[spin]
+                            [kpt_index, band_index, atom_indices, first:end])
         return float(procar_sum)
+
+    orbital_components = {}
+    azimuthal = len(orbitals[Spin.up][0, 0, 0]) > 5
 
     for element in structure.symbol_set:
         # get list of index
         indices = structure.indices_from_symbol(element)
-        orbital_components[element] = \
-            [round(projection_sum(indices, 0, 0), 3),
-             round(projection_sum(indices, 1, 3), 3),
-             round(projection_sum(indices, 4, 8), 3)]
-        try:
-            orbital_components[element].append(round(projection_sum(indices, 9, 16), 3))
-        except KeyError:
-            pass
-
+        if azimuthal:
+            orbital_components[element] = \
+                [round(projection_sum(indices, 0, 0), 3),
+                 round(projection_sum(indices, 1, 3), 3),
+                 round(projection_sum(indices, 4, 8), 3)]
+            try:
+                orbital_components[element].append(round(projection_sum(indices, 9, 16), 3))
+            except KeyError:
+                pass
+        else:
+            orbital_components[element] = \
+                [round(projection_sum(indices, 0, 0), 3),
+                 round(projection_sum(indices, 1, 1), 3),
+                 round(projection_sum(indices, 2, 2), 3)]
     return orbital_components
+
+
 
 
