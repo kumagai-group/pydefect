@@ -14,22 +14,22 @@ from pydefect.cli.vasp.make_band_edge_eigenvalues import \
 def band_edge_eigenvalues(mocker):
     mock_vasprun = mocker.Mock(spec=Vasprun, autospec=True)
     mock_vasprun.actual_kpoints = [[0.0, 0.0, 0.0]]
-    mock_vasprun.eigenvalues = {Spin.up: [[[-3.01, 1.],
+    mock_vasprun.eigenvalues = {Spin.up: np.array([[[-3.01, 1.],
                                            [-2.99, 1.],
                                            [ 8.01, 0.],
                                            [10.00, 0.]],
                                           [[-3.01, 1.],
                                            [-2.99, 1.],
                                            [ 7.99, 0.],
-                                           [10.00, 0.]]],
-                                Spin.down: [[[-3.01, 1.],
-                                             [-2.99, 1.],
-                                             [ 7.99, 0.],  # only change here
-                                             [10.00, 0.]],
-                                            [[-3.01, 1.],
-                                             [-2.99, 1.],
-                                             [ 7.99, 0.],
-                                             [10.00, 0.]]]}
+                                           [10.00, 0.]]]),
+                              Spin.down: np.array([[[-3.01, 1.],
+                                           [-2.99, 1.],
+                                           [ 7.99, 0.],  # only change here from Spin.up
+                                           [10.00, 0.]],
+                                          [[-3.01, 1.],
+                                           [-2.99, 1.],
+                                           [ 7.99, 0.],
+                                           [10.00, 0.]]])}
     return make_band_edge_eigenvalues(mock_vasprun, vbm=0.0, cbm=5.0)
 
 
