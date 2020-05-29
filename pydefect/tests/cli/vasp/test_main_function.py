@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 from monty.serialization import loadfn
-from pymatgen import IStructure, Composition
+from pymatgen import IStructure, Composition, Structure
 from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.analyzer.calc_results import CalcResults
@@ -13,8 +13,11 @@ from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_calc_results
+from pydefect.corrections.efnv_correction.efnv_correction import \
+    ExtendedFnvCorrection
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
+from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
 
 
@@ -123,8 +126,11 @@ def test_make_defect_entries(tmpdir, supercell_info):
     defect_set.to_yaml()
     args = Namespace()
     make_defect_entries(args)
-    dir_names = {str(dirname) for dirname in Path(".").glob("*_*_*")}
-    assert dir_names == {"Va_He1_-1", "Va_He1_0"}
+    names = {str(name) for name in Path(".").glob("*")}
+    assert names == {'Va_He1_-1', 'defect_in.yaml', 'perfect', 'Va_He1_0', 'supercell_info.json'}
+
+    perfect_structure = Structure.from_file(Path("perfect") / "POSCAR")
+    assert perfect_structure == supercell_info.structure
 
     file_names = {str(file_name.name) for file_name in Path("Va_He1_-1").glob("*")}
     assert file_names == {"POSCAR", "defect_entry.json"}
@@ -144,6 +150,38 @@ def test_make_calc_results(tmpdir, mocker):
     mock_outcar.assert_called_with(Path("a") / defaults.outcar)
     mock.assert_called_with(vasprun=mock_vasprun.return_value, outcar=mock_outcar.return_value)
     mock_calc_results.to_json_file.assert_called_with(filename=Path("a") / "calc_results.json")
+
+
+def test_make_efnv_correction_from_vasp(tmpdir, mocker):
+    mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
+    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+
+    def side_effect(key):
+        mock_loadfn = mocker.Mock()
+        print(key)
+        if key == Path("Va_O1_2") / "defect_entry.json":
+            mock_defect_entry.charge = 2
+            mock_loadfn.return_value = mock_defect_entry
+        if key == Path("Va_O1_2") / "calc_results.json":
+            mock_loadfn.return_value = mock_calc_results
+        else:
+            raise ValueError
+        return mock_loadfn
+
+    mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+    mock_unitcell = mocker.Mock(spec=Unitcell)
+    mock_make_efnv = mocker.patch("pydefect.cli.vasp.main_function.make_efnv_correction")
+    mock_efnv = mocker.Mock(spec=ExtendedFnvCorrection, autospec=True)
+    mock_make_efnv.return_value = mock_efnv
+    args = Namespace(dirs=[Path("Va_O1_2")],
+                     perfect_calc_results=mock_perfect_calc_results,
+                     unitcell=mock_unitcell)
+
+#    mock_loadfn.assert_called_with(Path("Va_O1_2") / "calc_results.json" )
+#     mock_efnv.assert_called_with(2, mock_calc_results, mock_perfect_calc_results, mock_unitcell.dielectric_constant)
+#     mock_efnv.to_json_file.assert_called_with(Path("Va_O1_2") / "correction.json")
+
 
 
 """
