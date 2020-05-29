@@ -12,7 +12,7 @@ from pydefect.util.mix_in import ToJsonFileMixIn
 
 @dataclass
 class BandEdgeEigenvalues(MSONable, ToJsonFileMixIn):
-    energies_and_occupations: List[List[List[float]]]  # [spin, k-idx, band-idx]
+    energies_and_occupations: List[List[List[List[float]]]]  # [spin, k-idx, band-idx] = energy, occupation
     kpt_coords: List[Tuple[float, float, float]]
 
 
