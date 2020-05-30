@@ -12,7 +12,8 @@ from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
-    make_chem_pot_diag, make_efnv_correction_from_vasp, print_file
+    make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
+    make_calc_results
 from pydefect.defaults import defaults
 from pydefect.version import __version__
 
@@ -173,7 +174,7 @@ def parse_args(args):
         nargs="+",
         type=Path)
 
-    parser_calc_results.set_defaults(func=make_defect_entries)
+    parser_calc_results.set_defaults(func=make_calc_results)
 
     # -- efnv correction ------------------------------------------------
     parser_efnv = subparsers.add_parser(
