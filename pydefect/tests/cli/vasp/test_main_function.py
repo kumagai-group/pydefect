@@ -12,7 +12,7 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
-    make_chem_pot_diag, make_calc_results, make_print_file
+    make_chem_pot_diag, make_calc_results, print_file
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
@@ -23,7 +23,7 @@ from pydefect.input_maker.defect_set import DefectSet
 
 def test_print():
     args = Namespace(obj="a")
-    make_print_file(args)
+    print_file(args)
 
 
 def test_make_unitcell(mocker):
