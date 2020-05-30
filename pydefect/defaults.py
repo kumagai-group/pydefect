@@ -13,7 +13,7 @@ class Defaults:
         self._symmetry_length_tolerance = 0.1
         self._symmetry_angle_tolerance = 5.0
         self._e_above_hull = 1e-5
-        self._cutoff_distance_factor = 1.7
+        self._cutoff_distance_factor = 1.3
         self._displace_distance = 0.2
         self._same_distance_criterion = 0.1
         self._kpoint_density = 5.0
