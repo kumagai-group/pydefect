@@ -12,8 +12,8 @@ def test_defect_set_maker(supercell_info):
 
 
 def test_defect_set_maker_oxi_state(supercell_info):
-    defect_maker = DefectSetMaker(supercell_info, {"H": 0})
-    assert defect_maker.defect_set.defects == {SimpleDefect(None, "H1", [0]),
+    defect_maker = DefectSetMaker(supercell_info, {"H": 2})
+    assert defect_maker.defect_set.defects == {SimpleDefect(None, "H1", [-2, -1, 0]),
                                                SimpleDefect(None, "He1", [0])}
 
 
@@ -39,4 +39,5 @@ def test_defect_set_maker_screening(supercell_info):
     defect_maker = DefectSetMaker(supercell_info, keywords=["Va_H1"])
     expected = {SimpleDefect(None, "H1", [-1, 0, 1])}
     assert defect_maker.defect_set.defects == expected
+
 

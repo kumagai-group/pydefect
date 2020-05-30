@@ -47,8 +47,8 @@ class DefectSetMaker:
     def _create_vacancy_set(self):
         result = set()
         for out_name, site in self.supercell_info.sites.items():
-            oxi_state = self._oxidation_state(site.element)
-            result.add(SimpleDefect(None, out_name, charge_set(oxi_state)))
+            minus_oxi_stat = - self._oxidation_state(site.element)
+            result.add(SimpleDefect(None, out_name, charge_set(minus_oxi_stat)))
 
         return result
 
