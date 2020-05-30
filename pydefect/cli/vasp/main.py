@@ -184,13 +184,10 @@ def parse_args(args):
         aliases=['e'])
 
     parser_efnv.add_argument(
-        "-de", "--defect_entry",
+        "-d", "--dirs",
         required=True,
-        type=loadfn)
-    parser_efnv.add_argument(
-        "-cr", "--calc_results",
-        required=True,
-        type=loadfn)
+        nargs="+",
+        type=Path)
     parser_efnv.add_argument(
         "-pcr", "--perfect_calc_results",
         required=True,
