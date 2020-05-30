@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 from pymatgen import Lattice, IStructure, Structure
 
+from pydefect.defaults import defaults
 from pydefect.input_maker.supercell_info import Site, SupercellInfo
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
@@ -233,8 +234,11 @@ def cubic_supercell_w_vacancy_w_perturb(cubic_supercell_w_vacancy):
     return result
 
 
-@pytest.fixture(scope="session")
-def supercell_info(ortho_conventional):
+@pytest.fixture
+def supercell_info(mocker, ortho_conventional):
+    mock = mocker.patch("pydefect.util.structure_tools.defaults")
+    mock.same_distance_criterion = defaults.same_distance_criterion
+    mock.cutoff_distance_factor = 1.7
     sites = {"H1": Site(element="H", wyckoff_letter="a", site_symmetry="mmm",
                         equivalent_atoms=[0, 1, 2, 3]),
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="mmm",
