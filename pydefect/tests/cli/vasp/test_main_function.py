@@ -143,8 +143,11 @@ def test_make_defect_entries(tmpdir, supercell_info):
     expected = """charge: -1
 task: defect
 """
-    assert (Path("Va_He1_-1") / "prior_info.yaml").read_text() == expected
+    assert Path("Va_He1_-1/prior_info.yaml").read_text() == expected
 
+    expected = """task: defect
+"""
+    assert Path("perfect/prior_info.yaml").read_text() == expected
 
 
 def test_make_calc_results(tmpdir, mocker):

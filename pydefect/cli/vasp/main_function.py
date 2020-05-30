@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from pathlib import Path
 
+import yaml
 from monty.serialization import loadfn
 from pymatgen.io.vasp import Vasprun, Outcar
 from vise.util.logger import get_logger
@@ -103,6 +104,7 @@ def make_defect_entries(args):
     defect_set = DefectSet.from_yaml()
     logger.info("Making perfect dir...")
     maker = DefectEntriesMaker(supercell_info, defect_set)
+    Path("perfect/prior_info.yaml").write_text(yaml.dump({"task": "defect"}))
 
     for defect_entry in maker.defect_entries:
         dir_path = Path(defect_entry.full_name)
