@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from pathlib import Path
 
 import pytest
 from pymatgen import IStructure, Lattice
@@ -55,6 +56,14 @@ def test_msonable(defect_entry):
 def test_json_roundtrip(defect_entry, tmpdir):
     assert_json_roundtrip(defect_entry, tmpdir)
 
+
+def test_defect_entry(defect_entry, tmpdir):
+    tmpdir.chdir()
+    defect_entry.to_prior_info(filename="a.yaml")
+    expected = """charge: 1
+task: defect
+"""
+    assert Path("a.yaml").read_text() == expected
 
 """
 TODO

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Tuple
 
 import numpy as np
+import yaml
 from monty.json import MSONable
 from pymatgen import IStructure
 
@@ -43,4 +45,8 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
     @property
     def full_name(self):
         return "_".join([self.name, str(self.charge)])
+
+    def to_prior_info(self, filename):
+        d = {"task": "defect", "charge": self.charge}
+        Path(filename).write_text(yaml.dump(d))
 
