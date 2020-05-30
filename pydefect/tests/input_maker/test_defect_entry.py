@@ -61,7 +61,6 @@ def test_defect_entry(defect_entry, tmpdir):
     tmpdir.chdir()
     defect_entry.to_prior_info(filename="a.yaml")
     expected = """charge: 1
-task: defect
 """
     assert Path("a.yaml").read_text() == expected
 

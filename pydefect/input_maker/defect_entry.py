@@ -47,6 +47,6 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
         return "_".join([self.name, str(self.charge)])
 
     def to_prior_info(self, filename):
-        d = {"task": "defect", "charge": self.charge}
+        d = {"charge": self.charge}
         Path(filename).write_text(yaml.dump(d))
 
