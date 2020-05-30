@@ -12,13 +12,20 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
-    make_chem_pot_diag, make_calc_results
+    make_chem_pot_diag, make_calc_results, make_print_file
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
+
+
+def test_print(mocker):
+    mock = mocker.patch("pydefect.cli.vasp.main_function.loadfn")
+    args = Namespace(filename="a")
+    make_print_file(args)
+    mock.assert_called_once_with("a")
 
 
 def test_make_unitcell(mocker):
@@ -37,6 +44,17 @@ def test_make_unitcell(mocker):
     mock.assert_called_once_with(vasprun_band=vasprun_band_mock,
                                  outcar_band=outcar_band_mock,
                                  outcar_dielectric=outcar_dielectric_mock)
+
+
+def test_make_competing_phase_dirs(mocker):
+    args = Namespace(elements=["Mg", "O"],
+                     e_above_hull=0.1)
+    mock = mocker.patch("pydefect.cli.vasp.main_function.MpQuery")
+    mock_make = mocker.patch("pydefect.cli.vasp.main_function.make_poscars_from_query")
+    make_competing_phase_dirs(args)
+    mock.assert_called_once_with(element_list=args.elements,
+                                 e_above_hull=args.e_above_hull)
+    mock_make.assert_called_once_with(materials_query=mock.return_value.materials, path=Path.cwd())
 
 
 def test_make_chem_pot_diag(mocker, tmpdir):
@@ -70,17 +88,6 @@ def test_make_chem_pot_diag(mocker, tmpdir):
     args_2 = Namespace(vasp_dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
                        target=Composition("MgO"))
     make_chem_pot_diag(args_2)
-
-
-def test_make_competing_phase_dirs(mocker):
-    args = Namespace(elements=["Mg", "O"],
-                     e_above_hull=0.1)
-    mock = mocker.patch("pydefect.cli.vasp.main_function.MpQuery")
-    mock_make = mocker.patch("pydefect.cli.vasp.main_function.make_poscars_from_query")
-    make_competing_phase_dirs(args)
-    mock.assert_called_once_with(element_list=args.elements,
-                                 e_above_hull=args.e_above_hull)
-    mock_make.assert_called_once_with(materials_query=mock.return_value.materials, path=Path.cwd())
 
 
 def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
