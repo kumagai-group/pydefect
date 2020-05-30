@@ -138,7 +138,13 @@ def test_make_defect_entries(tmpdir, supercell_info):
     assert perfect_structure == supercell_info.structure
 
     file_names = {str(file_name.name) for file_name in Path("Va_He1_-1").glob("*")}
-    assert file_names == {"POSCAR", "defect_entry.json"}
+    assert file_names == {"POSCAR", "defect_entry.json", "prior_info.yaml"}
+
+    expected = """charge: -1
+task: defect
+"""
+    assert (Path("Va_He1_-1") / "prior_info.yaml").read_text() == expected
+
 
 
 def test_make_calc_results(tmpdir, mocker):

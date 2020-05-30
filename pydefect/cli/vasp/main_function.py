@@ -101,13 +101,16 @@ def make_defect_entries(args):
 
     supercell_info.structure.to(filename=perfect / "POSCAR")
     defect_set = DefectSet.from_yaml()
+    logger.info("Making perfect dir...")
     maker = DefectEntriesMaker(supercell_info, defect_set)
 
     for defect_entry in maker.defect_entries:
         dir_path = Path(defect_entry.full_name)
+        logger.info(f"Making {dir_path} dir...")
         dir_path.mkdir()
         defect_entry.perturbed_structure.to(filename=dir_path / "POSCAR")
         defect_entry.to_json_file(filename=dir_path / "defect_entry.json")
+        defect_entry.to_prior_info(filename=dir_path / "prior_info.yaml")
 
 
 def make_calc_results(args):
