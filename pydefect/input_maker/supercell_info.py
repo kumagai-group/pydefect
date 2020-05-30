@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import List, Dict
 
 from monty.json import MSONable
+from more_itertools import consecutive_groups
 from numpy.linalg import det
 from pymatgen import IStructure
 from vise.util.logger import get_logger
@@ -21,6 +22,17 @@ class Site(MSONable):
     wyckoff_letter: str
     site_symmetry: str
     equivalent_atoms: List[int]
+
+    @property
+    def pprint_equiv_atoms(self):
+        str_list = []
+        for consecutive_ints in consecutive_groups(self.equivalent_atoms):
+            ints = list(consecutive_ints)
+            if len(ints) >= 3:
+                str_list.append("..".join([str(ints[0]), str(ints[-1])]))
+            else:
+                str_list.append(" ".join([str(j) for j in ints]))
+        return " ".join(str_list)
 
 
 @dataclass(frozen=True)
@@ -66,7 +78,7 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
             lines.append(f"         Site symmetry: {site.site_symmetry}")
             lines.append(f"         Cutoff radius: {cutoff}")
             lines.append(f"          Coordination: {distances}")
-            lines.append(f"      Equivalent atoms: {site.equivalent_atoms}")
+            lines.append(f"      Equivalent atoms: {site.pprint_equiv_atoms}")
             lines.append(f"Fractional coordinates: {self._frac_coords(site)}")
             lines.append(f"     Electronegativity: {electronegativity(elem)}")
             lines.append(f"       Oxidation state: {oxidation_state(elem)}")
