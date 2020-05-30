@@ -30,8 +30,8 @@ from pydefect.util.mp_tools import MpQuery
 logger = get_logger(__name__)
 
 
-def make_print_file(args):
-    print(loadfn(args.filename))
+def print_file(args):
+    print(args.obj)
 
 
 def make_unitcell(args):

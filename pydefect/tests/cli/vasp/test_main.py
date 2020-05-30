@@ -9,6 +9,13 @@ from pydefect.cli.vasp.main import parse_args
 from pydefect.defaults import defaults
 
 
+def test_print(mocker):
+    mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
+    parsed_args = parse_args(["p", "-f", "a.json"])
+    expected = Namespace(obj=mock.return_value, func=parsed_args.func)
+    assert parsed_args == expected
+
+
 def test_unitcell(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.Vasprun")
     mock_outcar = mocker.patch("pydefect.cli.vasp.main.Outcar")

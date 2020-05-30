@@ -21,11 +21,9 @@ from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
 
 
-def test_print(mocker):
-    mock = mocker.patch("pydefect.cli.vasp.main_function.loadfn")
-    args = Namespace(filename="a")
+def test_print():
+    args = Namespace(obj="a")
     make_print_file(args)
-    mock.assert_called_once_with("a")
 
 
 def test_make_unitcell(mocker):

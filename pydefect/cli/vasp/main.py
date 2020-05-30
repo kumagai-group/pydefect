@@ -6,12 +6,13 @@ import argparse
 import sys
 from pathlib import Path
 
+from monty.serialization import loadfn
 from pymatgen import IStructure, Composition
 from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
-    make_chem_pot_diag
+    make_chem_pot_diag, make_efnv_correction_from_vasp, print_file
 from pydefect.defaults import defaults
 from pydefect.version import __version__
 
@@ -26,6 +27,21 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     subparsers = parser.add_subparsers()
+
+    # -- print ------------------------------------------------
+    parser_print = subparsers.add_parser(
+        name="print",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['p'])
+
+    parser_print.add_argument(
+        "-f", "--filename",
+        dest="obj",
+        required=True,
+        type=loadfn)
+
+    parser_print.set_defaults(func=print_file)
 
     # -- unitcell ------------------------------------------------
     parser_unitcell = subparsers.add_parser(
@@ -159,6 +175,31 @@ def parse_args(args):
 
     parser_calc_results.set_defaults(func=make_defect_entries)
 
+    # -- efnv correction ------------------------------------------------
+    parser_efnv = subparsers.add_parser(
+        name="efnv",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['e'])
+
+    parser_efnv.add_argument(
+        "-de", "--defect_entry",
+        required=True,
+        type=loadfn)
+    parser_efnv.add_argument(
+        "-cr", "--calc_results",
+        required=True,
+        type=loadfn)
+    parser_efnv.add_argument(
+        "-pcr", "--perfect_calc_results",
+        required=True,
+        type=loadfn)
+    parser_efnv.add_argument(
+        "-u", "--unitcell",
+        required=True,
+        type=loadfn)
+
+    parser_efnv.set_defaults(func=make_efnv_correction_from_vasp)
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
 
