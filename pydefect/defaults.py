@@ -12,6 +12,8 @@ class Defaults:
     def __init__(self):
         self._symmetry_length_tolerance = 0.1
         self._symmetry_angle_tolerance = 5.0
+        self._ewald_accuracy = 15.0
+        self._e_above_hull = 1e-5
         self._e_above_hull = 1e-5
         self._cutoff_distance_factor = 1.3
         self._displace_distance = 0.2
@@ -47,6 +49,10 @@ class Defaults:
     @property
     def symmetry_angle_tolerance(self):
         return self._symmetry_angle_tolerance
+
+    @property
+    def ewald_accuracy(self):
+        return self._ewald_accuracy
 
     @property
     def e_above_hull(self):
