@@ -20,10 +20,10 @@ alphabets = list(string.ascii_uppercase)
 @dataclass
 class ChemPotDiag(MSONable, ToJsonFileMixIn):
     energies: Dict[str, float]
-    target: dataclasses.InitVar[Union[Composition, dict]] = None
+    target: dataclasses.InitVar[Optional[Union[Composition, dict]]] = None
 
     def __post_init__(self, target):
-        if isinstance(target, Composition):
+        if isinstance(target, Composition) or target is None:
             self.target = target
         else:
             self.target = Composition.from_dict(target)
