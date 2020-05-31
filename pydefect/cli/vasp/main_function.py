@@ -134,7 +134,7 @@ def make_efnv_correction_from_vasp(args):
 
 
 def make_defect_formation_energy(args):
-    title = args.perfect_calc_results.structure.compostion.reduced_formula
+    title = args.perfect_calc_results.structure.composition.reduced_formula
     abs_chem_pot = args.chem_pot_diag.abs_chem_pot_dict(args.label)
 
     single_energies = []

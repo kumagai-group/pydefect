@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 from monty.serialization import loadfn
-from pymatgen import IStructure, Composition, Structure
+from pymatgen import IStructure, Composition, Structure, Lattice
 from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.analyzer.calc_results import CalcResults
@@ -178,6 +178,7 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
         return mock_loadfn
 
     mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
+    mock_perfect_calc_results.structure = Structure(Lattice.cubic(1), species=["H"], coords=[[0]*3])
     mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
     mock_unitcell = mocker.Mock(spec=Unitcell)
     mock_make_efnv = mocker.patch("pydefect.cli.vasp.main_function.make_efnv_correction")
