@@ -4,6 +4,7 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pymatgen.io.vasp import Vasprun, Outcar
+from pymatgen.util.string import latexify
 from vise.util.logger import get_logger
 
 from pydefect.analyzer.defect_energy import make_defect_energies
@@ -18,8 +19,11 @@ from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
 from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
 from pydefect.corrections.efnv_correction.make_efnv_correction import \
     make_efnv_correction
+from pydefect.corrections.efnv_correction.site_potential_plotter import \
+    SitePotentialPlotter
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entries_maker import DefectEntriesMaker
+from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_info import SupercellInfo
@@ -124,7 +128,7 @@ def make_calc_results(args):
 
 def make_efnv_correction_from_vasp(args):
     for d in args.dirs:
-        defect_entry = loadfn(d / "defect_entry.json")
+        defect_entry: DefectEntry = loadfn(d / "defect_entry.json")
         calc_results = loadfn(d / "calc_results.json")
         efnv = make_efnv_correction(defect_entry.charge,
                                     calc_results,
@@ -132,9 +136,14 @@ def make_efnv_correction_from_vasp(args):
                                     args.unitcell.dielectric_constant)
         efnv.to_json_file(d / "correction.json")
 
+        title = defect_entry.full_name
+        plotter = SitePotentialPlotter(title, efnv)
+        plotter.construct_plot()
+        plotter.plt.savefig(fname=d / "correction.pdf")
+
 
 def make_defect_formation_energy(args):
-    title = args.perfect_calc_results.structure.composition.reduced_formula
+    title = latexify(args.perfect_calc_results.structure.composition.reduced_formula)
     abs_chem_pot = args.chem_pot_diag.abs_chem_pot_dict(args.label)
 
     single_energies = []

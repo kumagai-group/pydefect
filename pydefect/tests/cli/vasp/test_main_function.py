@@ -233,6 +233,7 @@ def test_make_defect_formation_energy(tmpdir, mocker):
                      y_range=[-100, 100])
     make_defect_formation_energy(args)
 
+    mock_chem_pot_diag.abs_chem_pot_dict.assert_called_once_with("A")
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")
 
