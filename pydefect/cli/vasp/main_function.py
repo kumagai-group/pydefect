@@ -48,7 +48,7 @@ def make_competing_phase_dirs(args):
 
 def make_chem_pot_diag(args) -> None:
     energies = {}
-    for d in args.vasp_dirs:
+    for d in args.dirs:
         vasprun = Vasprun(d / defaults.vasprun)
         composition = vasprun.final_structure.composition
         energy = vasprun.final_energy
@@ -116,13 +116,9 @@ def make_defect_entries(args):
 def make_calc_results(args):
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
-        try:
-            calc_results = make_calc_results_from_vasp(
+        calc_results = make_calc_results_from_vasp(
                 vasprun=Vasprun(d / defaults.vasprun),
                 outcar=Outcar(d / defaults.outcar))
-        except IOError:
-            logger.warning(f"Parsing data in {d} failed.")
-            continue
         calc_results.to_json_file(filename=Path(d) / "calc_results.json")
 
 

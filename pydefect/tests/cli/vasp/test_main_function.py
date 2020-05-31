@@ -79,11 +79,11 @@ def test_make_chem_pot_diag(mocker, tmpdir):
 
     tmpdir.chdir()
     mock = mocker.patch("pydefect.cli.vasp.main_function.Vasprun", side_effect=side_effect)
-    args = Namespace(vasp_dirs=[Path("Mg"), Path("MgO"), Path("O")],
+    args = Namespace(dirs=[Path("Mg"), Path("MgO"), Path("O")],
                      target=Composition("MgO"))
     make_chem_pot_diag(args)
 
-    args_2 = Namespace(vasp_dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
+    args_2 = Namespace(dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
                        target=Composition("MgO"))
     make_chem_pot_diag(args_2)
 

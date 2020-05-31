@@ -61,7 +61,7 @@ def test_cpd_wo_options():
     parsed_args = parse_args(["cpd",
                               "-d", "Mg", "O"])
     expected = Namespace(
-        vasp_dirs=[Path("Mg"), Path("O")],
+        dirs=[Path("Mg"), Path("O")],
         target=None,
         func=parsed_args.func)
     assert parsed_args == expected
@@ -156,7 +156,7 @@ def test_calc_results():
 
 def test_efnv_correction(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
-    parsed_args = parse_args(["e",
+    parsed_args = parse_args(["efnv",
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-pcr", "perfect/calc_results.json",
                               "-u", "unitcell.json"])
@@ -170,9 +170,23 @@ def test_efnv_correction(mocker):
     mock.assert_any_call("unitcell.json")
 
 
-"""
-TODO
--
-
-DONE
-"""
+def test_defect_formation_energy(mocker):
+    mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
+    parsed_args = parse_args(["e",
+                              "-d", "Va_O1_0", "Va_O1_1",
+                              "-pcr", "perfect/calc_results.json",
+                              "-u", "unitcell.json",
+                              "-c", "chem_pot_diag.json",
+                              "-y", "-5", "5",
+                              ])
+    expected = Namespace(
+        dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        perfect_calc_results=mock.return_value,
+        unitcell=mock.return_value,
+        chem_pot_diag=mock.return_value,
+        y_range=[-5, 5],
+        func=parsed_args.func)
+    assert parsed_args == expected
+    mock.assert_any_call("perfect/calc_results.json")
+    mock.assert_any_call("unitcell.json")
+    mock.assert_any_call("chem_pot_diag.json")

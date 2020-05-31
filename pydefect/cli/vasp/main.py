@@ -13,7 +13,7 @@ from pymatgen.io.vasp import Vasprun, Outcar
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
-    make_calc_results
+    make_calc_results, make_defect_formation_energy
 from pydefect.defaults import defaults
 from pydefect.version import __version__
 
@@ -181,7 +181,7 @@ def parse_args(args):
         name="efnv",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['e'])
+        aliases=['efnv'])
 
     parser_efnv.add_argument(
         "-d", "--dirs",
@@ -198,6 +198,37 @@ def parse_args(args):
         type=loadfn)
 
     parser_efnv.set_defaults(func=make_efnv_correction_from_vasp)
+
+    # -- defect formation energy ----------------------------------------------
+    parser_efnv = subparsers.add_parser(
+        name="defect_formation_energy",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['e'])
+
+    parser_efnv.add_argument(
+        "-d", "--dirs",
+        required=True,
+        nargs="+",
+        type=Path)
+    parser_efnv.add_argument(
+        "-pcr", "--perfect_calc_results",
+        required=True,
+        type=loadfn)
+    parser_efnv.add_argument(
+        "-u", "--unitcell",
+        required=True,
+        type=loadfn)
+    parser_efnv.add_argument(
+        "-c", "--chem_pot_diag",
+        required=True,
+        type=loadfn)
+    parser_efnv.add_argument(
+        "-y", "--y_range",
+        nargs=2,
+        type=float)
+
+    parser_efnv.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
 
@@ -209,4 +240,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
