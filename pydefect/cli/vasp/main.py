@@ -210,6 +210,10 @@ def parse_args(args):
         required=True,
         type=loadfn)
     parser_efnv.add_argument(
+        "-l", "--label",
+        required=True,
+        type=str)
+    parser_efnv.add_argument(
         "-y", "--y_range",
         nargs=2,
         type=float)

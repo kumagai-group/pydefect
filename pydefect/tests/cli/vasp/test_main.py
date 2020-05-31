@@ -177,6 +177,7 @@ def test_defect_formation_energy(mocker):
                               "-pcr", "perfect/calc_results.json",
                               "-u", "unitcell.json",
                               "-c", "chem_pot_diag.json",
+                              "-l", "A",
                               "-y", "-5", "5",
                               ])
     expected = Namespace(
@@ -184,6 +185,7 @@ def test_defect_formation_energy(mocker):
         perfect_calc_results=mock.return_value,
         unitcell=mock.return_value,
         chem_pot_diag=mock.return_value,
+        label="A",
         y_range=[-5, 5],
         func=parsed_args.func)
     assert parsed_args == expected
