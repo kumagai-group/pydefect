@@ -11,6 +11,8 @@ from numpy.linalg import norm, inv, det
 from scipy.special import erfc
 from scipy.stats import mstats
 
+from pydefect.defaults import defaults
+
 
 def grid_number(lattice_vectors: np.ndarray, max_length: float):
     a = [ceil(max_length / norm(lattice_vectors[i])) for i in range(3)]
@@ -30,7 +32,7 @@ class Ewald(MSONable):
     def __init__(self,
                  lattice: np.ndarray,
                  dielectric_tensor: np.ndarray,
-                 accuracy: float = 20,
+                 accuracy: float = defaults.ewald_accuracy,
                  ewald_param: Optional[float] = None):
         self.lattice = lattice
         self.rec_lattice = inv(self.lattice).T * 2 * pi
@@ -38,9 +40,9 @@ class Ewald(MSONable):
         self.cube_root_vol = pow(self.volume, 1 / 3)
 
         self.dielectric_tensor = dielectric_tensor
-        self.det_epsilon = det(self.dielectric_tensor)
+        self.det_epsilon = det(dielectric_tensor)
         self.root_epsilon = sqrt(self.det_epsilon)
-        self.epsilon_inv = inv(self.dielectric_tensor)
+        self.epsilon_inv = inv(dielectric_tensor)
 
         self.accuracy = accuracy
         if ewald_param:
