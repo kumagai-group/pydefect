@@ -37,6 +37,18 @@ def parse_args(args):
         required=True,
         nargs="+",
         type=Path)
+    # -- parent parser: refs
+    refs_parser = argparse.ArgumentParser(
+        description="", add_help=False)
+    refs_parser.add_argument(
+        "-pcr", "--perfect_calc_results",
+        required=True,
+        type=loadfn)
+    refs_parser.add_argument(
+        "-u", "--unitcell",
+        required=True,
+        type=loadfn)
+
     # -- print ------------------------------------------------
     parser_print = subparsers.add_parser(
         name="print",
@@ -178,18 +190,9 @@ def parse_args(args):
     parser_efnv = subparsers.add_parser(
         name="efnv",
         description="",
-        parents=[dirs_parser],
+        parents=[dirs_parser, refs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['efnv'])
-
-    parser_efnv.add_argument(
-        "-pcr", "--perfect_calc_results",
-        required=True,
-        type=loadfn)
-    parser_efnv.add_argument(
-        "-u", "--unitcell",
-        required=True,
-        type=loadfn)
 
     parser_efnv.set_defaults(func=make_efnv_correction_from_vasp)
 
@@ -197,18 +200,10 @@ def parse_args(args):
     parser_efnv = subparsers.add_parser(
         name="defect_formation_energy",
         description="",
-        parents=[dirs_parser],
+        parents=[dirs_parser, refs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['e'])
 
-    parser_efnv.add_argument(
-        "-pcr", "--perfect_calc_results",
-        required=True,
-        type=loadfn)
-    parser_efnv.add_argument(
-        "-u", "--unitcell",
-        required=True,
-        type=loadfn)
     parser_efnv.add_argument(
         "-c", "--chem_pot_diag",
         required=True,
