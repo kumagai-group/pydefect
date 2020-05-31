@@ -10,7 +10,7 @@ from pydefect.corrections.manual_correction import ManualCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
 
 
-def test_single_defect_energy_maker(mocker):
+def test_make_single_defect_energy(mocker):
     perfect = mocker.Mock(CalcResults, autospec=True)
     perfect.energy = 1.0
     perfect.structure = IStructure(Lattice.cubic(1), ["H"] * 2, [[0] * 3] * 2)
@@ -30,7 +30,7 @@ def test_single_defect_energy_maker(mocker):
                                   defect_entry=defect_entry,
                                   abs_chem_pot={Element.H: 100},
                                   correction=ManualCorrection(7.0))
-    energy = (3.0 + 7.0) - 1.0 - 100
+    energy = (3.0 + 7.0) - 1.0 + 100
 
     assert isinstance(single_defect_energy, SingleDefectEnergy)
     assert single_defect_energy == SingleDefectEnergy(name, charge, energy)
@@ -40,7 +40,7 @@ def test_reservoir_energy():
     num_atom_diff = {Element.He: 1, Element.Li: -1}
     abs_chem_pot = {Element.He: 10.0, Element.Li: 100.0, Element.H: 1000.0}
     actual = reservoir_energy(num_atom_diff, abs_chem_pot)
-    assert actual == 10.0 - 100.0
+    assert actual == -10.0 + 100.0
 
 
 def test_num_atom_diff():
