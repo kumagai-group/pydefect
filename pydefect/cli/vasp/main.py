@@ -29,7 +29,7 @@ def parse_args(args):
 
     subparsers = parser.add_subparsers()
 
-    # -- parent parser: dirs
+    # ++ parent parser: dirs
     dirs_parser = argparse.ArgumentParser(
         description="", add_help=False)
     dirs_parser.add_argument(
@@ -37,7 +37,8 @@ def parse_args(args):
         required=True,
         nargs="+",
         type=Path)
-    # -- parent parser: refs
+
+    # ++ parent parser: refs
     refs_parser = argparse.ArgumentParser(
         description="", add_help=False)
     refs_parser.add_argument(
