@@ -15,10 +15,10 @@ from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DPlotter, \
     ChemPotDiag3DPlotter
 from pydefect.cli.main_tools import sanitize_matrix
 from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
+from pydefect.cli.vasp.make_efnv_correction import \
+    make_efnv_correction
 from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
 from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
-from pydefect.corrections.efnv_correction.make_efnv_correction import \
-    make_efnv_correction
 from pydefect.corrections.efnv_correction.site_potential_plotter import \
     SitePotentialPlotter
 from pydefect.defaults import defaults
