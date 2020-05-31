@@ -29,6 +29,14 @@ def parse_args(args):
 
     subparsers = parser.add_subparsers()
 
+    # -- parent parser: dirs
+    dirs_parser = argparse.ArgumentParser(
+        description="", add_help=False)
+    dirs_parser.add_argument(
+        "-d", "--dirs",
+        required=True,
+        nargs="+",
+        type=Path)
     # -- print ------------------------------------------------
     parser_print = subparsers.add_parser(
         name="print",
@@ -89,14 +97,10 @@ def parse_args(args):
     parser_cpd = subparsers.add_parser(
         name="cpd",
         description="",
+        parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cpd'])
 
-    parser_cpd.add_argument(
-        "-d", "--dirs",
-        required=True,
-        nargs="+",
-        type=Path)
     parser_cpd.add_argument(
         "-t", "--target",
         type=Composition)
@@ -165,29 +169,19 @@ def parse_args(args):
     parser_calc_results = subparsers.add_parser(
         name="calc_results",
         description="",
+        parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cr'])
-
-    parser_calc_results.add_argument(
-        "-d", "--dirs",
-        required=True,
-        nargs="+",
-        type=Path)
-
     parser_calc_results.set_defaults(func=make_calc_results)
 
     # -- efnv correction ------------------------------------------------
     parser_efnv = subparsers.add_parser(
         name="efnv",
         description="",
+        parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['efnv'])
 
-    parser_efnv.add_argument(
-        "-d", "--dirs",
-        required=True,
-        nargs="+",
-        type=Path)
     parser_efnv.add_argument(
         "-pcr", "--perfect_calc_results",
         required=True,
@@ -203,14 +197,10 @@ def parse_args(args):
     parser_efnv = subparsers.add_parser(
         name="defect_formation_energy",
         description="",
+        parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['e'])
 
-    parser_efnv.add_argument(
-        "-d", "--dirs",
-        required=True,
-        nargs="+",
-        type=Path)
     parser_efnv.add_argument(
         "-pcr", "--perfect_calc_results",
         required=True,
