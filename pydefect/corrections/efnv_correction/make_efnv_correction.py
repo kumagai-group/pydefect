@@ -10,12 +10,15 @@ from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection, DefectSite
 from pydefect.corrections.efnv_correction.ewald import Ewald
+from pydefect.defaults import defaults
 
 
 def make_efnv_correction(charge: int,
                          calc_results: CalcResults,
                          perfect_calc_results: CalcResults,
-                         dielectric_tensor: np.array):
+                         dielectric_tensor: np.array,
+                         accuracy: float = defaults.ewald_accuracy,
+                         unit_conversion: float = 180.95128169876497):
     """
     Notes:
     (1) The formula written in YK2014 are divided by 4pi to keep the SI unit.
@@ -30,7 +33,7 @@ def make_efnv_correction(charge: int,
         calc_results.structure, perfect_calc_results.structure)
     defect_coord = structure_analyzer.defect_center_coord
     lattice = calc_results.structure.lattice.matrix
-    ewald = Ewald(lattice, dielectric_tensor)
+    ewald = Ewald(lattice, dielectric_tensor, accuracy=accuracy)
     point_charge_correction = - ewald.lattice_energy * charge ** 2
 
     sites = []
@@ -44,11 +47,14 @@ def make_efnv_correction(charge: int,
         rel_coord = [x - y for x, y in zip(coord, defect_coord)]
         pc_potential = ewald.atomic_site_potential(rel_coord) * charge
 
+        potential *= unit_conversion
+        pc_potential *= unit_conversion
+
         sites.append(DefectSite(specie, distance, potential, pc_potential))
 
     return ExtendedFnvCorrection(
         charge=charge,
-        point_charge_correction=point_charge_correction,
+        point_charge_correction=point_charge_correction * unit_conversion,
         defect_region_radius=calc_max_sphere_radius(lattice),
         sites=sites)
 

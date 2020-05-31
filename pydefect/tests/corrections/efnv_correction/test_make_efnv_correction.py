@@ -34,12 +34,14 @@ def test_pot(mocker):
                                  perfect_calc_results=mock_perfect,
                                  dielectric_tensor=np.eye(3))
 
+    unit_conversion = 180.95128169876497
+
     assert efnvc.charge == 2
-    assert efnvc.point_charge_correction == -4e3
+    assert efnvc.point_charge_correction == -4e3 * unit_conversion
     assert efnvc.defect_region_radius == 5.0
-    assert efnvc.sites == [DefectSite("He", 5 * np.sqrt(2), 10.0, 2e4),
-                           DefectSite("He", 5 * np.sqrt(2), 20.0, 2e4),
-                           DefectSite("He", 5 * np.sqrt(2), 30.0, 2e4)]
+    assert efnvc.sites == [DefectSite("He", 5 * np.sqrt(2), 10.0 * unit_conversion, 2e4 * unit_conversion),
+                           DefectSite("He", 5 * np.sqrt(2), 20.0 * unit_conversion, 2e4 * unit_conversion),
+                           DefectSite("He", 5 * np.sqrt(2), 30.0 * unit_conversion, 2e4 * unit_conversion)]
 
 
 def test_calc_max_sphere_radius():
