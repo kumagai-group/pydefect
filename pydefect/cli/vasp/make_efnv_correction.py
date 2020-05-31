@@ -40,14 +40,14 @@ def make_efnv_correction(charge: int,
     for d, p in structure_analyzer.atom_mapping.items():
         specie = str(calc_results.structure[d].specie)
         distance = structure_analyzer.distance_from_center(d)
-        potential = (calc_results.potentials[d] -
-                     perfect_calc_results.potentials[p])
+        # The site potential in vasp is for electron.
+        potential = - (calc_results.potentials[d] -
+                       perfect_calc_results.potentials[p])
 
         coord = calc_results.structure[d].frac_coords
         rel_coord = [x - y for x, y in zip(coord, defect_coord)]
         pc_potential = ewald.atomic_site_potential(rel_coord) * charge
 
-        potential *= unit_conversion
         pc_potential *= unit_conversion
 
         sites.append(DefectSite(specie, distance, potential, pc_potential))

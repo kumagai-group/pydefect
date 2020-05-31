@@ -5,9 +5,9 @@ import numpy as np
 from pymatgen import IStructure, Lattice
 
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.corrections.efnv_correction.efnv_correction import DefectSite
-from pydefect.corrections.efnv_correction.make_efnv_correction import \
+from pydefect.cli.vasp.make_efnv_correction import \
     calc_max_sphere_radius, make_efnv_correction
+from pydefect.corrections.efnv_correction.efnv_correction import DefectSite
 
 
 def test_pot(mocker):
