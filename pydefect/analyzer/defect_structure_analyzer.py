@@ -20,22 +20,22 @@ class DefectStructureAnalyzer:
         """
         self._defective_structure = defective_structure
         self._perfect_structure = perfect_structure
+        self.p_to_d = self.make_p_to_d()
+        self.d_to_p = self.make_d_to_p()
 
     @property
     def atom_mapping(self):
         return {d: p for d, p in enumerate(self.d_to_p)
                 if d not in self.inserted_indices}
 
-    @property
-    def p_to_d(self):
+    def make_p_to_d(self):
         result = []
         for site in self._perfect_structure:
             distances = Distances(self._defective_structure, site.frac_coords)
             result.append(distances.mapped_atom_idx(specie=site.specie))
         return result
 
-    @property
-    def d_to_p(self):
+    def make_d_to_p(self):
         result = []
         for site in self._defective_structure:
             distances = Distances(self._perfect_structure, site.frac_coords)

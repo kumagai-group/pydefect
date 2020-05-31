@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+
 import numpy as np
 import pytest
+from monty.serialization import loadfn
 from pymatgen import Structure, IStructure, Lattice
 
+from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_analyzer import \
     symmetrize_defect_structure, \
     DefectStructureAnalyzer
@@ -44,6 +47,20 @@ def test_defect_structure_analyzer_defect_center(structure_analyzer):
 
 def test_defect_structure_analyzer_distance(structure_analyzer):
     assert structure_analyzer.distance_from_center(4) == 5 / 4
+
+
+def test_actual_files(vasp_files):
+    d = vasp_files / "KInO2_Va_O_2"
+    calc_results: CalcResults = loadfn(d / "Va_O1_2/calc_results.json")
+    perfect_calc_results: CalcResults = loadfn(d / "perfect_calc_results.json")
+    dsa = DefectStructureAnalyzer(calc_results.structure,
+                                  perfect_calc_results.structure)
+    a = list(range(192))
+    a.pop(96)
+    expected = dict(zip(range(191), a))
+    assert dsa.inserted_indices == []
+    assert dsa.vacancy_indices == [96]
+    assert dsa.atom_mapping == expected
 
 
 def test_symmetrize_defect_structure():

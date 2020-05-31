@@ -1,0 +1,1 @@
+{"@module": "pydefect.analyzer.unitcell", "@class": "Unitcell", "@version": null, "vbm": 0.5275, "cbm": 2.5579, "ele_dielectric_const": [[4.076962, 0.0, -0.0], [-0.0, 4.076962, -0.0], [0.0, -0.0, 3.391659]], "ion_dielectric_const": [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]}
