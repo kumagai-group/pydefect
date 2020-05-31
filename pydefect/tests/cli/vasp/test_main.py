@@ -72,7 +72,7 @@ def test_cpd_w_options():
                               "-d", "Mg", "O",
                               "-t", "MgO"])
     expected = Namespace(
-        vasp_dirs=[Path("Mg"), Path("O")],
+        dirs=[Path("Mg"), Path("O")],
         target=Composition("MgO"),
         func=parsed_args.func)
     assert parsed_args == expected
