@@ -145,12 +145,13 @@ def make_defect_formation_energy(args):
                                       loadfn(d / "defect_entry.json"),
                                       abs_chem_pot))
 #                                      loadfn(d / "correction.json")))
-    DefectEnergyPlotter(title=title,
-                        defect_energies=make_defect_energies(single_energies),
-                        vbm=args.unitcell.vbm,
-                        cbm=args.unitcell.cbm,
-                        supercell_vbm=args.perfect_calc_results.vbm,
-                        supercell_cbm=args.perfect_calc_results.cbm,
-                        y_range=args.y_range)
+    plotter = DefectEnergyPlotter(title=title,
+                                  defect_energies=make_defect_energies(single_energies),
+                                  vbm=args.unitcell.vbm,
+                                  cbm=args.unitcell.cbm,
+                                  supercell_vbm=args.perfect_calc_results.vbm,
+                                  supercell_cbm=args.perfect_calc_results.cbm,
+                                  y_range=args.y_range)
 
-
+    plotter.construct_plot()
+    plotter.plt.show()

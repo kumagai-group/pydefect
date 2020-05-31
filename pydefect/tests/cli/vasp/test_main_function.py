@@ -5,15 +5,16 @@ from pathlib import Path
 
 import numpy as np
 from monty.serialization import loadfn
-from pymatgen import IStructure, Composition, Structure, Lattice
+from pymatgen import IStructure, Composition, Structure, Lattice, Element
 from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
+from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_calc_results, print_file, \
-    make_efnv_correction_from_vasp
+    make_efnv_correction_from_vasp, make_defect_formation_energy
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
@@ -176,7 +177,6 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
             raise ValueError
 
     mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
-    mock_perfect_calc_results.structure = Structure(Lattice.cubic(1), species=["H"], coords=[[0]*3])
     mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
     mock_unitcell = mocker.Mock(spec=Unitcell)
     mock_make_efnv = mocker.patch("pydefect.cli.vasp.main_function.make_efnv_correction")
@@ -193,45 +193,49 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
     mock_make_efnv.assert_called_with(mock_defect_entry.charge, mock_calc_results, mock_perfect_calc_results, mock_unitcell.dielectric_constant)
     mock_efnv.to_json_file.assert_called_with(Path("Va_O1_2") / "correction.json")
 
-#
-# def test_make_defect_formation_energy(tmpdir, mocker):
-#     mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
-#     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
-#
-#     def side_effect(key):
-#         mock_loadfn = mocker.Mock()
-#         print(key)
-#         if key == Path("Va_O1_2") / "defect_entry.json":
-#             mock_defect_entry.charge = 2
-#             mock_loadfn.return_value = mock_defect_entry
-#         if key == Path("Va_O1_2") / "calc_results.json":
-#             mock_loadfn.return_value = mock_calc_results
-#         else:
-#             raise ValueError
-#         return mock_loadfn
-#
-#     mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
-#     mock_perfect_calc_results.structure = Structure(Lattice.cubic(1), species=["H"], coords=[[0]*3])
-#     mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
-#     mock_unitcell = mocker.Mock(spec=Unitcell)
-#     mock_make_efnv = mocker.patch("pydefect.cli.vasp.main_function.make_single_defect_energy")
-#
-#     mock_energy = mocker.Mock(spec=DefectEnergyPlotter, autospec=True)
-#     args = Namespace(dirs=[Path("Va_O1_2")],
-#                      perfect_calc_results=mock_perfect_calc_results,
-#                      unitcell=mock_unitcell,
-#                      chem_pot_diag="",
-#                      label="A",
-#                      y_range=[0.0, 1.0])
+
+def test_make_defect_formation_energy(tmpdir, mocker):
+    mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
+    mock_perfect_calc_results.structure = Structure(Lattice.cubic(1), species=["H"] * 2, coords=[[0]*3] * 2)
+    mock_perfect_calc_results.energy = 10
+    mock_perfect_calc_results.vbm = 10
+    mock_perfect_calc_results.cbm = 20
+
+    mock_chem_pot_diag = mocker.Mock(spec=ChemPotDiag)
+    mock_chem_pot_diag.abs_chem_pot_dict.return_value = {Element.H: 0}
+
+    mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
+    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+
+    def side_effect(key):
+        if str(key) == "Va_O1_2/defect_entry.json":
+            mock_defect_entry.name = "Va_H1"
+            mock_defect_entry.charge = 2
+            return mock_defect_entry
+        elif str(key) == "Va_O1_2/calc_results.json":
+            mock_calc_results.structure = Structure(Lattice.cubic(1), species=["H"], coords=[[0]*3])
+            mock_calc_results.energy = 10
+            return mock_calc_results
+        else:
+            raise ValueError
+
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+
+    mock_unitcell = mocker.Mock(spec=Unitcell)
+    mock_unitcell.vbm = 11
+    mock_unitcell.cbm = 19
+
+    args = Namespace(dirs=[Path("Va_O1_2")],
+                     perfect_calc_results=mock_perfect_calc_results,
+                     unitcell=mock_unitcell,
+                     chem_pot_diag=mock_chem_pot_diag,
+                     label="A",
+                     y_range=[-100, 100])
+    make_defect_formation_energy(args)
+
+    mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
+    mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")
 
 
 
-"""
-TODO
-- 
 
-DONE
-- make 2x2x2 supercell
-- make supercell_info.json
-- Generate defect_set from minimum args.
-"""
