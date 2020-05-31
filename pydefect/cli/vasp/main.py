@@ -93,7 +93,7 @@ def parse_args(args):
         aliases=['cpd'])
 
     parser_cpd.add_argument(
-        "-d", "--vasp_dirs",
+        "-d", "--dirs",
         required=True,
         nargs="+",
         type=Path)
