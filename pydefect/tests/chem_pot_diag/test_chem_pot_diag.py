@@ -24,6 +24,12 @@ def test_chem_pot_diag_assert_msonable(cpd):
     assert_msonable(cpd)
 
 
+# 2020.5.30: Composition is not recovered with MSONable
+def test_msonable_for_composition(cpd):
+    a = ChemPotDiag.from_dict(cpd.as_dict())
+    assert isinstance(a.target, Composition)
+
+
 def test_chem_pot_diag_to_json_file(cpd, tmpdir):
     assert_json_roundtrip(cpd, tmpdir)
 
@@ -49,7 +55,7 @@ def test_cpd_plot_info_lacking_element_data():
 
 
 def test_chem_pot_diag_min_energy(cpd):
-    assert cpd.min_rel_energies == -3
+    assert cpd.lowest_relative_energy == -3
 
 
 @pytest.fixture()

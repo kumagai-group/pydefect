@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+import dataclasses
 import string
 from dataclasses import dataclass
 from itertools import chain
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 import numpy as np
 from monty.json import MSONable
@@ -19,16 +20,22 @@ alphabets = list(string.ascii_uppercase)
 @dataclass
 class ChemPotDiag(MSONable, ToJsonFileMixIn):
     energies: Dict[str, float]
-    target: Optional[Composition] = None
+    target: dataclasses.InitVar[Union[Composition, dict]] = None
+
+    def __post_init__(self, target):
+        if isinstance(target, Composition):
+            self.target = target
+        else:
+            self.target = Composition.from_dict(target)
 
     @property
-    def abs_energies(self):
+    def abs_energies_per_atom(self):
         return {Composition(c).reduced_composition: e / Composition(c).num_atoms
                 for c, e in self.energies.items()}
 
     @property
     def compounds(self):
-        return self.abs_energies.keys()
+        return self.abs_energies_per_atom.keys()
 
     @property
     def vertex_elements(self):
@@ -45,7 +52,7 @@ class ChemPotDiag(MSONable, ToJsonFileMixIn):
         for vertex_element in self.vertex_elements:
             target = Composition({vertex_element: 1.0}).reduced_composition
             candidates = filter(lambda x: x[0] == target,
-                                self.abs_energies.items())
+                                self.abs_energies_per_atom.items())
             try:
                 result.append(min([x[1] for x in candidates]))
             except ValueError:
@@ -55,7 +62,7 @@ class ChemPotDiag(MSONable, ToJsonFileMixIn):
     @property
     def rel_energies(self):
         result = {}
-        for c, e in self.abs_energies.items():
+        for c, e in self.abs_energies_per_atom.items():
             sub = sum(f * offset for f, offset
                       in zip(self.atomic_fractions(c), self.offset_to_abs))
             result[c] = e - sub
@@ -78,7 +85,7 @@ class ChemPotDiag(MSONable, ToJsonFileMixIn):
         return result
 
     @property
-    def min_rel_energies(self):
+    def lowest_relative_energy(self):
         return min(chain(*self.vertex_coords))
 
     def get_half_space_intersection(self, min_range):
@@ -114,7 +121,7 @@ class CpdPlotInfo:
                  cpd: ChemPotDiag,
                  min_range: Optional[float] = None):
         self.cpd = cpd
-        self.min_range = min_range or self.cpd.min_rel_energies * 1.1
+        self.min_range = min_range or self.cpd.lowest_relative_energy * 1.1
 
         self.dim = cpd.dim
         self.comp_vertices = self._get_comp_vertices(self.min_range)
