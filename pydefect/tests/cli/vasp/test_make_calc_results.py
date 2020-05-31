@@ -17,4 +17,6 @@ def test_make_calc_results_from_vasp_results(vasp_files):
     assert results.site_symmetry == "m-3m"
     assert results.energy == -34.91084360
     assert results.magnetization == 1.03e-05
+    assert results.vbm == 2.4163
+    assert results.cbm == 10.2574
 

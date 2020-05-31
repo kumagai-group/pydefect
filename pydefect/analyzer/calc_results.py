@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from monty.json import MSONable
 from pymatgen import IStructure
+from vise.analyzer.band_edge_properties import BandEdge
 
 from pydefect.util.mix_in import ToJsonFileMixIn
 
@@ -18,11 +19,18 @@ class CalcResults(MSONable, ToJsonFileMixIn):
     kpoint_coords: List[List[float]]
     kpoint_weights: List[float]
     potentials: List[float]
-    vbm_info: float
-    cbm_info: float
+    vbm_info: BandEdge
+    cbm_info: BandEdge
     fermi_level: float
     electronic_conv: Optional[bool] = None
     ionic_conv: Optional[bool] = None
 
+    @property
+    def vbm(self):
+        return self.vbm_info.energy
+
+    @property
+    def cbm(self):
+        return self.cbm_info.energy
 
 

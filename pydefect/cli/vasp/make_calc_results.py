@@ -29,7 +29,7 @@ def make_calc_results_from_vasp(vasprun: Vasprun,
                        kpoint_weights=vasprun.actual_kpoints_weights,
                        potentials=outcar.electrostatic_potential,
                        vbm_info=band_edge_prop.vbm_info,
-                       cbm_info=band_edge_prop.vbm_info,
+                       cbm_info=band_edge_prop.cbm_info,
                        fermi_level=vasprun.efermi,
                        electronic_conv=vasprun.converged_electronic,
                        ionic_conv=vasprun.converged_ionic)
