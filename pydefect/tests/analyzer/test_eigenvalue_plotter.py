@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+#  Copyright (c) 2020. Distributed under the terms of the MIT License.
+
+import pytest
+
+from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues
+from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotter
+
+
+@pytest.fixture
+def eigenvalue_plotter():
+    eig = BandEdgeEigenvalues(energies_and_occupations=[
+        [[[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]], [[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]]],
+        [[[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]], [[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]]],
+                                                        ],
+                               kpt_coords=[(0.0, 0.0, 0.0), (0.25, 0.0, 0.0)])
+    return EigenvaluePlotter("test", eig, supercell_vbm=0.1, supercell_cbm=0.9)
+
+
+def test(eigenvalue_plotter):
+    eigenvalue_plotter.construct_plot()
+    eigenvalue_plotter.plt.show()
+
+
+"""
+TODO
+-
+
+DONE
+"""
