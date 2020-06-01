@@ -216,6 +216,9 @@ def test_make_defect_formation_energy(tmpdir, mocker):
             mock_calc_results.structure = Structure(Lattice.cubic(1), species=["H"], coords=[[0]*3])
             mock_calc_results.energy = 10
             return mock_calc_results
+        elif str(key) == "Va_O1_2/correction.json":
+            mock_calc_results.correction_energy = 20
+            return mock_calc_results
         else:
             raise ValueError
 
