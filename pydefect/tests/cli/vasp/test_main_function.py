@@ -5,9 +5,6 @@ from pathlib import Path
 
 import numpy as np
 from monty.serialization import loadfn
-from pymatgen import IStructure, Composition, Structure, Lattice, Element
-from pymatgen.io.vasp import Vasprun, Outcar
-
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
@@ -21,6 +18,8 @@ from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
+from pymatgen import IStructure, Composition, Structure, Lattice, Element
+from pymatgen.io.vasp import Vasprun, Outcar
 
 
 def test_print():
@@ -169,6 +168,7 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
 
     def side_effect(key):
         if str(key) == "Va_O1_2/defect_entry.json":
+            mock_defect_entry.full_name = "Va_O1_2"
             mock_defect_entry.charge = 2
             return mock_defect_entry
         elif str(key) == "Va_O1_2/calc_results.json":
@@ -182,6 +182,9 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
     mock_make_efnv = mocker.patch("pydefect.cli.vasp.main_function.make_efnv_correction")
     mock_efnv = mocker.Mock(spec=ExtendedFnvCorrection, autospec=True)
     mock_make_efnv.return_value = mock_efnv
+
+    mock_pot_plotter = mocker.patch("pydefect.cli.vasp.main_function.SitePotentialPlotter")
+
     args = Namespace(dirs=[Path("Va_O1_2")],
                      perfect_calc_results=mock_perfect_calc_results,
                      unitcell=mock_unitcell)
@@ -192,6 +195,10 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
 
     mock_make_efnv.assert_called_with(mock_defect_entry.charge, mock_calc_results, mock_perfect_calc_results, mock_unitcell.dielectric_constant)
     mock_efnv.to_json_file.assert_called_with(Path("Va_O1_2") / "correction.json")
+
+    mock_pot_plotter.assert_called_with("Va_O1_2", mock_efnv)
+    mock_pot_plotter.return_value.construct_plot.assert_called_once_with()
+    mock_pot_plotter.return_value.plt.savefig.assert_called_once_with(fname=Path("Va_O1_2") / "correction.pdf")
 
 
 def test_make_defect_formation_energy(tmpdir, mocker):

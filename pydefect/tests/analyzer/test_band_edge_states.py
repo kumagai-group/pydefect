@@ -11,7 +11,7 @@ from pydefect.tests.helpers.assertion import assert_msonable, \
 
 @pytest.fixture
 def band_edge_eigenvalues():
-    return BandEdgeEigenvalues(energies_and_occupations=[[[0.0, 1.0]]],
+    return BandEdgeEigenvalues(energies_and_occupations=[[[[0.0, 1.0]]]],
                                kpt_coords=[(0.0, 0.0, 0.0)])
 
 
