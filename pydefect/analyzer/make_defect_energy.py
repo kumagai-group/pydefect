@@ -2,13 +2,12 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from typing import Dict, Optional
 
-from pymatgen import Element, IStructure
-
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import SingleDefectEnergy
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.corrections.manual_correction import NoCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
+from pymatgen import Element, IStructure
 
 
 def make_single_defect_energy(perfect: CalcResults,
@@ -18,7 +17,6 @@ def make_single_defect_energy(perfect: CalcResults,
                               correction: Optional[Correction] = NoCorrection()
                               ) -> SingleDefectEnergy:
     n_diffs = num_atom_differences(defect.structure, perfect.structure)
-    print(n_diffs)
     energy = (defect.energy - perfect.energy
               + correction.correction_energy
               + reservoir_energy(n_diffs, abs_chem_pot))

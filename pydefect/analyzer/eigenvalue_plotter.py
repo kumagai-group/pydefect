@@ -5,10 +5,9 @@ from itertools import cycle
 from typing import Optional, List
 
 from matplotlib import pyplot as plt
-from vise.util.matplotlib import float_to_int_formatter
-
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues
 from pydefect.defaults import defaults
+from vise.util.matplotlib import float_to_int_formatter
 
 
 class EigenvalueMplSettings:
@@ -59,7 +58,6 @@ class EigenvaluePlotter:
         self._supercell_vbm = supercell_vbm
         self._supercell_cbm = supercell_cbm
         self._y_range = y_range
-
         self._y_unit = y_unit
 
         self._mpl_defaults = mpl_defaults
