@@ -3,13 +3,12 @@
 from typing import List, Tuple
 
 import numpy as np
-from pymatgen import Structure, IStructure
-
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.supercell_info import SupercellInfo, Site
+from pymatgen import Structure, IStructure
 
 
 class DefectEntriesMaker:
@@ -19,9 +18,9 @@ class DefectEntriesMaker:
 
         for defect in defect_set:
             site = supercell_info.sites[defect.out_atom]
-            _, cutoff = supercell_info.coords(defect.out_atom)
+            coordination = supercell_info.coords(defect.out_atom)
             structure, perturbed_structure, coords = \
-                self._create_defect_structures(defect, site, cutoff)
+                self._create_defect_structures(defect, site, coordination.cutoff)
 
             for charge in defect.charges:
                 self.defect_entries.add(

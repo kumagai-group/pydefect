@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from pydefect.util.structure_tools import Distances
+from pydefect.util.structure_tools import Distances, Coordination
 
 
 def test_distances(ortho_conventional):
@@ -38,8 +38,10 @@ def test_coord_distances(mocker, ortho_conventional):
     mock.cutoff_distance_factor = 3.9051248 / 2.5 + 1e-5  # = 1.562
     distances = Distances(ortho_conventional, coord=[0.5, 0.5, 0.5])
 
-    actual = distances.coord_distances_and_cutoff()
-    expected = {"H": [2.5, 3.0, 3.5], "He": [3.91]}, 3.905
+    actual = distances.coordination
+    expected = Coordination({"H": [2.5, 3.0, 3.5], "He": [3.91]},
+                            3.905,
+                            neighboring_atom_indices={1, 2, 3, 4})
     assert actual == expected
 
 

@@ -6,12 +6,11 @@ from typing import List, Dict
 from monty.json import MSONable
 from more_itertools import consecutive_groups
 from numpy.linalg import det
-from pymatgen import IStructure
-from vise.util.logger import get_logger
-
 from pydefect.database.database import electronegativity, oxidation_state
 from pydefect.util.mix_in import ToJsonFileMixIn
 from pydefect.util.structure_tools import Distances
+from pymatgen import IStructure
+from vise.util.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -46,7 +45,7 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
         site = self.sites[name]
         coord = list(self.structure[site.equivalent_atoms[0]].frac_coords)
         distances = Distances(self.structure, coord)
-        return distances.coord_distances_and_cutoff()
+        return distances.coordination
 
     @property
     def multiplicity(self):
@@ -71,13 +70,12 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
                  f"Cell multiplicity: {self.multiplicity}", ""]
 
         for name, site in self.sites.items():
-            distances, cutoff = self.coords(name)
             elem = self._stripe_numbers(name)
             lines.append(f"   Irreducible element: {name}")
             lines.append(f"        Wyckoff letter: {site.wyckoff_letter}")
             lines.append(f"         Site symmetry: {site.site_symmetry}")
-            lines.append(f"         Cutoff radius: {cutoff}")
-            lines.append(f"          Coordination: {distances}")
+            lines.append(f"         Cutoff radius: {self.coords(name).cutoff}")
+            lines.append(f"          Coordination: {self.coords(name).distance_dict}")
             lines.append(f"      Equivalent atoms: {site.pprint_equiv_atoms}")
             lines.append(f"Fractional coordinates: {self._frac_coords(site)}")
             lines.append(f"     Electronegativity: {electronegativity(elem)}")

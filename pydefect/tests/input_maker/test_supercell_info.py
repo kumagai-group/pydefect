@@ -6,6 +6,7 @@ import pytest
 from pydefect.input_maker.supercell_info import Site
 from pydefect.tests.helpers.assertion import assert_msonable, \
     assert_json_roundtrip
+from pydefect.util.structure_tools import Coordination
 
 
 @pytest.fixture
@@ -29,8 +30,8 @@ def test_supercell_info_msonable(supercell_info):
 
 
 def test_supercell_info_distances(supercell_info):
-    assert supercell_info.coords("H1") == ({"H": [3.91], "He": [2.5, 3.0, 3.5]}, 4.25)
-    assert supercell_info.coords("He1") == ({"H": [2.5, 3.0, 3.5], "He": [3.91]}, 4.25)
+    assert supercell_info.coords("H1") == Coordination({"H": [3.91], "He": [2.5, 3.0, 3.5]}, 4.25, {1, 4, 5, 6})
+    assert supercell_info.coords("He1") == Coordination({"H": [2.5, 3.0, 3.5], "He": [3.91]}, 4.25, {0, 2, 3, 7})
 
 
 def test_supercell_info_str(supercell_info):
