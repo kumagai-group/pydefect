@@ -204,18 +204,40 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
 
 def test_make_defect_eigenvalues(mocker):
     mock_vasprun = mocker.patch("pydefect.cli.vasp.main_function.Vasprun")
+
     mock_unitcell = mocker.Mock(spec=Unitcell)
     mock_unitcell.vbm = 11
     mock_unitcell.cbm = 19
+
     mock_make_eigvals = mocker.patch("pydefect.cli.vasp.main_function.make_band_edge_eigenvalues")
 
+    mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
+    mock_perfect_calc_results.vbm = 10
+    mock_perfect_calc_results.cbm = 20
+
+    mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
+
+    mock_eigval_plotter = mocker.patch("pydefect.cli.vasp.main_function.EigenvaluePlotter")
+
+    def side_effect(key):
+        if str(key) == "Va_O1_2/defect_entry.json":
+            mock_defect_entry.name = "Va_O1"
+            mock_defect_entry.charge = 2
+            return mock_defect_entry
+        else:
+            raise ValueError
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+
     args = Namespace(dirs=[Path("Va_O1_2")],
+                     perfect_calc_results=mock_perfect_calc_results,
                      unitcell=mock_unitcell)
     make_defect_eigenvalues(args)
 
     mock_vasprun.assert_called_with(Path("Va_O1_2") / defaults.vasprun)
     mock_make_eigvals.assert_called_with(mock_vasprun.return_value, 11, 19)
     mock_make_eigvals.return_value.to_json_file.assert_called_with(Path("Va_O1_2") / "band_edge_eigenvalues.json")
+    mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
+    mock_eigval_plotter.assert_called_with("Va_O1", mock_make_eigvals.return_value, 10, 20)
 
 
 def test_make_defect_formation_energy(tmpdir, mocker):
@@ -230,6 +252,7 @@ def test_make_defect_formation_energy(tmpdir, mocker):
 
     mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_correction = mocker.Mock(spec=ExtendedFnvCorrection, autospec=True)
 
     def side_effect(key):
         if str(key) == "Va_O1_2/defect_entry.json":
@@ -241,8 +264,8 @@ def test_make_defect_formation_energy(tmpdir, mocker):
             mock_calc_results.energy = 10
             return mock_calc_results
         elif str(key) == "Va_O1_2/correction.json":
-            mock_calc_results.correction_energy = 20
-            return mock_calc_results
+            mock_correction.correction_energy = 20
+            return mock_correction
         else:
             raise ValueError
 
@@ -263,6 +286,7 @@ def test_make_defect_formation_energy(tmpdir, mocker):
     mock_chem_pot_diag.abs_chem_pot_dict.assert_called_once_with("A")
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")
+    mock_loadfn.assert_any_call(Path("Va_O1_2") / "correction.json")
 
 
 

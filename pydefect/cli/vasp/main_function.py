@@ -5,6 +5,7 @@ from pathlib import Path
 from monty.serialization import loadfn
 from pydefect.analyzer.defect_energy import make_defect_energies
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotter
+from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotter
 from pydefect.analyzer.make_defect_energy import make_single_defect_energy
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DPlotter, \
@@ -145,13 +146,18 @@ def make_efnv_correction_from_vasp(args):
 
 def make_defect_eigenvalues(args):
     vbm, cbm = args.unitcell.vbm, args.unitcell.cbm
+    supercell_vbm = args.perfect_calc_results.vbm
+    supercell_cbm = args.perfect_calc_results.cbm
     for d in args.dirs:
+        defect_entry = loadfn(d / "defect_entry.json")
+        title = defect_entry.name
         vasprun = Vasprun(d / defaults.vasprun)
         # procar = Procar(defaults.procar)
         # outcar = Outcar(defaults.outcar)
-        # calc_results = loadfn(d / "calc_results.json")
         band_edge_eigvals = make_band_edge_eigenvalues(vasprun, vbm, cbm)
         band_edge_eigvals.to_json_file(d / "band_edge_eigenvalues.json")
+        plotter = EigenvaluePlotter(title, band_edge_eigvals, supercell_vbm, supercell_cbm)
+        plotter.plt.savefig(fname=d / "eigenvalues.pdf")
 
 
 def make_defect_formation_energy(args):
