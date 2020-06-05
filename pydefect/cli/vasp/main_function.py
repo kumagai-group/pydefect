@@ -175,7 +175,7 @@ def make_edge_characters(args):
         edge_characters.to_json_file(d / "edge_characters.json")
 
 
-def make_edge_state(args):
+def make_edge_states(args):
     for edge_character, ref in zip(args.edge_characters, args.perf_char):
         edge_state = make_band_edge_state(edge_character, ref)
         print(edge_state)
