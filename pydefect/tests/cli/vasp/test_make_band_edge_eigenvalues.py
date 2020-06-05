@@ -13,6 +13,8 @@ from pymatgen.io.vasp import Vasprun
 def band_edge_eigenvalues(mocker):
     mock_vasprun = mocker.Mock(spec=Vasprun, autospec=True)
     mock_vasprun.actual_kpoints = [[0.0, 0.0, 0.0]]
+    mock_defaults = mocker.patch("pydefect.cli.vasp.make_band_edge_eigenvalues.defaults")
+    mock_defaults.eigval_range = 3.0
     mock_vasprun.eigenvalues = {Spin.up: np.array([[[-3.01, 1.],
                                            [-2.99, 1.],
                                            [ 8.01, 0.],
