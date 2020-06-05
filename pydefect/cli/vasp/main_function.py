@@ -7,6 +7,7 @@ from pydefect.analyzer.defect_energy import make_defect_energies
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotter
 from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotter
+from pydefect.analyzer.make_band_edge_state import make_band_edge_state
 from pydefect.analyzer.make_defect_energy import make_single_defect_energy
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DPlotter, \
@@ -172,6 +173,12 @@ def make_edge_characters(args):
         edge_characters = MakeEdgeCharacters(
             procar, vasprun, outcar, structure_analyzer.neighboring_atom_indices).edge_characters
         edge_characters.to_json_file(d / "edge_characters.json")
+
+
+def make_edge_state(args):
+    for edge_character, ref in zip(args.edge_characters, args.perf_char):
+        edge_state = make_band_edge_state(edge_character, ref)
+        print(edge_state)
 
 
 def make_defect_formation_energy(args):

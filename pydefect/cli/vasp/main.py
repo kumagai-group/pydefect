@@ -211,16 +211,33 @@ def parse_args(args):
 
     parser_eig.set_defaults(func=make_defect_eigenvalues)
 
+    # -- band edge characters ------------------------------------------------
+    parser_eig = subparsers.add_parser(
+        name="edge_characters",
+        description="",
+        parents=[dirs_parser, pcr_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['ec'])
+
+    parser_eig.set_defaults(func=make_edge_characters)
+
     # -- band edge states ------------------------------------------------
     parser_eig = subparsers.add_parser(
         name="edge_states",
         description="",
-        parents=[dirs_parser, pcr_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['es'])
 
-    parser_eig.set_defaults(func=make_edge_characters)
+    parser_efnv.add_argument(
+        "-e", "--edge_characters",
+        required=True,
+        type=loadfn)
+    parser_efnv.add_argument(
+        "-p", "--perfect_edge_characters",
+        required=True,
+        type=loadfn)
 
+    parser_eig.set_defaults(func=make_edge_characters)
     # -- defect formation energy ----------------------------------------------
     parser_efnv = subparsers.add_parser(
         name="defect_formation_energy",

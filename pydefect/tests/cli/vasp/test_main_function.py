@@ -275,6 +275,19 @@ def test_make_edge_characters(mocker):
                                        mock_analyzer.return_value.neighboring_atom_indices)
 
 
+# def test_make_edge_state(mocker):
+#     mock_edge_state = mocker.Mock(spec=kk, autospec=True)
+#     def side_effect(key):
+#         if str(key) == "Va_O1_2/edge_characters.json":
+#             mock_calc_results.structure = mocker.Mock(spec=Structure, autospec=True)
+#             return mock_calc_results
+#         else:
+#             raise ValueError
+#     mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+
+
+
+
 def test_make_defect_formation_energy(tmpdir, mocker):
     mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
     mock_perfect_calc_results.structure = Structure(Lattice.cubic(1), species=["H"] * 2, coords=[[0]*3] * 2)
