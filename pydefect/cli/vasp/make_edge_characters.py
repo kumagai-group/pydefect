@@ -3,11 +3,10 @@
 from typing import Dict
 
 import numpy as np
+from pydefect.analyzer.band_edge_states import EdgeCharacters, EdgeCharacter
 from pymatgen import Spin, Structure
 from pymatgen.io.vasp import Procar, Vasprun, Outcar
 from vise.analyzer.vasp.band_edge_properties import eigenvalues_from_vasprun
-
-from pydefect.analyzer.band_edge_states import EdgeCharacters, EdgeCharacter
 
 
 class MakeEdgeCharacters:
@@ -87,9 +86,6 @@ def calc_orbital_character(orbitals,
 
     LORBIT 10 -> consider only "s", "p", "d" orbitals
     LORBIT >=11 -> consider "s", "px", "py", "pz",.. orbitals
-
-
-    When
 
     """
 

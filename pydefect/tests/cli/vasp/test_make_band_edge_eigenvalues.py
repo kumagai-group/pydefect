@@ -3,11 +3,10 @@
 
 import numpy as np
 import pytest
-from pymatgen import Spin
-from pymatgen.io.vasp import Vasprun
-
 from pydefect.cli.vasp.make_band_edge_eigenvalues import \
     make_band_edge_eigenvalues
+from pymatgen import Spin
+from pymatgen.io.vasp import Vasprun
 
 
 @pytest.fixture
@@ -22,7 +21,7 @@ def band_edge_eigenvalues(mocker):
                                            [-2.99, 1.],
                                            [ 7.99, 0.],
                                            [10.00, 0.]]]),
-                              Spin.down: np.array([[[-3.01, 1.],
+                                Spin.down: np.array([[[-3.01, 1.],
                                            [-2.99, 1.],
                                            [ 7.99, 0.],  # only change here from Spin.up
                                            [10.00, 0.]],
@@ -42,10 +41,3 @@ def test_make_band_edge_eigenvalues_eigenvalues(band_edge_eigenvalues):
     expected = [[[[-2.99, 1.], [8.01, 0.]], [[-2.99, 1.], [7.99, 0.]]],
                 [[[-2.99, 1.], [7.99, 0.]], [[-2.99, 1.], [7.99, 0.]]]]
     np.testing.assert_array_almost_equal(actual, expected)
-
-
-"""
-TODO
-- Get kpt_coords and kpt_weights from Procar
-DONE
-"""
