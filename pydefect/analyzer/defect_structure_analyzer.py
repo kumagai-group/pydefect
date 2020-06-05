@@ -2,11 +2,10 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import numpy as np
-from pymatgen import IStructure, Structure
-from vise.util.structure_symmetrizer import StructureSymmetrizer
-
 from pydefect.defaults import defaults
 from pydefect.util.structure_tools import Distances
+from pymatgen import IStructure, Structure
+from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 
 class DefectStructureAnalyzer:
@@ -77,6 +76,21 @@ class DefectStructureAnalyzer:
         frac_coords = self._defective_structure[index].frac_coords
         result, _ = self._defective_structure.lattice.get_distance_and_image(
             self.defect_center_coord, frac_coords)
+        return result
+
+    @property
+    def neighboring_atom_indices(self):
+        result = set()
+        for v in self.vacancy_indices:
+            distances = Distances(self._defective_structure,
+                                  self._perfect_structure[v].frac_coords)
+            print(distances.coordination.distance_dict)
+            result.update(distances.coordination.neighboring_atom_indices)
+        for i in self.inserted_indices:
+            distances = Distances(self._defective_structure,
+                                  self._defective_structure[i].frac_coords)
+            result.update(distances.coordination.neighboring_atom_indices)
+
         return result
 
 

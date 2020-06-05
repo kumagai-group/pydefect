@@ -4,12 +4,11 @@
 import numpy as np
 import pytest
 from monty.serialization import loadfn
-from pymatgen import Structure, IStructure, Lattice
-
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_analyzer import \
     symmetrize_defect_structure, \
     DefectStructureAnalyzer
+from pymatgen import Structure, IStructure, Lattice
 
 
 @pytest.fixture
@@ -47,6 +46,16 @@ def test_defect_structure_analyzer_defect_center(structure_analyzer):
 
 def test_defect_structure_analyzer_distance(structure_analyzer):
     assert structure_analyzer.distance_from_center(4) == 5 / 4
+
+
+def test_neighboring_atom_indices(cubic_supercell):
+    structure: Structure = cubic_supercell.copy()
+    structure.pop(32)  # [0.25, 0, 0]
+    structure.pop(0)  # [0, 0, 0]
+    structure.append(species="Li", coords=[0.124, 0, 0])
+    structure.to(filename="POSCAR")
+    structure_analyzer = DefectStructureAnalyzer(structure, cubic_supercell)
+    assert structure_analyzer.neighboring_atom_indices == {25, 15, 16, 23, 54, 47, 46, 56, 62}
 
 
 def test_actual_files(vasp_files):
