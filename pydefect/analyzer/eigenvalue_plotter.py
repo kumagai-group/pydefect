@@ -20,7 +20,7 @@ class EigenvalueMplSettings:
                  supercell_band_edge_line_width: float = 0.5,
                  supercell_band_edge_line_color: str = "black",
                  supercell_band_edge_line_style: str = "-.",
-                 circle_size: int = 15,
+                 circle_size: int = 10,
                  tick_label_size: Optional[int] = 10,
                  title_font_size: Optional[int] = 15,
                  label_font_size: Optional[int] = 12):
@@ -57,6 +57,7 @@ class EigenvaluePlotter:
         self._kpt_coords = band_edge_eigenvalues.kpt_coords
         self._supercell_vbm = supercell_vbm
         self._supercell_cbm = supercell_cbm
+        self._middle = (self._supercell_vbm + self._supercell_cbm) / 2
         self._y_range = y_range
         self._y_unit = y_unit
 
@@ -80,10 +81,28 @@ class EigenvaluePlotter:
     def _add_eigenvalues(self):
         for spin_idx, (eo_by_spin, ax) in enumerate(zip(self._energies_and_occupations, self.axs)):
             for kpt_idx, eo_by_k_idx in enumerate(eo_by_spin):
-                for eo_by_band in eo_by_k_idx:
+                for band_idx, eo_by_band in enumerate(eo_by_k_idx):
                     energy, occup = eo_by_band
                     color = "r" if occup > 0.9 else "b" if occup < 0.1 else "g"
-                    ax.scatter([kpt_idx], energy, marker="o", color=color)
+                    ax.scatter([kpt_idx], energy, marker="o", color=color, s=self._mpl_defaults.circle_size)
+
+                    try:
+                        higher_band_e = eo_by_k_idx[band_idx + 1][0]
+                        lower_band_e = eo_by_k_idx[band_idx - 1][0]
+                    except IndexError:
+                        continue
+
+                    if self._add_band_idx(energy, higher_band_e, lower_band_e):
+                        ax.annotate(str(band_idx + 1),
+                                    xy=(kpt_idx + 0.05, energy),
+                                    va='center',
+                                    fontsize=self._mpl_defaults.tick_label_size)
+
+    def _add_band_idx(self, energy, higher_band_e, lower_band_e):
+        if energy < self._middle:
+            return higher_band_e - energy > 0.2
+        else:
+            return energy - lower_band_e > 0.2
 
     def _add_xticks(self):
         x_labels = []
