@@ -10,7 +10,7 @@ from monty.serialization import loadfn
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
-    make_calc_results, make_defect_formation_energy
+    make_calc_results, make_defect_formation_energy, make_defect_eigenvalues
 from pydefect.defaults import defaults
 from pydefect.version import __version__
 from pymatgen import IStructure, Composition
@@ -204,7 +204,7 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['eig'])
 
-    parser_eig.set_defaults(func=make_efnv_correction_from_vasp)
+    parser_eig.set_defaults(func=make_defect_eigenvalues)
 
     # -- defect formation energy ----------------------------------------------
     parser_efnv = subparsers.add_parser(
