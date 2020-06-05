@@ -10,7 +10,8 @@ from monty.serialization import loadfn
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
-    make_calc_results, make_defect_formation_energy, make_defect_eigenvalues
+    make_calc_results, make_defect_formation_energy, make_defect_eigenvalues, \
+    make_edge_characters
 from pydefect.defaults import defaults
 from pydefect.version import __version__
 from pymatgen import IStructure, Composition
@@ -37,14 +38,18 @@ def parse_args(args):
         nargs="+",
         type=Path)
 
-    # ++ parent parser: refs
-    refs_parser = argparse.ArgumentParser(
+    # ++ parent parser: pcr
+    pcr_parser = argparse.ArgumentParser(
         description="", add_help=False)
-    refs_parser.add_argument(
+    pcr_parser.add_argument(
         "-pcr", "--perfect_calc_results",
         required=True,
         type=loadfn)
-    refs_parser.add_argument(
+
+    # ++ parent parser: unitcell
+    unitcell_parser = argparse.ArgumentParser(
+        description="", add_help=False)
+    unitcell_parser.add_argument(
         "-u", "--unitcell",
         required=True,
         type=loadfn)
@@ -190,7 +195,7 @@ def parse_args(args):
     parser_efnv = subparsers.add_parser(
         name="efnv",
         description="",
-        parents=[dirs_parser, refs_parser],
+        parents=[dirs_parser, pcr_parser, unitcell_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['efnv'])
 
@@ -200,17 +205,27 @@ def parse_args(args):
     parser_eig = subparsers.add_parser(
         name="eig",
         description="",
-        parents=[dirs_parser, refs_parser],
+        parents=[dirs_parser, pcr_parser, unitcell_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['eig'])
 
     parser_eig.set_defaults(func=make_defect_eigenvalues)
 
+    # -- band edge states ------------------------------------------------
+    parser_eig = subparsers.add_parser(
+        name="edge_states",
+        description="",
+        parents=[dirs_parser, pcr_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['es'])
+
+    parser_eig.set_defaults(func=make_edge_characters)
+
     # -- defect formation energy ----------------------------------------------
     parser_efnv = subparsers.add_parser(
         name="defect_formation_energy",
         description="",
-        parents=[dirs_parser, refs_parser],
+        parents=[dirs_parser, pcr_parser, unitcell_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['e'])
 

@@ -171,7 +171,7 @@ def test_efnv_correction(mocker):
 
 def test_defect_eigenvalues(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
-    parsed_args = parse_args(["efnv",
+    parsed_args = parse_args(["eig",
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-pcr", "perfect/calc_results.json",
                               "-u", "unitcell.json"])
@@ -183,6 +183,19 @@ def test_defect_eigenvalues(mocker):
     assert parsed_args == expected
     mock.assert_any_call("perfect/calc_results.json")
     mock.assert_any_call("unitcell.json")
+
+
+def test_band_edge_states(mocker):
+    mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
+    parsed_args = parse_args(["es",
+                              "-d", "Va_O1_0", "Va_O1_1",
+                              "-pcr", "perfect/calc_results.json"])
+    expected = Namespace(
+        dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        perfect_calc_results=mock.return_value,
+        func=parsed_args.func)
+    assert parsed_args == expected
+    mock.assert_any_call("perfect/calc_results.json")
 
 
 def test_defect_formation_energy(mocker):
