@@ -157,6 +157,7 @@ def make_defect_eigenvalues(args):
         band_edge_eigvals = make_band_edge_eigenvalues(vasprun, vbm, cbm)
         band_edge_eigvals.to_json_file(d / "band_edge_eigenvalues.json")
         plotter = EigenvaluePlotter(title, band_edge_eigvals, supercell_vbm, supercell_cbm)
+        plotter.construct_plot()
         plotter.plt.savefig(fname=d / "eigenvalues.pdf")
 
 
