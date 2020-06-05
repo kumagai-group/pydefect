@@ -55,7 +55,8 @@ def test_neighboring_atom_indices(cubic_supercell):
     structure.append(species="Li", coords=[0.124, 0, 0])
     structure.to(filename="POSCAR")
     structure_analyzer = DefectStructureAnalyzer(structure, cubic_supercell)
-    assert structure_analyzer.neighboring_atom_indices == {25, 15, 16, 23, 54, 47, 46, 56, 62}
+    assert structure_analyzer.neighboring_atom_indices == sorted([25, 15, 16, 23, 54, 47, 46, 56, 62])
+    # must be list to be used for indexing
 
 
 def test_actual_files(vasp_files):

@@ -84,14 +84,13 @@ class DefectStructureAnalyzer:
         for v in self.vacancy_indices:
             distances = Distances(self._defective_structure,
                                   self._perfect_structure[v].frac_coords)
-            print(distances.coordination.distance_dict)
             result.update(distances.coordination.neighboring_atom_indices)
         for i in self.inserted_indices:
             distances = Distances(self._defective_structure,
                                   self._defective_structure[i].frac_coords)
             result.update(distances.coordination.neighboring_atom_indices)
 
-        return result
+        return sorted(list(result))
 
 
 def symmetrize_defect_structure(structure: IStructure,
