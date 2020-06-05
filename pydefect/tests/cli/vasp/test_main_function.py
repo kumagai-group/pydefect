@@ -11,7 +11,8 @@ from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_calc_results, print_file, \
-    make_efnv_correction_from_vasp, make_defect_formation_energy
+    make_efnv_correction_from_vasp, make_defect_formation_energy, \
+    make_defect_eigenvalues
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
@@ -199,6 +200,22 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
     mock_pot_plotter.assert_called_with("Va_O1_2", mock_efnv)
     mock_pot_plotter.return_value.construct_plot.assert_called_once_with()
     mock_pot_plotter.return_value.plt.savefig.assert_called_once_with(fname=Path("Va_O1_2") / "correction.pdf")
+
+
+def test_make_defect_eigenvalues(mocker):
+    mock_vasprun = mocker.patch("pydefect.cli.vasp.main_function.Vasprun")
+    mock_unitcell = mocker.Mock(spec=Unitcell)
+    mock_unitcell.vbm = 11
+    mock_unitcell.cbm = 19
+    mock_make_eigvals = mocker.patch("pydefect.cli.vasp.main_function.make_band_edge_eigenvalues")
+
+    args = Namespace(dirs=[Path("Va_O1_2")],
+                     unitcell=mock_unitcell)
+    make_defect_eigenvalues(args)
+
+    mock_vasprun.assert_called_with(Path("Va_O1_2") / defaults.vasprun)
+    mock_make_eigvals.assert_called_with(mock_vasprun.return_value, 11, 19)
+    mock_make_eigvals.return_value.to_json_file.assert_called_with(Path("Va_O1_2") / "band_edge_eigenvalues.json")
 
 
 def test_make_defect_formation_energy(tmpdir, mocker):

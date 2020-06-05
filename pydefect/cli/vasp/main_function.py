@@ -3,10 +3,6 @@
 from pathlib import Path
 
 from monty.serialization import loadfn
-from pymatgen.io.vasp import Vasprun, Outcar
-from pymatgen.util.string import latexify
-from vise.util.logger import get_logger
-
 from pydefect.analyzer.defect_energy import make_defect_energies
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotter
 from pydefect.analyzer.make_defect_energy import make_single_defect_energy
@@ -14,6 +10,8 @@ from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DPlotter, \
     ChemPotDiag3DPlotter
 from pydefect.cli.main_tools import sanitize_matrix
+from pydefect.cli.vasp.make_band_edge_eigenvalues import \
+    make_band_edge_eigenvalues
 from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
 from pydefect.cli.vasp.make_efnv_correction import \
     make_efnv_correction
@@ -30,6 +28,9 @@ from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pydefect.util.error_classes import CpdNotSupportedError
 from pydefect.util.mp_tools import MpQuery
+from pymatgen.io.vasp import Vasprun, Outcar
+from pymatgen.util.string import latexify
+from vise.util.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -140,6 +141,17 @@ def make_efnv_correction_from_vasp(args):
         plotter = SitePotentialPlotter(title, efnv)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "correction.pdf")
+
+
+def make_defect_eigenvalues(args):
+    vbm, cbm = args.unitcell.vbm, args.unitcell.cbm
+    for d in args.dirs:
+        vasprun = Vasprun(d / defaults.vasprun)
+        # procar = Procar(defaults.procar)
+        # outcar = Outcar(defaults.outcar)
+        # calc_results = loadfn(d / "calc_results.json")
+        band_edge_eigvals = make_band_edge_eigenvalues(vasprun, vbm, cbm)
+        band_edge_eigvals.to_json_file(d / "band_edge_eigenvalues.json")
 
 
 def make_defect_formation_energy(args):
