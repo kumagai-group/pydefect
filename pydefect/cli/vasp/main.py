@@ -212,54 +212,54 @@ def parse_args(args):
     parser_eig.set_defaults(func=make_defect_eigenvalues)
 
     # -- band edge characters ------------------------------------------------
-    parser_eig = subparsers.add_parser(
+    parser_ec = subparsers.add_parser(
         name="edge_characters",
         description="",
         parents=[dirs_parser, pcr_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['ec'])
 
-    parser_eig.set_defaults(func=make_edge_characters)
+    parser_ec.set_defaults(func=make_edge_characters)
 
     # -- band edge states ------------------------------------------------
-    parser_eig = subparsers.add_parser(
+    parser_es = subparsers.add_parser(
         name="edge_states",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['es'])
 
-    parser_efnv.add_argument(
+    parser_es.add_argument(
         "-e", "--edge_characters",
         required=True,
         type=loadfn)
-    parser_efnv.add_argument(
+    parser_es.add_argument(
         "-p", "--perfect_edge_characters",
         required=True,
         type=loadfn)
 
     parser_eig.set_defaults(func=make_edge_states)
     # -- defect formation energy ----------------------------------------------
-    parser_efnv = subparsers.add_parser(
+    parser_e = subparsers.add_parser(
         name="defect_formation_energy",
         description="",
         parents=[dirs_parser, pcr_parser, unitcell_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['e'])
 
-    parser_efnv.add_argument(
+    parser_e.add_argument(
         "-c", "--chem_pot_diag",
         required=True,
         type=loadfn)
-    parser_efnv.add_argument(
+    parser_e.add_argument(
         "-l", "--label",
         required=True,
         type=str)
-    parser_efnv.add_argument(
+    parser_e.add_argument(
         "-y", "--y_range",
         nargs=2,
         type=float)
 
-    parser_efnv.set_defaults(func=make_defect_formation_energy)
+    parser_e.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
 
