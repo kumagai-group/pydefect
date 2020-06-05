@@ -176,7 +176,7 @@ def make_edge_characters(args):
 
 
 def make_edge_states(args):
-    for edge_character, ref in zip(args.edge_characters, args.perf_char):
+    for edge_character, ref in zip(args.edge_characters, args.perfect_edge_characters):
         edge_state = make_band_edge_state(edge_character, ref)
         print(edge_state)
 
