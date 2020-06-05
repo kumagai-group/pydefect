@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-
+import pytest
 from monty.serialization import loadfn
 
 from pydefect.analyzer.calc_results import CalcResults
@@ -10,6 +10,7 @@ from pydefect.cli.vasp.make_efnv_correction import \
 from pydefect.input_maker.defect_entry import DefectEntry
 
 
+@pytest.mark.skip()
 def test(vasp_files):
     d = vasp_files / "KInO2_Va_O_2"
     defect_entry: DefectEntry = loadfn(d / "Va_O1_2/defect_entry.json")
