@@ -239,33 +239,34 @@ def parse_args(args):
 
     parser_es.set_defaults(func=make_edge_states)
     # -- defect formation energy ----------------------------------------------
-    parser_e = subparsers.add_parser(
+    parser_energy = subparsers.add_parser(
         name="defect_formation_energy",
         description="",
         parents=[dirs_parser, pcr_parser, unitcell_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['e'])
 
-    parser_e.add_argument(
+    parser_energy.add_argument(
         "-c", "--chem_pot_diag",
         required=True,
         type=loadfn)
-    parser_e.add_argument(
+    parser_energy.add_argument(
         "-l", "--label",
         required=True,
         type=str)
-    parser_e.add_argument(
+    parser_energy.add_argument(
         "-y", "--y_range",
         nargs=2,
         type=float)
 
-    parser_e.set_defaults(func=make_defect_formation_energy)
+    parser_energy.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
 
 
 def main():
     args = parse_args(sys.argv[1:])
+    print("aaaaaaaaaaaaaa", args)
     args.func(args)
 
 
