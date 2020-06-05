@@ -32,7 +32,6 @@ from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pydefect.util.error_classes import CpdNotSupportedError
 from pydefect.util.mp_tools import MpQuery
-from pymatgen import Spin
 from pymatgen.io.vasp import Vasprun, Outcar, Procar
 from pymatgen.util.string import latexify
 from vise.util.logger import get_logger
@@ -177,7 +176,7 @@ def make_edge_characters(args):
 
 
 def make_edge_states(args):
-    for spin, edge_character, ref in zip([Spin.up, Spin.down], args.edge_characters, args.perfect_edge_characters):
+    for spin, edge_character, ref in zip(["spin up  ", "spin down"], args.edge_characters, args.perfect_edge_characters):
         edge_state = make_band_edge_state(edge_character, ref)
         print(spin, edge_state)
 
