@@ -12,7 +12,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_calc_results, print_file, \
     make_efnv_correction_from_vasp, make_defect_formation_energy, \
-    make_defect_eigenvalues
+    make_defect_eigenvalues, make_edge_characters
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
@@ -238,6 +238,41 @@ def test_make_defect_eigenvalues(mocker):
     mock_make_eigvals.return_value.to_json_file.assert_called_with(Path("Va_O1_2") / "band_edge_eigenvalues.json")
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
     mock_eigval_plotter.assert_called_with("Va_O1", mock_make_eigvals.return_value, 10, 20)
+
+
+def test_make_edge_characters(mocker):
+    mock_vasprun = mocker.patch("pydefect.cli.vasp.main_function.Vasprun")
+    mock_procar = mocker.patch("pydefect.cli.vasp.main_function.Procar")
+    mock_outcar = mocker.patch("pydefect.cli.vasp.main_function.Outcar")
+
+    mock_perfect_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_perfect_calc_results.structure = mocker.Mock(spec=Structure)
+    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+
+    mock_analyzer = mocker.patch("pydefect.cli.vasp.main_function.DefectStructureAnalyzer")
+    mock_characters = mocker.patch("pydefect.cli.vasp.main_function.MakeEdgeCharacters")
+
+    def side_effect(key):
+        if str(key) == "Va_O1_2/calc_results.json":
+            mock_calc_results.structure = mocker.Mock(spec=Structure, autospec=True)
+            return mock_calc_results
+        else:
+            raise ValueError
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+
+    args = Namespace(dirs=[Path("Va_O1_2")],
+                     perfect_calc_results=mock_perfect_calc_results)
+    make_edge_characters(args)
+
+    mock_vasprun.assert_called_with(Path("Va_O1_2") / defaults.vasprun)
+    mock_procar.assert_called_with(Path("Va_O1_2") / defaults.procar)
+    mock_outcar.assert_called_with(Path("Va_O1_2") / defaults.outcar)
+    mock_analyzer.assert_called_with(mock_calc_results.structure,
+                                     mock_perfect_calc_results.structure)
+    mock_characters.assert_called_with(mock_procar.return_value,
+                                       mock_vasprun.return_value,
+                                       mock_outcar.return_value,
+                                       mock_analyzer.return_value.neighboring_atom_indices)
 
 
 def test_make_defect_formation_energy(tmpdir, mocker):
