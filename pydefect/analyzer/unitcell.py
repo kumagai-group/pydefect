@@ -5,7 +5,6 @@ from typing import List
 
 import numpy as np
 from monty.json import MSONable
-
 from pydefect.util.mix_in import ToJsonFileMixIn
 
 

@@ -7,9 +7,8 @@ from typing import Tuple
 import numpy as np
 import yaml
 from monty.json import MSONable
-from pymatgen import IStructure
-
 from pydefect.util.mix_in import ToJsonFileMixIn
+from pymatgen import IStructure
 
 
 @dataclass(frozen=True)

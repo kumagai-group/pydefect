@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from pydefect.analyzer.calc_results import CalcResults
+from pydefect.defaults import defaults
 from pymatgen.io.vasp import Vasprun, Outcar
 from vise.analyzer.vasp.band_edge_properties import VaspBandEdgeProperties
 from vise.util.structure_symmetrizer import StructureSymmetrizer
-
-from pydefect.analyzer.calc_results import CalcResults
-from pydefect.defaults import defaults
 
 
 def make_calc_results_from_vasp(vasprun: Vasprun,

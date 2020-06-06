@@ -8,11 +8,10 @@ from typing import Dict, Optional, Union
 
 import numpy as np
 from monty.json import MSONable
-from pymatgen import Composition
-from scipy.spatial.qhull import HalfspaceIntersection
-
 from pydefect.error import PydefectError
 from pydefect.util.mix_in import ToJsonFileMixIn
+from pymatgen import Composition
+from scipy.spatial.qhull import HalfspaceIntersection
 
 alphabets = list(string.ascii_uppercase)
 

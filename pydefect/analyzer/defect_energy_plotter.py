@@ -4,10 +4,9 @@ from itertools import cycle
 from typing import List, Optional
 
 from matplotlib import pyplot as plt
-from vise.util.matplotlib import float_to_int_formatter
-
 from pydefect.analyzer.defect_energy import DefectEnergy
 from pydefect.defaults import defaults
+from vise.util.matplotlib import float_to_int_formatter
 
 
 class DefectEnergiesMplSettings:

@@ -5,9 +5,8 @@ from shutil import copyfile
 from typing import List
 
 import yaml
-from pymatgen import Composition
-
 from pydefect.cli.vasp.molecules.molecules import MOLECULE_DATA
+from pymatgen import Composition
 
 mol_dir = Path(__file__).parent / "molecules"
 

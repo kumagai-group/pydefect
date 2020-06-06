@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
-from dataclasses import dataclass
 import re
-from typing import Union, List, Optional
+from dataclasses import dataclass
+from typing import List, Optional
 
 from monty.json import MSONable
 

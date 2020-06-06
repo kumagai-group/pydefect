@@ -5,7 +5,6 @@ from typing import List
 
 import numpy as np
 from monty.json import MSONable
-
 from pydefect.corrections.abstract_correction import Correction
 
 

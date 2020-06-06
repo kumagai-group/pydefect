@@ -7,9 +7,8 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from numpy import concatenate, clip, dot, arctan2
 from numpy.linalg import det
-from pymatgen.util.string import latexify
-
 from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo
+from pymatgen.util.string import latexify
 
 
 class CpdMplSettings:

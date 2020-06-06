@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from collections.abc import Set
-from typing import Iterator, List
-from typing import Set as typeSet
+from typing import Iterator, List, Set as typeSet
 
 from monty.serialization import loadfn, dumpfn
-from pydefect.input_maker.defect import screen_simple_defect
-
-from pydefect.input_maker.defect import SimpleDefect
+from pydefect.input_maker.defect import screen_simple_defect, SimpleDefect
 
 
 class DefectSet(Set):

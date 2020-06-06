@@ -4,11 +4,10 @@ from itertools import groupby, cycle
 from typing import Optional, List
 
 from matplotlib import pyplot as plt
-from vise.util.matplotlib import float_to_int_formatter
-
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
+from vise.util.matplotlib import float_to_int_formatter
 
 
 class PotentialPlotterMplSettings:

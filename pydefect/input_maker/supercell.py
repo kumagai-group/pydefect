@@ -8,9 +8,8 @@ from typing import List, Tuple
 
 import numpy as np
 from numpy.linalg import det
-from pymatgen import IStructure
-
 from pydefect.util.error_classes import SupercellError
+from pymatgen import IStructure
 
 
 class Supercell:

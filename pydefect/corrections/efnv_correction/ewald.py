@@ -8,10 +8,9 @@ import numpy as np
 from monty.json import MSONable
 from numpy import sqrt, dot, pi, exp, cos
 from numpy.linalg import norm, inv, det
+from pydefect.defaults import defaults
 from scipy.special import erfc
 from scipy.stats import mstats
-
-from pydefect.defaults import defaults
 
 
 def grid_number(lattice_vectors: np.ndarray, max_length: float):

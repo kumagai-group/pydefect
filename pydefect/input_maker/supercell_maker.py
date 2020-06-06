@@ -6,14 +6,13 @@ from itertools import groupby
 from typing import Optional, List
 
 import numpy as np
-from pymatgen import IStructure
-from vise.util.structure_symmetrizer import StructureSymmetrizer
-
 from pydefect.input_maker.supercell import Supercell, TetragonalSupercells, \
     Supercells
 from pydefect.input_maker.supercell_info import SupercellInfo, Site
 from pydefect.util.centering import Centering
 from pydefect.util.error_classes import NotPrimitiveError, SupercellError
+from pymatgen import IStructure
+from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 
 class SupercellMaker:

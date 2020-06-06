@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import numpy as np
-from pymatgen.io.vasp import Vasprun
-
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues
 from pydefect.defaults import defaults
+from pymatgen.io.vasp import Vasprun
 
 
 def make_band_edge_eigenvalues(vasprun: Vasprun, vbm: float, cbm: float):
