@@ -41,8 +41,7 @@ def make_efnv_correction(charge: int,
         specie = str(calc_results.structure[d].specie)
         distance = structure_analyzer.distance_from_center(d)
         # The site potential in vasp is for electron.
-        potential = - (calc_results.potentials[d] -
-                       perfect_calc_results.potentials[p])
+        pot = calc_results.potentials[d] - perfect_calc_results.potentials[p]
 
         coord = calc_results.structure[d].frac_coords
         rel_coord = [x - y for x, y in zip(coord, defect_coord)]
@@ -50,7 +49,7 @@ def make_efnv_correction(charge: int,
 
         pc_potential *= unit_conversion
 
-        sites.append(DefectSite(specie, distance, potential, pc_potential))
+        sites.append(DefectSite(specie, distance, pot, pc_potential))
 
     return ExtendedFnvCorrection(
         charge=charge,

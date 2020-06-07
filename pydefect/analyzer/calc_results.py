@@ -17,6 +17,8 @@ class CalcResults(MSONable, ToJsonFileMixIn):
     magnetization: float
     kpoint_coords: List[List[float]]
     kpoint_weights: List[float]
+    # potential acting on the positive unit charge, whose sign is reserved from
+    # vasp convention of atomic site potential.
     potentials: List[float]
     vbm_info: BandEdge
     cbm_info: BandEdge
