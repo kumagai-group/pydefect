@@ -210,4 +210,4 @@ def make_defect_formation_energy(args):
                                   y_range=args.y_range)
 
     plotter.construct_plot()
-    plotter.plt.show()
+    plotter.plt.savefig(f"energy_{args.label}.pdf")
