@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from pathlib import Path
 
 import pytest
-
+from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import EdgeCharacter, EdgeState
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state, \
     are_orbitals_similar
@@ -112,6 +113,19 @@ def test_are_orbitals_similar(mocker):
 
     mock.similar_orb_criterion = 27.1
     assert are_orbitals_similar(orb_1, orb_2) is True
+
+
+def test_edge_character_nacl_acceptor_phs():
+    ref = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "perfect_edge_characters.json")[0]
+    # compare spin up
+    target = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "Va_Na1_1_edge_characters.json")[0]
+    assert make_band_edge_state(target, ref) == EdgeState.acceptor_phs
+
+
+def test_edge_character_nacl_no_in_gap():
+    ref = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "perfect_edge_characters.json")[0]
+    target = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "Va_Na1_-1_edge_characters.json")[0]
+    assert make_band_edge_state(target, ref) == EdgeState.no_in_gap
 
 
 """
