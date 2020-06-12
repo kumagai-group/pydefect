@@ -225,13 +225,10 @@ def parse_args(args):
     parser_es = subparsers.add_parser(
         name="edge_states",
         description="",
+        parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['es'])
 
-    parser_es.add_argument(
-        "-e", "--edge_characters",
-        required=True,
-        type=loadfn)
     parser_es.add_argument(
         "-p", "--perfect_edge_characters",
         required=True,
