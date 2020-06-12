@@ -65,6 +65,10 @@ def test_edge_characters_to_json_file(edge_characters, tmpdir):
     assert_json_roundtrip(edge_characters, tmpdir)
 
 
+def test_str(edge_characters):
+    assert str(edge_characters) == """  up: EdgeCharacter(hob_bottom_e=0.3, lub_top_e=0.4, vbm=0.5, cbm=0.6, vbm_orbitals={'Mn': [0.5, 0.6]}, cbm_orbitals={'Mn': [0.7, 0.8]}, vbm_participation_ratio=0.1, cbm_participation_ratio=0.2)"""
+
+
 """
 TODO
 -

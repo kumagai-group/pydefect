@@ -54,6 +54,12 @@ class EdgeCharacters(Sequence, MSONable, ToJsonFileMixIn):
     def from_dict(cls, d):
         return cls([EdgeCharacter.from_dict(dd) for dd in d["edge_characters"]])
 
+    def __str__(self):
+        strings = []
+        for spin, edge_char in zip(["up", "down"], self.list):
+            strings.append(f"""{spin:>4}: {edge_char}""")
+        return "\n".join(strings)
+
 
 @dataclass
 class EdgeCharacter(MSONable):
