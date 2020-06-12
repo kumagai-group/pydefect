@@ -43,3 +43,7 @@ def test_make_band_edge_eigenvalues_eigenvalues(band_edge_eigenvalues):
     expected = [[[[-2.99, 1.], [8.01, 0.]], [[-2.99, 1.], [7.99, 0.]]],
                 [[[-2.99, 1.], [7.99, 0.]], [[-2.99, 1.], [7.99, 0.]]]]
     np.testing.assert_array_almost_equal(actual, expected)
+
+
+def test_make_band_edge_eigenvalues_lowest_band_index(band_edge_eigenvalues):
+    assert band_edge_eigenvalues.lowest_band_index == 1

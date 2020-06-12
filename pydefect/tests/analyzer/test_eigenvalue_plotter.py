@@ -14,7 +14,8 @@ def eigenvalue_plotter():
         [[[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]], [[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]]],
         [[[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]], [[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]]],
                                                         ],
-                               kpt_coords=[(0.0, 0.0, 0.0), (0.25, 0.0, 0.0)])
+        kpt_coords=[(0.0, 0.0, 0.0), (0.25, 0.0, 0.0)],
+        lowest_band_index=10)
     return EigenvaluePlotter("test", eig, supercell_vbm=0.1, supercell_cbm=0.9)
 
 

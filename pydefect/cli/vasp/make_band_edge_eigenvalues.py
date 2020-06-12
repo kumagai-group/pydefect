@@ -32,4 +32,5 @@ def make_band_edge_eigenvalues(vasprun: Vasprun, vbm: float, cbm: float):
         e_and_occu.append(e[:, lower_idx:upper_idx + 1, :].tolist())
 
     return BandEdgeEigenvalues(energies_and_occupations=e_and_occu,
-                               kpt_coords=kpt_coords)
+                               kpt_coords=kpt_coords,
+                               lowest_band_index=lower_idx)

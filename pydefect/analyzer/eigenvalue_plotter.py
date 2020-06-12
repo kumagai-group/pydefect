@@ -55,6 +55,7 @@ class EigenvaluePlotter:
         self._title = title
         self._energies_and_occupations = band_edge_eigenvalues.energies_and_occupations
         self._kpt_coords = band_edge_eigenvalues.kpt_coords
+        self._lowest_band_idx = band_edge_eigenvalues.lowest_band_index
         self._supercell_vbm = supercell_vbm
         self._supercell_cbm = supercell_cbm
         self._middle = (self._supercell_vbm + self._supercell_cbm) / 2
@@ -93,7 +94,7 @@ class EigenvaluePlotter:
                         continue
 
                     if self._add_band_idx(energy, higher_band_e, lower_band_e):
-                        ax.annotate(str(band_idx + 1),
+                        ax.annotate(str(band_idx + self._lowest_band_idx + 1),
                                     xy=(kpt_idx + 0.05, energy),
                                     va='center',
                                     fontsize=self._mpl_defaults.tick_label_size)
