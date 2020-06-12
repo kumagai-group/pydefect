@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from monty.serialization import loadfn
+from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.defect_energy import make_defect_energies
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotter
 from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
@@ -176,9 +177,16 @@ def make_edge_characters(args):
 
 
 def make_edge_states(args):
-    for spin, edge_character, ref in zip(["spin up  ", "spin down"], args.edge_characters, args.perfect_edge_characters):
-        edge_state = make_band_edge_state(edge_character, ref)
-        print(spin, edge_state)
+    for d in args.dirs:
+        print(f"-- {d}")
+        edge_states = []
+        edge_characters = loadfn(d / "edge_characters.json")
+        for spin, edge_character, ref in zip(["spin up  ", "spin down"], edge_characters, args.perfect_edge_characters):
+            edge_state = make_band_edge_state(edge_character, ref)
+            edge_states.append(edge_state)
+            print(spin, edge_state)
+
+        BandEdgeStates(edge_states).to_json_file(d / "band_edge_states.json")
 
 
 def make_defect_formation_energy(args):

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 from monty.serialization import loadfn
+from pydefect.analyzer.band_edge_states import EdgeCharacters
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
@@ -209,7 +210,8 @@ def test_make_defect_eigenvalues(mocker):
     mock_unitcell.vbm = 11
     mock_unitcell.cbm = 19
 
-    mock_make_eigvals = mocker.patch("pydefect.cli.vasp.main_function.make_band_edge_eigenvalues")
+    mock_make_eigvals = mocker.patch(
+        "pydefect.cli.vasp.main_function.make_band_edge_eigenvalues")
 
     mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
     mock_perfect_calc_results.vbm = 10
@@ -217,7 +219,8 @@ def test_make_defect_eigenvalues(mocker):
 
     mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
 
-    mock_eigval_plotter = mocker.patch("pydefect.cli.vasp.main_function.EigenvaluePlotter")
+    mock_eigval_plotter = mocker.patch(
+        "pydefect.cli.vasp.main_function.EigenvaluePlotter")
 
     def side_effect(key):
         if str(key) == "Va_O1_2/defect_entry.json":
@@ -226,7 +229,9 @@ def test_make_defect_eigenvalues(mocker):
             return mock_defect_entry
         else:
             raise ValueError
-    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn",
+                               side_effect=side_effect)
 
     args = Namespace(dirs=[Path("Va_O1_2")],
                      perfect_calc_results=mock_perfect_calc_results,
@@ -235,9 +240,12 @@ def test_make_defect_eigenvalues(mocker):
 
     mock_vasprun.assert_called_with(Path("Va_O1_2") / defaults.vasprun)
     mock_make_eigvals.assert_called_with(mock_vasprun.return_value, 11, 19)
-    mock_make_eigvals.return_value.to_json_file.assert_called_with(Path("Va_O1_2") / "band_edge_eigenvalues.json")
+    mock_make_eigvals.return_value.to_json_file.assert_called_with(
+        Path("Va_O1_2") / "band_edge_eigenvalues.json")
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
-    mock_eigval_plotter.assert_called_with("Va_O1", mock_make_eigvals.return_value, 10, 20)
+    mock_eigval_plotter.assert_called_with("Va_O1",
+                                           mock_make_eigvals.return_value, 10,
+                                           20)
 
 
 def test_make_edge_characters(mocker):
@@ -249,8 +257,10 @@ def test_make_edge_characters(mocker):
     mock_perfect_calc_results.structure = mocker.Mock(spec=Structure)
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
 
-    mock_analyzer = mocker.patch("pydefect.cli.vasp.main_function.DefectStructureAnalyzer")
-    mock_characters = mocker.patch("pydefect.cli.vasp.main_function.MakeEdgeCharacters")
+    mock_analyzer = mocker.patch(
+        "pydefect.cli.vasp.main_function.DefectStructureAnalyzer")
+    mock_characters = mocker.patch(
+        "pydefect.cli.vasp.main_function.MakeEdgeCharacters")
 
     def side_effect(key):
         if str(key) == "Va_O1_2/calc_results.json":
@@ -258,7 +268,7 @@ def test_make_edge_characters(mocker):
             return mock_calc_results
         else:
             raise ValueError
-    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+    mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
 
     args = Namespace(dirs=[Path("Va_O1_2")],
                      perfect_calc_results=mock_perfect_calc_results)
@@ -275,17 +285,21 @@ def test_make_edge_characters(mocker):
                                        mock_analyzer.return_value.neighboring_atom_indices)
 
 
-# def test_make_edge_state(mocker):
-#     mock_edge_state = mocker.Mock(spec=kk, autospec=True)
-#     def side_effect(key):
-#         if str(key) == "Va_O1_2/edge_characters.json":
-#             mock_calc_results.structure = mocker.Mock(spec=Structure, autospec=True)
-#             return mock_calc_results
-#         else:
-#             raise ValueError
-#     mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+def test_make_edge_state(mocker):
+    mock_perf_edge_chars = mocker.Mock(spec=EdgeCharacters, autospec=True)
+    args = Namespace(dirs=[Path("Va_O1_2")],
+                     perfect_edge_characters=mock_perf_edge_chars)
 
+    mock_edge_chars = mocker.Mock(spec=EdgeCharacters, autospec=True)
+    def side_effect(key):
+        if str(key) == "Va_O1_2/edge_characters.json":
+            return mock_edge_chars
+        else:
+            raise ValueError
+    mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
 
+    mocker.patch("pydefect.cli.vasp.main_function.make_band_edge_state")
+    mocker.patch("pydefect.cli.vasp.main_function.BandEdgeStates")
 
 
 def test_make_defect_formation_energy(tmpdir, mocker):
