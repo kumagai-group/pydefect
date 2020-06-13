@@ -153,6 +153,15 @@ def test_calc_results():
     assert parsed_args == expected
 
 
+def test_refine_structure():
+    parsed_args = parse_args(["rr", "-d", "Va_O1_0"])
+    expected = Namespace(
+        dir=Path("Va_O1_0"),
+        func=parsed_args.func,
+    )
+    assert parsed_args == expected
+
+
 def test_efnv_correction(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
     parsed_args = parse_args(["efnv",

@@ -11,7 +11,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
     make_calc_results, make_defect_formation_energy, make_defect_eigenvalues, \
-    make_edge_characters, make_edge_states
+    make_edge_characters, make_edge_states, make_refined_structure
 from pydefect.defaults import defaults
 from pydefect.version import __version__
 from pymatgen import IStructure, Composition
@@ -190,6 +190,18 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cr'])
     parser_calc_results.set_defaults(func=make_calc_results)
+
+    # -- refine_structure ------------------------------------------------
+    parser_refine_structure = subparsers.add_parser(
+        name="refine_results",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['rr'])
+    parser_refine_structure.set_defaults(func=make_refined_structure)
+    parser_refine_structure.add_argument(
+        "-d", "--dir",
+        required=True,
+        type=Path)
 
     # -- efnv correction ------------------------------------------------
     parser_efnv = subparsers.add_parser(
