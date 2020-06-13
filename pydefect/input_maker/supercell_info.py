@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Dict
 
 from monty.json import MSONable
@@ -47,7 +47,7 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
     space_group: str
     transform_matrix: List[List[int]]
     sites: Dict[str, Site]
-    interstitials: List[Interstitial]
+    interstitials: List[Interstitial] = field(default_factory=list)
 
     def coords(self, name):
         site = self.sites[name]
