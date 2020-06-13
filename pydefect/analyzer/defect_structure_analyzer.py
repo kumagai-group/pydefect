@@ -95,7 +95,7 @@ class DefectStructureAnalyzer:
 
 def symmetrize_defect_structure(structure: IStructure,
                                 anchor_atom_idx: int,
-                                anchor_atom_coord) -> Structure:
+                                anchor_atom_coord: np.ndarray) -> Structure:
     ss = StructureSymmetrizer(structure, defaults.symmetry_length_tolerance)
     result = ss.primitive.copy()
     offset = result[anchor_atom_idx].frac_coords - anchor_atom_coord
