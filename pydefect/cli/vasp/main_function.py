@@ -141,7 +141,7 @@ def make_refined_structure(args):
     refined_structure = symmetrize_defect_structure(
         calc_results.structure,
         defect_entry.anchor_atom_index,
-        defect_entry.structure[defect_entry.anchor_atom_index])
+        defect_entry.structure[defect_entry.anchor_atom_index].frac_coords)
     ref_dir = Path(f"ref_{args.dir}")
     ref_dir.mkdir()
     refined_structure.to(fmt="POSCAR", filename=ref_dir / "POSCAR")
