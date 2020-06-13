@@ -134,6 +134,7 @@ def make_calc_results(args):
 
 def make_efnv_correction_from_vasp(args):
     for d in args.dirs:
+        logger.info(f"Parsing data in {d} ...")
         defect_entry: DefectEntry = loadfn(d / "defect_entry.json")
         calc_results = loadfn(d / "calc_results.json")
         efnv = make_efnv_correction(defect_entry.charge,
@@ -153,6 +154,7 @@ def make_defect_eigenvalues(args):
     supercell_vbm = args.perfect_calc_results.vbm
     supercell_cbm = args.perfect_calc_results.cbm
     for d in args.dirs:
+        logger.info(f"Parsing data in {d} ...")
         defect_entry = loadfn(d / "defect_entry.json")
         title = defect_entry.name
         vasprun = Vasprun(d / defaults.vasprun)
@@ -165,6 +167,7 @@ def make_defect_eigenvalues(args):
 
 def make_edge_characters(args):
     for d in args.dirs:
+        logger.info(f"Parsing data in {d} ...")
         vasprun = Vasprun(d / defaults.vasprun)
         procar = Procar(d / defaults.procar)
         outcar = Outcar(d / defaults.outcar)
