@@ -116,14 +116,14 @@ def test_are_orbitals_similar(mocker):
 
 
 def test_edge_character_nacl_acceptor_phs():
-    ref = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "perfect_edge_characters.json")[0]
+    ref = loadfn(Path(__file__).parent / "band_edge_database" / "NaCl" / "perfect_edge_characters.json")[0]
     # compare spin up
     target = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "Va_Na1_1_edge_characters.json")[0]
     assert make_band_edge_state(target, ref) == EdgeState.acceptor_phs
 
 
 def test_edge_character_nacl_no_in_gap():
-    ref = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "perfect_edge_characters.json")[0]
+    ref = loadfn(Path(__file__).parent / "band_edge_database" / "NaCl" / "perfect_edge_characters.json")[0]
     target = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "Va_Na1_-1_edge_characters.json")[0]
     assert make_band_edge_state(target, ref) == EdgeState.no_in_gap
 
