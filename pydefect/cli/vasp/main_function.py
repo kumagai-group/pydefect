@@ -127,8 +127,8 @@ def make_calc_results(args):
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
         calc_results = make_calc_results_from_vasp(
-                vasprun=Vasprun(d / defaults.vasprun),
-                outcar=Outcar(d / defaults.outcar))
+            vasprun=Vasprun(d / defaults.vasprun),
+            outcar=Outcar(d / defaults.outcar))
         calc_results.to_json_file(filename=Path(d) / "calc_results.json")
 
 
@@ -159,9 +159,10 @@ def make_defect_eigenvalues(args):
         defect_entry = loadfn(d / "defect_entry.json")
         title = defect_entry.name
         vasprun = Vasprun(d / defaults.vasprun)
-        band_edge_eigvals = make_band_edge_eigenvalues(vasprun, vbm, cbm)
-        band_edge_eigvals.to_json_file(d / "band_edge_eigenvalues.json")
-        plotter = EigenvaluePlotter(title, band_edge_eigvals, supercell_vbm, supercell_cbm)
+        band_edge_eigenvalues = make_band_edge_eigenvalues(vasprun, vbm, cbm)
+        band_edge_eigenvalues.to_json_file(d / "band_edge_eigenvalues.json")
+        plotter = EigenvaluePlotter(title, band_edge_eigenvalues, supercell_vbm,
+                                    supercell_cbm)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "eigenvalues.pdf")
         plotter.plt.clf()
@@ -177,7 +178,8 @@ def make_edge_characters(args):
         structure_analyzer = DefectStructureAnalyzer(
             calc_results.structure, args.perfect_calc_results.structure)
         edge_characters = MakeEdgeCharacters(
-            procar, vasprun, outcar, structure_analyzer.neighboring_atom_indices).edge_characters
+            procar, vasprun, outcar,
+            structure_analyzer.neighboring_atom_indices).edge_characters
         edge_characters.to_json_file(d / "edge_characters.json")
 
 
@@ -186,7 +188,9 @@ def make_edge_states(args):
         print(f"-- {d}")
         edge_states = []
         edge_characters = loadfn(d / "edge_characters.json")
-        for spin, edge_character, ref in zip(["spin up  ", "spin down"], edge_characters, args.perfect_edge_characters):
+        for spin, edge_character, ref in zip(["spin up  ", "spin down"],
+                                             edge_characters,
+                                             args.perfect_edge_characters):
             edge_state = make_band_edge_state(edge_character, ref)
             edge_states.append(edge_state)
             print(spin, edge_state)
@@ -195,7 +199,8 @@ def make_edge_states(args):
 
 
 def make_defect_formation_energy(args):
-    title = latexify(args.perfect_calc_results.structure.composition.reduced_formula)
+    title = latexify(
+        args.perfect_calc_results.structure.composition.reduced_formula)
     abs_chem_pot = args.chem_pot_diag.abs_chem_pot_dict(args.label)
 
     single_energies = []
@@ -209,7 +214,8 @@ def make_defect_formation_energy(args):
                                       abs_chem_pot,
                                       loadfn(d / "correction.json")))
     plotter = DefectEnergyPlotter(title=title,
-                                  defect_energies=make_defect_energies(single_energies),
+                                  defect_energies=make_defect_energies(
+                                      single_energies),
                                   vbm=args.unitcell.vbm,
                                   cbm=args.unitcell.cbm,
                                   supercell_vbm=args.perfect_calc_results.vbm,
