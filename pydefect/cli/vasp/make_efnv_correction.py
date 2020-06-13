@@ -34,7 +34,8 @@ def make_efnv_correction(charge: int,
     defect_coord = structure_analyzer.defect_center_coord
     lattice = calc_results.structure.lattice.matrix
     ewald = Ewald(lattice, dielectric_tensor, accuracy=accuracy)
-    point_charge_correction = - ewald.lattice_energy * charge ** 2
+    point_charge_correction = \
+        0.0 if not charge else - ewald.lattice_energy * charge ** 2
 
     defect_region_radius = calc_max_sphere_radius(lattice)
 
