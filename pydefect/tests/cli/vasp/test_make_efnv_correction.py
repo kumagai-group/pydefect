@@ -9,18 +9,18 @@ from pydefect.corrections.efnv_correction.efnv_correction import DefectSite
 from pymatgen import IStructure, Lattice
 
 
-def test_pot(mocker):
+def test_make_efnv_correction(mocker):
     mock_perfect = mocker.Mock(spec=CalcResults, autospec=True)
     mock_defect = mocker.Mock(spec=CalcResults, autospec=True)
 
     mock_perfect.structure = IStructure(
-        Lattice.cubic(10), species=["H"] + ["He"] * 3,
-        coords=[[0, 0, 0], [1/2, 1/2, 0], [1/2, 0, 1/2], [0, 1/2, 1/2]])
+        Lattice.cubic(10), species=["H"] + ["He"] * 3 + ["Li"],
+        coords=[[0, 0, 0], [1/2, 1/2, 0], [1/2, 0, 1/2], [0, 1/2, 1/2], [0, 0, 1/2]])
     mock_defect.structure = IStructure(
-        Lattice.cubic(10), species=["He"] * 3,
-        coords=[[1/2, 1/2, 0], [1/2, 0, 1/2], [0, 1/2, 1/2]])
-    mock_perfect.potentials = [3.0, 4.0, 5.0, 6.0]
-    mock_defect.potentials = [14.0, 25.0, 36.0]
+        Lattice.cubic(10), species=["He"] * 3 + ["Li"],
+        coords=[[1/2, 1/2, 0], [1/2, 0, 1/2], [0, 1/2, 1/2], [0, 0, 1/2]])
+    mock_perfect.potentials = [3.0, 4.0, 5.0, 6.0, 7.0]
+    mock_defect.potentials = [14.0, 25.0, 36.0, 47.0]
 
     mock_ewald = mocker.patch("pydefect.cli.vasp.make_efnv_correction.Ewald")
     ewald = mocker.Mock()
@@ -40,7 +40,9 @@ def test_pot(mocker):
     assert efnvc.defect_region_radius == 5.0
     assert efnvc.sites == [DefectSite("He", 5 * np.sqrt(2), 10.0, 2e4 * unit_conversion),
                            DefectSite("He", 5 * np.sqrt(2), 20.0, 2e4 * unit_conversion),
-                           DefectSite("He", 5 * np.sqrt(2), 30.0, 2e4 * unit_conversion)]
+                           DefectSite("He", 5 * np.sqrt(2), 30.0, 2e4 * unit_conversion),
+                           DefectSite("Li", 5.0, 40.0, None),
+                           ]
 
 
 def test_calc_max_sphere_radius():

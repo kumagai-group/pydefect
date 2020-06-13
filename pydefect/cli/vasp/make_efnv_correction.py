@@ -36,6 +36,8 @@ def make_efnv_correction(charge: int,
     ewald = Ewald(lattice, dielectric_tensor, accuracy=accuracy)
     point_charge_correction = - ewald.lattice_energy * charge ** 2
 
+    defect_region_radius = calc_max_sphere_radius(lattice)
+
     sites = []
     for d, p in structure_analyzer.atom_mapping.items():
         specie = str(calc_results.structure[d].specie)
@@ -45,16 +47,18 @@ def make_efnv_correction(charge: int,
 
         coord = calc_results.structure[d].frac_coords
         rel_coord = [x - y for x, y in zip(coord, defect_coord)]
-        pc_potential = ewald.atomic_site_potential(rel_coord) * charge
-
-        pc_potential *= unit_conversion
+        if distance <= defect_region_radius:
+            pc_potential = None
+        else:
+            pc_potential = ewald.atomic_site_potential(rel_coord) * charge
+            pc_potential *= unit_conversion
 
         sites.append(DefectSite(specie, distance, pot, pc_potential))
 
     return ExtendedFnvCorrection(
         charge=charge,
         point_charge_correction=point_charge_correction * unit_conversion,
-        defect_region_radius=calc_max_sphere_radius(lattice),
+        defect_region_radius=defect_region_radius,
         sites=sites)
 
 
