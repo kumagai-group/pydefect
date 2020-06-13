@@ -154,7 +154,7 @@ def test_calc_results():
 
 
 def test_refine_structure():
-    parsed_args = parse_args(["rr", "-d", "Va_O1_0"])
+    parsed_args = parse_args(["rs", "-d", "Va_O1_0"])
     expected = Namespace(
         dir=Path("Va_O1_0"),
         func=parsed_args.func,

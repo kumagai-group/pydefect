@@ -193,10 +193,10 @@ def parse_args(args):
 
     # -- refine_structure ------------------------------------------------
     parser_refine_structure = subparsers.add_parser(
-        name="refine_results",
+        name="refine_structure",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['rr'])
+        aliases=['rs'])
     parser_refine_structure.set_defaults(func=make_refined_structure)
     parser_refine_structure.add_argument(
         "-d", "--dir",
