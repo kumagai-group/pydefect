@@ -57,16 +57,16 @@ def in_gap_state_character():
                          cbm_orbitals={"Mn": [0.3, 0.2], "O": [0.4, 0.2]})
 
 
-@pytest.fixture
-def unknown_state_character():
-    return EdgeCharacter(vbm_participation_ratio=0.1,
-                         cbm_participation_ratio=0.2,
-                         hob_bottom_e=0.4,
-                         lub_top_e=0.6,
-                         vbm=0.45,
-                         cbm=0.55,
-                         vbm_orbitals={"Mn": [0.3, 0.2], "O": [0.3, 0.1]},
-                         cbm_orbitals={"Mn": [0.3, 0.2], "O": [0.4, 0.2]})
+# @pytest.fixture
+# def unknown_state_character():
+#     return EdgeCharacter(vbm_participation_ratio=0.1,
+#                          cbm_participation_ratio=0.2,
+#                          hob_bottom_e=0.4,
+#                          lub_top_e=0.6,
+#                          vbm=0.45,
+#                          cbm=0.55,
+#                          vbm_orbitals={"Mn": [0.3, 0.2], "O": [0.3, 0.1]},
+#                          cbm_orbitals={"Mn": [0.3, 0.2], "O": [0.4, 0.2]})
 
 
 @pytest.fixture
@@ -99,9 +99,9 @@ def test_make_band_edge_state_in_gap_state(in_gap_state_character, perfect_chara
     assert actual == EdgeState.in_gap_state
 
 
-def test_make_band_edge_state_unknown_state(unknown_state_character, perfect_character):
-    actual = make_band_edge_state(unknown_state_character, perfect_character)
-    assert actual == EdgeState.unknown
+# def test_make_band_edge_state_unknown_state(unknown_state_character, perfect_character):
+#     actual = make_band_edge_state(unknown_state_character, perfect_character)
+#     assert actual == EdgeState.unknown
 
 
 def test_are_orbitals_similar(mocker):
