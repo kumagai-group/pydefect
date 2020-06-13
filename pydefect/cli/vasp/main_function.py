@@ -195,6 +195,8 @@ def make_defect_formation_energy(args):
 
     single_energies = []
     for d in args.dirs:
+        if args.skip_shallow and loadfn(d / "band_edge_states.json").is_shallow:
+            continue
         single_energies.append(
             make_single_defect_energy(args.perfect_calc_results,
                                       loadfn(d / "calc_results.json"),

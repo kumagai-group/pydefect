@@ -4,8 +4,9 @@ from argparse import Namespace
 from pathlib import Path
 
 import numpy as np
+import pytest
 from monty.serialization import loadfn
-from pydefect.analyzer.band_edge_states import EdgeCharacters
+from pydefect.analyzer.band_edge_states import EdgeCharacters, BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
@@ -302,7 +303,9 @@ def test_make_edge_state(mocker):
     mocker.patch("pydefect.cli.vasp.main_function.BandEdgeStates")
 
 
-def test_make_defect_formation_energy(tmpdir, mocker):
+@pytest.mark.parametrize("skip_shallow", [False, True])
+def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
+    tmpdir.chdir()
     mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
     mock_perfect_calc_results.structure = Structure(Lattice.cubic(1), species=["H"] * 2, coords=[[0]*3] * 2)
     mock_perfect_calc_results.energy = 10
@@ -328,6 +331,10 @@ def test_make_defect_formation_energy(tmpdir, mocker):
         elif str(key) == "Va_O1_2/correction.json":
             mock_correction.correction_energy = 20
             return mock_correction
+        elif str(key) == "Va_O1_2/band_edge_states.json":
+            mock_band_edge_states = mocker.Mock(spec=BandEdgeStates, autospec=True)
+            mock_band_edge_states.is_shallow = True
+            return mock_band_edge_states
         else:
             raise ValueError
 
@@ -342,14 +349,19 @@ def test_make_defect_formation_energy(tmpdir, mocker):
                      unitcell=mock_unitcell,
                      chem_pot_diag=mock_chem_pot_diag,
                      label="A",
-                     y_range=[-100, 100])
+                     y_range=[-100, 100],
+                     skip_shallow=skip_shallow)
+
     make_defect_formation_energy(args)
 
     mock_chem_pot_diag.abs_chem_pot_dict.assert_called_once_with("A")
-    mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
-    mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")
-    mock_loadfn.assert_any_call(Path("Va_O1_2") / "correction.json")
 
+    if skip_shallow is True:
+        mock_loadfn.assert_any_call(Path("Va_O1_2") / "band_edge_states.json")
+    else:
+        mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
+        mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")
+        mock_loadfn.assert_any_call(Path("Va_O1_2") / "correction.json")
 
 
 
