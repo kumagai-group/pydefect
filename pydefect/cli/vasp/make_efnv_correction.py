@@ -50,8 +50,11 @@ def make_efnv_correction(charge: int,
         if distance <= defect_region_radius:
             pc_potential = None
         else:
-            pc_potential = ewald.atomic_site_potential(rel_coord) * charge
-            pc_potential *= unit_conversion
+            if charge == 0:
+                pc_potential = 0
+            else:
+                pc_potential = ewald.atomic_site_potential(rel_coord) * charge
+                pc_potential *= unit_conversion
 
         sites.append(DefectSite(specie, distance, pot, pc_potential))
 
