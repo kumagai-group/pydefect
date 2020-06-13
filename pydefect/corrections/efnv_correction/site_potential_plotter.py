@@ -21,6 +21,9 @@ class PotentialPlotterMplSettings:
                  ave_pot_diff_line_color: str = "red",
                  ave_pot_diff_line_style: str = ":",
                  circle_size: int = 15,
+                 zero_line_width: float = 0.5,
+                 zero_line_color: str = "black",
+                 zero_line_style: str = ":",
                  tick_label_size: Optional[int] = 12,
                  title_font_size: Optional[int] = 15,
                  label_font_size: Optional[int] = 15):
@@ -38,6 +41,10 @@ class PotentialPlotterMplSettings:
         self.hline = {"linewidth": ave_pot_diff_line_width,
                       "color": ave_pot_diff_line_color,
                       "linestyle": ave_pot_diff_line_style}
+
+        self.zero_line = {"linewidth": zero_line_width,
+                          "color": zero_line_color,
+                          "linestyle": zero_line_style}
 
 
 class SitePotentialPlotter:
@@ -94,9 +101,12 @@ class SitePotentialPlotter:
         self.plt.scatter(all_distances, potential_diffs, marker="+", color="r")
 
     def _add_lines(self):
-        self.plt.axvline(x=self.defect_region_radius, **self._mpl_defaults.vline)
+        self.plt.axvline(x=self.defect_region_radius,
+                         **self._mpl_defaults.vline)
         self.plt.plot([self.defect_region_radius, self._max_distance * 1.1],
-                      [self.ave_pot_diff,self.ave_pot_diff], **self._mpl_defaults.hline)
+                      [self.ave_pot_diff, self.ave_pot_diff],
+                      **self._mpl_defaults.hline)
+        self.plt.axhline(y=0, **self._mpl_defaults.zero_line)
 
     def _set_x_range(self):
         self.plt.xlim(0, self._max_distance * 1.05)
