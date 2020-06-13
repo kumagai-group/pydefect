@@ -255,6 +255,9 @@ def parse_args(args):
         "-y", "--y_range",
         nargs=2,
         type=float)
+    parser_energy.add_argument(
+        "-s", "--skip_shallow",
+        action="store_true")
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------

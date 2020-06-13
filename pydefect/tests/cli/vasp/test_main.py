@@ -220,6 +220,7 @@ def test_defect_formation_energy(mocker):
                               "-c", "chem_pot_diag.json",
                               "-l", "A",
                               "-y", "-5", "5",
+                              "-s",
                               ])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
@@ -228,6 +229,7 @@ def test_defect_formation_energy(mocker):
         chem_pot_diag=mock.return_value,
         label="A",
         y_range=[-5, 5],
+        skip_shallow=True,
         func=parsed_args.func)
     assert parsed_args == expected
     mock.assert_any_call("perfect/calc_results.json")
