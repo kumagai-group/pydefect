@@ -164,6 +164,7 @@ def make_defect_eigenvalues(args):
         plotter = EigenvaluePlotter(title, band_edge_eigvals, supercell_vbm, supercell_cbm)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "eigenvalues.pdf")
+        plotter.plt.clf()
 
 
 def make_edge_characters(args):
