@@ -10,7 +10,8 @@ from pydefect.input_maker.defect_entries_maker import (
     perturb_structure, random_3d_vector)
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
-from pydefect.input_maker.supercell_info import SupercellInfo, Site
+from pydefect.input_maker.supercell_info import SupercellInfo, Site, \
+    Interstitial
 
 
 @pytest.fixture
@@ -19,9 +20,12 @@ def cubic_supercell_info(cubic_supercell):
                         equivalent_atoms=list(range(32))),
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="m-3m",
                          equivalent_atoms=list(range(32, 64)))}
+    interstitial = Interstitial([0.25]*3, wyckoff_letter="xx", site_symmetry="yy")
     return SupercellInfo(cubic_supercell,
                          "Fm-3m",
-                         [[2, 0, 0], [0, 2, 0], [0, 0, 2]], sites)
+                         [[2, 0, 0], [0, 2, 0], [0, 0, 2]],
+                         sites,
+                         interstitials=[interstitial])
 
 
 def test_defect_entries_maker(cubic_supercell_info, cubic_supercell, mocker):
@@ -63,6 +67,18 @@ def test_defect_entries_maker_insert_host_atoms(cubic_supercell_info, mocker):
         if defect_entry.name == "He_H1":
             actual = defect_entry.structure[31].frac_coords
             np.testing.assert_array_equal(actual, [0.0, 0.0, 0.0])
+
+
+def test_defect_entries_interstitials(cubic_supercell_info, mocker):
+    mock = mocker.patch("pydefect.input_maker.defect_entries_maker.defaults")
+    mock.displace_distance = 0.0
+
+    defect_set = DefectSet(defects={SimpleDefect("H", "i1", [0])})
+    maker = DefectEntriesMaker(cubic_supercell_info, defect_set)
+
+    defect_entry = maker.defect_entries.pop()
+    actual = defect_entry.structure[0].frac_coords
+    np.testing.assert_array_equal(actual, [0.25, 0.25, 0.25])
 
 
 def test_add_atom_to_structure(ortho_conventional):

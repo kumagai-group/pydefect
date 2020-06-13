@@ -55,7 +55,7 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
         distances = Distances(self.structure, coord)
         return distances.coordination
 
-    def interstitial_coords(self, idx):
+    def interstitial_coords(self, idx: int):
         interstitial = self.interstitials[idx]
         distances = Distances(self.structure, interstitial.frac_coords)
         return distances.coordination

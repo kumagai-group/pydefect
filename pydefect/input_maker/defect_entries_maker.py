@@ -7,7 +7,7 @@ from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
-from pydefect.input_maker.supercell_info import SupercellInfo, Site
+from pydefect.input_maker.supercell_info import SupercellInfo
 from pymatgen import Structure, IStructure
 
 
@@ -17,10 +17,8 @@ class DefectEntriesMaker:
         self.defect_entries = set()
 
         for defect in defect_set:
-            site = supercell_info.sites[defect.out_atom]
-            coordination = supercell_info.coords(defect.out_atom)
-            structure, perturbed_structure, coords = \
-                self._create_defect_structures(defect, site, coordination.cutoff)
+            structure, perturbed_structure, coords, site_symmetry = \
+                self._create_defect_structures(defect)
 
             for charge in defect.charges:
                 self.defect_entries.add(
@@ -28,26 +26,35 @@ class DefectEntriesMaker:
                                 charge=charge,
                                 structure=structure,
                                 perturbed_structure=perturbed_structure,
-                                site_symmetry=site.site_symmetry,
+                                site_symmetry=site_symmetry,
                                 defect_center=coords))
 
     def _create_defect_structures(self,
                                   defect: SimpleDefect,
-                                  site: Site,
-                                  cutoff: float
                                   ) -> Tuple[IStructure, IStructure,
-                                             Tuple[float, float, float]]:
+                                             Tuple[float, float, float], str]:
+
         structure = copy_to_structure(self.supercell_info.structure)
 
-        removed_site_index = site.equivalent_atoms[0]
-        coords = structure.pop(removed_site_index).frac_coords
+        if defect.out_atom[0] is "i":
+            index = int(defect.out_atom[1:]) - 1
+            site = self.supercell_info.interstitials[index]
+            cutoff = self.supercell_info.interstitial_coords(index).cutoff
+            coords = self.supercell_info.interstitials[index].frac_coords
+        else:
+            site = self.supercell_info.sites[defect.out_atom]
+            cutoff = self.supercell_info.coords(defect.out_atom).cutoff
+            removed_site_index = site.equivalent_atoms[0]
+            coords = structure.pop(removed_site_index).frac_coords
+
         perturbed_structure = perturb_structure(structure, coords, cutoff)
 
         if defect.in_atom:
             add_atom_to_structure(structure, defect.in_atom, coords)
             add_atom_to_structure(perturbed_structure, defect.in_atom, coords)
 
-        return to_istructure(structure), to_istructure(perturbed_structure), tuple(coords)
+        return to_istructure(structure), to_istructure(perturbed_structure), \
+               tuple(coords), site.site_symmetry
 
 
 def copy_to_structure(structure: IStructure) -> Structure:
