@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from pathlib import Path
+from shutil import copyfile
 
 from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeStates
+from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import make_defect_energies
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotter
-from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
+from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer, \
+    symmetrize_defect_structure
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotter
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state
 from pydefect.analyzer.make_defect_energy import make_single_defect_energy
@@ -130,6 +133,20 @@ def make_calc_results(args):
             vasprun=Vasprun(d / defaults.vasprun),
             outcar=Outcar(d / defaults.outcar))
         calc_results.to_json_file(filename=Path(d) / "calc_results.json")
+
+
+def make_refined_structure(args):
+    defect_entry: DefectEntry = loadfn(args.dir / "defect_entry.json")
+    calc_results: CalcResults = loadfn(args.dir / "calc_results.json")
+    refined_structure = symmetrize_defect_structure(
+        calc_results.structure,
+        defect_entry.anchor_atom_index,
+        defect_entry.structure[defect_entry.anchor_atom_index])
+    ref_dir = Path(f"ref_{args.dir}")
+    ref_dir.mkdir()
+    refined_structure.to(fmt="POSCAR", filename=ref_dir / "POSCAR")
+    for i in ["INCAR", "POTCAR", "KPOINTS"]:
+        copyfile(args.dir / i, ref_dir / i)
 
 
 def make_efnv_correction_from_vasp(args):
