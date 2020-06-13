@@ -10,7 +10,7 @@ from pydefect.tests.helpers.assertion import assert_msonable
 
 @pytest.fixture
 def efnv_correction():
-    s1 = DefectSite(specie="H", distance=1.999, potential=1.0, pc_potential=0.1)
+    s1 = DefectSite(specie="H", distance=1.999, potential=1.0, pc_potential=None)
     s2 = DefectSite(specie="He", distance=2.0001, potential=1.5, pc_potential=0.2)
     s3 = DefectSite(specie="He", distance=3.0, potential=2.0, pc_potential=0.3)
 
@@ -46,9 +46,3 @@ def test_defect_site_msonable(efnv_correction):
     s = DefectSite(specie="H", distance=1.999, potential=1.0, pc_potential=0.1)
     assert_msonable(s)
 
-"""
-TODO
--
-
-DONE
-"""

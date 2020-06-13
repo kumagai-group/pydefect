@@ -79,6 +79,7 @@ class SitePotentialPlotter:
 
     def _add_potentials(self):
         all_distances = []
+        pc_pot_distances = []
         pc_potentials = []
         potential_diffs = []
         for _, grouped_sites in groupby(self.sites, key=lambda x: x.specie):
@@ -86,19 +87,21 @@ class SitePotentialPlotter:
             potentials = []
             for site in grouped_sites:
                 distances.append(site.distance)
+                all_distances.append(site.distance)
                 potentials.append(site.potential)
 
-                all_distances.append(site.distance)
-                pc_potentials.append(site.pc_potential)
-                potential_diffs.append(site.diff_pot)
+                if site.pc_potential:
+                    pc_pot_distances.append(site.distance)
+                    pc_potentials.append(site.pc_potential)
+                    potential_diffs.append(site.diff_pot)
 
             color = next(self._mpl_defaults.colors)
             self.plt.scatter(distances, potentials, marker="o", color=color)
 
         self._max_distance = max(all_distances)
 
-        self.plt.scatter(all_distances, pc_potentials, marker="1", color="b")
-        self.plt.scatter(all_distances, potential_diffs, marker="+", color="r")
+        self.plt.scatter(pc_pot_distances, pc_potentials, marker="1", color="b")
+        self.plt.scatter(pc_pot_distances, potential_diffs, marker="+", color="r")
 
     def _add_lines(self):
         self.plt.axvline(x=self.defect_region_radius,
