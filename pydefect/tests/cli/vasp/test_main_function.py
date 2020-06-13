@@ -30,7 +30,8 @@ def test_print():
     print_file(args)
 
 
-def test_make_unitcell(mocker):
+def test_make_unitcell(mocker, tmpdir):
+    tmpdir.chdir()
     vasprun_band_mock = mocker.Mock(spec=Vasprun, autospec=True)
     outcar_band_mock = mocker.Mock(spec=Outcar, autospec=True)
     outcar_dielectric_mock = mocker.Mock(spec=Outcar, autospec=True)
