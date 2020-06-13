@@ -248,3 +248,18 @@ def supercell_info(mocker, ortho_conventional):
                          "Fmmm",
                          [[1, 0, 0], [0, 1, 0], [0, 0, 1]], sites,
                          [interstitial])
+
+
+@pytest.fixture
+def cubic_supercell_info_wo_int(mocker, cubic_supercell):
+    mock = mocker.patch("pydefect.util.structure_tools.defaults")
+    mock.same_distance_criterion = defaults.same_distance_criterion
+    mock.cutoff_distance_factor = 1.7
+    sites = {"H1": Site(element="H", wyckoff_letter="a", site_symmetry="m-3m",
+                        equivalent_atoms=[0, 1, 2, 3]),
+             "He1": Site(element="He", wyckoff_letter="b", site_symmetry="m-3m",
+                         equivalent_atoms=[4, 5, 6, 7])}
+    return SupercellInfo(cubic_supercell,
+                         "Fm-3m", [[-2, 2, 2], [2, -2, 2], [2, 2, -2]], sites)
+
+
