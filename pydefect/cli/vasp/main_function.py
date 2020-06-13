@@ -147,6 +147,7 @@ def make_efnv_correction_from_vasp(args):
         plotter = SitePotentialPlotter(title, efnv)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "correction.pdf")
+        plotter.plt.clf()
 
 
 def make_defect_eigenvalues(args):
