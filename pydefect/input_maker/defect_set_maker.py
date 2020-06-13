@@ -22,6 +22,8 @@ class DefectSetMaker:
         self._dopants = dopants or []
         self._ele_neg_diff = ele_neg_diff
 
+        self._subs = self._dopants + self._host_elements
+
         defect_set = self._create_defect_set()
         if keywords:
             self.defect_set = screen_defect_set(defect_set, keywords)
@@ -42,6 +44,7 @@ class DefectSetMaker:
     def _create_defect_set(self):
         result = self._create_vacancy_set()
         result.update(self._create_substitutional_set())
+        result.update(self._create_interstitial_set())
         return DefectSet(result)
 
     def _create_vacancy_set(self):
@@ -54,9 +57,8 @@ class DefectSetMaker:
 
     def _create_substitutional_set(self):
         result = set()
-        subs = self._dopants + self._host_elements
         for in_name, (out_name, site) \
-                in product(subs, self.supercell_info.sites.items()):
+                in product(self._subs, self.supercell_info.sites.items()):
             host_element = site.element
             sub_en = electronegativity(in_name)
             host_en = electronegativity(host_element)
@@ -71,6 +73,16 @@ class DefectSetMaker:
             result.add(SimpleDefect(in_name, out_name, charge_set(oxi_diff)))
 
         return result
+
+    def _create_interstitial_set(self):
+        result = set()
+        for in_name in self._subs:
+            oxi_stat = self._oxidation_state(in_name)
+            for i in range(len(self.supercell_info.interstitials)):
+                result.add(SimpleDefect(in_name, f"i{i + 1}", charge_set(oxi_stat)))
+
+        return result
+
 
 
 def charge_set(ox_state: int) -> List[int]:
