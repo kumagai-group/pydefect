@@ -89,12 +89,14 @@ def test_make_band_edge_state_donor_phs(donor_phs_character, perfect_character):
     assert actual == EdgeState.donor_phs
 
 
-def test_make_band_edge_state_acceptor_phs(acceptor_phs_character, perfect_character):
+def test_make_band_edge_state_acceptor_phs(acceptor_phs_character,
+                                           perfect_character):
     actual = make_band_edge_state(acceptor_phs_character, perfect_character)
     assert actual == EdgeState.acceptor_phs
 
 
-def test_make_band_edge_state_in_gap_state(in_gap_state_character, perfect_character):
+def test_make_band_edge_state_in_gap_state(in_gap_state_character,
+                                           perfect_character):
     actual = make_band_edge_state(in_gap_state_character, perfect_character)
     assert actual == EdgeState.in_gap_state
 
@@ -115,24 +117,18 @@ def test_are_orbitals_similar(mocker):
     assert are_orbitals_similar(orb_1, orb_2) is True
 
 
+dir_path = Path(__file__).parent / "band_edge_database" / "NaCl"
+
+
 def test_edge_character_nacl_acceptor_phs():
-    ref = loadfn(Path(__file__).parent / "band_edge_database" / "NaCl" / "perfect_edge_characters.json")[0]
-    # compare spin up
-    target = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "Va_Na1_1_edge_characters.json")[0]
+    ref = loadfn(dir_path / "perfect_edge_characters.json")[0]  # only spin up
+    target = loadfn(dir_path / "Va_Na1_1_edge_characters.json")[0]
     assert make_band_edge_state(target, ref) == EdgeState.acceptor_phs
 
 
 def test_edge_character_nacl_no_in_gap():
-    ref = loadfn(Path(__file__).parent / "band_edge_database" / "NaCl" / "perfect_edge_characters.json")[0]
-    target = loadfn(Path(".").parent / "band_edge_database" / "NaCl" / "Va_Na1_-1_edge_characters.json")[0]
+    ref = loadfn(dir_path / "perfect_edge_characters.json")[0]
+    target = loadfn(dir_path / "Va_Na1_-1_edge_characters.json")[0]
     assert make_band_edge_state(target, ref) == EdgeState.no_in_gap
 
 
-"""
-TODO
-- energy
-- participation_ratio
-- similarity
-
-DONE
-"""
