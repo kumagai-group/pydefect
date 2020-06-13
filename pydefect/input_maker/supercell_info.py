@@ -35,16 +35,29 @@ class Site(MSONable):
 
 
 @dataclass(frozen=True)
+class Interstitial(MSONable):
+    frac_coords: List[float]
+    wyckoff_letter: str
+    site_symmetry: str
+
+
+@dataclass(frozen=True)
 class SupercellInfo(MSONable, ToJsonFileMixIn):
     structure: IStructure
     space_group: str
     transform_matrix: List[List[int]]
     sites: Dict[str, Site]
+    interstitials: List[Interstitial]
 
     def coords(self, name):
         site = self.sites[name]
         coord = list(self.structure[site.equivalent_atoms[0]].frac_coords)
         distances = Distances(self.structure, coord)
+        return distances.coordination
+
+    def interstitial_coords(self, idx):
+        interstitial = self.interstitials[idx]
+        distances = Distances(self.structure, interstitial.frac_coords)
         return distances.coordination
 
     @property
@@ -80,6 +93,17 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
             lines.append(f"Fractional coordinates: {self._frac_coords(site)}")
             lines.append(f"     Electronegativity: {electronegativity(elem)}")
             lines.append(f"       Oxidation state: {oxidation_state(elem)}")
+            lines.append("")
+        lines.append("-- interstitials")
+
+        for idx, site in enumerate(self.interstitials):
+            frac = "{0[0]:9.7f}  {0[1]:9.7f}  {0[2]:9.7f}".format(site.frac_coords)
+            coordination = self.interstitial_coords(idx).distance_dict
+
+            lines.append(f"Fractional coordinates: {frac}")
+            lines.append(f"        Wyckoff letter: {site.wyckoff_letter}")
+            lines.append(f"         Site symmetry: {site.site_symmetry}")
+            lines.append(f"          Coordination: {coordination}")
             lines.append("")
 
         return "\n".join(lines)

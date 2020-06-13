@@ -6,10 +6,10 @@ from math import sqrt
 from pathlib import Path
 
 import pytest
-from pymatgen import Lattice, IStructure, Structure
-
 from pydefect.defaults import defaults
-from pydefect.input_maker.supercell_info import Site, SupercellInfo
+from pydefect.input_maker.supercell_info import Site, SupercellInfo, \
+    Interstitial
+from pymatgen import Lattice, IStructure, Structure
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 # Need the following the share the fixture
@@ -243,6 +243,8 @@ def supercell_info(mocker, ortho_conventional):
                         equivalent_atoms=[0, 1, 2, 3]),
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="mmm",
                          equivalent_atoms=[4, 5, 6, 7])}
+    interstitial = Interstitial([0.25]*3, wyckoff_letter="xx", site_symmetry="yy")
     return SupercellInfo(ortho_conventional,
                          "Fmmm",
-                         [[1, 0, 0], [0, 1, 0], [0, 0, 1]], sites)
+                         [[1, 0, 0], [0, 1, 0], [0, 0, 1]], sites,
+                         [interstitial])

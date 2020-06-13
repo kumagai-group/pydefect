@@ -3,7 +3,7 @@
 
 import pytest
 
-from pydefect.input_maker.supercell_info import Site
+from pydefect.input_maker.supercell_info import Site, Interstitial
 from pydefect.tests.helpers.assertion import assert_msonable, \
     assert_json_roundtrip
 from pydefect.util.structure_tools import Coordination
@@ -25,6 +25,17 @@ def test_site_pprint_equiv_atoms(site):
     assert site.pprint_equiv_atoms == "0..3 5 6"
 
 
+@pytest.fixture
+def interstitial():
+    return Interstitial(frac_coords=[0.25, 0.25, 0.25],
+                        wyckoff_letter="a",
+                        site_symmetry="m3m")
+
+
+def test_interstitial(interstitial):
+    assert_msonable(interstitial)
+
+
 def test_supercell_info_msonable(supercell_info):
     assert_msonable(supercell_info)
 
@@ -32,6 +43,10 @@ def test_supercell_info_msonable(supercell_info):
 def test_supercell_info_distances(supercell_info):
     assert supercell_info.coords("H1") == Coordination({"H": [3.91], "He": [2.5, 3.0, 3.5]}, 4.25, {1, 4, 5, 6})
     assert supercell_info.coords("He1") == Coordination({"H": [2.5, 3.0, 3.5], "He": [3.91]}, 4.25, {0, 2, 3, 7})
+
+
+def test_supercell_info_interstitials_distances(supercell_info):
+    assert supercell_info.interstitial_coords(0) == Coordination({'H': [2.62, 2.62, 2.62, 2.62], 'He': [2.62, 2.62, 2.62, 2.62]}, 4.457, {0, 1, 2, 3, 4, 5, 6, 7})
 
 
 def test_supercell_info_str(supercell_info):
@@ -58,6 +73,12 @@ Fractional coordinates: 0.0000000  0.0000000  0.0000000
 Fractional coordinates: 0.0000000  0.0000000  0.5000000
      Electronegativity: None
        Oxidation state: 0
+
+-- interstitials
+Fractional coordinates: 0.2500000  0.2500000  0.2500000
+        Wyckoff letter: xx
+         Site symmetry: yy
+          Coordination: {'H': [2.62, 2.62, 2.62, 2.62], 'He': [2.62, 2.62, 2.62, 2.62]}
 """
     assert str(supercell_info) == expected
 
