@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-import pytest
+from pathlib import Path
 
+import pytest
+from monty.serialization import loadfn
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection, DefectSite
 from pydefect.corrections.efnv_correction.site_potential_plotter import \
@@ -28,9 +30,9 @@ def test(plotter):
     plotter.plt.show()
 
 
-"""
-TODO
-- Plot dft potentials
+def test_actual_file():
+    efnv_cor = loadfn(Path(__file__).parent / "NaCl_Va_Na_-1_correction.json")
+    plotter = SitePotentialPlotter("NaCl Va_Na_-1", efnv_cor)
+    plotter.construct_plot()
+    plotter.plt.show()
 
-DONE
-"""
