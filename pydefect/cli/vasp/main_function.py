@@ -28,6 +28,7 @@ from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
 from pydefect.corrections.efnv_correction.site_potential_plotter import \
     SitePotentialPlotter
 from pydefect.defaults import defaults
+from pydefect.input_maker.add_interstitial import add_interstitial
 from pydefect.input_maker.defect_entries_maker import DefectEntriesMaker
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
@@ -96,6 +97,18 @@ def make_supercell(args):
 
     maker.supercell.structure.to(filename="SPOSCAR")
     maker.supercell_info.to_json_file()
+
+
+def add_interstitials(args):
+    supercell_info = add_interstitial(args.supercell_info,
+                                      args.base_structure,
+                                      args.frac_coords)
+    supercell_info.to_json_file()
+
+
+def pop_interstitials(args):
+    supercell_info = args.supercell_info.interstitials.pop(args.index - 1)
+    supercell_info.to_json_file()
 
 
 def make_defect_set(args):
