@@ -413,7 +413,8 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
                      chem_pot_diag=mock_chem_pot_diag,
                      label="A",
                      y_range=[-100, 100],
-                     skip_shallow=skip_shallow)
+                     skip_shallow=skip_shallow,
+                     print=False)
 
     make_defect_formation_energy(args)
 

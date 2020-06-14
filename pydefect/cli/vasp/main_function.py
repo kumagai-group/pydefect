@@ -244,9 +244,19 @@ def make_defect_formation_energy(args):
                                       loadfn(d / "defect_entry.json"),
                                       abs_chem_pot,
                                       loadfn(d / "correction.json")))
+
+    defect_energies = make_defect_energies(single_energies)
+    if args.print:
+        for e in defect_energies:
+            print(e)
+            print("")
+        for e in defect_energies:
+            print(e.cross_points(args.unitcell.vbm, args.unitcell.cbm))
+            print("")
+        return
+
     plotter = DefectEnergyPlotter(title=title,
-                                  defect_energies=make_defect_energies(
-                                      single_energies),
+                                  defect_energies=defect_energies,
                                   vbm=args.unitcell.vbm,
                                   cbm=args.unitcell.cbm,
                                   supercell_vbm=args.perfect_calc_results.vbm,
