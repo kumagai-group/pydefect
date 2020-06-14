@@ -43,7 +43,6 @@ def make_efnv_correction(charge: int,
     for d, p in structure_analyzer.atom_mapping.items():
         specie = str(calc_results.structure[d].specie)
         distance = structure_analyzer.distance_from_center(d)
-        # The site potential in vasp is for electron.
         pot = calc_results.potentials[d] - perfect_calc_results.potentials[p]
 
         coord = calc_results.structure[d].frac_coords
