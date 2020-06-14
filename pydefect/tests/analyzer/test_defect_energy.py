@@ -11,7 +11,8 @@ from pydefect.analyzer.defect_energy import (
 def defect_energy():
     return DefectEnergy(name="Va_O1",
                         charges=[0, 1, 2],
-                        energies=[6, 3, -4])
+                        energies=[4, 2, -4],
+                        corrections=[2, 1, 0])
 
 
 def test_defect_energy_cross_points(defect_energy):
@@ -36,15 +37,15 @@ def test_cross_points(cross_points):
 
 def test_generate_defect_energies():
     defect_energies = [
-        SingleDefectEnergy("Va_O1", 0, 0),
-        SingleDefectEnergy("Va_Mg1", 0, 0),
-        SingleDefectEnergy("Va_O1", 1, 10),
-        SingleDefectEnergy("Va_Mg1", -1, -10),
-        SingleDefectEnergy("Va_O1", 2, 20),
-        SingleDefectEnergy("Va_Mg1", -2, -20)]
+        SingleDefectEnergy("Va_O1", 0, -1, 1),
+        SingleDefectEnergy("Va_Mg1", 0, -2, 2),
+        SingleDefectEnergy("Va_O1", 1, 7, 3),
+        SingleDefectEnergy("Va_Mg1", -1, -14, 4),
+        SingleDefectEnergy("Va_O1", 2, 15, 5),
+        SingleDefectEnergy("Va_Mg1", -2, -14, 6)]
     actual = make_defect_energies(defect_energies)
-    expected = [DefectEnergy("Va_Mg1", [0, -1, -2], [0, -10, -20]),
-                DefectEnergy("Va_O1", [0, 1, 2], [0, 10, 20])]
+    expected = [DefectEnergy("Va_Mg1", [0, -1, -2], [-2, -14, -14], [2, 4, 6]),
+                DefectEnergy("Va_O1", [0, 1, 2], [-1, 7, 15], [1, 3, 5])]
     assert actual == expected
 
 """

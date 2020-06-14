@@ -13,6 +13,7 @@ class SingleDefectEnergy:
     name: str
     charge: int
     energy: float
+    correction: float
 
 
 @dataclass
@@ -20,12 +21,14 @@ class DefectEnergy:
     name: str
     charges: List[int]
     energies: List[float]
+    corrections: List[float]
 
     def cross_points(self, ef_min, ef_max):
         large_minus_number = -1e4
         half_spaces = []
-        for charge, energy in zip(self.charges, self.energies):
-            half_spaces.append([-charge, 1, -energy])
+        for charge, energy, correction in zip(self.charges, self.energies, self.corrections):
+            corrected_energy = energy + correction
+            half_spaces.append([-charge, 1, -corrected_energy])
 
         half_spaces.append([-1, 0, ef_min])
         half_spaces.append([1, 0, -ef_max])
@@ -76,8 +79,10 @@ def make_defect_energies(single_energies: List[SingleDefectEnergy]
     for _, grouped_energies in groupby(sorted_energies, lambda x: x.name):
         charges = []
         energies = []
+        corrections = []
         for single_energy in grouped_energies:
             charges.append(single_energy.charge)
             energies.append(single_energy.energy)
-        result.append(DefectEnergy(single_energy.name, charges, energies))
+            corrections.append(single_energy.correction)
+        result.append(DefectEnergy(single_energy.name, charges, energies, corrections))
     return result
