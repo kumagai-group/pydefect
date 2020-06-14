@@ -20,7 +20,8 @@ def test_site_potential_plotter_with_simple_example():
             PotentialSite(specie="He", distance=3.0, potential=-2,
                           pc_potential=-3),
             PotentialSite(specie="He", distance=4.0, potential=-1, pc_potential=-2)
-                                     ])
+                                     ],
+        defect_coords=(0.0, 0.0, 0.0))
     plotter = SitePotentialPlotter("ZnO Va_O1_2", efnv_cor)
     plotter.construct_plot()
     plotter.plt.show()

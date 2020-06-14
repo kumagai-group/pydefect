@@ -31,7 +31,7 @@ def make_efnv_correction(charge: int,
 
     structure_analyzer = DefectStructureAnalyzer(
         calc_results.structure, perfect_calc_results.structure)
-    defect_coord = structure_analyzer.defect_center_coord
+    defect_coords = structure_analyzer.defect_center_coord
     lattice = calc_results.structure.lattice.matrix
     ewald = Ewald(lattice, dielectric_tensor, accuracy=accuracy)
     point_charge_correction = \
@@ -47,7 +47,7 @@ def make_efnv_correction(charge: int,
         pot = calc_results.potentials[d] - perfect_calc_results.potentials[p]
 
         coord = calc_results.structure[d].frac_coords
-        rel_coord = [x - y for x, y in zip(coord, defect_coord)]
+        rel_coord = [x - y for x, y in zip(coord, defect_coords)]
         if distance <= defect_region_radius:
             pc_potential = None
         else:
@@ -63,7 +63,8 @@ def make_efnv_correction(charge: int,
         charge=charge,
         point_charge_correction=point_charge_correction * unit_conversion,
         defect_region_radius=defect_region_radius,
-        sites=sites)
+        sites=sites,
+        defect_coords=tuple(defect_coords))
 
 
 def calc_max_sphere_radius(lattice) -> float:

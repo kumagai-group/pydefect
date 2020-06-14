@@ -18,6 +18,7 @@ def efnv_correction():
                                  point_charge_correction=1.0,
                                  defect_region_radius=2.0,
                                  sites=[s1, s2, s3],
+                                 defect_coords=(0.0, 0.0, 0.0),
                                  additional_correction=100)
 
 

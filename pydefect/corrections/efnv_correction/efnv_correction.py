@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 from monty.json import MSONable
@@ -26,6 +26,7 @@ class ExtendedFnvCorrection(Correction):
     point_charge_correction: float
     defect_region_radius: float
     sites: List["PotentialSite"]
+    defect_coords: Tuple[float, float, float]
     additional_correction: float = 0.0
 
     @property
