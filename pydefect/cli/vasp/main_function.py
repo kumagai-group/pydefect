@@ -248,9 +248,13 @@ def make_defect_formation_energy(args):
     defect_energies = make_defect_energies(single_energies)
     if args.print:
         for e in defect_energies:
+            print("")
+            print("         charge          E_f   correction    ")
             print(e)
             print("")
         for e in defect_energies:
+            print("-- cross points -- ")
+            print(e.name)
             print(e.cross_points(args.unitcell.vbm, args.unitcell.cbm))
             print("")
         return

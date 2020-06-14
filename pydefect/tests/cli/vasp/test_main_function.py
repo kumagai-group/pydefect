@@ -414,7 +414,7 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
                      label="A",
                      y_range=[-100, 100],
                      skip_shallow=skip_shallow,
-                     print=False)
+                     print=True)
 
     make_defect_formation_energy(args)
 
