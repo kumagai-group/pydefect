@@ -10,9 +10,9 @@ from pymatgen import Structure, Element
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 
-def add_interstitial(supercell_info: SupercellInfo,
-                     based_structure: Structure,
-                     frac_coords: List[float]) -> SupercellInfo:
+def append_interstitial(supercell_info: SupercellInfo,
+                        based_structure: Structure,
+                        frac_coords: List[float]) -> SupercellInfo:
     """
     inv_trans_mat must be multiplied with coords from the right as the
     trans_mat is multiplied to the unitcell lattice vector from the left.

@@ -2,7 +2,7 @@
 #  Copyright (c) 2020 Kumagai group.
 
 import pytest
-from pydefect.input_maker.add_interstitial import add_interstitial
+from pydefect.input_maker.add_interstitial import append_interstitial
 from pydefect.input_maker.supercell_info import Interstitial
 from pydefect.util.error_classes import NotPrimitiveError
 from pymatgen import Structure, Lattice
@@ -19,9 +19,9 @@ def test(cubic_supercell_info_wo_int):
 Direct
   0.0000000000000000  0.0000000000000000  0.0000000000000000
   0.5000000000000000  0.5000000000000000  0.5000000000000000""", fmt="POSCAR")
-    new_supercell_info = add_interstitial(cubic_supercell_info_wo_int,
-                                          base_primitive,
-                                          [1/4, 1/4, 1/4])
+    new_supercell_info = append_interstitial(cubic_supercell_info_wo_int,
+                                             base_primitive,
+                                             [1/4, 1/4, 1/4])
     expected = Interstitial(frac_coords=[1/8, 1/8, 1/8], wyckoff_letter="d", site_symmetry="-43m")
     assert new_supercell_info.interstitials[0] == expected
 
@@ -40,8 +40,8 @@ def test_add_interstitial_not_primitive_error(cubic_supercell_info_wo_int):
                                           [0.5, 0.5, 0.5],
                                         ])
     with pytest.raises(NotPrimitiveError):
-        add_interstitial(cubic_supercell_info_wo_int, conventional_cell,
-                         [1/4, 1/4, 1/4])
+        append_interstitial(cubic_supercell_info_wo_int, conventional_cell,
+                            [1/4, 1/4, 1/4])
 
 
 """

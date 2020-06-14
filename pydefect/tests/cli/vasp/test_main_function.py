@@ -15,7 +15,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_chem_pot_diag, make_calc_results, print_file, \
     make_efnv_correction_from_vasp, make_defect_formation_energy, \
     make_defect_eigenvalues, make_edge_characters, make_refined_structure, \
-    add_interstitials, pop_interstitials
+    append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
@@ -122,9 +122,9 @@ def test_add_interstitials(mocker):
     mock_2 = mocker.Mock()
     mock_3 = mocker.Mock()
     args = Namespace(supercell_info=mock_1, base_structure=mock_2, frac_coords=mock_3)
-    mock = mocker.patch("pydefect.cli.vasp.main_function.add_interstitial")
+    mock = mocker.patch("pydefect.cli.vasp.main_function.append_interstitial")
 
-    add_interstitials(args)
+    append_interstitial_to_supercell_info(args)
     mock.assert_called_once_with(mock_1, mock_2, mock_3)
     mock.return_value.to_json_file.assert_called_once_with()
 
@@ -133,7 +133,7 @@ def test_pop_interstitials(mocker):
     mock_si = mocker.MagicMock()
     args = Namespace(supercell_info=mock_si, index=1000)
 
-    pop_interstitials(args)
+    pop_interstitial_from_supercell_info(args)
     mock_si.interstitials.pop.assert_called_once_with(999)
     mock_si.interstitials.pop.return_value.to_json_file.assert_called_once_with()
 
