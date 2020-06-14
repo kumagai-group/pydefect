@@ -2,12 +2,11 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import pytest
-from pymatgen.util.string import latexify
-
 from pydefect.analyzer.defect_energy import DefectEnergy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotter, \
     DefectEnergiesMplSettings
 from pydefect.defaults import defaults
+from pymatgen.util.string import latexify
 
 
 def test_defect_energies_mpl_settings():
@@ -20,9 +19,9 @@ def test_defect_energies_mpl_settings():
 
 @pytest.fixture
 def defect_energies():
-    va_o = DefectEnergy(name="Va_O1", charges=[0, 1, 2], energies=[6, 3, -4])
-    va_mg = DefectEnergy(name="Va_Mg1", charges=[-2, -1, 0], energies=[6, 3, 1])
-    mg_i = DefectEnergy(name="Mg_i1", charges=[1], energies=[5])
+    va_o = DefectEnergy(name="Va_O1", charges=[0, 1, 2], energies=[5, 2, -5], corrections=[1, 1, 1])
+    va_mg = DefectEnergy(name="Va_Mg1", charges=[-2, -1, 0], energies=[5, 2, 0], corrections=[-1, -1, -1])
+    mg_i = DefectEnergy(name="Mg_i1", charges=[1], energies=[4], corrections=[1])
 
     return DefectEnergyPlotter(
         title=latexify("MgAl2O4"),

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from pymatgen import IStructure, Lattice, Element
-
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import SingleDefectEnergy
 from pydefect.analyzer.make_defect_energy import make_single_defect_energy, \
     num_atom_differences, reservoir_energy
 from pydefect.corrections.manual_correction import ManualCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
+from pymatgen import IStructure, Lattice, Element
 
 
 def test_make_single_defect_energy(mocker):
@@ -30,10 +29,10 @@ def test_make_single_defect_energy(mocker):
                                   defect_entry=defect_entry,
                                   abs_chem_pot={Element.H: 100},
                                   correction=ManualCorrection(7.0))
-    energy = (3.0 + 7.0) - 1.0 + 100
+    energy = 3.0 - 1.0 + 100
 
     assert isinstance(single_defect_energy, SingleDefectEnergy)
-    assert single_defect_energy == SingleDefectEnergy(name, charge, energy)
+    assert single_defect_energy == SingleDefectEnergy(name, charge, energy, 7.0)
 
 
 def test_reservoir_energy():

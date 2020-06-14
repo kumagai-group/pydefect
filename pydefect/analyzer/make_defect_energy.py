@@ -18,9 +18,9 @@ def make_single_defect_energy(perfect: CalcResults,
                               ) -> SingleDefectEnergy:
     n_diffs = num_atom_differences(defect.structure, perfect.structure)
     energy = (defect.energy - perfect.energy
-              + correction.correction_energy
               + reservoir_energy(n_diffs, abs_chem_pot))
-    return SingleDefectEnergy(defect_entry.name, defect_entry.charge, energy)
+    return SingleDefectEnergy(defect_entry.name, defect_entry.charge, energy,
+                              correction.correction_energy)
 
 
 def reservoir_energy(diffs: Dict[Element, int],
