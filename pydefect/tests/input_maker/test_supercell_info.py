@@ -76,7 +76,7 @@ Fractional coordinates: 0.0000000  0.0000000  0.5000000
 
 -- interstitials
 Fractional coordinates: 0.2500000  0.2500000  0.2500000
-        Wyckoff letter: xx
+        Wyckoff letter: x
          Site symmetry: yy
           Coordination: {'H': [2.62, 2.62, 2.62, 2.62], 'He': [2.62, 2.62, 2.62, 2.62]}
 """
