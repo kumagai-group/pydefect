@@ -3,8 +3,12 @@
 from argparse import Namespace
 from pathlib import Path
 
+from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.unitcell import Unitcell
+from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
 from pydefect.cli.vasp.main import parse_args
 from pydefect.defaults import defaults
+from pydefect.input_maker.supercell_info import SupercellInfo
 from pymatgen import Composition
 
 
@@ -144,6 +148,25 @@ def test_defect_entries():
     assert parsed_args == expected
 
 
+def test_append_interstitial(mocker):
+
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main.loadfn")
+    mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
+    mock_loadfn.return_value = mock_supercell_info
+    mock_structure = mocker.patch("pydefect.cli.vasp.main.Structure")
+    parsed_args = parse_args(["ai",
+                              "-s", "supercell_info.json",
+                              "-p", "POSCAR",
+                              "-c", "0.1", "0.2", "0.3"])
+    expected = Namespace(
+        supercell_info=mock_supercell_info,
+        base_structure=mock_structure.from_file.return_value,
+        frac_coords=[0.1, 0.2, 0.3],
+        func=parsed_args.func,
+    )
+    assert parsed_args == expected
+
+
 def test_calc_results():
     parsed_args = parse_args(["cr", "-d", "Va_O1_0", "Va_O1_1"])
     expected = Namespace(
@@ -163,35 +186,53 @@ def test_refine_structure():
 
 
 def test_efnv_correction(mocker):
-    mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
+    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_unitcell = mocker.Mock(spec=Unitcell, autospec=True)
+
+    def side_effect(filename):
+        if filename == "perfect/calc_results.json":
+            return mock_calc_results
+        elif filename == "unitcell.json":
+            return mock_unitcell
+        else:
+            raise ValueError
+
+    mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
     parsed_args = parse_args(["efnv",
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-pcr", "perfect/calc_results.json",
                               "-u", "unitcell.json"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
-        perfect_calc_results=mock.return_value,
-        unitcell=mock.return_value,
+        perfect_calc_results=mock_calc_results,
+        unitcell=mock_unitcell,
         func=parsed_args.func)
     assert parsed_args == expected
-    mock.assert_any_call("perfect/calc_results.json")
-    mock.assert_any_call("unitcell.json")
 
 
 def test_defect_eigenvalues(mocker):
-    mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
+    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_unitcell = mocker.Mock(spec=Unitcell, autospec=True)
+
+    def side_effect(filename):
+        if filename == "perfect/calc_results.json":
+            return mock_calc_results
+        elif filename == "unitcell.json":
+            return mock_unitcell
+        else:
+            raise ValueError
+
+    mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
     parsed_args = parse_args(["eig",
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-pcr", "perfect/calc_results.json",
                               "-u", "unitcell.json"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
-        perfect_calc_results=mock.return_value,
-        unitcell=mock.return_value,
+        perfect_calc_results=mock_calc_results,
+        unitcell=mock_unitcell,
         func=parsed_args.func)
     assert parsed_args == expected
-    mock.assert_any_call("perfect/calc_results.json")
-    mock.assert_any_call("unitcell.json")
 
 
 def test_band_edge_characters(mocker):
@@ -221,7 +262,21 @@ def test_band_edge_states(mocker):
 
 
 def test_defect_formation_energy(mocker):
-    mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
+    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_unitcell = mocker.Mock(spec=Unitcell, autospec=True)
+    mock_chem_pot_diag = mocker.Mock(spec=ChemPotDiag, autospec=True)
+
+    def side_effect(filename):
+        if filename == "perfect/calc_results.json":
+            return mock_calc_results
+        elif filename == "unitcell.json":
+            return mock_unitcell
+        elif filename == "chem_pot_diag.json":
+            return mock_chem_pot_diag
+        else:
+            raise ValueError
+
+    mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
     parsed_args = parse_args(["e",
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-pcr", "perfect/calc_results.json",
@@ -233,14 +288,11 @@ def test_defect_formation_energy(mocker):
                               ])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
-        perfect_calc_results=mock.return_value,
-        unitcell=mock.return_value,
-        chem_pot_diag=mock.return_value,
+        perfect_calc_results=mock_calc_results,
+        unitcell=mock_unitcell,
+        chem_pot_diag=mock_chem_pot_diag,
         label="A",
         y_range=[-5, 5],
         skip_shallow=True,
         func=parsed_args.func)
     assert parsed_args == expected
-    mock.assert_any_call("perfect/calc_results.json")
-    mock.assert_any_call("unitcell.json")
-    mock.assert_any_call("chem_pot_diag.json")

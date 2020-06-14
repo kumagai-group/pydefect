@@ -11,10 +11,11 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
     make_calc_results, make_defect_formation_energy, make_defect_eigenvalues, \
-    make_edge_characters, make_edge_states, make_refined_structure
+    make_edge_characters, make_edge_states, make_refined_structure, \
+    append_interstitial_to_supercell_info
 from pydefect.defaults import defaults
 from pydefect.version import __version__
-from pymatgen import IStructure, Composition
+from pymatgen import IStructure, Composition, Structure
 from pymatgen.io.vasp import Vasprun, Outcar
 
 
@@ -181,6 +182,29 @@ def parse_args(args):
         aliases=['de'])
 
     parser_defect_entries.set_defaults(func=make_defect_entries)
+
+    # -- append_interstitial ------------------------------------------------
+    parser_append_interstitial = subparsers.add_parser(
+        name="append_interstitial",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['ai'])
+
+    parser_append_interstitial.add_argument(
+        "-s", "--supercell_info",
+        required=True,
+        type=loadfn)
+    parser_append_interstitial.add_argument(
+        "-p", "--base_structure",
+        required=True,
+        type=Structure.from_file)
+    parser_append_interstitial.add_argument(
+        "-c", "--frac_coords",
+        required=True,
+        nargs=3,
+        type=float)
+
+    parser_append_interstitial.set_defaults(func=append_interstitial_to_supercell_info)
 
     # -- calc_results ------------------------------------------------
     parser_calc_results = subparsers.add_parser(
