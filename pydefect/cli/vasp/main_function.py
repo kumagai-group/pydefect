@@ -108,6 +108,7 @@ def append_interstitial_to_supercell_info(args):
 
 def pop_interstitial_from_supercell_info(args):
     supercell_info = args.supercell_info.interstitials.pop(args.index - 1)
+    supercell_info.interstitials.pop(args.index - 1)
     supercell_info.to_json_file()
 
 
