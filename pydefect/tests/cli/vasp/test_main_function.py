@@ -135,7 +135,7 @@ def test_pop_interstitials(mocker):
 
     pop_interstitial_from_supercell_info(args)
     mock_si.interstitials.pop.assert_called_once_with(999)
-    mock_si.interstitials.pop.return_value.to_json_file.assert_called_once_with()
+    mock_si.to_json_file.assert_called_once_with()
 
 
 def test_make_defect_set(tmpdir, supercell_info):
