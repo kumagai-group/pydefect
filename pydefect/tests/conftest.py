@@ -6,6 +6,8 @@ from math import sqrt
 from pathlib import Path
 
 import pytest
+from pydefect.corrections.efnv_correction.efnv_correction import PotentialSite, \
+    ExtendedFnvCorrection
 from pydefect.defaults import defaults
 from pydefect.input_maker.supercell_info import Site, SupercellInfo, \
     Interstitial
@@ -263,3 +265,15 @@ def cubic_supercell_info_wo_int(mocker, cubic_supercell):
                          "Fm-3m", [[-2, 2, 2], [2, -2, 2], [2, 2, -2]], sites)
 
 
+@pytest.fixture
+def efnv_correction():
+    s1 = PotentialSite(specie="H", distance=1.999, potential=1.0, pc_potential=None)
+    s2 = PotentialSite(specie="He", distance=2.0001, potential=1.5, pc_potential=0.2)
+    s3 = PotentialSite(specie="He", distance=3.0, potential=2.0, pc_potential=0.3)
+
+    return ExtendedFnvCorrection(charge=10,
+                                 point_charge_correction=1.0,
+                                 defect_region_radius=2.0,
+                                 sites=[s1, s2, s3],
+                                 defect_coords=(0.0, 0.0, 0.0),
+                                 additional_correction=100)
