@@ -32,12 +32,12 @@ def make_efnv_correction(charge: int,
     structure_analyzer = DefectStructureAnalyzer(
         calc_results.structure, perfect_calc_results.structure)
     defect_coords = structure_analyzer.defect_center_coord
-    lattice = calc_results.structure.lattice.matrix
-    ewald = Ewald(lattice, dielectric_tensor, accuracy=accuracy)
+    lattice = calc_results.structure.lattice
+    ewald = Ewald(lattice.matrix, dielectric_tensor, accuracy=accuracy)
     point_charge_correction = \
         0.0 if not charge else - ewald.lattice_energy * charge ** 2
 
-    defect_region_radius = calc_max_sphere_radius(lattice)
+    defect_region_radius = calc_max_sphere_radius(lattice.matrix)
 
     sites = []
     for d, p in structure_analyzer.atom_mapping.items():
@@ -66,14 +66,14 @@ def make_efnv_correction(charge: int,
         defect_coords=tuple(defect_coords))
 
 
-def calc_max_sphere_radius(lattice) -> float:
+def calc_max_sphere_radius(lattice_matrix) -> float:
     """Calculate Maximum radius of a sphere fitting inside the unit cell.
 
     Calculate three distances between two parallel planes using
     (a_i x a_j) . a_k / |a_i . a_j| """
     distances = np.zeros(3, dtype=float)
     for i in range(3):
-        a_i_a_j = cross(lattice[i - 2], lattice[i - 1])
-        a_k = lattice[i]
+        a_i_a_j = cross(lattice_matrix[i - 2], lattice_matrix[i - 1])
+        a_k = lattice_matrix[i]
         distances[i] = abs(dot(a_i_a_j, a_k)) / norm(a_i_a_j)
     return max(distances) / 2.0
