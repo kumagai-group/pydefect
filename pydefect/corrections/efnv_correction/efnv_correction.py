@@ -25,7 +25,7 @@ class ExtendedFnvCorrection(Correction):
     charge: int
     point_charge_correction: float
     defect_region_radius: float
-    sites: List["DefectSite"]
+    sites: List["PotentialSite"]
     additional_correction: float = 0.0
 
     @property
@@ -44,7 +44,7 @@ class ExtendedFnvCorrection(Correction):
 
 
 @dataclass
-class DefectSite(MSONable):
+class PotentialSite(MSONable):
     specie: str
     distance: float
     potential: float

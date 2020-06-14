@@ -8,7 +8,7 @@ from numpy.linalg import norm
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
 from pydefect.corrections.efnv_correction.efnv_correction import \
-    ExtendedFnvCorrection, DefectSite
+    ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.ewald import Ewald
 from pydefect.defaults import defaults
 
@@ -57,7 +57,7 @@ def make_efnv_correction(charge: int,
                 pc_potential = ewald.atomic_site_potential(rel_coord) * charge
                 pc_potential *= unit_conversion
 
-        sites.append(DefectSite(specie, distance, pot, pc_potential))
+        sites.append(PotentialSite(specie, distance, pot, pc_potential))
 
     return ExtendedFnvCorrection(
         charge=charge,

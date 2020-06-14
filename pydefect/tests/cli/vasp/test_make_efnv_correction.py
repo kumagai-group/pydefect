@@ -5,7 +5,7 @@ import numpy as np
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.cli.vasp.make_efnv_correction import \
     calc_max_sphere_radius, make_efnv_correction
-from pydefect.corrections.efnv_correction.efnv_correction import DefectSite
+from pydefect.corrections.efnv_correction.efnv_correction import PotentialSite
 from pymatgen import IStructure, Lattice
 
 
@@ -38,10 +38,10 @@ def test_make_efnv_correction(mocker):
     assert efnvc.charge == 2
     assert efnvc.point_charge_correction == -4e3 * unit_conversion
     assert efnvc.defect_region_radius == 5.0
-    assert efnvc.sites == [DefectSite("He", 5 * np.sqrt(2), 10.0, 2e4 * unit_conversion),
-                           DefectSite("He", 5 * np.sqrt(2), 20.0, 2e4 * unit_conversion),
-                           DefectSite("He", 5 * np.sqrt(2), 30.0, 2e4 * unit_conversion),
-                           DefectSite("Li", 5.0, 40.0, None),
+    assert efnvc.sites == [PotentialSite("He", 5 * np.sqrt(2), 10.0, 2e4 * unit_conversion),
+                           PotentialSite("He", 5 * np.sqrt(2), 20.0, 2e4 * unit_conversion),
+                           PotentialSite("He", 5 * np.sqrt(2), 30.0, 2e4 * unit_conversion),
+                           PotentialSite("Li", 5.0, 40.0, None),
                            ]
 
 
