@@ -12,7 +12,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
     make_calc_results, make_defect_formation_energy, make_defect_eigenvalues, \
     make_edge_characters, make_edge_states, make_refined_structure, \
-    append_interstitial_to_supercell_info
+    append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info
 from pydefect.defaults import defaults
 from pydefect.version import __version__
 from pymatgen import IStructure, Composition, Structure
@@ -205,6 +205,24 @@ def parse_args(args):
         type=float)
 
     parser_append_interstitial.set_defaults(func=append_interstitial_to_supercell_info)
+
+    # -- pop_interstitial ------------------------------------------------
+    parser_pop_interstitial = subparsers.add_parser(
+        name="pop",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['pi'])
+
+    parser_pop_interstitial.add_argument(
+        "-s", "--supercell_info",
+        required=True,
+        type=loadfn)
+    parser_pop_interstitial.add_argument(
+        "-i", "--index",
+        required=True,
+        type=int)
+
+    parser_pop_interstitial.set_defaults(func=pop_interstitial_from_supercell_info)
 
     # -- calc_results ------------------------------------------------
     parser_calc_results = subparsers.add_parser(

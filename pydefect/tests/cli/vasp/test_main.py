@@ -167,6 +167,22 @@ def test_append_interstitial(mocker):
     assert parsed_args == expected
 
 
+def test_pop_interstitial(mocker):
+
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main.loadfn")
+    mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
+    mock_loadfn.return_value = mock_supercell_info
+    parsed_args = parse_args(["pi",
+                              "-s", "supercell_info.json",
+                              "-i", "1000"])
+    expected = Namespace(
+        supercell_info=mock_supercell_info,
+        index=1000,
+        func=parsed_args.func,
+    )
+    assert parsed_args == expected
+
+
 def test_calc_results():
     parsed_args = parse_args(["cr", "-d", "Va_O1_0", "Va_O1_1"])
     expected = Namespace(
