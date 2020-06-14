@@ -21,6 +21,13 @@ def test_defect_energy_cross_points(defect_energy):
     assert actual == expected
 
 
+def test_defect_energy_str(defect_energy):
+    expected = """     Va_O1    0       4.0000       2.0000
+     Va_O1    1       2.0000       1.0000
+     Va_O1    2      -4.0000       0.0000"""
+    assert str(defect_energy) == expected
+
+
 @pytest.fixture
 def cross_points():
     inner_cross_points = [[2, 20], [3, 30], [4, 40]]
@@ -33,6 +40,15 @@ def test_cross_points(cross_points):
     assert cross_points.t_all_sorted_points == [[1, 2, 3, 4, 5], [10, 20, 30, 40, 50]]
     assert cross_points.t_inner_cross_points == [[2, 3, 4], [20, 30, 40]]
     assert cross_points.t_boundary_points == [[1, 5], [10, 50]]
+
+
+def test_cross_points_str(cross_points):
+    expected = """      1.0000      10.0000
+      2.0000      20.0000
+      3.0000      30.0000
+      4.0000      40.0000
+      5.0000      50.0000"""
+    assert str(cross_points) == expected
 
 
 def test_generate_defect_energies():

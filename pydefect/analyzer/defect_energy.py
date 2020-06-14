@@ -48,6 +48,12 @@ class DefectEnergy:
 
         return CrossPoints(inner_cross_points, boundary_points)
 
+    def __str__(self):
+        lines = []
+        for charge, energy, correction in zip(self.charges, self.energies, self.corrections):
+            lines.append(f"{self.name:>10} {charge:>4} {energy:12.4f} {correction:12.4f}")
+        return "\n".join(lines)
+
 
 @dataclass
 class CrossPoints:
@@ -70,6 +76,12 @@ class CrossPoints:
     @property
     def t_boundary_points(self):
         return np.transpose(np.array(self.boundary_points)).tolist()
+
+    def __str__(self):
+        lines = []
+        for point in self.all_sorted_points:
+            lines.append(f"{point[0]:12.4f} {point[1]:12.4f}")
+        return "\n".join(lines)
 
 
 def make_defect_energies(single_energies: List[SingleDefectEnergy]
