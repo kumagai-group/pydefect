@@ -9,7 +9,7 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection, DefectSite
-from pydefect.corrections.efnv_correction.ewald import Ewald
+from pydefect.corrections.ewald import Ewald
 from pydefect.defaults import defaults
 
 

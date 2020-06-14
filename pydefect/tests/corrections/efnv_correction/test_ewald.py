@@ -4,10 +4,9 @@
 import numpy as np
 import pytest
 from numpy import pi, sqrt, exp, cos
-from scipy.special import erfc
-
-from pydefect.corrections.efnv_correction.ewald import Ewald
+from pydefect.corrections.ewald import Ewald
 from pydefect.tests.helpers.assertion import assert_msonable
+from scipy.special import erfc
 
 
 @pytest.fixture
@@ -65,7 +64,7 @@ def test_ewald_lattice_set(ewald):
 
 
 def test_ewald_real(ewald, mocker):
-    mock = mocker.patch("pydefect.corrections.efnv_correction.ewald.Ewald.r_lattice_set")
+    mock = mocker.patch("pydefect.corrections.ewald.Ewald.r_lattice_set")
     mock.return_value = np.array([[-2, -2, -2]])
     root_r_inv_epsilon_r = sqrt(2 / 3 * 2 * 3)
     actual = ewald.ewald_real(include_self=False, shift=[0, 0, 0])
@@ -74,7 +73,7 @@ def test_ewald_real(ewald, mocker):
 
 
 def test_ewald_rec(ewald, mocker):
-    mock = mocker.patch("pydefect.corrections.efnv_correction.ewald.Ewald.g_lattice_set")
+    mock = mocker.patch("pydefect.corrections.ewald.Ewald.g_lattice_set")
     mock.return_value = np.array([[2, 2, 2]])
     g_epsilon_g = 2 * 3 * 2 * 3
     actual = ewald.ewald_rec([0.2, 0.2, 0.2])
