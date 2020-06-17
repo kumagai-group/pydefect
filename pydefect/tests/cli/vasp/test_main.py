@@ -132,7 +132,7 @@ def test_defect_set_w_options():
                               "-d", "Li",
                               "-k", "Li_H1", "Va_H1_0"])
     expected = Namespace(
-        oxi_states=["He", "1"],
+        oxi_states=["He", 1],
         dopants=["Li"],
         kwargs=["Li_H1", "Va_H1_0"],
         func=parsed_args.func,

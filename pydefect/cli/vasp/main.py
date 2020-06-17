@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from monty.serialization import loadfn
+from pydefect.cli.main_tools import str_int_to_int
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
@@ -162,7 +163,7 @@ def parse_args(args):
     parser_defect_set.add_argument(
         "-o", "--oxi_states",
         nargs="+",
-        type=str)
+        type=str_int_to_int)
     parser_defect_set.add_argument(
         "-d", "--dopants",
         nargs="+",
