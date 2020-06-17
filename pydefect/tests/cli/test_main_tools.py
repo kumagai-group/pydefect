@@ -3,7 +3,7 @@
 
 import pytest
 
-from pydefect.cli.main_tools import sanitize_matrix
+from pydefect.cli.main_tools import sanitize_matrix, str_int_to_int
 
 
 def test_sanitize_matrix_9_input_values():
@@ -27,6 +27,12 @@ def test_sanitize_matrix_1_input_value():
 def test_sanitize_matrix_raise_error_for_improper_matrix_element_length():
     with pytest.raises(ValueError):
          sanitize_matrix([1, 4])
+
+
+def test_str_int_to_int():
+    assert str_int_to_int("a") == "a"
+    assert str_int_to_int("1") == 1
+    assert str_int_to_int("1.1") == "1.1"
 
 
 """

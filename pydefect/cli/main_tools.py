@@ -21,3 +21,10 @@ def sanitize_matrix(matrix: List[int]) -> List[List[int]]:
         return result.tolist()
     else:
         raise ValueError(f"Matrix element length {len(matrix)} is improper.")
+
+
+def str_int_to_int(x):
+    try:
+        return int(x)
+    except ValueError:
+        return x
