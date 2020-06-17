@@ -141,14 +141,15 @@ def test_pop_interstitials(mocker):
 def test_make_defect_set(tmpdir, supercell_info):
     tmpdir.chdir()
     supercell_info.to_json_file()
-    args = Namespace(oxi_states={"He": 1}, dopants=["Li"], kwargs=["Li_H1", "Va_He1", "Va_H1_-1"])
+    args = Namespace(oxi_states=["He", 1, "Li", 1], dopants=["Li"], kwargs=["Li_H1", "Va_He1", "Va_H1_-1"])
     make_defect_set(args)
 
     simple_defects = {SimpleDefect(None, "He1", [-1, 0, 1]),
                       SimpleDefect(None, "H1", [-1]),
                       SimpleDefect("Li", "H1", [0]),
                       }
-    assert DefectSet.from_yaml() == DefectSet(defects=simple_defects)
+    DefectSet(defects=simple_defects).to_yaml("expected.yaml")
+    assert Path("defect_in.yaml").read_text() == Path("expected.yaml").read_text()
 
 
 def test_make_defect_entries(tmpdir, supercell_info):

@@ -114,8 +114,9 @@ def pop_interstitial_from_supercell_info(args):
 
 def make_defect_set(args):
     supercell_info = loadfn("supercell_info.json")
+    oxi_states = dict(zip(args.oxi_states[::2], args.oxi_states[1::2]))
     maker = DefectSetMaker(supercell_info,
-                           args.oxi_states,
+                           oxi_states,
                            args.dopants,
                            keywords=args.kwargs)
     maker.defect_set.to_yaml()
