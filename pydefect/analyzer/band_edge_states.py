@@ -27,6 +27,11 @@ class EdgeState(MSONable, ExtendedEnum):
     def is_shallow(self):
         return self in [self.acceptor_phs, self.donor_phs]
 
+    def as_dict(self):
+        return {"@module": self.__class__.__module__,
+                "@class": self.__class__.__name__,
+                "value": self.value}
+
 
 @dataclass
 class BandEdgeStates(MSONable, ToJsonFileMixIn):
