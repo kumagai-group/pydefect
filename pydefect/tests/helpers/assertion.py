@@ -14,7 +14,6 @@ def assert_msonable(obj):
 
 def assert_json_roundtrip(obj, tmpdir):
     tmpdir.chdir()
-    print(tmpdir)
     obj.to_json_file("a.json")
     actual = loadfn("a.json")
     assert actual.as_dict() == obj.as_dict()
