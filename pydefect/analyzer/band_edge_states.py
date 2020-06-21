@@ -16,15 +16,6 @@ class BandEdgeEigenvalues(MSONable, ToJsonFileMixIn):
     lowest_band_index: int
 
 
-@dataclass
-class BandEdgeStates(MSONable, ToJsonFileMixIn):
-    states: List["EdgeState"]  # by spin.
-
-    @property
-    def is_shallow(self):
-        return any([s.is_shallow for s in self.states])
-
-
 class EdgeState(MSONable, ExtendedEnum):
     donor_phs = "Donor PHS"
     acceptor_phs = "Acceptor PHS"
@@ -35,6 +26,15 @@ class EdgeState(MSONable, ExtendedEnum):
     @property
     def is_shallow(self):
         return self in [self.acceptor_phs, self.donor_phs]
+
+
+@dataclass
+class BandEdgeStates(MSONable, ToJsonFileMixIn):
+    states: List[EdgeState]  # by spin.
+
+    @property
+    def is_shallow(self):
+        return any([s.is_shallow for s in self.states])
 
 
 class EdgeCharacters(Sequence, MSONable, ToJsonFileMixIn):
