@@ -223,7 +223,7 @@ def test_make_refined_structure(tmpdir, mocker, simple_cubic):
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")
 
     mock.assert_called_once_with(mock_calc_results.structure, 0,
-                                 mock_defect_entry.structure[0].frac_coords)
+                                 mock_defect_entry.anchor_atom_coords)
 
     assert Path("ref_Va_O1_2/INCAR").read_text() == "1"
     assert Path("ref_Va_O1_2/POTCAR").read_text() == "1"
