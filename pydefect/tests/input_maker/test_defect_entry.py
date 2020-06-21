@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from pathlib import Path
 
+import numpy as np
 import pytest
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.tests.helpers.assertion import assert_json_roundtrip, \
@@ -49,7 +50,8 @@ def test_anchor_atom_index(defect_entry):
 
 
 def test_anchor_atom_coords(defect_entry):
-    assert defect_entry.anchor_atom_coords == [0.5, 0.5, 0.5]
+    np.testing.assert_array_almost_equal(defect_entry.anchor_atom_coords,
+                                         np.array([0.5, 0.5, 0.5]))
 
 
 def test_msonable(defect_entry):
