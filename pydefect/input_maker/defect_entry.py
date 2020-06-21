@@ -2,7 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, List
 
 import numpy as np
 import yaml
@@ -31,6 +31,10 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
         all_coords = self.structure.frac_coords
         dist_set = lattice.get_all_distances(self.defect_center, all_coords)[0]
         return int(np.argmax(dist_set))
+
+    @property
+    def anchor_atom_coords(self) -> List[float]:
+        return self.structure[self.anchor_atom_index].frac_coords.tolist()
 
     @property
     def perturbed_site_indices(self):

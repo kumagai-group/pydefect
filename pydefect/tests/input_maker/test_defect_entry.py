@@ -3,11 +3,10 @@
 from pathlib import Path
 
 import pytest
-from pymatgen import IStructure, Lattice
-
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.tests.helpers.assertion import assert_json_roundtrip, \
     assert_msonable
+from pymatgen import IStructure, Lattice
 
 # "H" at [0.0, 0.0, 0.0] is removed here.
 coords = \
@@ -47,6 +46,10 @@ def test_full_name(defect_entry):
 
 def test_anchor_atom_index(defect_entry):
     assert defect_entry.anchor_atom_index == 6
+
+
+def test_anchor_atom_coords(defect_entry):
+    assert defect_entry.anchor_atom_coords == [0.5, 0.5, 0.5]
 
 
 def test_msonable(defect_entry):
