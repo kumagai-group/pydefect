@@ -19,7 +19,6 @@ class BandEdgeEigenvalues(MSONable, ToJsonFileMixIn):
 @dataclass
 class BandEdgeStates(MSONable, ToJsonFileMixIn):
     states: List["EdgeState"]  # by spin.
-    method: str = None
 
     @property
     def is_shallow(self):

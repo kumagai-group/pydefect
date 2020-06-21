@@ -26,14 +26,12 @@ def test_band_edge_eigenvalues_to_json_file(band_edge_eigenvalues, tmpdir):
 
 @pytest.fixture
 def band_edge_states():
-    return BandEdgeStates([EdgeState.donor_phs, EdgeState.no_in_gap],
-                          method="manual")
+    return BandEdgeStates([EdgeState.donor_phs, EdgeState.no_in_gap])
 
 
 def test_band_edge_states_is_shallow(band_edge_states):
     assert band_edge_states.is_shallow is True
-    actual = BandEdgeStates([EdgeState.in_gap_state, EdgeState.no_in_gap],
-                            method="manual")
+    actual = BandEdgeStates([EdgeState.in_gap_state, EdgeState.no_in_gap])
     assert actual.is_shallow is False
 
 
