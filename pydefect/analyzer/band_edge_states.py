@@ -28,7 +28,7 @@ class EdgeState(MSONable, ExtendedEnum):
         return self in [self.acceptor_phs, self.donor_phs]
 
     def as_dict(self):
-        return {"@module": self.__class__.__module__,
+        return {"@module": "pydefect.analyzer.band_edge_states",
                 "@class": self.__class__.__name__,
                 "value": self.value}
 
