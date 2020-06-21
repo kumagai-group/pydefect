@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import numpy as np
+from numpy.linalg import inv
 from pydefect.defaults import defaults
 from pydefect.util.structure_tools import Distances
 from pymatgen import IStructure, Structure
@@ -97,8 +98,18 @@ def symmetrize_defect_structure(structure: IStructure,
                                 anchor_atom_idx: int,
                                 anchor_atom_coord: np.ndarray) -> Structure:
     ss = StructureSymmetrizer(structure, defaults.symmetry_length_tolerance)
-    result = ss.primitive.copy()
-    offset = result[anchor_atom_idx].frac_coords - anchor_atom_coord
-    result.translate_sites(list(range(len(structure))), offset)
+    result = structure.copy()
+
+    origin_shift = ss.spglib_sym_data["origin_shift"]
+    inv_trans_mat = inv(ss.spglib_sym_data["transformation_matrix"])
+    coords = ss.spglib_sym_data["std_positions"]
+    new_coords = []
+    for i in range(len(result)):
+        new_coords.append(np.dot(inv_trans_mat, (coords[i] - origin_shift)))
+
+    offset = new_coords[anchor_atom_idx] - anchor_atom_coord
+    new_coords = np.array(new_coords) - offset
+    for i, coords in zip(result, new_coords):
+        i.frac_coords = coords % 1
     return result
 
