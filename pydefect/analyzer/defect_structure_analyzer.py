@@ -6,8 +6,10 @@ from numpy.linalg import inv
 from pydefect.defaults import defaults
 from pydefect.util.structure_tools import Distances
 from pymatgen import IStructure, Structure
+from vise.util.logger import get_logger
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
+logger = get_logger(__name__)
 
 class DefectStructureAnalyzer:
     def __init__(self,
@@ -99,6 +101,8 @@ def symmetrize_defect_structure(structure: IStructure,
                                 anchor_atom_coord: np.ndarray) -> Structure:
     ss = StructureSymmetrizer(structure, defaults.symmetry_length_tolerance)
     result = structure.copy()
+
+    logger.info(f"The symmetry is {ss.point_group}")
 
     origin_shift = ss.spglib_sym_data["origin_shift"]
     inv_trans_mat = inv(ss.spglib_sym_data["transformation_matrix"])
