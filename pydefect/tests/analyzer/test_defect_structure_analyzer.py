@@ -194,3 +194,38 @@ Direct
     0.499815  0.249456  0.718626
     0.250897  0.717616  0.500086""")
     assert actual == expected
+
+
+def test_symmetrize_defect_structure_wo_anchor():
+    structure = Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
+1.00000000000000
+5 0 0
+0 5 0
+0 0 5
+Mg   O
+4     3
+Direct
+0.01 0.01 0.01
+0.01 0.51 0.51
+0.51 0.01 0.51
+0.51 0.51 0.01
+0.51 0.51 0.51
+0.01 0.01 0.51
+0.01 0.51 0.01""")
+    actual = symmetrize_defect_structure(structure=structure)
+    expected = Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
+1.00000000000000
+5 0 0
+0 5 0
+0 0 5
+Mg   O
+4     3
+Direct
+0.01 0.01 0.01
+0.01 0.51 0.51
+0.51 0.01 0.51
+0.51 0.51 0.01
+0.51 0.51 0.51
+0.01 0.01 0.51
+0.01 0.51 0.01""")
+    assert actual == expected

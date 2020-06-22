@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from typing import Optional
 
 import numpy as np
 from numpy.linalg import inv
@@ -10,6 +11,7 @@ from vise.util.logger import get_logger
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 logger = get_logger(__name__)
+
 
 class DefectStructureAnalyzer:
     def __init__(self,
@@ -97,8 +99,9 @@ class DefectStructureAnalyzer:
 
 
 def symmetrize_defect_structure(structure: IStructure,
-                                anchor_atom_idx: int,
-                                anchor_atom_coord: np.ndarray) -> Structure:
+                                anchor_atom_idx: Optional[int] = None,
+                                anchor_atom_coord: Optional[np.ndarray] = None
+                                ) -> Structure:
     ss = StructureSymmetrizer(structure, defaults.symmetry_length_tolerance)
     result = structure.copy()
 
@@ -111,7 +114,10 @@ def symmetrize_defect_structure(structure: IStructure,
     for i in range(len(result)):
         new_coords.append(np.dot(inv_trans_mat, (coords[i] - origin_shift)))
 
-    offset = new_coords[anchor_atom_idx] - anchor_atom_coord
+    if anchor_atom_idx:
+        offset = new_coords[anchor_atom_idx] - anchor_atom_coord
+    else:
+        offset = np.array([0.0]*3)
     new_coords = np.array(new_coords) - offset
     for i, coords in zip(result, new_coords):
         i.frac_coords = coords % 1
