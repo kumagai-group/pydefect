@@ -260,7 +260,7 @@ def parse_args(args):
     parser_eig = subparsers.add_parser(
         name="eig",
         description="",
-        parents=[dirs_parser, pcr_parser, unitcell_parser],
+        parents=[dirs_parser, pcr_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['eig'])
 

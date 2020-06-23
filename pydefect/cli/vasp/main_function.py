@@ -185,7 +185,6 @@ def make_efnv_correction_from_vasp(args):
 
 
 def make_defect_eigenvalues(args):
-    vbm, cbm = args.unitcell.vbm, args.unitcell.cbm
     supercell_vbm = args.perfect_calc_results.vbm
     supercell_cbm = args.perfect_calc_results.cbm
     for d in args.dirs:
@@ -193,10 +192,11 @@ def make_defect_eigenvalues(args):
         defect_entry = loadfn(d / "defect_entry.json")
         title = defect_entry.name
         vasprun = Vasprun(d / defaults.vasprun)
-        band_edge_eigenvalues = make_band_edge_eigenvalues(vasprun, vbm, cbm)
+        band_edge_eigenvalues = make_band_edge_eigenvalues(
+            vasprun, supercell_vbm, supercell_cbm)
         band_edge_eigenvalues.to_json_file(d / "band_edge_eigenvalues.json")
-        plotter = EigenvaluePlotter(title, band_edge_eigenvalues, supercell_vbm,
-                                    supercell_cbm)
+        plotter = EigenvaluePlotter(
+            title, band_edge_eigenvalues, supercell_vbm, supercell_cbm)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "eigenvalues.pdf")
         plotter.plt.clf()

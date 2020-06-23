@@ -228,25 +228,20 @@ def test_efnv_correction(mocker):
 
 def test_defect_eigenvalues(mocker):
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
-    mock_unitcell = mocker.Mock(spec=Unitcell, autospec=True)
 
     def side_effect(filename):
         if filename == "perfect/calc_results.json":
             return mock_calc_results
-        elif filename == "unitcell.json":
-            return mock_unitcell
         else:
             raise ValueError
 
     mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
     parsed_args = parse_args(["eig",
                               "-d", "Va_O1_0", "Va_O1_1",
-                              "-pcr", "perfect/calc_results.json",
-                              "-u", "unitcell.json"])
+                              "-pcr", "perfect/calc_results.json"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         perfect_calc_results=mock_calc_results,
-        unitcell=mock_unitcell,
         func=parsed_args.func)
     assert parsed_args == expected
 

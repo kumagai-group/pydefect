@@ -273,10 +273,6 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
 def test_make_defect_eigenvalues(mocker):
     mock_vasprun = mocker.patch("pydefect.cli.vasp.main_function.Vasprun")
 
-    mock_unitcell = mocker.Mock(spec=Unitcell)
-    mock_unitcell.vbm = 11
-    mock_unitcell.cbm = 19
-
     mock_make_eigvals = mocker.patch(
         "pydefect.cli.vasp.main_function.make_band_edge_eigenvalues")
 
@@ -301,12 +297,11 @@ def test_make_defect_eigenvalues(mocker):
                                side_effect=side_effect)
 
     args = Namespace(dirs=[Path("Va_O1_2")],
-                     perfect_calc_results=mock_perfect_calc_results,
-                     unitcell=mock_unitcell)
+                     perfect_calc_results=mock_perfect_calc_results)
     make_defect_eigenvalues(args)
 
     mock_vasprun.assert_called_with(Path("Va_O1_2") / defaults.vasprun)
-    mock_make_eigvals.assert_called_with(mock_vasprun.return_value, 11, 19)
+    mock_make_eigvals.assert_called_with(mock_vasprun.return_value, 10, 20)
     mock_make_eigvals.return_value.to_json_file.assert_called_with(
         Path("Va_O1_2") / "band_edge_eigenvalues.json")
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
