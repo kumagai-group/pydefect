@@ -33,4 +33,5 @@ def make_band_edge_eigenvalues(vasprun: Vasprun, vbm: float, cbm: float):
 
     return BandEdgeEigenvalues(energies_and_occupations=e_and_occu,
                                kpt_coords=kpt_coords,
-                               lowest_band_index=lower_idx)
+                               # need to convert numpy.int64 to int for mongoDB.
+                               lowest_band_index=int(lower_idx))
