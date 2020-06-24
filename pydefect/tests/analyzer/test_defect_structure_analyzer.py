@@ -229,3 +229,6 @@ Direct
 0.01 0.01 0.51
 0.01 0.51 0.01""")
     assert actual == expected
+
+    with pytest.raises(AssertionError):
+        symmetrize_defect_structure(structure=structure, point_group="1")

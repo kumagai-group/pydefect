@@ -100,9 +100,12 @@ class DefectStructureAnalyzer:
 
 def symmetrize_defect_structure(structure: IStructure,
                                 anchor_atom_idx: Optional[int] = None,
-                                anchor_atom_coord: Optional[np.ndarray] = None
-                                ) -> Structure:
+                                anchor_atom_coord: Optional[np.ndarray] = None,
+                                point_group: Optional[str] = None) -> Structure:
     ss = StructureSymmetrizer(structure, defaults.symmetry_length_tolerance)
+    if point_group and ss.point_group != point_group:
+        raise AssertionError("point group is different from the given one.")
+
     result = structure.copy()
 
     logger.info(f"The symmetry is {ss.point_group}")
