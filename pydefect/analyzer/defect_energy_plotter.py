@@ -76,8 +76,8 @@ class DefectEnergyPlotter:
         self._set_labels()
         self._set_title()
         self._set_formatter()
-        self.plt.tight_layout()
         self.plt.gca().legend(bbox_to_anchor=(1, 0.5), loc='center left')
+        self.plt.tight_layout()
 
     def _add_energies(self):
         for de in self._defect_energies:
