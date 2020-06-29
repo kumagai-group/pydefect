@@ -2,10 +2,9 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import numpy as np
 import pytest
-from pymatgen import Lattice
-
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pydefect.util.error_classes import NotPrimitiveError
+from pymatgen import Lattice, Structure
 
 
 def test_create_supercell_tetragonal(tetra_close_to_cubic):
@@ -51,6 +50,34 @@ def test_create_supercell_generate_supercell_info(simple_cubic):
     assert info.transform_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
     assert info.sites["H1"].wyckoff_letter == "a"
     assert info.sites["H1"].equivalent_atoms == list(range(8))
+
+
+def test_spglib_cyclic_behavior():
+    structure = Structure.from_str("""Ca4 Sc2 Sb2 O12
+1.0
+5.469740 0.000000 0.000000
+0.000000 5.632621 0.000000
+-5.467914 0.000000 7.830251
+O
+12
+direct
+0.344251 0.197893 0.550856 O
+0.344251 0.302107 0.050856 O
+0.655749 0.802107 0.449144 O
+0.655749 0.697893 0.949144 O
+0.752694 0.208674 0.946720 O
+0.752694 0.291326 0.446720 O
+0.247306 0.791326 0.053280 O
+0.247306 0.708674 0.553280 O
+0.144882 0.034671 0.743977 O
+0.144882 0.465329 0.243977 O
+0.855118 0.965329 0.256023 O
+0.855118 0.534671 0.756023 O
+""", fmt="POSCAR")
+
+    sm = SupercellMaker(structure)
+    assert sm.conv_structure == structure
+
 
 """
 TODO
