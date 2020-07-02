@@ -9,9 +9,9 @@ import numpy as np
 from pydefect.input_maker.supercell import Supercell, TetragonalSupercells, \
     Supercells
 from pydefect.input_maker.supercell_info import SupercellInfo, Site
-from pydefect.util.centering import Centering
 from pydefect.util.error_classes import NotPrimitiveError, SupercellError
 from pymatgen import IStructure
+from vise.util.centering import Centering
 from vise.util.logger import get_logger
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
@@ -26,12 +26,10 @@ class SupercellMaker:
 
         symmetrizer = StructureSymmetrizer(input_structure)
         if input_structure.lattice != symmetrizer.primitive.lattice:
-            symmetrizer = StructureSymmetrizer(symmetrizer.primitive)
-            if input_structure.lattice != symmetrizer.primitive.lattice:
-                logger.warning(
-                    f"Input structure: {input_structure}",
-                    f"Primitive structure:{symmetrizer.primitive}")
-                raise NotPrimitiveError
+            logger.warning(
+                f"Input structure: {input_structure}",
+                f"Primitive structure:{symmetrizer.primitive}")
+            raise NotPrimitiveError
 
         self.sg = symmetrizer.sg_number
         self.sg_symbol = symmetrizer.spglib_sym_data["international"]
