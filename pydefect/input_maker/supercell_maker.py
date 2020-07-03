@@ -64,25 +64,7 @@ class SupercellMaker:
         if symmetrizer.sg_number != self.sg:
             raise SupercellError
 
-        wyckoffs = symmetrizer.spglib_sym_data["wyckoffs"]
-        equivalent_atoms = symmetrizer.spglib_sym_data["equivalent_atoms"]
-        site_symmetries = symmetrizer.spglib_sym_data["site_symmetry_symbols"]
-
-        equiv_indices = sorted(enumerate(equivalent_atoms), key=lambda x: x[1])
-        sites = {}
-        element_idx_dict = defaultdict(int)
-
-        for _, equiv_sites in groupby(equiv_indices, lambda x: x[1]):
-            equiv_site_list = list(equiv_sites)
-            repr_idx = equiv_site_list[0][0]
-            element = self.supercell.structure[repr_idx].specie.name
-            element_idx_dict[element] += 1
-            index = str(element_idx_dict[str(element)])
-            name = element + index
-            sites[name] = Site(element=element,
-                               wyckoff_letter=wyckoffs[repr_idx],
-                               site_symmetry=site_symmetries[repr_idx],
-                               equivalent_atoms=[s[0] for s in equiv_site_list])
+        sites = create_sites(symmetrizer)
 
         self.supercell_info = SupercellInfo(self.supercell.structure,
                                             self.sg_symbol,
@@ -93,3 +75,24 @@ class SupercellMaker:
     def transform_matrix(self):
         matrix = np.dot(self.conv_trans_mat, self.supercell.matrix).astype(int)
         return matrix.tolist()
+
+
+def create_sites(symmetrizer: StructureSymmetrizer):
+    wyckoffs = symmetrizer.spglib_sym_data["wyckoffs"]
+    equivalent_atoms = symmetrizer.spglib_sym_data["equivalent_atoms"]
+    site_symmetries = symmetrizer.spglib_sym_data["site_symmetry_symbols"]
+    equiv_indices = sorted(enumerate(equivalent_atoms), key=lambda x: x[1])
+    sites = {}
+    element_idx_dict = defaultdict(int)
+    for _, equiv_sites in groupby(equiv_indices, lambda x: x[1]):
+        equiv_site_list = list(equiv_sites)
+        repr_idx = equiv_site_list[0][0]
+        element = symmetrizer.structure[repr_idx].specie.name
+        element_idx_dict[element] += 1
+        index = str(element_idx_dict[str(element)])
+        name = element + index
+        sites[name] = Site(element=element,
+                           wyckoff_letter=wyckoffs[repr_idx],
+                           site_symmetry=site_symmetries[repr_idx],
+                           equivalent_atoms=[s[0] for s in equiv_site_list])
+    return sites
