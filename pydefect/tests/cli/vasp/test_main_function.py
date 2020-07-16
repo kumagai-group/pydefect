@@ -283,7 +283,7 @@ def test_make_defect_eigenvalues(mocker):
     mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
 
     mock_eigval_plotter = mocker.patch(
-        "pydefect.cli.vasp.main_function.EigenvaluePlotter")
+        "pydefect.cli.vasp.main_function.EigenvalueMplPlotter")
 
     def side_effect(key):
         if str(key) == "Va_O1_2/defect_entry.json":

@@ -10,7 +10,7 @@ from pydefect.analyzer.defect_energy import make_defect_energies
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer, \
     symmetrize_defect_structure
-from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotter
+from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state
 from pydefect.analyzer.make_defect_energy import make_single_defect_energy
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo
@@ -195,7 +195,7 @@ def make_defect_eigenvalues(args):
         band_edge_eigenvalues = make_band_edge_eigenvalues(
             vasprun, supercell_vbm, supercell_cbm)
         band_edge_eigenvalues.to_json_file(d / "band_edge_eigenvalues.json")
-        plotter = EigenvaluePlotter(
+        plotter = EigenvalueMplPlotter(
             title, band_edge_eigenvalues, supercell_vbm, supercell_cbm)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "eigenvalues.pdf")

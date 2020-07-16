@@ -48,8 +48,6 @@ class EigenvaluePlotter:
                  supercell_cbm: float,
                  y_range: Optional[List[float]] = None,
                  y_unit: Optional[str] = "eV",
-                 mpl_defaults: Optional[EigenvalueMplSettings]
-                 = EigenvalueMplSettings()
                  ):
 
         self._title = title
@@ -62,7 +60,11 @@ class EigenvaluePlotter:
         self._y_range = y_range
         self._y_unit = y_unit
 
-        self._mpl_defaults = mpl_defaults
+
+class EigenvalueMplPlotter(EigenvaluePlotter):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._mpl_defaults = kwargs.get("mpl_defaults", EigenvalueMplSettings())
         self.plt = plt
 
         num_figure = len(self._energies_and_occupations)
