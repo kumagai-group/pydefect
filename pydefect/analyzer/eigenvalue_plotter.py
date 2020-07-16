@@ -68,7 +68,7 @@ class EigenvaluePlotter:
         else:
             return energy - lower_band_e > 0.2
 
-    def _x_labels(self):
+    def _x_labels(self, line_break="\n"):
         result = []
         for k in self._kpt_coords:
             x_label = []
@@ -78,7 +78,7 @@ class EigenvaluePlotter:
                     x_label.append("0")
                 else:
                     x_label.append(f"{frac.numerator}/{frac.denominator}")
-            result.append("\n".join(x_label))
+            result.append(line_break.join(x_label))
         return result
 
 
@@ -124,8 +124,9 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
                                          '<br><b>Energy</b>: %{y:.2f}',
                                          marker_color=color, name=name, **common),
                               row=1, col=spin_idx)
+
                 fig.update_xaxes(tickvals=list(range(len(self._kpt_coords))),
-                                 ticktext=self._x_labels(),
+                                 ticktext=self._x_labels(line_break="<br>"),
                                  tickfont_size=16,
                                  row=1, col=spin_idx)
         return fig
