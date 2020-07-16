@@ -252,7 +252,7 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
     mock_efnv = mocker.Mock(spec=ExtendedFnvCorrection, autospec=True)
     mock_make_efnv.return_value = mock_efnv
 
-    mock_pot_plotter = mocker.patch("pydefect.cli.vasp.main_function.SitePotentialPlotter")
+    mock_pot_plotter = mocker.patch("pydefect.cli.vasp.main_function.SitePotentialMplPlotter")
 
     args = Namespace(dirs=[Path("Va_O1_2")],
                      perfect_calc_results=mock_perfect_calc_results,

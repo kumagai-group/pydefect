@@ -26,7 +26,7 @@ from pydefect.cli.vasp.make_efnv_correction import \
 from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
 from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
 from pydefect.corrections.efnv_correction.site_potential_plotter import \
-    SitePotentialPlotter
+    SitePotentialMplPlotter
 from pydefect.defaults import defaults
 from pydefect.input_maker.add_interstitial import append_interstitial
 from pydefect.input_maker.defect_entries_maker import DefectEntriesMaker
@@ -178,7 +178,7 @@ def make_efnv_correction_from_vasp(args):
         efnv.to_json_file(d / "correction.json")
 
         title = defect_entry.full_name
-        plotter = SitePotentialPlotter(title, efnv)
+        plotter = SitePotentialMplPlotter(title, efnv)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "correction.pdf")
         plotter.plt.clf()

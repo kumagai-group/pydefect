@@ -53,9 +53,7 @@ class SitePotentialPlotter:
                  efnv_correction: ExtendedFnvCorrection,
                  x_unit: Optional[str] = "Å",
                  y_unit: Optional[str] = "V",
-                 mpl_defaults: Optional[PotentialPlotterMplSettings]
-                 = PotentialPlotterMplSettings()):
-
+                 **plot_setting):
         self._title = title
         self.sites = efnv_correction.sites
         self.defect_region_radius = efnv_correction.defect_region_radius
@@ -64,7 +62,12 @@ class SitePotentialPlotter:
         self._x_unit = x_unit
         self._y_unit = y_unit
 
-        self._mpl_defaults = mpl_defaults
+
+class SitePotentialMplPlotter(SitePotentialPlotter):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._mpl_defaults = kwargs.get("mpl_defaults",
+                                        PotentialPlotterMplSettings())
         self.plt = plt
 
     def construct_plot(self):
