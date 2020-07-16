@@ -7,7 +7,7 @@ from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import make_defect_energies
-from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotter
+from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer, \
     symmetrize_defect_structure
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotter
@@ -262,13 +262,13 @@ def make_defect_formation_energy(args):
             print("")
         return
 
-    plotter = DefectEnergyPlotter(title=title,
-                                  defect_energies=defect_energies,
-                                  vbm=args.unitcell.vbm,
-                                  cbm=args.unitcell.cbm,
-                                  supercell_vbm=args.perfect_calc_results.vbm,
-                                  supercell_cbm=args.perfect_calc_results.cbm,
-                                  y_range=args.y_range)
+    plotter = DefectEnergyMplPlotter(title=title,
+                                     defect_energies=defect_energies,
+                                     vbm=args.unitcell.vbm,
+                                     cbm=args.unitcell.cbm,
+                                     supercell_vbm=args.perfect_calc_results.vbm,
+                                     supercell_cbm=args.perfect_calc_results.cbm,
+                                     y_range=args.y_range)
 
     plotter.construct_plot()
     plotter.plt.savefig(f"energy_{args.label}.pdf")

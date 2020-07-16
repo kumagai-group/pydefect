@@ -3,6 +3,7 @@
 from itertools import cycle
 from typing import List, Optional
 
+import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from pydefect.analyzer.defect_energy import DefectEnergy
 from pydefect.defaults import defaults
@@ -50,9 +51,7 @@ class DefectEnergyPlotter:
                  y_range: Optional[List[float]] = None,
                  x_unit: Optional[str] = "eV",
                  y_unit: Optional[str] = "eV",
-                 mpl_defaults: Optional[DefectEnergiesMplSettings]
-                 = DefectEnergiesMplSettings()
-                 ):
+                 **plot_settings):
 
         self._title = title
         self._defect_energies = defect_energies
@@ -65,7 +64,38 @@ class DefectEnergyPlotter:
         self._x_unit = x_unit
         self._y_unit = y_unit
 
-        self._mpl_defaults = mpl_defaults
+
+class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
+    def construct_plotly_plot(self):
+        fig = go.Figure()
+
+        for de in self._defect_energies:
+            #            color = next(self._mpl_defaults.colors)
+            cp = de.cross_points(self._supercell_vbm, self._supercell_cbm)
+            x, y = cp.t_all_sorted_points
+            fig.add_trace(go.Scatter(x=x, y=y, name=de.name))
+            # fillcolor="blue",
+            # mode="markers",
+            # marker_size=10,
+            # opacity=0.7,
+            # showlegend=False),)
+            # self.plt.plot(*cp.t_all_sorted_points, color=color,
+            #               linewidth=self._mpl_defaults.line_width,
+            #               label=de.name)
+            # if cp.t_inner_cross_points:
+            #     self.plt.scatter(*cp.t_inner_cross_points, marker="o",
+            #                      color=color, s=self._mpl_defaults.circle_size)
+
+        fig["layout"]["xaxis"]["range"] = [self._vbm, self._cbm]
+
+        return fig
+
+
+class DefectEnergyMplPlotter(DefectEnergyPlotter):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._mpl_defaults = kwargs.get("mpl_defaults",
+                                        DefectEnergiesMplSettings())
         self.plt = plt
 
     def construct_plot(self):
