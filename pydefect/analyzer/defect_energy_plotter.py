@@ -66,7 +66,7 @@ class DefectEnergyPlotter:
 
 
 class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
-    def construct_plotly_plot(self):
+    def create_figure(self):
         fig = go.Figure()
 
         for de in self._defect_energies:

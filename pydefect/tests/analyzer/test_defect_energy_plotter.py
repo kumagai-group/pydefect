@@ -38,7 +38,7 @@ def test_defect_energies_mpl_actual_plot(defect_energy_plotters):
 
 def test_defect_energies_plotly_actual_plot(defect_energy_plotters):
     _, plotter = defect_energy_plotters
-    fig = plotter.construct_plotly_plot()
+    fig = plotter.create_figure()
     fig.show()
 
 """
