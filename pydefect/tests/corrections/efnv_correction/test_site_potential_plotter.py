@@ -2,15 +2,17 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from pathlib import Path
 
+import pytest
 from monty.serialization import loadfn
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.efnv_correction.site_potential_plotter import \
-    SitePotentialMplPlotter
+    SitePotentialMplPlotter, SitePotentialPlotlyPlotter
 
 
-def test_site_potential_plotter_with_simple_example():
-    efnv_cor = ExtendedFnvCorrection(
+@pytest.fixture
+def efnv_cor():
+    return ExtendedFnvCorrection(
         charge=1,
         point_charge_correction=0.0,
         defect_region_radius=2.8,
@@ -20,8 +22,11 @@ def test_site_potential_plotter_with_simple_example():
             PotentialSite(specie="He", distance=3.0, potential=-2,
                           pc_potential=-3),
             PotentialSite(specie="He", distance=4.0, potential=-1, pc_potential=-2)
-                                     ],
+        ],
         defect_coords=(0.0, 0.0, 0.0))
+
+
+def test_site_potential_plotter_with_simple_example(efnv_cor):
     plotter = SitePotentialMplPlotter(title="ZnO Va_O1_2",
                                       efnv_correction=efnv_cor)
     plotter.construct_plot()
@@ -35,3 +40,8 @@ def test_site_potential_plotter_with_actual_file():
     plotter.construct_plot()
     plotter.plt.show()
 
+
+def test_defect_energies_plotly_actual_plot(efnv_cor):
+    fig = SitePotentialPlotlyPlotter(title="ZnO Va_O1_2",
+                                     efnv_correction=efnv_cor).create_figure()
+    fig.show()

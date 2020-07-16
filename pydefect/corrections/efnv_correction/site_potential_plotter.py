@@ -3,6 +3,7 @@
 from itertools import groupby, cycle
 from typing import Optional, List
 
+import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
@@ -61,6 +62,61 @@ class SitePotentialPlotter:
 
         self._x_unit = x_unit
         self._y_unit = y_unit
+
+
+class SitePotentialPlotlyPlotter(SitePotentialPlotter):
+    def create_figure(self):
+        common = {"mode": "markers", "marker_size": 15}
+        fig = go.Figure()
+        all_distances = []
+        pc_pot_distances = []
+        all_potentials = []
+        pc_potentials = []
+        potential_diffs = []
+        for _, grouped_sites in groupby(self.sites, key=lambda x: x.specie):
+            distances = []
+            potentials = []
+            for site in grouped_sites:
+                distances.append(site.distance)
+                all_distances.append(site.distance)
+                all_potentials.append(site.potential)
+                potentials.append(site.potential)
+
+                if site.pc_potential:
+                    pc_pot_distances.append(site.distance)
+                    pc_potentials.append(site.pc_potential)
+                    potential_diffs.append(site.diff_pot)
+
+            fig.add_trace(go.Scatter(x=distances, y=potentials,
+                                     name=site.specie,
+                                     marker_symbol="circle",
+                                     **common))
+
+        min_y = min(all_potentials + pc_potentials + potential_diffs) - 0.4
+        max_y = max(all_potentials + pc_potentials + potential_diffs) + 0.4
+        max_x = max(all_distances) + 0.4
+        fig.add_shape(dict(type="line",
+                           x0=self.defect_region_radius,
+                           x1=self.defect_region_radius,
+                           y0=min_y, y1=max_y,
+                           line=dict(color="royalblue", width=1.5, dash="dot")))
+        fig["layout"]["xaxis"]["range"] = [0, max_x]
+        fig["layout"]["yaxis"]["range"] = [min_y, max_y]
+
+        fig.add_trace(go.Scatter(x=pc_pot_distances, y=pc_potentials,
+                                 name="PC potential", marker_symbol="diamond",
+                                 **common))
+        fig.add_trace(go.Scatter(x=pc_pot_distances, y=potential_diffs,
+                                 name="Potential diff", marker_symbol="cross",
+                                 **common))
+
+        fig.add_shape(dict(type="line",
+                           x0=self.defect_region_radius, x1=max_x,
+                           y0=self.ave_pot_diff, y1=self.ave_pot_diff,
+                           line=dict(color="red", width=1.5, dash="dot"),
+                           name="alignment"))
+
+        return fig
 
 
 class SitePotentialMplPlotter(SitePotentialPlotter):
