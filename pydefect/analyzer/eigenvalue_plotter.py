@@ -4,7 +4,9 @@ from fractions import Fraction
 from itertools import cycle
 from typing import Optional, List
 
+import plotly.graph_objects as go
 from matplotlib import pyplot as plt
+from plotly.subplots import make_subplots
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues
 from pydefect.defaults import defaults
 from vise.util.matplotlib import float_to_int_formatter
@@ -60,6 +62,74 @@ class EigenvaluePlotter:
         self._y_range = y_range
         self._y_unit = y_unit
 
+    def _add_band_idx(self, energy, higher_band_e, lower_band_e):
+        if energy < self._middle:
+            return higher_band_e - energy > 0.2
+        else:
+            return energy - lower_band_e > 0.2
+
+    def _x_labels(self):
+        result = []
+        for k in self._kpt_coords:
+            x_label = []
+            for i in k:
+                frac = Fraction(i).limit_denominator(10)
+                if frac.numerator == 0:
+                    x_label.append("0")
+                else:
+                    x_label.append(f"{frac.numerator}/{frac.denominator}")
+            result.append("\n".join(x_label))
+        return result
+
+
+class EigenvaluePlotlyPlotter(EigenvaluePlotter):
+    def create_figure(self):
+        fig = make_subplots(rows=1,
+                            cols=2,
+                            shared_yaxes=True,
+                            horizontal_spacing=0.01,
+                            subplot_titles=["up", "down"],
+                            x_title="K-points",
+                            y_title="Energy (eV)")
+
+        common = {"mode": "markers", "marker_size": 10}
+
+        for spin_idx, eo_by_spin in enumerate(self._energies_and_occupations, 1):
+            occupied = [[], [], []]
+            partially_occupied = [[], [], []]
+            unoccupied = [[], [], []]
+            for kpt_idx, eo_by_k_idx in enumerate(eo_by_spin):
+                for band_idx, (energy, occup) in enumerate(eo_by_k_idx):
+#                    print(kpt_idx, energy)
+                    if occup > 0.9:
+                        occupied[0].append(kpt_idx)
+                        occupied[1].append(energy)
+                        occupied[2].append(band_idx)
+                    elif occup < 0.1:
+                        unoccupied[0].append(kpt_idx)
+                        unoccupied[1].append(energy)
+                        unoccupied[2].append(band_idx)
+                    else:
+                        partially_occupied[0].append(kpt_idx)
+                        partially_occupied[1].append(energy)
+                        partially_occupied[2].append(band_idx)
+            for points, color, name in \
+                    zip([occupied, partially_occupied, unoccupied],
+                        ["blue", "green", "red"],
+                        ["occupied", "partial", "unoccupied"]):
+                fig.add_trace(go.Scatter(x=points[0], y=points[1],
+                                         text=points[2],
+                                         hovertemplate=
+                                         '<i>band index</i>: %{text}' +
+                                         '<br><b>Energy</b>: %{y:.2f}',
+                                         marker_color=color, name=name, **common),
+                              row=1, col=spin_idx)
+                fig.update_xaxes(tickvals=list(range(len(self._kpt_coords))),
+                                 ticktext=self._x_labels(),
+                                 tickfont_size=16,
+                                 row=1, col=spin_idx)
+        return fig
+
 
 class EigenvalueMplPlotter(EigenvaluePlotter):
     def __init__(self, **kwargs):
@@ -82,7 +152,8 @@ class EigenvalueMplPlotter(EigenvaluePlotter):
         self.plt.tight_layout()
 
     def _add_eigenvalues(self):
-        for spin_idx, (eo_by_spin, ax) in enumerate(zip(self._energies_and_occupations, self.axs)):
+        for spin_idx, (eo_by_spin, ax) in \
+                enumerate(zip(self._energies_and_occupations, self.axs)):
             for kpt_idx, eo_by_k_idx in enumerate(eo_by_spin):
                 for band_idx, eo_by_band in enumerate(eo_by_k_idx):
                     energy, occup = eo_by_band
@@ -101,27 +172,10 @@ class EigenvalueMplPlotter(EigenvaluePlotter):
                                     va='center',
                                     fontsize=self._mpl_defaults.tick_label_size)
 
-    def _add_band_idx(self, energy, higher_band_e, lower_band_e):
-        if energy < self._middle:
-            return higher_band_e - energy > 0.2
-        else:
-            return energy - lower_band_e > 0.2
-
     def _add_xticks(self):
-        x_labels = []
-        for k in self._kpt_coords:
-            x_label = []
-            for i in k:
-                frac = Fraction(i).limit_denominator(10)
-                if frac.numerator == 0:
-                    x_label.append("0")
-                else:
-                    x_label.append(f"{frac.numerator}/{frac.denominator}")
-            x_labels.append("\n".join(x_label))
-
         for ax in self.axs:
             ax.set_xticks(list(range(len(self._kpt_coords))))
-            ax.set_xticklabels(x_labels, size=10)
+            ax.set_xticklabels(self._x_labels(), size=10)
 
     def _add_band_edges(self):
         for ax in self.axs:
