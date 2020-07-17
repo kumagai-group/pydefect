@@ -89,8 +89,13 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
                             shared_yaxes=True,
                             horizontal_spacing=0.01,
                             subplot_titles=["up", "down"],
-                            x_title="K-points",
-                            y_title="Energy (eV)")
+#                            x_title="K-points",
+                            )
+
+        fig.update_layout(
+            title="Eigenvalues",
+            yaxis_title="Energy (eV)",
+            font_size=15)
 
         common = {"mode": "markers", "marker_size": 10}
 
@@ -99,8 +104,8 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
             partially_occupied = [[], [], []]
             unoccupied = [[], [], []]
             for kpt_idx, eo_by_k_idx in enumerate(eo_by_spin):
-                for band_idx, (energy, occup) in enumerate(eo_by_k_idx):
-#                    print(kpt_idx, energy)
+                for band_idx, (energy, occup) \
+                        in enumerate(eo_by_k_idx, self._lowest_band_idx):
                     if occup > 0.9:
                         occupied[0].append(kpt_idx)
                         occupied[1].append(energy)
@@ -127,7 +132,7 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
 
                 fig.update_xaxes(tickvals=list(range(len(self._kpt_coords))),
                                  ticktext=self._x_labels(line_break="<br>"),
-                                 tickfont_size=16,
+                                 tickfont_size=15,
                                  row=1, col=spin_idx)
         return fig
 
