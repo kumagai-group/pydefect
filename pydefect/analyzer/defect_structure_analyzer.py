@@ -111,8 +111,13 @@ class DefectStructureAnalyzer:
                 displacement = (self._perfect_structure[p].frac_coords
                                 - self._defective_structure[d].frac_coords
                                 - offset)
+                displacement = fold_frac_coords(displacement)
                 result.append(lattice.get_cartesian_coords(displacement))
         return result
+
+
+def fold_frac_coords(frac_coords):
+    return [(frac_coord + 0.5) % 1 - 0.5 for frac_coord in frac_coords]
 
 
 def symmetrize_defect_structure(structure: IStructure,

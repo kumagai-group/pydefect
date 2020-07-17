@@ -7,7 +7,7 @@ from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_analyzer import \
     symmetrize_defect_structure, \
-    DefectStructureAnalyzer
+    DefectStructureAnalyzer, fold_frac_coords
 from pymatgen import Structure, IStructure, Lattice
 
 
@@ -33,7 +33,7 @@ def structure_analyzer():
                              coords=[[0.25, 0.5, 0.5],
                                      [0.76, 0.73, 0.24],
                                      [0.75, 0.25, 0.73],
-                                     [0.1, -0.1, 0],
+                                     [0.1, 0.9, 0],
                                      [0.5, 0.5, 0.5]])
 
     return DefectStructureAnalyzer(defective_structure=cu2o_defect,
@@ -64,6 +64,11 @@ def test_neighboring_atom_indices(cubic_supercell):
     structure_analyzer = DefectStructureAnalyzer(structure, cubic_supercell)
     assert structure_analyzer.neighboring_atom_indices == sorted([25, 15, 16, 23, 54, 47, 46, 56, 62])
     # must be list to be used for indexing
+
+
+def test_fold_frac_coords():
+    np.testing.assert_array_almost_equal(fold_frac_coords([-0.1, 0.49, 0.51]),
+                                         [-0.1, 0.49, -0.49])
 
 
 def test_displacements(structure_analyzer):
