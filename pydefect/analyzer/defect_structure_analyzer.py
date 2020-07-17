@@ -97,6 +97,23 @@ class DefectStructureAnalyzer:
 
         return sorted(list(result))
 
+    def displacements(self, anchor_atom_idx):
+        anchor_fcoords_after = self._defective_structure[anchor_atom_idx]
+        anchor_fcoords_before = self._perfect_structure[self.d_to_p[anchor_atom_idx]]
+        offset = (anchor_fcoords_before.frac_coords
+                  - anchor_fcoords_after.frac_coords)
+        result = []
+        lattice = self._defective_structure.lattice
+        for d, p in enumerate(self.d_to_p):
+            if p is None:
+                result.append(None)
+            else:
+                displacement = (self._perfect_structure[p].frac_coords
+                                - self._defective_structure[d].frac_coords
+                                - offset)
+                result.append(lattice.get_cartesian_coords(displacement))
+        return result
+
 
 def symmetrize_defect_structure(structure: IStructure,
                                 anchor_atom_idx: Optional[int] = None,
@@ -104,7 +121,7 @@ def symmetrize_defect_structure(structure: IStructure,
                                 point_group: Optional[str] = None) -> Structure:
     ss = StructureSymmetrizer(structure, defaults.symmetry_length_tolerance)
     if point_group and ss.point_group != point_group:
-        raise AssertionError("point group is different from the given one.")
+        raise AssertionError("Point group is different from the given one.")
 
     result = structure.copy()
 

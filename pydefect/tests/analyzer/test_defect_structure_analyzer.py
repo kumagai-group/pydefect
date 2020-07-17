@@ -21,6 +21,13 @@ def structure_analyzer():
                                       [0.75, 0.25, 0.75],
                                       [0, 0, 0],
                                       [0.5, 0.5, 0.5]])
+
+    # add [0.1, -0.1, 0]
+    # 3rd -- 6th
+    # [0.85, 0.65, 0.25] - [0.76, 0.73, 0.24] = [0.09, -0.08, 0.01]
+    # [0.85, 0.15, 0.75] - [0.75, 0.25, 0.73] = [0.10, -0.10, 0.02]
+    # [0.1, -0.1, 0] -[0.1, -0.1, 0] = [0, 0, 0]
+    # [0.6, 0.4, 0.5] - [0.5, 0.5, 0.5] = [0.1, -0.1, 0]
     cu2o_defect = IStructure(Lattice.cubic(5),
                              species=["Cu"] * 3 + ["O"] * 2,
                              coords=[[0.25, 0.5, 0.5],
@@ -57,6 +64,14 @@ def test_neighboring_atom_indices(cubic_supercell):
     structure_analyzer = DefectStructureAnalyzer(structure, cubic_supercell)
     assert structure_analyzer.neighboring_atom_indices == sorted([25, 15, 16, 23, 54, 47, 46, 56, 62])
     # must be list to be used for indexing
+
+
+def test_displacements(structure_analyzer):
+    actual = structure_analyzer.displacements(anchor_atom_idx=3)
+    expected = [None, [0.45, -0.4, 0.05], [0.5, -0.5, 0.1], [0, 0, 0],
+                [0.5, -0.5, 0]]
+    assert actual[0] is None
+    np.testing.assert_array_almost_equal(actual[1:], expected[1:])
 
 
 def test_actual_files(vasp_files):
