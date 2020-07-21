@@ -69,7 +69,7 @@ class SitePotentialPlotlyPlotter(SitePotentialPlotter):
         common = {"mode": "markers", "marker_size": 15}
         fig = go.Figure()
         fig.update_layout(
-            title="potential",
+            title="Potential",
             xaxis_title=f"Distance ({self._x_unit})",
             yaxis_title=f"Potential ({self._y_unit})",
             font_size=15)

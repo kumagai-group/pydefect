@@ -109,15 +109,31 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
                     if occup > 0.9:
                         occupied[0].append(kpt_idx)
                         occupied[1].append(energy)
-                        occupied[2].append(band_idx)
+                        occupied[2].append(band_idx + 1)
                     elif occup < 0.1:
                         unoccupied[0].append(kpt_idx)
                         unoccupied[1].append(energy)
-                        unoccupied[2].append(band_idx)
+                        unoccupied[2].append(band_idx + 1)
                     else:
                         partially_occupied[0].append(kpt_idx)
                         partially_occupied[1].append(energy)
-                        partially_occupied[2].append(band_idx)
+                        partially_occupied[2].append(band_idx + 1)
+
+            fig.add_shape(type="line",
+                          x0=-0.5,
+                          x1=len(eo_by_spin) - 0.5,
+                          y0=self._supercell_vbm,
+                          y1=self._supercell_vbm,
+                          line=dict(color="MediumPurple", width=4, dash="dot"),
+                          row=1, col=spin_idx)
+            fig.add_shape(type="line",
+                          x0=-0.5,
+                          x1=len(eo_by_spin) - 0.5,
+                          y0=self._supercell_cbm,
+                          y1=self._supercell_cbm,
+                          line=dict(color="MediumPurple", width=4, dash="dot"),
+                          row=1, col=spin_idx)
+
             for points, color, name in \
                     zip([occupied, partially_occupied, unoccupied],
                         ["blue", "green", "red"],
