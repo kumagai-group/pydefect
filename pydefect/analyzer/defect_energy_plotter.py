@@ -68,25 +68,36 @@ class DefectEnergyPlotter:
 class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
     def create_figure(self):
         fig = go.Figure()
+        fig.update_layout(
+            title="Defect formation energy",
+            xaxis_title=f"Fermi level ({self._x_unit})",
+            yaxis_title=f"Energy ({self._y_unit})",
+            font_size=15)
 
+        all_y = []
         for de in self._defect_energies:
-            #            color = next(self._mpl_defaults.colors)
             cp = de.cross_points(self._supercell_vbm, self._supercell_cbm)
             x, y = cp.t_all_sorted_points
-            fig.add_trace(go.Scatter(x=x, y=y, name=de.name))
-            # fillcolor="blue",
-            # mode="markers",
-            # marker_size=10,
-            # opacity=0.7,
-            # showlegend=False),)
-            # self.plt.plot(*cp.t_all_sorted_points, color=color,
-            #               linewidth=self._mpl_defaults.line_width,
-            #               label=de.name)
-            # if cp.t_inner_cross_points:
-            #     self.plt.scatter(*cp.t_inner_cross_points, marker="o",
-            #                      color=color, s=self._mpl_defaults.circle_size)
+            all_y.extend(y)
+            fig.add_trace(go.Scatter(x=x, y=y, name=de.name,
+                                     text=cp.charge_list,
+                                     hovertemplate=
+                                     f'{de.name}<br>' +
+                                     'Charges %{text}<br>' +
+                                     'Energy: %{y:.2f}'))
 
-        fig["layout"]["xaxis"]["range"] = [self._vbm, self._cbm]
+        y_min = min(all_y) - 0.2
+        y_max = max(all_y) + 0.2
+
+        fig["layout"]["xaxis"]["range"] = [self._supercell_vbm, self._supercell_cbm]
+        fig["layout"]["yaxis"]["range"] = [y_min, y_max]
+
+        fig.add_shape(type="line",
+                      y0=y_min, y1=y_max, x0=self._vbm, x1=self._vbm,
+                      line=dict(width=2, dash="dot"))
+        fig.add_shape(type="line",
+                      y0=y_min, y1=y_max, x0=self._cbm, x1=self._cbm,
+                      line=dict(width=2, dash="dot"))
 
         return fig
 

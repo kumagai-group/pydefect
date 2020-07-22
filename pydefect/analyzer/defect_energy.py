@@ -88,7 +88,8 @@ class CrossPoints:
 
     @property
     def charge_list(self):
-        return list(zip(self.charges[:-1], self.charges[1:]))
+        charges = [None] + self.charges + [None]
+        return list(zip(charges[:-1], charges[1:]))
 
     def __str__(self):
         lines = []

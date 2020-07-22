@@ -41,7 +41,7 @@ def test_cross_points(cross_points):
     assert cross_points.t_inner_cross_points == [[2, 3], [30, 40]]
     assert cross_points.t_boundary_points == [[1, 4], [10, 40]]
     assert cross_points.charges == [20, 10, 0]
-    assert cross_points.charge_list == [(20, 10), (10, 0)]
+    assert cross_points.charge_list == [(None, 20), (20, 10), (10, 0), (0, None)]
 
 
 def test_cross_points_str(cross_points):
