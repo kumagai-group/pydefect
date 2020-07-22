@@ -17,7 +17,7 @@ def defect_energy():
 
 def test_defect_energy_cross_points(defect_energy):
     actual = defect_energy.cross_points(1, 6)
-    expected = CrossPoints([[5.0, 6.0]], [[1.0, -2.0], [6.0, 6.0]])
+    expected = CrossPoints([[5.0, 6.0]], [[1.0, -2.0], [6.0, 6.0]], [1, 2])
     assert actual == expected
 
 
@@ -30,16 +30,18 @@ def test_defect_energy_str(defect_energy):
 
 @pytest.fixture
 def cross_points():
-    inner_cross_points = [[2, 20], [3, 30], [4, 40]]
-    boundary_points = [[1, 10], [5, 50]]
+    inner_cross_points = [[2, 30], [3, 40]]
+    boundary_points = [[1, 10], [4, 40]]
     return CrossPoints(inner_cross_points, boundary_points)
 
 
 def test_cross_points(cross_points):
-    assert cross_points.all_sorted_points == [[1, 10], [2, 20], [3, 30], [4, 40], [5, 50]]
-    assert cross_points.t_all_sorted_points == [[1, 2, 3, 4, 5], [10, 20, 30, 40, 50]]
-    assert cross_points.t_inner_cross_points == [[2, 3, 4], [20, 30, 40]]
-    assert cross_points.t_boundary_points == [[1, 5], [10, 50]]
+    assert cross_points.all_sorted_points == [[1, 10], [2, 30], [3, 40], [4, 40]]
+    assert cross_points.t_all_sorted_points == [[1, 2, 3, 4], [10, 30, 40, 40]]
+    assert cross_points.t_inner_cross_points == [[2, 3], [30, 40]]
+    assert cross_points.t_boundary_points == [[1, 4], [10, 40]]
+    assert cross_points.charges == [20, 10, 0]
+    assert cross_points.charge_list == [(20, 10), (10, 0)]
 
 
 def test_cross_points_str(cross_points):

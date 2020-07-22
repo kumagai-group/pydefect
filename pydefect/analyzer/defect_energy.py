@@ -77,6 +77,19 @@ class CrossPoints:
     def t_boundary_points(self):
         return np.transpose(np.array(self.boundary_points)).tolist()
 
+    @property
+    def charges(self):
+        result = []
+        for i, j in zip(self.all_sorted_points[:-1], self.all_sorted_points[1:]):
+            dx = j[0] - i[0]
+            dy = j[1] - i[1]
+            result.append(int(round(dy / dx)))
+        return result
+
+    @property
+    def charge_list(self):
+        return list(zip(self.charges[:-1], self.charges[1:]))
+
     def __str__(self):
         lines = []
         for point in self.all_sorted_points:
