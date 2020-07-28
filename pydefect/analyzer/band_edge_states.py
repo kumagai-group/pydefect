@@ -44,24 +44,17 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
 
 class EdgeCharacters(Sequence, MSONable, ToJsonFileMixIn):
     def __init__(self, edge_characters: List["EdgeCharacter"]):
-        self.list = edge_characters  # [by spin]
+        self.edge_characters = edge_characters  # [by spin]
 
     def __getitem__(self, item):
-        return self.list[item]
+        return self.edge_characters[item]
 
     def __len__(self):
-        return len(self.list)
-
-    def as_dict(self):
-        return {"edge_characters": [ec.as_dict() for ec in self.list]}
-
-    @classmethod
-    def from_dict(cls, d):
-        return cls([EdgeCharacter.from_dict(dd) for dd in d["edge_characters"]])
+        return len(self.edge_characters)
 
     def __str__(self):
         strings = []
-        for spin, edge_char in zip(["up", "down"], self.list):
+        for spin, edge_char in zip(["up", "down"], self.edge_characters):
             strings.append(f"""{spin:>4}: {edge_char}""")
         return "\n".join(strings)
 
