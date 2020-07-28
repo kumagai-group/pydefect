@@ -17,7 +17,7 @@ def defect_energy():
 
 def test_defect_energy_cross_points(defect_energy):
     actual = defect_energy.cross_points(1, 6)
-    expected = CrossPoints([[5.0, 6.0]], [[1.0, -2.0], [6.0, 6.0]], [1, 2])
+    expected = CrossPoints([[5.0, 6.0]], [[1.0, -2.0], [6.0, 6.0]])
     assert actual == expected
 
 
@@ -46,10 +46,9 @@ def test_cross_points(cross_points):
 
 def test_cross_points_str(cross_points):
     expected = """      1.0000      10.0000
-      2.0000      20.0000
-      3.0000      30.0000
-      4.0000      40.0000
-      5.0000      50.0000"""
+      2.0000      30.0000
+      3.0000      40.0000
+      4.0000      40.0000"""
     assert str(cross_points) == expected
 
 

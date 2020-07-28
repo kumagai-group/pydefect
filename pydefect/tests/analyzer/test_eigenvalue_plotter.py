@@ -37,6 +37,7 @@ def test_plot_with_actual_file():
 
 def test_plotly_with_actual_file():
     eig = loadfn(Path(__file__).parent / "band_edge_eigenvalues.json")
-    plotter = EigenvaluePlotlyPlotter()
+    plotter = EigenvaluePlotlyPlotter(title="test", band_edge_eigenvalues=eig,
+                                      supercell_vbm=0.5, supercell_cbm=2.6)
     fig = plotter.create_figure()
     fig.show()
