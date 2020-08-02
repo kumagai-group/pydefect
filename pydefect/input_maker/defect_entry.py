@@ -21,7 +21,7 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
     defect_center: Tuple[float, float, float]
 
     @property
-    def anchor_atom_index(self):
+    def anchor_atom_index(self) -> int:
         """ Returns an index of atom that is the farthest from the defect.
 
          Only the first occurrence is returned when using argmax.

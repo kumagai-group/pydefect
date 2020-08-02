@@ -89,7 +89,8 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
         y_min = min(all_y) - 0.2
         y_max = max(all_y) + 0.2
 
-        fig["layout"]["xaxis"]["range"] = [self._supercell_vbm, self._supercell_cbm]
+        fig["layout"]["xaxis"]["range"] = [self._supercell_vbm,
+                                           self._supercell_cbm]
         fig["layout"]["yaxis"]["range"] = [y_min, y_max]
 
         fig.add_shape(type="line",

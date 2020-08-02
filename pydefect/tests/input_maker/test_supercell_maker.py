@@ -41,13 +41,13 @@ def test_create_supercell_matrix(a_centered_orthorhombic):
     np.testing.assert_array_equal(actual, matrix)
 
     expected = [[2, 0, 0], [0, 1, -1], [0, 1, 1]]
-    np.testing.assert_array_equal(cs.transform_matrix, expected)
+    np.testing.assert_array_equal(cs.transformation_matrix, expected)
 
 
 def test_create_supercell_generate_supercell_info(simple_cubic):
     cs = SupercellMaker(simple_cubic, matrix=[[2, 0, 0], [0, 2, 0], [0, 0, 2]])
     info = cs.supercell_info
-    assert info.transform_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
+    assert info.transformation_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
     assert info.sites["H1"].wyckoff_letter == "a"
     assert info.sites["H1"].equivalent_atoms == list(range(8))
 

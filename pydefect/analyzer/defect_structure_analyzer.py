@@ -36,14 +36,14 @@ class DefectStructureAnalyzer:
         result = []
         for site in self._perfect_structure:
             distances = Distances(self._defective_structure, site.frac_coords)
-            result.append(distances.mapped_atom_idx(specie=site.specie))
+            result.append(distances.atom_idx_at_center(specie=site.specie))
         return result
 
     def make_d_to_p(self):
         result = []
         for site in self._defective_structure:
             distances = Distances(self._perfect_structure, site.frac_coords)
-            result.append(distances.mapped_atom_idx(specie=site.specie))
+            result.append(distances.atom_idx_at_center(specie=site.specie))
         return result
 
     @property

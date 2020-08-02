@@ -32,7 +32,7 @@ def append_interstitial(supercell_info: SupercellInfo,
     wyckoff_letter = (symmetrizer.spglib_sym_data["wyckoffs"][-1])
     site_symmetry = (symmetrizer.spglib_sym_data["site_symmetry_symbols"][-1])
 
-    inv_matrix = inv(np.array(supercell_info.transform_matrix))
+    inv_matrix = inv(np.array(supercell_info.transformation_matrix))
     new_coords = np.dot(frac_coords, inv_matrix).tolist()
     supercell_info.interstitials.append(
         Interstitial(frac_coords=new_coords, wyckoff_letter=wyckoff_letter,

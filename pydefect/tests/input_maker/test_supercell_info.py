@@ -50,7 +50,7 @@ def test_supercell_info_interstitials_distances(supercell_info):
 
 
 def test_supercell_info_str(supercell_info):
-    expected = """  Space group: Fmmm
+    expected = """Space group: Fmmm
 Transformation matrix: [1, 0, 0]  [0, 1, 0]  [0, 0, 1]
 Cell multiplicity: 1
 

@@ -10,11 +10,9 @@ from pymatgen import Structure, Element
 
 
 class Distances:
-    def __init__(self,
-                 structure: Structure,
-                 coord: np.array):
+    def __init__(self, structure: Structure, center_coord: np.array):
         self.structure = structure
-        self.coord = coord
+        self.coord = center_coord
 
     def distances(self, remove_self=True, specie=None) -> List[float]:
         result = []
@@ -31,7 +29,7 @@ class Distances:
 
         return result
 
-    def mapped_atom_idx(self, specie: str) -> Optional[int]:
+    def atom_idx_at_center(self, specie: str) -> Optional[int]:
         distances = self.distances(remove_self=False, specie=specie)
         sorted_dists = sorted(distances)
         if sorted_dists[1] - sorted_dists[0] < defaults.same_distance_criterion:
@@ -59,7 +57,8 @@ class Distances:
         for element, distances in unsorted_distances.items():
             distance_dict[element] = sorted(distances)
 
-        return Coordination(distance_dict, round(cutoff, 3), neighboring_atom_indices)
+        return Coordination(distance_dict, round(cutoff, 3),
+                            neighboring_atom_indices)
 
 
 @dataclass

@@ -3,7 +3,7 @@
 
 from collections import defaultdict
 from itertools import groupby
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 import numpy as np
 from pydefect.input_maker.supercell import Supercell, TetragonalSupercells, \
@@ -68,16 +68,16 @@ class SupercellMaker:
 
         self.supercell_info = SupercellInfo(self.supercell.structure,
                                             self.sg_symbol,
-                                            self.transform_matrix,
+                                            self.transformation_matrix,
                                             sites)
 
     @property
-    def transform_matrix(self):
+    def transformation_matrix(self):
         matrix = np.dot(self.conv_trans_mat, self.supercell.matrix).astype(int)
         return matrix.tolist()
 
 
-def create_sites(symmetrizer: StructureSymmetrizer):
+def create_sites(symmetrizer: StructureSymmetrizer) -> Dict[str, Site]:
     wyckoffs = symmetrizer.spglib_sym_data["wyckoffs"]
     equivalent_atoms = symmetrizer.spglib_sym_data["equivalent_atoms"]
     site_symmetries = symmetrizer.spglib_sym_data["site_symmetry_symbols"]

@@ -45,7 +45,7 @@ class Interstitial(MSONable):
 class SupercellInfo(MSONable, ToJsonFileMixIn):
     structure: IStructure
     space_group: str
-    transform_matrix: List[List[int]]
+    transformation_matrix: List[List[int]]
     sites: Dict[str, Site]
     interstitials: List[Interstitial] = field(default_factory=list)
 
@@ -62,11 +62,11 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
 
     @property
     def multiplicity(self):
-        return int(round(det(self.transform_matrix)))
+        return int(round(det(self.transformation_matrix)))
 
     @property
     def _transform_matrix_str(self):
-        return '  '.join(str(x) for x in self.transform_matrix)
+        return '  '.join(str(x) for x in self.transformation_matrix)
 
     def _frac_coords(self, site):
         repr_atom_idx = site.equivalent_atoms[0]
@@ -78,7 +78,7 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
         return ''.join([i for i in name if i.isalpha()])
 
     def __str__(self):
-        lines = [f"  Space group: {self.space_group}",
+        lines = [f"Space group: {self.space_group}",
                  f"Transformation matrix: {self._transform_matrix_str}",
                  f"Cell multiplicity: {self.multiplicity}", ""]
 

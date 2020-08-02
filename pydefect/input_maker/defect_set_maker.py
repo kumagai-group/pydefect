@@ -38,8 +38,8 @@ class DefectSetMaker:
 
     @property
     def _host_elements(self) -> List[str]:
-        species_set = set(self.supercell_info.structure.species)
-        return [str(specie) for specie in species_set]
+        return [str(specie) for specie in
+                set(self.supercell_info.structure.species)]
 
     def _create_defect_set(self):
         result = self._create_vacancy_set()
@@ -79,10 +79,10 @@ class DefectSetMaker:
         for in_name in self._subs:
             oxi_stat = self._oxidation_state(in_name)
             for i in range(len(self.supercell_info.interstitials)):
-                result.add(SimpleDefect(in_name, f"i{i + 1}", charge_set(oxi_stat)))
+                result.add(SimpleDefect(in_name, f"i{i + 1}",
+                                        charge_set(oxi_stat)))
 
         return result
-
 
 
 def charge_set(ox_state: int) -> List[int]:

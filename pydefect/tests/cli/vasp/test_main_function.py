@@ -103,7 +103,7 @@ def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
     info = loadfn("supercell_info.json")
     assert IStructure.from_file("SPOSCAR") == simple_cubic_2x1x1
     assert info.structure == simple_cubic_2x1x1
-    assert info.transform_matrix == [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
+    assert info.transformation_matrix == [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
 
 
 def test_make_recommended_supercell(simple_cubic, simple_cubic_2x2x2, tmpdir):
@@ -114,7 +114,7 @@ def test_make_recommended_supercell(simple_cubic, simple_cubic_2x2x2, tmpdir):
     info = loadfn("supercell_info.json")
     assert IStructure.from_file("SPOSCAR") == simple_cubic_2x2x2
     assert info.structure == simple_cubic_2x2x2
-    assert info.transform_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
+    assert info.transformation_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
 
 
 def test_add_interstitials(mocker):
