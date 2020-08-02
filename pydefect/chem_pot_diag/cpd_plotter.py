@@ -173,7 +173,8 @@ class ChemPotDiag3DPlotter(ChemPotDiagPlotter):
         face.set_edgecolor("black")
         self._ax.add_collection3d(face)
 
-    def _3d_simplex_color(self, atomic_fractions):
+    @staticmethod
+    def _3d_simplex_color(atomic_fractions):
         return [(f + 1.5) / 2.5 for f in atomic_fractions]
 
 

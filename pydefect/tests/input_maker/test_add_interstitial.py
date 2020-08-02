@@ -8,7 +8,7 @@ from pydefect.util.error_classes import NotPrimitiveError
 from pymatgen import Structure, Lattice
 
 
-def test(cubic_supercell_info_wo_int):
+def test_add_interstitial(cubic_supercell_info_wo_int):
     base_primitive = Structure.from_str("""
    1.00000000000000
     0 2.5 2.5
