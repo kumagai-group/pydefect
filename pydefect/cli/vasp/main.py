@@ -35,26 +35,19 @@ def parse_args(args):
     dirs_parser = argparse.ArgumentParser(
         description="", add_help=False)
     dirs_parser.add_argument(
-        "-d", "--dirs",
-        required=True,
-        nargs="+",
-        type=Path)
+        "-d", "--dirs", required=True, nargs="+", type=Path)
 
     # ++ parent parser: pcr
     pcr_parser = argparse.ArgumentParser(
         description="", add_help=False)
     pcr_parser.add_argument(
-        "-pcr", "--perfect_calc_results",
-        required=True,
-        type=loadfn)
+        "-pcr", "--perfect_calc_results", required=True, type=loadfn)
 
     # ++ parent parser: unitcell
     unitcell_parser = argparse.ArgumentParser(
         description="", add_help=False)
     unitcell_parser.add_argument(
-        "-u", "--unitcell",
-        required=True,
-        type=loadfn)
+        "-u", "--unitcell", required=True, type=loadfn)
 
     # -- print ------------------------------------------------
     parser_print = subparsers.add_parser(
@@ -74,22 +67,16 @@ def parse_args(args):
     # -- unitcell ------------------------------------------------
     parser_unitcell = subparsers.add_parser(
         name="unitcell",
-        description="",
+        description="Parse unitcell info and create unitcell.json",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['u'])
 
     parser_unitcell.add_argument(
-        "-vb", "--vasprun_band",
-        required=True,
-        type=Vasprun)
+        "-vb", "--vasprun_band", required=True, type=Vasprun)
     parser_unitcell.add_argument(
-        "-ob", "--outcar_band",
-        required=True,
-        type=Outcar)
+        "-ob", "--outcar_band", required=True, type=Outcar)
     parser_unitcell.add_argument(
-        "-od", "--outcar_dielectric",
-        required=True,
-        type=Outcar)
+        "-od", "--outcar_dielectric", required=True, type=Outcar)
 
     parser_unitcell.set_defaults(func=make_unitcell)
 
@@ -101,14 +88,9 @@ def parse_args(args):
         aliases=['mp'])
 
     parser_make_poscars.add_argument(
-        "-e", "--elements",
-        required=True,
-        nargs="+",
-        type=str)
+        "-e", "--elements", required=True, nargs="+", type=str)
     parser_make_poscars.add_argument(
-        "--e_above_hull",
-        default=defaults.e_above_hull,
-        type=float)
+        "--e_above_hull", default=defaults.e_above_hull, type=float)
 
     parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
 
@@ -120,9 +102,7 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cpd'])
 
-    parser_cpd.add_argument(
-        "-t", "--target",
-        type=Composition)
+    parser_cpd.add_argument("-t", "--target", type=Composition)
 
     parser_cpd.set_defaults(func=make_chem_pot_diag)
 
@@ -134,22 +114,10 @@ def parse_args(args):
         aliases=['s'])
 
     parser_supercell.add_argument(
-        "-p", "--unitcell",
-        default="POSCAR",
-        type=IStructure.from_file)
-    parser_supercell.add_argument(
-        "--matrix",
-        default=None,
-        nargs="+",
-        type=int)
-    parser_supercell.add_argument(
-        "--min_num_atoms",
-        default=50,
-        type=int)
-    parser_supercell.add_argument(
-        "--max_num_atoms",
-        default=300,
-        type=int)
+        "-p", "--unitcell", default="POSCAR", type=IStructure.from_file)
+    parser_supercell.add_argument("--matrix", default=None, nargs="+", type=int)
+    parser_supercell.add_argument("--min_num_atoms", default=50, type=int)
+    parser_supercell.add_argument("--max_num_atoms", default=300, type=int)
 
     parser_supercell.set_defaults(func=make_supercell)
 
@@ -161,17 +129,9 @@ def parse_args(args):
         aliases=['ds'])
 
     parser_defect_set.add_argument(
-        "-o", "--oxi_states",
-        nargs="+",
-        type=str_int_to_int)
-    parser_defect_set.add_argument(
-        "-d", "--dopants",
-        nargs="+",
-        type=str)
-    parser_defect_set.add_argument(
-        "-k", "--kwargs",
-        nargs="+",
-        type=str)
+        "-o", "--oxi_states", nargs="+", type=str_int_to_int)
+    parser_defect_set.add_argument("-d", "--dopants", nargs="+", type=str)
+    parser_defect_set.add_argument("-k", "--kwargs", nargs="+", type=str)
 
     parser_defect_set.set_defaults(func=make_defect_set)
 
@@ -192,18 +152,11 @@ def parse_args(args):
         aliases=['ai'])
 
     parser_append_interstitial.add_argument(
-        "-s", "--supercell_info",
-        required=True,
-        type=loadfn)
+        "-s", "--supercell_info", required=True, type=loadfn)
     parser_append_interstitial.add_argument(
-        "-p", "--base_structure",
-        required=True,
-        type=Structure.from_file)
+        "-p", "--base_structure", required=True, type=Structure.from_file)
     parser_append_interstitial.add_argument(
-        "-c", "--frac_coords",
-        required=True,
-        nargs=3,
-        type=float)
+        "-c", "--frac_coords", required=True, nargs=3, type=float)
 
     parser_append_interstitial.set_defaults(func=append_interstitial_to_supercell_info)
 
@@ -215,13 +168,9 @@ def parse_args(args):
         aliases=['pi'])
 
     parser_pop_interstitial.add_argument(
-        "-s", "--supercell_info",
-        required=True,
-        type=loadfn)
+        "-s", "--supercell_info", required=True, type=loadfn)
     parser_pop_interstitial.add_argument(
-        "-i", "--index",
-        required=True,
-        type=int)
+        "-i", "--index", required=True, type=int)
 
     parser_pop_interstitial.set_defaults(func=pop_interstitial_from_supercell_info)
 
@@ -242,9 +191,7 @@ def parse_args(args):
         aliases=['rs'])
     parser_refine_structure.set_defaults(func=make_refined_structure)
     parser_refine_structure.add_argument(
-        "-d", "--dir",
-        required=True,
-        type=Path)
+        "-d", "--dir", required=True, type=Path)
 
     # -- efnv correction ------------------------------------------------
     parser_efnv = subparsers.add_parser(
@@ -285,9 +232,7 @@ def parse_args(args):
         aliases=['es'])
 
     parser_es.add_argument(
-        "-p", "--perfect_edge_characters",
-        required=True,
-        type=loadfn)
+        "-p", "--perfect_edge_characters", required=True, type=loadfn)
 
     parser_es.set_defaults(func=make_edge_states)
     # -- defect formation energy ----------------------------------------------
@@ -299,23 +244,11 @@ def parse_args(args):
         aliases=['e'])
 
     parser_energy.add_argument(
-        "-c", "--chem_pot_diag",
-        required=True,
-        type=loadfn)
-    parser_energy.add_argument(
-        "-l", "--label",
-        required=True,
-        type=str)
-    parser_energy.add_argument(
-        "-y", "--y_range",
-        nargs=2,
-        type=float)
-    parser_energy.add_argument(
-        "-s", "--skip_shallow",
-        action="store_true")
-    parser_energy.add_argument(
-        "-p", "--print",
-        action="store_true")
+        "-c", "--chem_pot_diag", required=True, type=loadfn)
+    parser_energy.add_argument("-l", "--label", required=True, type=str)
+    parser_energy.add_argument("-y", "--y_range", nargs=2, type=float)
+    parser_energy.add_argument("-s", "--skip_shallow", action="store_true")
+    parser_energy.add_argument("-p", "--print", action="store_true")
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------
