@@ -14,8 +14,8 @@ from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state
 from pydefect.analyzer.make_defect_energy import make_single_defect_energy
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo
-from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DPlotter, \
-    ChemPotDiag3DPlotter
+from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagMpl2DMplPlotter, \
+    ChemPotDiagMpl3DMplPlotter
 from pydefect.cli.main_tools import sanitize_matrix
 from pydefect.cli.vasp.make_band_edge_eigenvalues import \
     make_band_edge_eigenvalues
@@ -72,9 +72,9 @@ def make_chem_pot_diag(args) -> None:
     cpd.to_json_file()
 
     if cpd.dim == 2:
-        plotter = ChemPotDiag2DPlotter(CpdPlotInfo(cpd))
+        plotter = ChemPotDiagMpl2DMplPlotter(CpdPlotInfo(cpd))
     elif cpd.dim == 3:
-        plotter = ChemPotDiag3DPlotter(CpdPlotInfo(cpd))
+        plotter = ChemPotDiagMpl3DMplPlotter(CpdPlotInfo(cpd))
     else:
         raise CpdNotSupportedError("Number of elements must be 2 or 3. "
                                    f"Now {cpd.vertex_elements}.")

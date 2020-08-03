@@ -3,6 +3,7 @@ from abc import abstractmethod, ABC
 from typing import Optional
 
 import numpy as np
+import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from numpy import concatenate, clip, dot, arctan2
@@ -39,7 +40,7 @@ class CpdMplSettings:
         self.simplex_2d = {"color": "black", "linewidth": 2, "zorder": 1}
 
 
-class ChemPotDiagPlotter(ABC):
+class ChemPotDiagMplPlotter(ABC):
     def __init__(self,
                  cpd_plot_info: CpdPlotInfo,
                  mpl_defaults: Optional[CpdMplSettings] = CpdMplSettings()):
@@ -107,15 +108,12 @@ class ChemPotDiagPlotter(ABC):
     def _add_alphabet_labels(self):
         if self.info.cpd.target:
             for label, cp in self.info.cpd.target_vertices.items():
+                print(cp)
                 self._ax.text(*transpose(cp), label,
                               **self._mpl_defaults.alphabet_label)
 
 
-def transpose(target_list) -> list:
-    return np.array(target_list).transpose().tolist()
-
-
-class ChemPotDiag2DPlotter(ChemPotDiagPlotter):
+class ChemPotDiagMpl2DMplPlotter(ChemPotDiagMplPlotter):
 
     def _add_ax(self):
         self._ax = plt.figure().add_subplot(111)
@@ -142,7 +140,7 @@ class ChemPotDiag2DPlotter(ChemPotDiagPlotter):
         plt.plot(*transpose(vertex_coords), **self._mpl_defaults.simplex_2d)
 
 
-class ChemPotDiag3DPlotter(ChemPotDiagPlotter):
+class ChemPotDiagMpl3DMplPlotter(ChemPotDiagMplPlotter):
     def _add_ax(self):
         self._ax = plt.figure().add_subplot(111, projection='3d')
 
@@ -219,3 +217,127 @@ def sort_coords(coords: np.ndarray) -> np.ndarray:
     indices = [i for i in range(len(coords))]
     indices.sort(key=angle_between_v0)
     return coords[indices]
+
+
+def transpose(target_list) -> list:
+    return np.array(target_list).transpose().tolist()
+
+
+class ChemPotDiagPlotly2DMplPlotter:
+
+    def __init__(self, cpd_plot_info: CpdPlotInfo):
+        self.info = cpd_plot_info
+
+    def _add_ax(self):
+        self._ax = plt.figure().add_subplot(111)
+
+    @property
+    def _text_kwargs(self):
+        return {}
+
+    def _set_grid(self):
+        self._ax.grid(**self._mpl_defaults.grid_2d)
+
+    def figure(self):
+        fig = go.Figure()
+
+        for comp, vertices in self.info.comp_vertices.items():
+            x0 = vertices[0][0]
+            y0 = vertices[0][1]
+            x1 = vertices[1][0]
+            y1 = vertices[1][1]
+
+            fig.add_shape(
+                dict(
+                    type="line",
+                    x0=x0, y0=y0, x1=x1, y1=y1,
+                    line=dict(
+#                        color="RoyalBlue",
+                        width=3),
+            ))
+            fig.add_trace(go.Scatter(
+                x=[(x0 + x1) / 2],
+                y=[(y0 + y1) / 2],
+                text=[clean_formula(comp)],
+                mode="text",
+                hoverinfo='skip',
+            ))
+
+        if self.info.cpd.target:
+            x, y, text = [], [], []
+            for label, cp in self.info.cpd.target_vertices.items():
+                x.append(cp[0])
+                y.append(cp[1])
+                text.append(label)
+
+            fig.add_trace(go.Scatter(x=x, y=y, text=text, mode='markers+text',
+                                     textposition="top center",
+                                     textfont=dict(
+                                         family="sans serif",
+                                         size=18,
+                                     )))
+
+        vertex_elements = self.info.cpd.vertex_elements
+        fig.update_traces(marker_size=30)
+        fig.update_layout(xaxis_title=f"Chemical potential of {vertex_elements[0]}",
+                          yaxis_title=f"Chemical potential of {vertex_elements[1]}")
+
+        fig.update_xaxes(range=[self.info.min_range, -self.info.min_range * 0.05])
+        fig.update_yaxes(range=[self.info.min_range, -self.info.min_range * 0.05])
+        return fig
+
+    @staticmethod
+    def _2d_simplex_color(atomic_fractions):
+        return [(f + 1.5) / 2.5 for f in atomic_fractions]
+
+
+def clean_formula(comp):
+    s = []
+    for char in str(comp):
+        if char == "1":
+            continue
+        elif char.isdigit():
+            s.append(f"<sub>{char}</sub>")
+        else:
+            s.append(char)
+
+    return "".join(s)
+
+
+# class ChemPotDiagMpl3DMplPlotter(ChemPotDiagMplPlotter):
+#     def _add_ax(self):
+#         self._ax = plt.figure().add_subplot(111, projection='3d')
+#
+#     @property
+#     def _text_kwargs(self):
+#         return {"ha": "center", "va": "center"}
+#
+#     def _set_lims(self):
+#         self._ax.set_xlim3d(self.info.min_range, 0)
+#         self._ax.set_ylim3d(0, self.info.min_range)
+#         self._ax.set_zlim3d(self.info.min_range, 0)
+#
+#     def _set_labels(self):
+#         vertex_elements = self.info.cpd.vertex_elements
+#         self._ax.set_xlabel(f"Chemical potential of {vertex_elements[0]}")
+#         self._ax.set_ylabel(f"Chemical potential of {vertex_elements[1]}")
+#         self._ax.set_zlabel(f"Chemical potential of {vertex_elements[2]}")
+#
+#     def _set_grid(self):
+#         pass
+#
+#     def draw_simplex(self, composition):
+#         vertex_coords = self.info.comp_vertices[composition]
+#         atomic_fractions = self.info.atomic_fractions(composition)
+#
+#         face = Poly3DCollection([sort_coords(np.array(vertex_coords))])
+#         face.set_color(self._3d_simplex_color(atomic_fractions))
+#         face.set_edgecolor("black")
+#         self._ax.add_collection3d(face)
+#
+#     @staticmethod
+#     def _3d_simplex_color(atomic_fractions):
+#         return [(f + 1.5) / 2.5 for f in atomic_fractions]
+#
+#
+#
