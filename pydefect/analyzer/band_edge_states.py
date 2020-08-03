@@ -11,7 +11,8 @@ from vise.util.enum import ExtendedEnum
 
 @dataclass
 class BandEdgeEigenvalues(MSONable, ToJsonFileMixIn):
-    energies_and_occupations: List[List[List[List[float]]]]  # [spin, k-idx, band-idx] = energy, occupation
+    # [spin, k-idx, band-idx] = energy, occupation
+    energies_and_occupations: List[List[List[List[float]]]]
     kpt_coords: List[Tuple[float, float, float]]
     lowest_band_index: int
 

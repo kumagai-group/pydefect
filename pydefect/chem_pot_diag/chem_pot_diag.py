@@ -4,7 +4,7 @@ import dataclasses
 import string
 from dataclasses import dataclass
 from itertools import chain
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, List
 
 import numpy as np
 from monty.json import MSONable
@@ -125,7 +125,8 @@ class CpdPlotInfo:
         self.dim = cpd.dim
         self.comp_vertices = self._get_comp_vertices(self.min_range)
 
-    def _get_comp_vertices(self, min_range):
+    def _get_comp_vertices(self, min_range
+                           ) -> Dict[Composition, List[List[float]]]:
         hs = self.cpd.get_half_space_intersection(min_range)
         intersections = hs.intersections.tolist()
         result = {}
@@ -151,7 +152,7 @@ class CpdPlotInfo:
                 for e in self.cpd.vertex_elements]
 
 
-def on_composition(atomic_fractions, coord, energy):
+def on_composition(atomic_fractions, coord, energy) -> bool:
     diff = sum([x * y for x, y in zip(atomic_fractions, coord)]) - energy
     return abs(diff) < 1e-8
 

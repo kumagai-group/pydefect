@@ -22,9 +22,10 @@ class RadialDist:
     def distances_data(self):
         if self._distances_data is None:
             grid_points = [[x / self.dim[0], y / self.dim[1], z / self.dim[2]]
-                           for (x, y, z) in product(*[list(range(i)) for i in self.dim])]
+                           for (x, y, z) in
+                           product(*[list(range(i)) for i in self.dim])]
 
-            # Use boolean indexing to find all charges within the desired distance.
+            # Use boolean indexing to find charges within the desired distance.
             # data[:, 0]: shifted_coords
             # data[:, 1]: distances
             # data[:, 2]: sequential indices
@@ -42,7 +43,8 @@ class RadialDist:
 
         vals = [self.data[spin][x, y, z] for x, y, z in data_inds]
 
-        hist, edges = np.histogram(dists, nbins, range=[0, self.radius], weights=vals)
+        hist, edges = np.histogram(dists, nbins,
+                                   range=[0, self.radius], weights=vals)
         hist_numbers, _ = np.histogram(dists, nbins, range=[0, self.radius])
         mesh_distance = edges[1] - edges[0]
 
