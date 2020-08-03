@@ -178,7 +178,7 @@ def make_efnv_correction_from_vasp(args):
         efnv.to_json_file(d / "correction.json")
 
         title = defect_entry.full_name
-        plotter = SitePotentialMplPlotter(title, efnv)
+        plotter = SitePotentialMplPlotter(title=title, efnv_correction=efnv)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "correction.pdf")
         plotter.plt.clf()
@@ -196,7 +196,8 @@ def make_defect_eigenvalues(args):
             vasprun, supercell_vbm, supercell_cbm)
         band_edge_eigenvalues.to_json_file(d / "band_edge_eigenvalues.json")
         plotter = EigenvalueMplPlotter(
-            title, band_edge_eigenvalues, supercell_vbm, supercell_cbm)
+            title=title, band_edge_eigenvalues=band_edge_eigenvalues,
+            supercell_vbm=supercell_vbm, supercell_cbm=supercell_cbm)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "eigenvalues.pdf")
         plotter.plt.clf()
