@@ -2,13 +2,15 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Optional
 
 import numpy as np
 import yaml
 from monty.json import MSONable
+from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
 from pydefect.util.mix_in import ToJsonFileMixIn
 from pymatgen import IStructure
+from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 
 @dataclass(frozen=True)
@@ -16,7 +18,7 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
     name: str
     charge: int
     structure: IStructure
-    perturbed_structure: IStructure
+    perturbed_structure: Optional[IStructure]
     site_symmetry: str
     defect_center: Tuple[float, float, float]
 
@@ -53,3 +55,30 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
         d = {"charge": self.charge}
         Path(filename).write_text(yaml.dump(d))
 
+
+def make_defect_entry(name: str,
+                      charge: int,
+                      perfect_structure: IStructure,
+                      defect_structure: IStructure):
+
+    analyzer = DefectStructureAnalyzer(perfect_structure, defect_structure)
+
+    species = []
+    frac_coords = []
+    for d, p in enumerate(analyzer.p_to_d):
+        if p is None:
+            site = defect_structure[d]
+        else:
+            site = perfect_structure[p]
+        species.append(site.specie)
+        frac_coords.append(site.frac_coords)
+
+    initial_structure = IStructure(perfect_structure.lattice,
+                                   species, frac_coords)
+    symmetrizer = StructureSymmetrizer(initial_structure)
+
+    initial_structure.to(filename="POSCAR")
+
+    return DefectEntry(name, charge, initial_structure, None,
+                       site_symmetry=symmetrizer.point_group,
+                       defect_center=tuple(analyzer.defect_center_coord))

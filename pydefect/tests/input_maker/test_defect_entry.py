@@ -1,25 +1,31 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from copy import deepcopy
 from pathlib import Path
 
 import numpy as np
 import pytest
-from pydefect.input_maker.defect_entry import DefectEntry
+from pydefect.input_maker.defect_entry import DefectEntry, make_defect_entry
 from pydefect.tests.helpers.assertion import assert_json_roundtrip, \
     assert_msonable
-from pymatgen import IStructure, Lattice
+from pymatgen import Lattice, IStructure
 
 # "H" at [0.0, 0.0, 0.0] is removed here.
-coords = \
-    [[0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.0, 0.5, 0.5],
-     [0.0, 0.0, 0.5], [0.0, 0.5, 0.0], [0.5, 0.0, 0.0], [0.5, 0.5, 0.5]]
+perf_coords = [[0.0, 0.0, 0.0], [0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.0, 0.5, 0.5],
+               [0.0, 0.0, 0.5], [0.0, 0.5, 0.0], [0.5, 0.0, 0.0], [0.5, 0.5, 0.5]]
+
+coords = deepcopy(perf_coords)
+coords.pop(0)
+
 perturbed_coords = \
     [[0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.0, 0.5, 0.5],
      [0.0, 0.0, 0.501], [0.0, 0.501, 0.0], [0.501, 0.0, 0.0], [0.5, 0.5, 0.5]]
 
-rocksalt = IStructure(
+perfect = IStructure(
+    Lattice.cubic(10.0), ["H"] * 4 + ["He"] * 4, perf_coords)
+defect_structure = IStructure(
     Lattice.cubic(10.0), ["H"] * 3 + ["He"] * 4, coords)
-perturbed_rocksalt = IStructure(
+perturbed_defect = IStructure(
     Lattice.cubic(10.0), ["H"] * 3 + ["He"] * 4, perturbed_coords)
 
 
@@ -27,8 +33,8 @@ perturbed_rocksalt = IStructure(
 def defect_entry():
     return DefectEntry(name="Va_O1",
                        charge=1,
-                       structure=rocksalt,
-                       perturbed_structure=perturbed_rocksalt,
+                       structure=defect_structure,
+                       perturbed_structure=perturbed_defect,
                        site_symmetry="m-3m",
                        defect_center=(0, 0, 0))
 
@@ -69,10 +75,16 @@ def test_defect_entry(defect_entry, tmpdir):
 """
     assert Path("a.yaml").read_text() == expected
 
-"""
-TODO
-- Store basic info for a single input defect initial structure.
-- create prior_info
-- from structure
-DONE
-"""
+
+def test_make_defect_entry(defect_entry):
+    actual = make_defect_entry(name="Va_O1", charge=1,
+                               perfect_structure=perfect, defect_structure=perturbed_defect)
+
+    expected = DefectEntry(name="Va_O1",
+                           charge=1,
+                           structure=defect_structure,
+                           perturbed_structure=None,
+                           site_symmetry="m-3m",
+                           defect_center=(0.0, 0.0, 0.0))
+
+    assert actual == expected
