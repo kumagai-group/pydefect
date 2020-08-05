@@ -137,11 +137,14 @@ def make_defect_entries(args):
 
     for defect_entry in maker.defect_entries:
         dir_path = Path(defect_entry.full_name)
-        logger.info(f"Making {dir_path} dir...")
-        dir_path.mkdir()
-        defect_entry.perturbed_structure.to(filename=dir_path / "POSCAR")
-        defect_entry.to_json_file(filename=dir_path / "defect_entry.json")
-        defect_entry.to_prior_info(filename=dir_path / "prior_info.yaml")
+        try:
+            dir_path.mkdir()
+            logger.info(f"Making {dir_path} dir...")
+            defect_entry.perturbed_structure.to(filename=dir_path / "POSCAR")
+            defect_entry.to_json_file(filename=dir_path / "defect_entry.json")
+            defect_entry.to_prior_info(filename=dir_path / "prior_info.yaml")
+        except FileExistsError:
+            logger.info(f"{dir_path} exists, so skipped...")
 
 
 def make_calc_results(args):
@@ -159,7 +162,7 @@ def make_refined_structure(args):
     refined_structure = symmetrize_defect_structure(
         calc_results.structure,
         defect_entry.anchor_atom_index, defect_entry.anchor_atom_coords)
-    ref_dir = Path(f"ref_{args.dir}")
+    ref_dir = Path("refined")
     ref_dir.mkdir()
     refined_structure.to(fmt="POSCAR", filename=ref_dir / "POSCAR")
     for i in ["INCAR", "POTCAR", "KPOINTS"]:
