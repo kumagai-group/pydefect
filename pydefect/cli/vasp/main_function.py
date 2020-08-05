@@ -128,11 +128,15 @@ def make_defect_set(args):
 def make_defect_entries(args):
     supercell_info: SupercellInfo = loadfn("supercell_info.json")
     perfect = Path("perfect")
-    perfect.mkdir()
 
-    supercell_info.structure.to(filename=perfect / "POSCAR")
+    try:
+        perfect.mkdir()
+        logger.info("Making perfect dir...")
+        supercell_info.structure.to(filename=perfect / "POSCAR")
+    except FileExistsError:
+        logger.info(f"perfect dir exists, so skipped...")
+
     defect_set = DefectSet.from_yaml()
-    logger.info("Making perfect dir...")
     maker = DefectEntriesMaker(supercell_info, defect_set)
 
     for defect_entry in maker.defect_entries:
@@ -144,7 +148,7 @@ def make_defect_entries(args):
             defect_entry.to_json_file(filename=dir_path / "defect_entry.json")
             defect_entry.to_prior_info(filename=dir_path / "prior_info.yaml")
         except FileExistsError:
-            logger.info(f"{dir_path} exists, so skipped...")
+            logger.info(f"{dir_path} dir exists, so skipped...")
 
 
 def make_calc_results(args):
