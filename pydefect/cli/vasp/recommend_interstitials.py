@@ -1,23 +1,26 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+
 import fire
-from pymatgen import Element
+from pymatgen import Element, Structure
 from pymatgen.analysis.defects.utils import ChargeDensityAnalyzer
-from pymatgen.io.vasp import Chgcar
+from pymatgen.io.vasp import Chgcar, VolumetricData
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 
-def interstitials_from_charge_density(
-        chgcar_file: str,
+def interstitials_from_volumetric_data(
+        volumetric_data: VolumetricData,
+        find_min: bool = True,  # or "local minima"
         threshold_frac: float = None,
         threshold_abs: float = None,
         min_dist: float = 0.5,
-        tol: float = 0.2,
+        tol: float = 0.5,
         radius: float = 0.4) -> None:
-    chgcar = Chgcar.from_file(chgcar_file)
-    cda = ChargeDensityAnalyzer(chgcar=chgcar)
+
+    cda = ChargeDensityAnalyzer(chgcar=volumetric_data)
     cda.get_local_extrema(threshold_frac=threshold_frac,
-                          threshold_abs=threshold_abs)
+                          threshold_abs=threshold_abs,
+                          find_min=find_min)
     cda.sort_sites_by_integrated_chg(r=radius)
     # Remove sites near host atoms.
     cda.remove_collisions(min_dist)
@@ -29,7 +32,7 @@ def interstitials_from_charge_density(
         pass
     print(cda.extrema_df)
 
-    structure = chgcar.structure.copy()
+    structure: Structure = volumetric_data.structure.copy()
     start_index = len(structure)
     end_index = len(structure) + len(cda.extrema_coords)
     interstitial_indices = [i for i in range(start_index, end_index)]
@@ -38,17 +41,25 @@ def interstitials_from_charge_density(
     symmetrizer = StructureSymmetrizer(structure)
     equiv_atoms = symmetrizer.spglib_sym_data["equivalent_atoms"]
 
-    print("")
+    structure.to(filename="POSCAR")
+    print(symmetrizer.spglib_sym_data["site_symmetry_symbols"])
+
+    print(f"Host symmetry {symmetrizer.spglib_sym_data['international']}")
     print("++ Inequivalent indices and site symmetries ++")
-    orig_num_atoms = len(chgcar.structure)
+    orig_num_atoms = len(volumetric_data.structure)
     for i, ii in enumerate(interstitial_indices):
         if ii == equiv_atoms[ii]:
             idx = orig_num_atoms + i
-            coords = symmetrizer.primitive[idx].frac_coords
+            coords = structure[idx].frac_coords
             idx_coords = \
                 f"{i:>3} {coords[0]:8.4f} {coords[1]:8.4f} {coords[2]:8.4f}"
 
             print(idx_coords, symmetrizer.spglib_sym_data["site_symmetry_symbols"][ii])
+
+
+def interstitials_from_charge_density(aeccar0, aeccar2, **kwargs):
+    aeccar = Chgcar.from_file(aeccar0) + Chgcar.from_file(aeccar2)
+    interstitials_from_volumetric_data(aeccar, **kwargs)
 
 
 if __name__ == '__main__':
