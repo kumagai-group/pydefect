@@ -29,6 +29,9 @@ def test_distances_mapped_atom_idx(ortho_conventional):
     distances = Distances(ortho_conventional, center_coord=[0.251, 0.25, 0.25])
     assert distances.atom_idx_at_center(specie="H") is None
 
+    distances = Distances(ortho_conventional, center_coord=[0.0, 0.0, 0.5])
+    assert distances.atom_idx_at_center(specie="Li") == None
+
 
 def test_shortest_distances(ortho_conventional):
     distances = Distances(ortho_conventional, center_coord=[0.5, 0.5, 0.5])

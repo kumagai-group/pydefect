@@ -34,6 +34,8 @@ class Distances:
         sorted_dists = sorted(distances)
         if sorted_dists[1] - sorted_dists[0] < defaults.same_distance_criterion:
             return None
+        if sorted_dists[0] == float("inf"):
+            return None
         return np.argmin(distances)
 
     @property
