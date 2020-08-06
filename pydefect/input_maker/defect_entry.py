@@ -77,8 +77,6 @@ def make_defect_entry(name: str,
                                    species, frac_coords)
     symmetrizer = StructureSymmetrizer(initial_structure)
 
-    initial_structure.to(filename="POSCAR")
-
     return DefectEntry(name, charge, initial_structure, None,
                        site_symmetry=symmetrizer.point_group,
                        defect_center=tuple(analyzer.defect_center_coord))

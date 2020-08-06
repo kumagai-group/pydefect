@@ -77,14 +77,29 @@ def test_defect_entry(defect_entry, tmpdir):
 
 
 def test_make_defect_entry(defect_entry):
-    actual = make_defect_entry(name="Va_O1", charge=1,
-                               perfect_structure=perfect, defect_structure=perturbed_defect)
+    relaxed_coords = \
+        [[0.25, 0.0, 0.0], [0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.0, 0.5, 0.5],
+         [0.0, 0.0, 0.51], [0.0, 0.51, 0.0], [0.5, 0.0, 0.0], [0.5, 0.5, 0.5]]
+    relaxed_defect = IStructure(
+        Lattice.cubic(10.0), ["Li"] + ["H"] * 3 + ["He"] * 4, relaxed_coords)
+
+    unrelaxed_coords = \
+        [[0.25, 0.0, 0.0], [0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.0, 0.5, 0.5],
+         [0.0, 0.0, 0.5], [0.0, 0.5, 0.0], [0.5, 0.0, 0.0], [0.5, 0.5, 0.5]]
+
+    unrelaxed_defect = IStructure(
+        Lattice.cubic(10.0), ["Li"] + ["H"] * 3 + ["He"] * 4, unrelaxed_coords)
+
+    actual = make_defect_entry(name="Va_O1",
+                               charge=1,
+                               perfect_structure=perfect,
+                               defect_structure=relaxed_defect)
 
     expected = DefectEntry(name="Va_O1",
                            charge=1,
-                           structure=defect_structure,
+                           structure=unrelaxed_defect,
                            perturbed_structure=None,
-                           site_symmetry="m-3m",
-                           defect_center=(0.0, 0.0, 0.0))
+                           site_symmetry="4mm",
+                           defect_center=(0.125, 0.0, 0.0))
 
     assert actual == expected
