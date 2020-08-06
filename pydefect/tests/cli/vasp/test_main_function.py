@@ -225,10 +225,10 @@ def test_make_refined_structure(tmpdir, mocker, simple_cubic):
     mock.assert_called_once_with(mock_calc_results.structure, 0,
                                  mock_defect_entry.anchor_atom_coords)
 
-    assert Path("ref_Va_O1_2/INCAR").read_text() == "1"
-    assert Path("ref_Va_O1_2/POTCAR").read_text() == "1"
-    assert Path("ref_Va_O1_2/KPOINTS").read_text() == "1"
-    assert Structure.from_file(Path("ref_Va_O1_2/POSCAR")) == simple_cubic
+    assert Path("refined/INCAR").read_text() == "1"
+    assert Path("refined/POTCAR").read_text() == "1"
+    assert Path("refined/KPOINTS").read_text() == "1"
+    assert Structure.from_file(Path("refined/POSCAR")) == simple_cubic
 
 
 def test_make_efnv_correction_from_vasp(tmpdir, mocker):
@@ -265,7 +265,7 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
     mock_make_efnv.assert_called_with(mock_defect_entry.charge, mock_calc_results, mock_perfect_calc_results, mock_unitcell.dielectric_constant)
     mock_efnv.to_json_file.assert_called_with(Path("Va_O1_2") / "correction.json")
 
-    mock_pot_plotter.assert_called_with("Va_O1_2", mock_efnv)
+    mock_pot_plotter.assert_called_with(title="Va_O1_2", efnv_correction=mock_efnv)
     mock_pot_plotter.return_value.construct_plot.assert_called_once_with()
     mock_pot_plotter.return_value.plt.savefig.assert_called_once_with(fname=Path("Va_O1_2") / "correction.pdf")
 
@@ -305,9 +305,11 @@ def test_make_defect_eigenvalues(mocker):
     mock_make_eigvals.return_value.to_json_file.assert_called_with(
         Path("Va_O1_2") / "band_edge_eigenvalues.json")
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
-    mock_eigval_plotter.assert_called_with("Va_O1",
-                                           mock_make_eigvals.return_value, 10,
-                                           20)
+    mock_eigval_plotter.assert_called_with(
+        title="Va_O1",
+        band_edge_eigenvalues=mock_make_eigvals.return_value,
+        supercell_vbm=10,
+        supercell_cbm=20)
 
 
 def test_make_edge_characters(mocker):
