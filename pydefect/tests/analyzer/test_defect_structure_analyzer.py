@@ -29,12 +29,13 @@ def structure_analyzer():
     # [0.1, -0.1, 0] -[0.1, -0.1, 0] = [0, 0, 0]
     # [0.6, 0.4, 0.5] - [0.5, 0.5, 0.5] = [0.1, -0.1, 0]
     cu2o_defect = IStructure(Lattice.cubic(5),
-                             species=["Cu"] * 3 + ["O"] * 2,
+                             species=["Cu"] * 3 + ["O"] * 2 + ["H"],
                              coords=[[0.25, 0.5, 0.5],
                                      [0.76, 0.73, 0.24],
                                      [0.75, 0.25, 0.73],
                                      [0.1, 0.9, 0],
-                                     [0.5, 0.5, 0.5]])
+                                     [0.5, 0.5, 0.5],
+                                     [0.25]*3])
 
     return DefectStructureAnalyzer(defective_structure=cu2o_defect,
                                    perfect_structure=cu2o_perfect)
@@ -43,16 +44,16 @@ def structure_analyzer():
 def test_atom_mapping_to_perfect(structure_analyzer):
     assert structure_analyzer.atom_mapping == {1: 2, 2: 3, 3: 4, 4: 5}
     assert structure_analyzer.vacancy_indices == [0, 1]
-    assert structure_analyzer.inserted_indices == [0]
+    assert structure_analyzer.inserted_indices == [0, 5]
 
 
 def test_defect_structure_analyzer_defect_center(structure_analyzer):
-    expected = np.array([0.25, 0.5, 0.5])
+    expected = np.array([0.25, 0.4375, 0.4375])
     assert (structure_analyzer.defect_center_coord == expected).all()
 
 
 def test_defect_structure_analyzer_distance(structure_analyzer):
-    assert structure_analyzer.distance_from_center(4) == 5 / 4
+    assert structure_analyzer.distance_from_center(4) == 1.3258252147247767
 
 
 def test_neighboring_atom_indices(cubic_supercell):
@@ -74,9 +75,10 @@ def test_fold_frac_coords():
 def test_displacements(structure_analyzer):
     actual = structure_analyzer.displacements(anchor_atom_idx=3)
     expected = [None, [0.45, -0.4, 0.05], [0.5, -0.5, 0.1], [0, 0, 0],
-                [0.5, -0.5, 0]]
+                [0.5, -0.5, 0], None]
     assert actual[0] is None
-    np.testing.assert_array_almost_equal(actual[1:], expected[1:])
+    assert actual[-1] is None
+    np.testing.assert_array_almost_equal(actual[1:-1], expected[1:-1])
 
 
 def test_actual_files(vasp_files):
