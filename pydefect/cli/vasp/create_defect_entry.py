@@ -20,11 +20,12 @@ def make_defect_entry_from_poscars(dirname, perf_poscar, defect_poscar):
     perfect = IStructure.from_file(perf_poscar)
     defect = IStructure.from_file(defect_poscar)
 
-    return make_defect_entry(name=name,
-                             charge=charge,
-                             perfect_structure=perfect,
-                             defect_structure=defect)
+    defect_entry = make_defect_entry(name=name,
+                                     charge=charge,
+                                     perfect_structure=perfect,
+                                     defect_structure=defect)
+    defect_entry.to_json_file()
 
 
 if __name__ == '__main__':
-    fire.Fire()
+    fire.Fire(make_defect_entry_from_poscars)
