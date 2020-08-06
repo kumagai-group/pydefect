@@ -41,20 +41,33 @@ def interstitials_from_volumetric_data(
     symmetrizer = StructureSymmetrizer(structure)
     equiv_atoms = symmetrizer.spglib_sym_data["equivalent_atoms"]
 
-    structure.to(filename="POSCAR")
     print(symmetrizer.spglib_sym_data["site_symmetry_symbols"])
 
     print(f"Host symmetry {symmetrizer.spglib_sym_data['international']}")
     print("++ Inequivalent indices and site symmetries ++")
     orig_num_atoms = len(volumetric_data.structure)
+
+    structure_for_visualize: Structure = volumetric_data.structure.copy()
+
     for i, ii in enumerate(interstitial_indices):
         if ii == equiv_atoms[ii]:
             idx = orig_num_atoms + i
             coords = structure[idx].frac_coords
+
+            def element():
+                for z in range(1, 100):
+                    e = Element.from_Z(z)
+                    if e not in structure_for_visualize.composition:
+                        yield e
+
+            structure_for_visualize.append(next(element()), coords)
+
             idx_coords = \
                 f"{i:>3} {coords[0]:8.4f} {coords[1]:8.4f} {coords[2]:8.4f}"
+            print(idx_coords,
+                  symmetrizer.spglib_sym_data["site_symmetry_symbols"][ii])
 
-            print(idx_coords, symmetrizer.spglib_sym_data["site_symmetry_symbols"][ii])
+        structure_for_visualize.to(filename="POSCAR-w-interstitials")
 
 
 def interstitials_from_charge_density(aeccar0, aeccar2, **kwargs):

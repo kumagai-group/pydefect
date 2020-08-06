@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from pydefect.cli.vasp.recommend_interstitials import \
-    interstitials_from_charge_density
+    interstitials_from_charge_density, interstitials_from_volumetric_data
 from pymatgen.io.vasp import Chgcar, Locpot
 
 
@@ -12,7 +12,7 @@ def test_interstitials_from_charge_density():
     aeccar2 = Chgcar.from_file(str(Path(__file__).parent / "vasp_files" / "NaMgF3_AECCAR2"))
     aeccar = aeccar0 + aeccar2
     aeccar.write_file("CHGCAR")
-    interstitials_from_charge_density(aeccar)
+    interstitials_from_volumetric_data(aeccar)
 
 
 def test_interstitials_from_potential():
