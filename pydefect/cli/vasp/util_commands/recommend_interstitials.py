@@ -10,7 +10,7 @@ from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 def interstitials_from_volumetric_data(
         volumetric_data: VolumetricData,
-        find_min: bool = True,  # or "local minima"
+        find_min: bool = True,
         threshold_frac: float = None,
         threshold_abs: float = None,
         min_dist: float = 0.5,
