@@ -20,7 +20,11 @@ def make_refined_structure():
                                        defaults.symmetry_angle_tolerance)
     if symmetrizer.point_group == "1":
         return
+
     shutil.move(defaults.contcar, str(defaults.contcar) + ".sym_1")
+    shutil.move(defaults.outcar, str(defaults.outcar) + ".sym_1")
+    shutil.move(defaults.vasprun, str(defaults.vasprun) + ".sym_1")
+
     refined_structure = symmetrize_defect_structure(
         symmetrizer,
         defect_entry.anchor_atom_index,
