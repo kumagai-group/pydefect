@@ -41,8 +41,6 @@ def interstitials_from_volumetric_data(
     symmetrizer = StructureSymmetrizer(structure)
     equiv_atoms = symmetrizer.spglib_sym_data["equivalent_atoms"]
 
-    print(symmetrizer.spglib_sym_data["site_symmetry_symbols"])
-
     print(f"Host symmetry {symmetrizer.spglib_sym_data['international']}")
     print("++ Inequivalent indices and site symmetries ++")
     orig_num_atoms = len(volumetric_data.structure)
