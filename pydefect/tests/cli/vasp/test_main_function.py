@@ -14,7 +14,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_calc_results, print_file, \
     make_efnv_correction_from_vasp, make_defect_formation_energy, \
-    make_defect_eigenvalues, make_edge_characters, make_refined_structure, \
+    make_defect_eigenvalues, make_edge_characters, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
@@ -189,46 +189,6 @@ def test_make_calc_results(tmpdir, mocker):
     mock_outcar.assert_called_with(Path("a") / defaults.outcar)
     mock.assert_called_with(vasprun=mock_vasprun.return_value, outcar=mock_outcar.return_value)
     mock_calc_results.to_json_file.assert_called_with(filename=Path("a") / "calc_results.json")
-
-
-def test_make_refined_structure(tmpdir, mocker, simple_cubic):
-    tmpdir.chdir()
-    tmpdir.join("Va_O1_2").mkdir()
-    tmpdir.join("Va_O1_2/INCAR").write("1")
-    tmpdir.join("Va_O1_2/KPOINTS").write("1")
-    tmpdir.join("Va_O1_2/POTCAR").write("1")
-
-    mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
-    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
-
-    def side_effect(key):
-        if str(key) == "Va_O1_2/defect_entry.json":
-            mock_defect_entry.anchor_atom_index = 0
-            mock_defect_entry.structure = simple_cubic
-            return mock_defect_entry
-        elif str(key) == "Va_O1_2/calc_results.json":
-            mock_calc_results.structure = simple_cubic
-            return mock_calc_results
-        else:
-            raise ValueError
-
-    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
-    mock = mocker.patch("pydefect.cli.vasp.main_function.symmetrize_defect_structure")
-    mock.return_value = simple_cubic
-
-    args = Namespace(dir=Path("Va_O1_2"))
-    make_refined_structure(args)
-
-    mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
-    mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")
-
-    mock.assert_called_once_with(mock_calc_results.structure, 0,
-                                 mock_defect_entry.anchor_atom_coords)
-
-    assert Path("refined/INCAR").read_text() == "1"
-    assert Path("refined/POTCAR").read_text() == "1"
-    assert Path("refined/KPOINTS").read_text() == "1"
-    assert Structure.from_file(Path("refined/POSCAR")) == simple_cubic
 
 
 def test_make_efnv_correction_from_vasp(tmpdir, mocker):

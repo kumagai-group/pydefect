@@ -192,15 +192,6 @@ def test_calc_results():
     assert parsed_args == expected
 
 
-def test_refine_structure():
-    parsed_args = parse_args(["rs", "-d", "Va_O1_0"])
-    expected = Namespace(
-        dir=Path("Va_O1_0"),
-        func=parsed_args.func,
-    )
-    assert parsed_args == expected
-
-
 def test_efnv_correction(mocker):
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
     mock_unitcell = mocker.Mock(spec=Unitcell, autospec=True)
