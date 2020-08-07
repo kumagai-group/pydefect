@@ -4,7 +4,6 @@ from typing import Optional
 
 import numpy as np
 from numpy.linalg import inv
-from pydefect.defaults import defaults
 from pydefect.util.structure_tools import Distances
 from pymatgen import IStructure, Structure
 from vise.util.logger import get_logger
@@ -120,21 +119,17 @@ def fold_frac_coords(frac_coords):
     return [(frac_coord + 0.5) % 1 - 0.5 for frac_coord in frac_coords]
 
 
-def symmetrize_defect_structure(structure: IStructure,
+def symmetrize_defect_structure(structure_symmetrizer: StructureSymmetrizer,
                                 anchor_atom_idx: Optional[int] = None,
-                                anchor_atom_coord: Optional[np.ndarray] = None,
-                                point_group: Optional[str] = None) -> Structure:
-    ss = StructureSymmetrizer(structure, defaults.symmetry_length_tolerance)
-    if point_group and ss.point_group != point_group:
-        raise AssertionError("Point group is different from the given one.")
+                                anchor_atom_coord: Optional[np.ndarray] = None
+                                ) -> Structure:
+    result = structure_symmetrizer.structure.copy()
 
-    result = structure.copy()
+    logger.info(f"The symmetry is {structure_symmetrizer.point_group}")
 
-    logger.info(f"The symmetry is {ss.point_group}")
-
-    origin_shift = ss.spglib_sym_data["origin_shift"]
-    inv_trans_mat = inv(ss.spglib_sym_data["transformation_matrix"])
-    coords = ss.spglib_sym_data["std_positions"]
+    origin_shift = structure_symmetrizer.spglib_sym_data["origin_shift"]
+    inv_trans_mat = inv(structure_symmetrizer.spglib_sym_data["transformation_matrix"])
+    coords = structure_symmetrizer.spglib_sym_data["std_positions"]
     new_coords = []
     for i in range(len(result)):
         new_coords.append(np.dot(inv_trans_mat, (coords[i] - origin_shift)))
