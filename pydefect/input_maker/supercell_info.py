@@ -84,11 +84,12 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
 
         for name, site in self.sites.items():
             elem = self._stripe_numbers(name)
+            coordination = self.coords(name).distance_dict
             lines.append(f"   Irreducible element: {name}")
             lines.append(f"        Wyckoff letter: {site.wyckoff_letter}")
             lines.append(f"         Site symmetry: {site.site_symmetry}")
             lines.append(f"         Cutoff radius: {self.coords(name).cutoff}")
-            lines.append(f"          Coordination: {self.coords(name).distance_dict}")
+            lines.append(f"          Coordination: {coordination}")
             lines.append(f"      Equivalent atoms: {site.pprint_equiv_atoms}")
             lines.append(f"Fractional coordinates: {self._frac_coords(site)}")
             lines.append(f"     Electronegativity: {electronegativity(elem)}")
@@ -97,9 +98,11 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
         lines.append("-- interstitials")
 
         for idx, site in enumerate(self.interstitials):
-            frac = "{0[0]:9.7f}  {0[1]:9.7f}  {0[2]:9.7f}".format(site.frac_coords)
             coordination = self.interstitial_coords(idx).distance_dict
 
+            lines.append(f"#{idx + 1}")
+            frac = \
+                "{0[0]:9.7f}  {0[1]:9.7f}  {0[2]:9.7f}".format(site.frac_coords)
             lines.append(f"Fractional coordinates: {frac}")
             lines.append(f"        Wyckoff letter: {site.wyckoff_letter}")
             lines.append(f"         Site symmetry: {site.site_symmetry}")

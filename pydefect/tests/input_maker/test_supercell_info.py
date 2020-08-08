@@ -75,6 +75,7 @@ Fractional coordinates: 0.0000000  0.0000000  0.5000000
        Oxidation state: 0
 
 -- interstitials
+#1
 Fractional coordinates: 0.2500000  0.2500000  0.2500000
         Wyckoff letter: x
          Site symmetry: yy
@@ -87,12 +88,3 @@ def test_json_round_trip(supercell_info, tmpdir):
     assert_json_roundtrip(supercell_info, tmpdir)
 
 
-"""
-TODO
-- Implement from_json
-
-DONE
-- Evaluate coords at Site
-- Add spacegroup to Supercell Info
-- Implement print info
-"""
