@@ -160,12 +160,18 @@ class SitePotentialMplPlotter(SitePotentialPlotter):
                     potential_diffs.append(site.diff_pot)
 
             color = next(self._mpl_defaults.colors)
-            self.plt.scatter(distances, potentials, marker="o", color=color)
+            self.plt.scatter(distances, potentials, marker="o", color=color,
+                             label=str(site.specie))
 
         self._max_distance = max(all_distances)
 
-        self.plt.scatter(pc_pot_distances, pc_potentials, marker="1", color="b")
-        self.plt.scatter(pc_pot_distances, potential_diffs, marker="+", color="r")
+        self.plt.scatter(pc_pot_distances, pc_potentials, marker="1",
+                         color="b", label="point charge")
+        self.plt.scatter(pc_pot_distances, potential_diffs, marker="+",
+                         color="r", label="potential difference")
+
+        self.plt.legend(bbox_to_anchor=(0, 1.05), loc='upper left',
+                        borderaxespad=0, fontsize=8)
 
     def _add_lines(self):
         self.plt.axvline(x=self.defect_region_radius,
