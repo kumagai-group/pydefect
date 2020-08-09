@@ -2,9 +2,9 @@
 #  Copyright (c) 2020 Kumagai group.
 from pathlib import Path
 
-from pydefect.analyzer.calc_results import CalcResults
 from pydefect.cli.vasp.util_commands.make_refined_poscar import \
     make_refined_structure
+from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import Structure
 
@@ -12,10 +12,11 @@ from pymatgen import Structure
 def test_make_refined_structure(tmpdir, mocker, simple_cubic):
     tmpdir.chdir()
     tmpdir.join("Va_O1_2").mkdir()
-    simple_cubic.to(fmt="POSCAR", filename="CONTCAR")
+    simple_cubic.to(fmt="POSCAR", filename=defaults.contcar)
+    tmpdir.join(defaults.outcar).write("")
+    tmpdir.join(defaults.vasprun).write("")
 
     mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
-    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
 
     def side_effect(key):
         if str(key) == "defect_entry.json":
