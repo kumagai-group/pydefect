@@ -102,7 +102,7 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cpd'])
 
-    parser_cpd.add_argument("-t", "--target", type=Composition)
+    parser_cpd.add_argument("-t", "--target", type=Composition, required=True)
 
     parser_cpd.set_defaults(func=make_chem_pot_diag)
 

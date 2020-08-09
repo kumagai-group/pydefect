@@ -60,17 +60,7 @@ def test_make_poscars_w_options():
     assert parsed_args == expected
 
 
-def test_cpd_wo_options():
-    parsed_args = parse_args(["cpd",
-                              "-d", "Mg", "O"])
-    expected = Namespace(
-        dirs=[Path("Mg"), Path("O")],
-        target=None,
-        func=parsed_args.func)
-    assert parsed_args == expected
-
-
-def test_cpd_w_options():
+def test_cpd_options():
     parsed_args = parse_args(["cpd",
                               "-d", "Mg", "O",
                               "-t", "MgO"])
