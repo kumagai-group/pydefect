@@ -60,18 +60,22 @@ def make_competing_phase_dirs(args):
 
 
 def make_chem_pot_diag(args) -> None:
-    if args.elements:
-        cpd = make_chem_pot_diag_from_mp(args.elements, args.target,
-                                         args.functional)
+
+    if args.yaml:
+        cpd = ChemPotDiag.from_yaml(args.yaml)
     else:
-        comp_es = set()
-        for d in args.dirs:
-            vasprun = Vasprun(d / defaults.vasprun)
-            composition = vasprun.final_structure.composition
-            energy = vasprun.final_energy
-            comp_es.add(CompositionEnergy(composition, energy, "local"))
-        cpd = ChemPotDiag(comp_es, args.target)
-    cpd.to_yaml()
+        if args.elements:
+            cpd = make_chem_pot_diag_from_mp(args.elements, args.target,
+                                             args.functional)
+        else:
+            comp_es = set()
+            for d in args.dirs:
+                vasprun = Vasprun(d / defaults.vasprun)
+                composition = vasprun.final_structure.composition
+                energy = vasprun.final_energy
+                comp_es.add(CompositionEnergy(composition, energy, "local"))
+            cpd = ChemPotDiag(comp_es, args.target)
+        cpd.to_yaml()
 
     if cpd.dim == 2:
         plotter = ChemPotDiagMpl2DMplPlotter(CpdPlotInfo(cpd))

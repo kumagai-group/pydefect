@@ -101,6 +101,7 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cpd'])
 
+    parser_cpd.add_argument("-y", "--yaml", type=str)
     parser_cpd.add_argument("-t", "--target", type=Composition, required=True)
     parser_cpd.add_argument("-e", "--elements", type=str, nargs="+")
     parser_cpd.add_argument("-f", "--functional", type=str)
