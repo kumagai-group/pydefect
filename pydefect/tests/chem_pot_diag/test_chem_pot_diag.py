@@ -50,7 +50,13 @@ target: H2O1
 
 
 def test_host_comp_abs_energies(cpd):
-    print(cpd.rel_energies)
+    assert cpd.rel_energies == {Composition("H2O1"): -1.0,
+                                Composition("O2"): 0.0,
+                                Composition("H2"): 0.0}
+
+
+def test_impurity_elements(cpd):
+    assert cpd.impurity_elements == [Element.Cl]
 
 
 def test_chem_pot_diag(cpd):
@@ -63,7 +69,7 @@ def test_chem_pot_diag(cpd):
 
 
 def test_abs_chem_pots(cpd):
-    assert cpd.abs_chem_pot_dict("A") == {Element.H: 0.0, Element.O: -3.0 + 1.0}
+    assert cpd.abs_chem_pot_dict("A") == {Element.H: 0.0, Element.O: -3.0 + 1.0, Element.Cl: 5.0}
 
 
 def test_host_ele_abs_energies_per_atom(cpd):

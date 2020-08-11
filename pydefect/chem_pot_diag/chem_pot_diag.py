@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import dataclasses
 import string
+from copy import deepcopy
 from dataclasses import dataclass
 from itertools import chain
 from pathlib import Path
@@ -57,13 +58,21 @@ class ChemPotDiag:
         return cls(composition_energies, target)
 
     @property
-    def abs_energies_per_atom(self):
+    def abs_energies_per_atom(self) -> Dict[Composition, float]:
         return {ce.composition.reduced_composition: ce.abs_energy_per_atom
                 for ce in self.comp_energies}
 
     @property
-    def all_compounds(self):
-        return self.abs_energies_per_atom.keys()
+    def all_compounds(self) -> List[Composition]:
+        return list(self.abs_energies_per_atom.keys())
+
+    @property
+    def impurity_elements(self):
+        result = set()
+        for c in self.all_compounds:
+            result.update(set(c.elements))
+        result.difference_update(set(self.target.elements))
+        return list(result)
 
     @property
     def vertex_elements(self):
@@ -145,10 +154,16 @@ class ChemPotDiag:
         return {next(label): c for c in self.vertex_coords
                 if on_composition(fractions, c, energy)}
 
-    def abs_chem_pot_dict(self, label) -> dict:
+    def host_abs_chem_pot_dict(self, label) -> Dict[Element, float]:
         rel_chem_pots = self.target_vertices[label]
         abs_chem_pots = [x + y for x, y in zip(rel_chem_pots, self.offset_to_abs)]
         return dict(zip(self.vertex_elements, abs_chem_pots))
+
+    def abs_chem_pot_dict(self, label) -> Dict[Element, float]:
+        result = deepcopy(self.host_abs_chem_pot_dict(label))
+        for e in self.impurity_elements:
+            _, result[e] = self.impurity_abs_energy(e, label)
+        return result
 
     def impurity_abs_energy(self, element: Element, label: str):
         comp_set = set(self.vertex_elements) | {element}
@@ -159,7 +174,7 @@ class ChemPotDiag:
                 if set(ce.composition.elements).issubset(comp_set) is False:
                     raise ValueError("Other element(s) than host elements "
                                      "exists.")
-                abs_chem_pot = self.abs_chem_pot_dict(label)
+                abs_chem_pot = self.host_abs_chem_pot_dict(label)
                 mu = ce.energy
                 comp_d = ce.composition.as_dict()
                 for ve in self.vertex_elements:
