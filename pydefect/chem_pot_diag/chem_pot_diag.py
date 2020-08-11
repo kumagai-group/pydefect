@@ -32,6 +32,7 @@ class CompositionEnergy:
 class ChemPotDiag:
     comp_energies: Set[CompositionEnergy]
     target: dataclasses.InitVar[Union[Composition, dict]]
+    host_elements: Optional[List[Element]] = None
 
     def __post_init__(self, target):
         self.target: Composition = target if isinstance(target, Composition) \
@@ -66,7 +67,7 @@ class ChemPotDiag:
 
     @property
     def vertex_elements(self):
-        return sorted(self.target.elements)
+        return self.host_elements or sorted(self.target.elements)
 
     @property
     def dim(self):
@@ -76,7 +77,7 @@ class ChemPotDiag:
     def host_ele_abs_energies_per_atom(self):
         result = {}
         for k, v in self.abs_energies_per_atom.items():
-            if set(k.elements).issubset(set(self.target.elements)):
+            if set(k.elements).issubset(set(self.vertex_elements)):
                 result[k] = v
         return result
 
@@ -123,8 +124,6 @@ class ChemPotDiag:
         return min(chain(*self.vertex_coords))
 
     def get_half_space_intersection(self, min_range):
-        print("dim", self.dim)
-        print("vertex_elements", self.vertex_elements)
         half_spaces = []
         for c, e in self.rel_energies.items():
             half_spaces.append(self.atomic_fractions(c) + [-e])
