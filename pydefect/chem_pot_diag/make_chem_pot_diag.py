@@ -27,14 +27,12 @@ def make_chem_pot_diag_from_mp(elements: List[str],
     comp_es = set()
     for m in query.materials:
         energy = m["final_energy"]
-        print(energy)
         if vise_functional == "pbesol":
             diff = {elem: pbesol_energies[elem] - mp_energies[elem]
                     for elem in elements}
             for k, v in Composition(m["full_formula"]).as_dict().items():
                 energy += diff[k] * v
-        else:
-            print(vise_functional)
+        elif vise_functional:
             raise ValueError("Now support only pbesol.")
         comp_es.add(CompositionEnergy(
             Composition(m["full_formula"]), energy, m["task_id"]))
