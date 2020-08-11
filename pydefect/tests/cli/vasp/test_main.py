@@ -69,6 +69,7 @@ def test_cpd_options():
         target=Composition("MgO"),
         elements=None,
         functional=None,
+        yaml=None,
         func=parsed_args.func)
     assert parsed_args == expected
 
