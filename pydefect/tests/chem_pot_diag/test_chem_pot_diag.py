@@ -1,36 +1,56 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from copy import deepcopy
+from pathlib import Path
 
 import numpy as np
 import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
-    NoElementEnergyError
+    NoElementEnergyError, CompositionEnergy
 # When same keys are inserted, only the latter one is accepted.
-from pydefect.tests.helpers.assertion import assert_msonable, \
-    assert_json_roundtrip
 from pymatgen import Composition, Element
 
-energies = {"H": 0.0, "O": 1.0, "H4O2": -4.0}
+energies = {CompositionEnergy(Composition("H"), 0.0, "a"),
+            CompositionEnergy(Composition("O"), 1.0, "b"),
+            CompositionEnergy(Composition("H4O2"), -4.0, "c"),
+            CompositionEnergy(Composition("O2Cl2"), 6.0, "d"),
+            CompositionEnergy(Composition("O2Cl"), 3.0, "e")}
 
 
 @pytest.fixture
 def cpd():
-    return ChemPotDiag(energies, target=Composition("H2"))
+    return ChemPotDiag(energies, target=Composition("H2O"))
 
 
-def test_chem_pot_diag_assert_msonable(cpd):
-    assert_msonable(cpd)
+def test_chem_pot_diag_yaml(cpd, tmpdir):
+    print(tmpdir)
+    tmpdir.chdir()
+    cpd.to_yaml()
+    expected = """H1:
+  energy: 0.0
+  source: a
+H4O2:
+  energy: -4.0
+  source: c
+O1:
+  energy: 1.0
+  source: b
+O1Cl1:
+  energy: 3.0
+  source: d
+O2Cl1:
+  energy: 3.0
+  source: e
+target: H2O1
+"""
+    assert Path("cpd.yaml").read_text() == expected
+
+    actual = ChemPotDiag.from_yaml("cpd.yaml")
+    assert actual == cpd
 
 
-# 2020.5.30: Composition is not recovered with MSONable
-def test_msonable_for_composition(cpd):
-    a = ChemPotDiag.from_dict(cpd.as_dict())
-    assert isinstance(a.target, Composition)
-
-
-def test_chem_pot_diag_to_json_file(cpd, tmpdir):
-    assert_json_roundtrip(cpd, tmpdir)
+def test_host_comp_abs_energies(cpd):
+    print(cpd.rel_energies)
 
 
 def test_chem_pot_diag(cpd):
@@ -48,13 +68,18 @@ def test_abs_chem_pots(cpd):
 
 def test_cpd_plot_info_lacking_element_data():
     new_energies = deepcopy(energies)
-    new_energies[Composition("MgO")] = -3.0
+    new_energies.add(CompositionEnergy(Composition("MgO"), -3.0, "f"))
     with pytest.raises(NoElementEnergyError):
         ChemPotDiag(new_energies, target={"Mg": 1, "O": 1}).offset_to_abs
 
 
 def test_chem_pot_diag_min_energy(cpd):
     assert cpd.lowest_relative_energy == -3
+
+
+def test_impurity_abs_energy(cpd):
+    expected = CompositionEnergy(Composition("Cl2O2"), 6.0, 'd'), 5.0
+    assert cpd.impurity_abs_energy(Element.Cl, "A") == expected
 
 
 @pytest.fixture()
@@ -84,11 +109,14 @@ def test_cpd_plot_info_with_defaults(cpd_plot_info_wo_min_range):
             Composition('H2O'): [[-1.5, 0.0], [0.0, -3.0]],
             Composition('O2'): [[-3.3, 0.0], [-1.5, 0.0]]}
 
+
 """
 TODO
-- Return the formation energy of a compound
-- Return the absolute energy of a compound
-- 
+1. Implement impurity_abs_energy
+4. implement print
+
 
 DONE
+2. change energies types from Dict[str, float] to CompoundEnergy
+3. to yaml
 """

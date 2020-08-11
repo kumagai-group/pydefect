@@ -3,7 +3,6 @@
 from pathlib import Path
 from typing import List, Optional
 
-import fire
 from monty.serialization import loadfn
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
 from pydefect.util.mp_tools import MpQuery
@@ -29,11 +28,6 @@ def make_chem_pot_diag_from_mp(elements: List[str],
             for k, v in Composition(formula).as_dict().items():
                 energies[formula] += diff[k] * v
 
-    cpd = ChemPotDiag(energies, target)
-    cpd.to_json_file("chem_pot_diag_mp.json")
-    return cpd
+    return ChemPotDiag(energies, target)
 
-
-if __name__ == '__main__':
-    fire.Fire(make_chem_pot_diag_from_mp)
 

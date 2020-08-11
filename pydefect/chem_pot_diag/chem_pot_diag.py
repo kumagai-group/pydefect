@@ -4,44 +4,77 @@ import dataclasses
 import string
 from dataclasses import dataclass
 from itertools import chain
-from typing import Dict, Optional, Union, List
+from pathlib import Path
+from typing import Dict, Optional, Union, List, Set
 
 import numpy as np
-from monty.json import MSONable
+import yaml
+from monty.serialization import loadfn
 from pydefect.error import PydefectError
-from pydefect.util.mix_in import ToJsonFileMixIn
-from pymatgen import Composition
+from pymatgen import Composition, Element
 from scipy.spatial.qhull import HalfspaceIntersection
 
 alphabets = list(string.ascii_uppercase)
 
 
+@dataclass(frozen=True)
+class CompositionEnergy:
+    composition: Composition
+    energy: float
+    source: str
+
+    @property
+    def abs_energy_per_atom(self):
+        return self.energy / self.composition.num_atoms
+
+
 @dataclass
-class ChemPotDiag(MSONable, ToJsonFileMixIn):
-    energies: Dict[str, float]
+class ChemPotDiag:
+    comp_energies: Set[CompositionEnergy]
     target: dataclasses.InitVar[Union[Composition, dict]]
 
     def __post_init__(self, target):
-        self.target = target if isinstance(target, Composition) \
+        self.target: Composition = target if isinstance(target, Composition) \
             else Composition.from_dict(target)
+
+    def to_yaml(self, filename: str = "cpd.yaml") -> None:
+        d = {"target": str(self.target).replace(" ", "")}
+        for ce in self.comp_energies:
+            key = str(ce.composition.iupac_formula).replace(" ", "")
+            val = {"energy": ce.energy, "source": ce.source}
+            d[key] = val
+        Path(filename).write_text(yaml.dump(d))
+
+    @classmethod
+    def from_yaml(cls, filename: str = "cpd.yaml") -> "ChemPotDiag":
+        d = loadfn(filename)
+        target = d.pop("target")
+        composition_energies = set()
+        for k, v in d.items():
+            composition_energies.add(
+                CompositionEnergy(Composition(k), v["energy"], v["source"]))
+        return cls(composition_energies, target)
 
     @property
     def abs_energies_per_atom(self):
-        return {Composition(c).reduced_composition: e / Composition(c).num_atoms
-                for c, e in self.energies.items()}
+        return {ce.composition.reduced_composition: ce.abs_energy_per_atom
+                for ce in self.comp_energies}
 
     @property
-    def compounds(self):
+    def all_compounds(self):
         return self.abs_energies_per_atom.keys()
 
     @property
     def vertex_elements(self):
-        elements = sum(list(c.elements for c in self.compounds), [])
-        return sorted(list(set(elements)))
+        return sorted(self.target.elements)
 
     @property
     def dim(self):
         return len(self.vertex_elements)
+
+    @property
+    def host_comp_abs_energies(self):
+        pass
 
     @property
     def offset_to_abs(self):
@@ -107,10 +140,31 @@ class ChemPotDiag(MSONable, ToJsonFileMixIn):
         return {next(label): c for c in self.vertex_coords
                 if on_composition(fractions, c, energy)}
 
-    def abs_chem_pot_dict(self, label):
+    def abs_chem_pot_dict(self, label) -> dict:
         rel_chem_pots = self.target_vertices[label]
         abs_chem_pots = [x + y for x, y in zip(rel_chem_pots, self.offset_to_abs)]
         return dict(zip(self.vertex_elements, abs_chem_pots))
+
+    def impurity_abs_energy(self, element: Element, label: str):
+        comp_set = set(self.vertex_elements) | {element}
+        competing_comp_e = None
+        y = float("inf")
+        for ce in self.comp_energies:
+            if element in set(ce.composition.elements):
+                if set(ce.composition.elements).issubset(comp_set) is False:
+                    raise ValueError("Other element(s) than host elements "
+                                     "exists.")
+                abs_chem_pot = self.abs_chem_pot_dict(label)
+                mu = ce.energy
+                comp_d = ce.composition.as_dict()
+                for ve in self.vertex_elements:
+                    mu -= comp_d[str(ve)] * abs_chem_pot[ve]
+                mu /= comp_d[str(element)]
+                if mu < y:
+                    competing_comp_e, y = ce, mu
+        if competing_comp_e is None:
+            raise ValueError(f"No compounds exist with element {element}.")
+        return competing_comp_e, y
 
 
 class CpdPlotInfo:
