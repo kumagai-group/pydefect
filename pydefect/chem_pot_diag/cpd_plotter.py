@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from abc import abstractmethod, ABC
+from random import random
 from typing import Optional
 
 import numpy as np
@@ -228,40 +229,28 @@ class ChemPotDiagPlotly2DMplPlotter:
     def __init__(self, cpd_plot_info: CpdPlotInfo):
         self.info = cpd_plot_info
 
-    def _add_ax(self):
-        self._ax = plt.figure().add_subplot(111)
-
     @property
-    def _text_kwargs(self):
-        return {}
-
-    def _set_grid(self):
-        self._ax.grid(**self._mpl_defaults.grid_2d)
-
     def figure(self):
         fig = go.Figure()
 
         for comp, vertices in self.info.comp_vertices.items():
-            x0 = vertices[0][0]
-            y0 = vertices[0][1]
-            x1 = vertices[1][0]
-            y1 = vertices[1][1]
+            (x0, y0), (x1, y1) = vertices[0], vertices[1]
+            x_ave, y_ave = (x0 + x1) / 2, (y0 + y1) / 2
+            if x_ave == 0.0:
+                pos = "middle right"
+            elif y_ave == 0.0:
+                pos = "top center"
+            else:
+                pos = "top center"
 
-            fig.add_shape(
-                dict(
-                    type="line",
-                    x0=x0, y0=y0, x1=x1, y1=y1,
-                    line=dict(
-#                        color="RoyalBlue",
-                        width=3),
-            ))
-            fig.add_trace(go.Scatter(
-                x=[(x0 + x1) / 2],
-                y=[(y0 + y1) / 2],
-                text=[clean_formula(comp)],
-                mode="text",
-                hoverinfo='skip',
-            ))
+            fig.add_shape(dict(type="line", x0=x0, y0=y0, x1=x1, y1=y1,
+                               line=dict(color="RoyalBlue", width=3)))
+            fig.add_trace(go.Scatter(x=[x_ave], y=[y_ave],
+                                     text=[clean_formula(comp)],
+                                     mode="text",
+                                     textposition=pos,
+                                     textfont=dict(color="RoyalBlue", size=20),
+                                     hoverinfo='skip'))
 
         if self.info.cpd.target:
             x, y, text = [], [], []
@@ -269,32 +258,95 @@ class ChemPotDiagPlotly2DMplPlotter:
                 x.append(cp[0])
                 y.append(cp[1])
                 text.append(label)
-
             fig.add_trace(go.Scatter(x=x, y=y, text=text, mode='markers+text',
-                                     textposition="top center",
-                                     textfont=dict(
-                                         family="sans serif",
-                                         size=18,
-                                     )))
+                                     textposition="bottom left",
+                                     textfont=dict(size=20),
+                                     hovertemplate="<b>label %{text}</b><br>"
+                                                   "energy (%{x:.2f}, %{y:.2f})"))
 
         vertex_elements = self.info.cpd.vertex_elements
-        fig.update_traces(marker_size=30)
-        fig.update_layout(xaxis_title=f"Chemical potential of {vertex_elements[0]}",
-                          yaxis_title=f"Chemical potential of {vertex_elements[1]}")
+        fig.update_traces(marker_size=15)
+        elements_str = [str(elem) for elem in self.info.cpd.vertex_elements]
+        fig.update_layout(
+            title=f"Chemical potential diagram of {'-'.join(elements_str)}",
+            xaxis_title=f"Chemical potential of {vertex_elements[0]}",
+            yaxis_title=f"Chemical potential of {vertex_elements[1]}",
+            width=500, height=500,
+            font_size=15,
+            showlegend=False)
 
-        fig.update_xaxes(range=[self.info.min_range, -self.info.min_range * 0.05])
-        fig.update_yaxes(range=[self.info.min_range, -self.info.min_range * 0.05])
+        _range = [self.info.min_range, -self.info.min_range * 0.1]
+        fig.update_xaxes(range=_range)
+        fig.update_yaxes(range=_range)
         return fig
 
-    @staticmethod
-    def _2d_simplex_color(atomic_fractions):
-        return [(f + 1.5) / 2.5 for f in atomic_fractions]
+
+class ChemPotDiagPlotly3DMplPlotter:
+
+    def __init__(self, cpd_plot_info: CpdPlotInfo):
+        self.info = cpd_plot_info
+
+    @property
+    def figure(self):
+        data = []
+        for comp, vertices in self.info.comp_vertices.items():
+            x = [v[0] + random() * 1e-5 for v in vertices]
+            y = [v[1] + random() * 1e-5 for v in vertices]
+            z = [v[2] + random() * 1e-5 for v in vertices]
+            data.append(go.Mesh3d(x=x, y=y, z=z, opacity=0.3))
+
+            # fig.add_shape(dict(type="line", x0=x0, y0=y0, x1=x1, y1=y1,
+            #                    line=dict(color="RoyalBlue", width=3)))
+            x_ave = sum(x) / len(vertices)
+            y_ave = sum(y) / len(vertices)
+            z_ave = sum(z) / len(vertices)
+
+            data.append(go.Scatter3d(x=[x_ave], y=[y_ave], z=[z_ave],
+                                     text=[clean_formula(comp)],
+                                     mode="text",
+                                     textposition="middle center",
+                                     textfont=dict(color="RoyalBlue", size=20),
+                                     hoverinfo='skip'))
+
+        if self.info.cpd.target:
+            x, y, z, text = [], [], [], []
+            for label, cp in self.info.cpd.target_vertices.items():
+                x.append(cp[0])
+                y.append(cp[1])
+                z.append(cp[2])
+                text.append(label)
+            data.append(go.Scatter3d(x=x, y=y, z=z, text=text,
+                                     mode='markers+text',
+                                     textfont=dict(size=20),
+                                     hovertemplate="<b>label %{text}</b><br>"
+                                                   "energy (%{x:.2f}, %{y:.2f})"))
+
+        fig = go.Figure(data=data)
+        # fig.update_traces(marker_size=15)
+        _range = [self.info.min_range * 1.001, -self.info.min_range * 0.1]
+        vertex_elements = self.info.cpd.vertex_elements
+        elements_str = [str(elem) for elem in self.info.cpd.vertex_elements]
+        fig.update_layout(
+            title=f"Chemical potential diagram of {'-'.join(elements_str)}",
+            scene=dict(
+                xaxis_title=f"Chemical potential of {vertex_elements[0]}",
+                yaxis_title=f"Chemical potential of {vertex_elements[1]}",
+                zaxis_title=f"Chemical potential of {vertex_elements[2]}",
+                xaxis_range=_range,
+                yaxis_range=_range,
+                zaxis_range=_range,
+            ),
+            width=1000, height=1000,
+            font_size=15,
+            showlegend=False)
+
+        return fig
 
 
 def clean_formula(comp):
     s = []
     for char in str(comp):
-        if char == "1":
+        if char == "1" or char == " ":
             continue
         elif char.isdigit():
             s.append(f"<sub>{char}</sub>")

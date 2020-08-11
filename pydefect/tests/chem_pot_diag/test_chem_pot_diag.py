@@ -35,12 +35,12 @@ H4O2:
 O1:
   energy: 1.0
   source: b
-O1Cl1:
-  energy: 3.0
-  source: d
 O2Cl1:
   energy: 3.0
   source: e
+O2Cl2:
+  energy: 6.0
+  source: d
 target: H2O1
 """
     assert Path("cpd.yaml").read_text() == expected
@@ -64,6 +64,12 @@ def test_chem_pot_diag(cpd):
 
 def test_abs_chem_pots(cpd):
     assert cpd.abs_chem_pot_dict("A") == {Element.H: 0.0, Element.O: -3.0 + 1.0}
+
+
+def test_host_ele_abs_energies_per_atom(cpd):
+    assert cpd.host_ele_abs_energies_per_atom == {Composition("H2"): 0.0,
+                                                  Composition("O2"): 1.0,
+                                                  Composition("H2O"): -2/3}
 
 
 def test_cpd_plot_info_lacking_element_data():

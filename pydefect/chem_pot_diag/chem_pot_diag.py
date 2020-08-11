@@ -73,8 +73,12 @@ class ChemPotDiag:
         return len(self.vertex_elements)
 
     @property
-    def host_comp_abs_energies(self):
-        pass
+    def host_ele_abs_energies_per_atom(self):
+        result = {}
+        for k, v in self.abs_energies_per_atom.items():
+            if set(k.elements).issubset(set(self.target.elements)):
+                result[k] = v
+        return result
 
     @property
     def offset_to_abs(self):
@@ -82,7 +86,7 @@ class ChemPotDiag:
         for vertex_element in self.vertex_elements:
             target = Composition({vertex_element: 1.0}).reduced_composition
             candidates = filter(lambda x: x[0] == target,
-                                self.abs_energies_per_atom.items())
+                                self.host_ele_abs_energies_per_atom.items())
             try:
                 result.append(min([x[1] for x in candidates]))
             except ValueError:
@@ -92,7 +96,7 @@ class ChemPotDiag:
     @property
     def rel_energies(self):
         result = {}
-        for c, e in self.abs_energies_per_atom.items():
+        for c, e in self.host_ele_abs_energies_per_atom.items():
             sub = sum(f * offset for f, offset
                       in zip(self.atomic_fractions(c), self.offset_to_abs))
             result[c] = e - sub
@@ -119,6 +123,8 @@ class ChemPotDiag:
         return min(chain(*self.vertex_coords))
 
     def get_half_space_intersection(self, min_range):
+        print("dim", self.dim)
+        print("vertex_elements", self.vertex_elements)
         half_spaces = []
         for c, e in self.rel_energies.items():
             half_spaces.append(self.atomic_fractions(c) + [-e])

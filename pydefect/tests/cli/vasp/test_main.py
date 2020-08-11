@@ -67,6 +67,8 @@ def test_cpd_options():
     expected = Namespace(
         dirs=[Path("Mg"), Path("O")],
         target=Composition("MgO"),
+        elements=None,
+        functional=None,
         func=parsed_args.func)
     assert parsed_args == expected
 

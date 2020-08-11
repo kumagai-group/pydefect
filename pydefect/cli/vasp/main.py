@@ -98,11 +98,13 @@ def parse_args(args):
     parser_cpd = subparsers.add_parser(
         name="cpd",
         description="",
-        parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cpd'])
 
     parser_cpd.add_argument("-t", "--target", type=Composition, required=True)
+    parser_cpd.add_argument("-e", "--elements", type=str, nargs="+")
+    parser_cpd.add_argument("-f", "--functional", type=str)
+    parser_cpd.add_argument("-d", "--dirs", nargs="+", type=Path)
 
     parser_cpd.set_defaults(func=make_chem_pot_diag)
 
