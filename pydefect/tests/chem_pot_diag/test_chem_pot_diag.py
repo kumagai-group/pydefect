@@ -82,7 +82,7 @@ def test_host_ele_abs_energies_per_atom_2():
     energies_with_cl = deepcopy(energies)
     energies_with_cl.add(CompositionEnergy(Composition("Cl"), 10.0, "z"))
     cpd = ChemPotDiag(energies_with_cl, target=Composition("H2O"),
-                      host_elements=[Element.H, Element.O, Element.Cl])
+                      vertex_elements=[Element.H, Element.O, Element.Cl])
     assert cpd.host_ele_abs_energies_per_atom == {Composition("H2"): 0.0,
                                                   Composition("O2"): 1.0,
                                                   Composition("H2O"): -2/3,

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-import dataclasses
 import string
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
 from itertools import chain
 from pathlib import Path
 from typing import Dict, Optional, Union, List, Set
@@ -12,6 +11,7 @@ import numpy as np
 import yaml
 from monty.serialization import loadfn
 from pydefect.error import PydefectError
+from pydefect.util.error_classes import CpdNotSupportedError
 from pymatgen import Composition, Element
 from scipy.spatial.qhull import HalfspaceIntersection
 
@@ -32,12 +32,13 @@ class CompositionEnergy:
 @dataclass
 class ChemPotDiag:
     comp_energies: Set[CompositionEnergy]
-    target: dataclasses.InitVar[Union[Composition, dict]]
-    host_elements: Optional[List[Element]] = None
+    target: InitVar[Union[Composition, dict]]
+    vertex_elements: InitVar[Optional[List[Element]]] = None
 
-    def __post_init__(self, target):
+    def __post_init__(self, target, vertex_elements):
         self.target: Composition = target if isinstance(target, Composition) \
             else Composition.from_dict(target)
+        self.vertex_elements = vertex_elements or sorted(self.target.elements)
 
     def to_yaml(self, filename: str = "cpd.yaml") -> None:
         d = {"target": str(self.target).replace(" ", "")}
@@ -73,10 +74,6 @@ class ChemPotDiag:
             result.update(set(c.elements))
         result.difference_update(set(self.target.elements))
         return list(result)
-
-    @property
-    def vertex_elements(self):
-        return self.host_elements or sorted(self.target.elements)
 
     @property
     def dim(self):
@@ -172,8 +169,8 @@ class ChemPotDiag:
         for ce in self.comp_energies:
             if element in set(ce.composition.elements):
                 if set(ce.composition.elements).issubset(comp_set) is False:
-                    raise ValueError("Other element(s) than host elements "
-                                     "exists.")
+                    raise CpdNotSupportedError(
+                        "Other element(s) than host elements exists.")
                 abs_chem_pot = self.host_abs_chem_pot_dict(label)
                 mu = ce.energy
                 comp_d = ce.composition.as_dict()
@@ -183,7 +180,7 @@ class ChemPotDiag:
                 if mu < y:
                     competing_comp_e, y = ce, mu
         if competing_comp_e is None:
-            raise ValueError(f"No compounds exist with element {element}.")
+            raise CpdNotSupportedError(f"No compounds with element {element}.")
         return competing_comp_e, y
 
 
