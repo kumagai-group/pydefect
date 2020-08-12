@@ -19,40 +19,58 @@ def mp_query(mocker):
     return mock
 
 
-def test_make_chem_pot_diag_from_mp(mp_query):
-    actual = make_chem_pot_diag_from_mp(elements=["Mg", "O"],
-                                        target=Composition("MgO"))
-    expected = ChemPotDiag({
+@pytest.fixture
+def cpd():
+    return ChemPotDiag({
         CompositionEnergy(Composition('O8'), -39.58364375, "mp-1"),
         CompositionEnergy(Composition('Mg3'), -4.79068775, "mp-2"),
         CompositionEnergy(Composition('Mg1O1'), -11.96742144, "mp-3")},
         target=Composition("MgO"))
-    mp_query.assert_called_once_with(
-        ["Mg", "O"], properties=["task_id", "full_formula", "final_energy"])
-    assert actual == expected
 
 
-def test_make_chem_pot_diag_from_mp_w_vise_functional(mp_query):
-    to_datasets = Path(__file__).parent / "../../chem_pot_diag/datasets"
-    pbesol = loadfn(str(to_datasets / "vise_pbesol_atom_energy.yaml"))
-    mp = loadfn(str(to_datasets / "mp_atom_energy.yaml"))
+to_datasets = Path(__file__).parent / "../../chem_pot_diag/datasets"
+pbesol = loadfn(str(to_datasets / "vise_pbesol_atom_energy.yaml"))
+mp = loadfn(str(to_datasets / "mp_atom_energy.yaml"))
 
-    diff = {elem: pbesol[elem] - mp[elem] for elem in ["O", "Mg"]}
-    actual = make_chem_pot_diag_from_mp(elements=["Mg", "O"],
-                                        target=Composition("MgO"),
-                                        vise_functional="pbesol")
-    expected = ChemPotDiag({
+diff = {elem: pbesol[elem] - mp[elem] for elem in ["O", "Mg"]}
+
+
+@pytest.fixture
+def cpd_corr():
+    return ChemPotDiag({
         CompositionEnergy(Composition('O8'), -39.58364375 + diff["O"] * 8, "mp-1"),
         CompositionEnergy(Composition('Mg3'), -4.79068775 + diff["Mg"] * 3, "mp-2"),
         CompositionEnergy(Composition('Mg1O1'), -11.96742144 + diff["Mg"] + diff["O"], "mp-3")},
         target=Composition("MgO"))
-    assert actual == expected
+
+
+def test_make_chem_pot_diag_from_mp(mp_query, cpd):
+    actual = make_chem_pot_diag_from_mp(elements=["Mg", "O"],
+                                        target=Composition("MgO"))
+    mp_query.assert_called_once_with(
+        ["Mg", "O"], properties=["task_id", "full_formula", "final_energy"])
+    assert actual == cpd
+
+
+def test_make_chem_pot_diag_from_mp_yaml(mp_query, tmpdir, cpd_corr):
+    tmpdir.chdir()
+    tmpdir.join("tmp.yaml").write("""O:  -1.61154565
+Mg: -0.00912097""")
+    actual = make_chem_pot_diag_from_mp(elements=["Mg", "O"],
+                                        target=Composition("MgO"),
+                                        atom_energy_yaml="tmp.yaml")
+    assert actual == cpd_corr
+
+
+def test_make_chem_pot_diag_from_mp_w_vise_functional(mp_query, cpd_corr):
+    actual = make_chem_pot_diag_from_mp(elements=["Mg", "O"],
+                                        target=Composition("MgO"),
+                                        atom_energy_yaml="pbesol")
+    assert actual == cpd_corr
 
 
 """
 TODO
-- Make ChemPotDiag from MP data 
-- Modify the MP total energies using the atom energy difference.
 - Raise an error when the elements the MP does not support are given.
 
 DONE

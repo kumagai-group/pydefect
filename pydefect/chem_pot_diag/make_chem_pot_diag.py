@@ -12,32 +12,45 @@ from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagPlotly3DMplPlotter, \
     ChemPotDiagPlotly2DMplPlotter
 from pydefect.util.mp_tools import MpQuery
 from pymatgen import Composition, Element
+from vise.util.enum import ExtendedEnum
 
-pbesol_energies = loadfn(Path(__file__).parent / "datasets/vise_pbesol_atom_energy.yaml")
-mp_energies = loadfn(Path(__file__).parent / "datasets/mp_atom_energy.yaml")
+parent = Path(__file__).parent
+
+mp_energies = loadfn(parent / "datasets/mp_atom_energy.yaml")
+
+
+class AtomEnergyType(ExtendedEnum):
+    pbesol = "pbesol"
+    hse = "hse"
+
+    @property
+    def energies(self):
+        if self.pbesol:
+            return loadfn(parent / "datasets/vise_pbesol_atom_energy.yaml")
 
 
 def make_chem_pot_diag_from_mp(elements: List[str],
                                target: Composition,
-                               host_elements: List[str] = None,
-                               vise_functional: Optional[str] = None):
+                               vertex_elements: List[str] = None,
+                               atom_energy_yaml: Optional[str] = None):
     """Obtain the energies from Materials Project."""
     properties = ["task_id", "full_formula", "final_energy"]
     query = MpQuery(elements, properties=properties)
     comp_es = set()
     for m in query.materials:
         energy = m["final_energy"]
-        if vise_functional == "pbesol":
-            diff = {elem: pbesol_energies[elem] - mp_energies[elem]
-                    for elem in elements}
+        if atom_energy_yaml:
+            if ".yaml" in atom_energy_yaml:
+                energies = loadfn(atom_energy_yaml)
+            else:
+                energies = AtomEnergyType.from_string(atom_energy_yaml).energies
+            diff = {e: energies[e] - mp_energies[e] for e in elements}
             for k, v in Composition(m["full_formula"]).as_dict().items():
                 energy += diff[k] * v
-        elif vise_functional:
-            raise ValueError("Now support only pbesol.")
         comp_es.add(CompositionEnergy(
             Composition(m["full_formula"]), energy, m["task_id"]))
 
-    return ChemPotDiag(comp_es, target, host_elements)
+    return ChemPotDiag(comp_es, target, vertex_elements)
 
 
 def parse_args(args):
