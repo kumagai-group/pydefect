@@ -60,8 +60,8 @@ def test_make_poscars_w_options():
     assert parsed_args == expected
 
 
-def test_cpd_options():
-    parsed_args = parse_args(["cpd",
+def test_make_cpd_options():
+    parsed_args = parse_args(["mcpd",
                               "-d", "Mg", "O",
                               "-t", "MgO"])
     expected = Namespace(
@@ -70,6 +70,16 @@ def test_cpd_options():
         elements=None,
         functional=None,
         yaml=None,
+        update=False,
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
+def test_plot_cpd_options():
+    parsed_args = parse_args(["pcpd",
+                              "-y", "a.yaml"])
+    expected = Namespace(
+        yaml="a.yaml",
         func=parsed_args.func)
     assert parsed_args == expected
 

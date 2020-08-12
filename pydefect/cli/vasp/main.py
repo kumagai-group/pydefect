@@ -13,7 +13,8 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
     make_calc_results, make_defect_formation_energy, make_defect_eigenvalues, \
     make_edge_characters, make_edge_states, \
-    append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info
+    append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
+    plot_chem_pot_diag
 from pydefect.defaults import defaults
 from pydefect.version import __version__
 from pymatgen import IStructure, Composition, Structure
@@ -94,20 +95,32 @@ def parse_args(args):
 
     parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
 
-    # -- cpd ------------------------------------------------
-    parser_cpd = subparsers.add_parser(
-        name="cpd",
+    # -- make_cpd ------------------------------------------------
+    parser_mcpd = subparsers.add_parser(
+        name="make_cpd",
         description="",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['cpd'])
+        aliases=['mcpd'])
 
-    parser_cpd.add_argument("-y", "--yaml", type=str)
-    parser_cpd.add_argument("-t", "--target", type=Composition, required=True)
-    parser_cpd.add_argument("-e", "--elements", type=str, nargs="+")
-    parser_cpd.add_argument("-f", "--functional", type=str)
-    parser_cpd.add_argument("-d", "--dirs", nargs="+", type=Path)
+    parser_mcpd.add_argument("-y", "--yaml", type=str)
+    parser_mcpd.add_argument("-t", "--target", type=Composition, required=True)
+    parser_mcpd.add_argument("-e", "--elements", type=str, nargs="+")
+    parser_mcpd.add_argument("-f", "--functional", type=str)
+    parser_mcpd.add_argument("-d", "--dirs", nargs="+", type=Path)
+    parser_mcpd.add_argument("-u", "--update", action="store_true")
 
-    parser_cpd.set_defaults(func=make_chem_pot_diag)
+    parser_mcpd.set_defaults(func=make_chem_pot_diag)
+
+    # -- plot_cpd ------------------------------------------------
+    parser_pcpd = subparsers.add_parser(
+        name="plot_cpd",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['pcpd'])
+
+    parser_pcpd.add_argument("-y", "--yaml", type=str)
+
+    parser_pcpd.set_defaults(func=plot_chem_pot_diag)
 
     # -- supercell ------------------------------------------------
     parser_supercell = subparsers.add_parser(
