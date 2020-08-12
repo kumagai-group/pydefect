@@ -3,8 +3,41 @@
 from pathlib import Path
 
 from monty.serialization import loadfn
+from pydefect.analyzer.band_edge_states import BandEdgeStates
+from pydefect.analyzer.defect_energy import make_defect_energies
+from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
+from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
+from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
+from pydefect.analyzer.make_band_edge_state import make_band_edge_state
+from pydefect.analyzer.make_defect_energy import make_single_defect_energy
+from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
+    CompositionEnergy, replace_comp_energy
+from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagMpl2DMplPlotter, \
+    ChemPotDiagMpl3DMplPlotter
+from pydefect.chem_pot_diag.make_chem_pot_diag import make_chem_pot_diag_from_mp
+from pydefect.cli.main_tools import sanitize_matrix
+from pydefect.cli.vasp.make_band_edge_eigenvalues import \
+    make_band_edge_eigenvalues
+from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
+from pydefect.cli.vasp.make_edge_characters import MakeEdgeCharacters
+from pydefect.cli.vasp.make_efnv_correction import \
+    make_efnv_correction
+from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
+from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
+from pydefect.corrections.efnv_correction.site_potential_plotter import \
+    SitePotentialMplPlotter
 from pydefect.defaults import defaults
+from pydefect.input_maker.add_interstitial import append_interstitial
+from pydefect.input_maker.defect_entries_maker import DefectEntriesMaker
+from pydefect.input_maker.defect_entry import DefectEntry
+from pydefect.input_maker.defect_set import DefectSet
+from pydefect.input_maker.defect_set_maker import DefectSetMaker
+from pydefect.input_maker.supercell_info import SupercellInfo
+from pydefect.input_maker.supercell_maker import SupercellMaker
+from pydefect.util.error_classes import CpdNotSupportedError
+from pydefect.util.mp_tools import MpQuery
 from pymatgen.io.vasp import Vasprun, Outcar, Procar
+from pymatgen.util.string import latexify
 from vise.util.logger import get_logger
 
 logger = get_logger(__name__)
@@ -15,7 +48,6 @@ def print_file(args):
 
 
 def make_unitcell(args):
-    from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
     unitcell = make_unitcell_from_vasp(vasprun_band=args.vasprun_band,
                                        outcar_band=args.outcar_band,
                                        outcar_dielectric=args.outcar_dielectric)
@@ -23,16 +55,11 @@ def make_unitcell(args):
 
 
 def make_competing_phase_dirs(args):
-    from pydefect.util.mp_tools import MpQuery
-    from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
     query = MpQuery(element_list=args.elements, e_above_hull=args.e_above_hull)
     make_poscars_from_query(materials_query=query.materials, path=Path.cwd())
 
 
 def make_chem_pot_diag(args) -> None:
-    from pydefect.chem_pot_diag.make_chem_pot_diag import make_chem_pot_diag_from_mp
-    from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CompositionEnergy
-
     if args.elements:
         cpd = make_chem_pot_diag_from_mp(args.elements, args.target,
                                          args.functional)
@@ -43,15 +70,15 @@ def make_chem_pot_diag(args) -> None:
             composition = vasprun.final_structure.composition
             energy = vasprun.final_energy
             comp_es.add(CompositionEnergy(composition, energy, "local"))
-        cpd = ChemPotDiag(comp_es, args.target)
+        if args.update:
+            cpd = ChemPotDiag.from_yaml(args.yaml)
+            replace_comp_energy(cpd, comp_es)
+        else:
+            cpd = ChemPotDiag(comp_es, args.target)
     cpd.to_yaml()
 
 
 def plot_chem_pot_diag(args) -> None:
-    from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo
-    from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagMpl2DMplPlotter, \
-        ChemPotDiagMpl3DMplPlotter
-    from pydefect.util.error_classes import CpdNotSupportedError
     cpd = ChemPotDiag.from_yaml(args.yaml)
     if cpd.dim == 2:
         plotter = ChemPotDiagMpl2DMplPlotter(CpdPlotInfo(cpd))
@@ -66,9 +93,6 @@ def plot_chem_pot_diag(args) -> None:
 
 
 def make_supercell(args):
-    from pydefect.cli.main_tools import sanitize_matrix
-    from pydefect.input_maker.supercell_maker import SupercellMaker
-
     if args.matrix:
         matrix = sanitize_matrix(args.matrix)
         maker = SupercellMaker(args.unitcell, matrix)
@@ -85,7 +109,6 @@ def make_supercell(args):
 
 
 def append_interstitial_to_supercell_info(args):
-    from pydefect.input_maker.add_interstitial import append_interstitial
     supercell_info = append_interstitial(args.supercell_info,
                                          args.base_structure,
                                          args.frac_coords)
@@ -99,7 +122,6 @@ def pop_interstitial_from_supercell_info(args):
 
 
 def make_defect_set(args):
-    from pydefect.input_maker.defect_set_maker import DefectSetMaker
     supercell_info = loadfn("supercell_info.json")
     if args.oxi_states:
         oxi_states = dict(zip(args.oxi_states[::2], args.oxi_states[1::2]))
@@ -113,9 +135,6 @@ def make_defect_set(args):
 
 
 def make_defect_entries(args):
-    from pydefect.input_maker.supercell_info import SupercellInfo
-    from pydefect.input_maker.defect_set import DefectSet
-    from pydefect.input_maker.defect_entries_maker import DefectEntriesMaker
     supercell_info: SupercellInfo = loadfn("supercell_info.json")
     perfect = Path("perfect")
 
@@ -142,7 +161,6 @@ def make_defect_entries(args):
 
 
 def make_calc_results(args):
-    from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
         calc_results = make_calc_results_from_vasp(
@@ -152,9 +170,6 @@ def make_calc_results(args):
 
 
 def make_efnv_correction_from_vasp(args):
-    from pydefect.input_maker.defect_entry import DefectEntry
-    from pydefect.cli.vasp.make_efnv_correction import make_efnv_correction
-    from pydefect.corrections.efnv_correction.site_potential_plotter import SitePotentialMplPlotter
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
         defect_entry: DefectEntry = loadfn(d / "defect_entry.json")
@@ -173,8 +188,6 @@ def make_efnv_correction_from_vasp(args):
 
 
 def make_defect_eigenvalues(args):
-    from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
-    from pydefect.cli.vasp.make_band_edge_eigenvalues import make_band_edge_eigenvalues
     supercell_vbm = args.perfect_calc_results.vbm
     supercell_cbm = args.perfect_calc_results.cbm
     for d in args.dirs:
@@ -194,8 +207,6 @@ def make_defect_eigenvalues(args):
 
 
 def make_edge_characters(args):
-    from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
-    from pydefect.cli.vasp.make_edge_characters import MakeEdgeCharacters
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
         vasprun = Vasprun(d / defaults.vasprun)
@@ -211,8 +222,6 @@ def make_edge_characters(args):
 
 
 def make_edge_states(args):
-    from pydefect.analyzer.band_edge_states import BandEdgeStates
-    from pydefect.analyzer.make_band_edge_state import make_band_edge_state
     for d in args.dirs:
         print(f"-- {d}")
         edge_states = []
@@ -228,10 +237,6 @@ def make_edge_states(args):
 
 
 def make_defect_formation_energy(args):
-    from pymatgen.util.string import latexify
-    from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
-    from pydefect.analyzer.defect_energy import make_defect_energies
-    from pydefect.analyzer.make_defect_energy import make_single_defect_energy
     title = latexify(
         args.perfect_calc_results.structure.composition.reduced_formula)
     abs_chem_pot = args.chem_pot_diag.abs_chem_pot_dict(args.label)

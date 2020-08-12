@@ -15,7 +15,8 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_chem_pot_diag, make_calc_results, print_file, \
     make_efnv_correction_from_vasp, make_defect_formation_energy, \
     make_defect_eigenvalues, make_edge_characters, \
-    append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info
+    append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
+    plot_chem_pot_diag
 from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
@@ -85,15 +86,21 @@ def test_make_chem_pot_diag(mocker, tmpdir):
 
     tmpdir.chdir()
     mock = mocker.patch("pydefect.cli.vasp.main_function.Vasprun", side_effect=side_effect)
-    args_1 = Namespace(elements=None, functional=None, yaml=None,
+    args_1 = Namespace(elements=None, functional=None, yaml=None, update=False,
                        dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
                        target=Composition("MgO"))
     make_chem_pot_diag(args_1)
 
-    args_2 = Namespace(elements=None, functional=None, yaml=None,
+    args = Namespace(yaml="cpd.yaml")
+    plot_chem_pot_diag(args)
+
+    args_2 = Namespace(elements=None, functional=None, yaml=None, update=False,
                        dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
                        target=Composition("MgAl2O4"))
     make_chem_pot_diag(args_2)
+
+    args = Namespace(yaml="cpd.yaml")
+    plot_chem_pot_diag(args)
 
 
 def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
