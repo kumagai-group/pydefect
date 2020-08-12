@@ -5,7 +5,8 @@ from pathlib import Path
 import pytest
 from monty.serialization import loadfn
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CompositionEnergy
-from pydefect.chem_pot_diag.make_chem_pot_diag import make_chem_pot_diag_from_mp
+from pydefect.chem_pot_diag.make_chem_pot_diag import \
+    make_chem_pot_diag_from_mp, remove_higher_energy_comp
 from pymatgen import Composition
 
 
@@ -68,6 +69,15 @@ def test_make_chem_pot_diag_from_mp_w_vise_functional(mp_query, cpd_corr):
                                         atom_energy_yaml="pbesol")
     assert actual == cpd_corr
 
+
+def test_remove_higher_energy_comp():
+    comp_es = {CompositionEnergy(Composition('O2'), -2.1, "mp-1"),
+               CompositionEnergy(Composition('O4'), -4.0, "mp-2"),
+               CompositionEnergy(Composition('Mg1'), -10, "mp-3")}
+    actual = remove_higher_energy_comp(comp_es)
+    expected = {CompositionEnergy(Composition('O2'), -2.1, "mp-1"),
+                CompositionEnergy(Composition('Mg1'), -10, "mp-3")}
+    assert actual == expected
 
 """
 TODO

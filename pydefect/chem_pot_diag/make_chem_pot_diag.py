@@ -2,8 +2,9 @@
 #  Copyright (c) 2020 Kumagai group.
 import argparse
 import sys
+from itertools import groupby
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from monty.serialization import loadfn
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CompositionEnergy, \
@@ -50,7 +51,18 @@ def make_chem_pot_diag_from_mp(elements: List[str],
         comp_es.add(CompositionEnergy(
             Composition(m["full_formula"]), energy, m["task_id"]))
 
+    comp_es = remove_higher_energy_comp(comp_es)
+
     return ChemPotDiag(comp_es, target, vertex_elements)
+
+
+def remove_higher_energy_comp(comp_energies: Set[CompositionEnergy]):
+    result = set()
+    for _, grouped_comp_energies in groupby(
+            comp_energies, key=lambda x: x.composition.reduced_formula):
+        result.add(min(list(grouped_comp_energies),
+                       key=lambda y: y.abs_energy_per_atom))
+    return result
 
 
 def parse_args(args):
