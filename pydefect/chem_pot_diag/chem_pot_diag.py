@@ -226,5 +226,20 @@ def on_composition(atomic_fractions, coord, energy) -> bool:
     return abs(diff) < 1e-8
 
 
+def replace_comp_energy(chem_pot_diag: ChemPotDiag,
+                        replaced_comp_energies: List[CompositionEnergy]):
+    new_comp_energies = set()
+    for ce in chem_pot_diag.comp_energies:
+        for replaced_comp_energy in replaced_comp_energies:
+            if (ce.composition.reduced_composition
+                    == replaced_comp_energy.composition.reduced_composition):
+                new_comp_energies.add(replaced_comp_energy)
+                break
+        else:
+            new_comp_energies.add(ce)
+    chem_pot_diag.comp_energies = new_comp_energies
+    return chem_pot_diag
+
+
 class NoElementEnergyError(PydefectError):
     pass

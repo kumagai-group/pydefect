@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
-    NoElementEnergyError, CompositionEnergy
+    NoElementEnergyError, CompositionEnergy, replace_comp_energy
 # When same keys are inserted, only the latter one is accepted.
 from pymatgen import Composition, Element
 
@@ -134,6 +134,21 @@ def test_cpd_plot_info_with_defaults(cpd_plot_info_wo_min_range):
             Composition('H2O'): [[-1.5, 0.0], [0.0, -3.0]],
             Composition('O2'): [[-3.3, 0.0], [-1.5, 0.0]]}
 
+
+def test_replace_comp_energy():
+    cpd = ChemPotDiag({CompositionEnergy(Composition("H"), 0.0, "a"),
+                       CompositionEnergy(Composition("O"), 1.0, "b"),
+                       CompositionEnergy(Composition("F"), 1.0, "c")},
+                      target={"H": 1})
+    actual = replace_comp_energy(cpd,
+                                 [CompositionEnergy(Composition("H"), -1.0, "x"),
+                                  CompositionEnergy(Composition("O"), 0.0, "y")])
+
+    expected = ChemPotDiag({CompositionEnergy(Composition("H"), -1.0, "x"),
+                            CompositionEnergy(Composition("O"), 0.0, "y"),
+                            CompositionEnergy(Composition("F"), 1.0, "c")},
+                           target={"H": 1})
+    assert actual == expected
 
 """
 TODO
