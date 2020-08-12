@@ -140,15 +140,15 @@ def test_replace_comp_energy():
                        CompositionEnergy(Composition("O"), 1.0, "b"),
                        CompositionEnergy(Composition("F"), 1.0, "c")},
                       target={"H": 1})
-    actual = replace_comp_energy(cpd,
-                                 [CompositionEnergy(Composition("H"), -1.0, "x"),
-                                  CompositionEnergy(Composition("O"), 0.0, "y")])
+    replace_comp_energy(cpd,
+                        {CompositionEnergy(Composition("H"), -1.0, "x"),
+                         CompositionEnergy(Composition("O"), 0.0, "y")})
 
     expected = ChemPotDiag({CompositionEnergy(Composition("H"), -1.0, "x"),
                             CompositionEnergy(Composition("O"), 0.0, "y"),
                             CompositionEnergy(Composition("F"), 1.0, "c")},
                            target={"H": 1})
-    assert actual == expected
+    assert cpd == expected
 
 """
 TODO
