@@ -19,7 +19,8 @@ energies = {CompositionEnergy(Composition("H"), 0.0, "a"),
 
 @pytest.fixture
 def cpd():
-    return ChemPotDiag(energies, target=Composition("H2O"))
+    return ChemPotDiag(energies, target=Composition("H2O"),
+                       vertex_elements=[Element.H, Element.O])
 
 
 def test_chem_pot_diag_yaml(cpd, tmpdir):
@@ -42,6 +43,9 @@ O2Cl2:
   energy: 6.0
   source: d
 target: H2O1
+vertex_elements:
+- H
+- O
 """
     assert Path("cpd.yaml").read_text() == expected
 

@@ -41,7 +41,8 @@ class ChemPotDiag:
         self.vertex_elements = vertex_elements or sorted(self.target.elements)
 
     def to_yaml(self, filename: str = "cpd.yaml") -> None:
-        d = {"target": str(self.target).replace(" ", "")}
+        d = {"target": str(self.target).replace(" ", ""),
+             "vertex_elements": [str(e) for e in self.vertex_elements]}
         for ce in self.comp_energies:
             key = str(ce.composition.iupac_formula).replace(" ", "")
             val = {"energy": ce.energy, "source": ce.source}
@@ -52,11 +53,12 @@ class ChemPotDiag:
     def from_yaml(cls, filename: str = "cpd.yaml") -> "ChemPotDiag":
         d = loadfn(filename)
         target = d.pop("target")
+        vertex_elements = [Element(e) for e in d.pop("vertex_elements")]
         composition_energies = set()
         for k, v in d.items():
             composition_energies.add(
                 CompositionEnergy(Composition(k), v["energy"], v["source"]))
-        return cls(composition_energies, target)
+        return cls(composition_energies, target, vertex_elements)
 
     @property
     def abs_energies_per_atom(self) -> Dict[Composition, float]:
