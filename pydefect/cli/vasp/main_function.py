@@ -68,14 +68,14 @@ def make_chem_pot_diag(args) -> None:
         for d in args.dirs:
             vasprun = Vasprun(d / defaults.vasprun)
             composition = vasprun.final_structure.composition
-            energy = vasprun.final_energy
+            energy = float(vasprun.final_energy)  # type is FloatWithUnit
             comp_es.add(CompositionEnergy(composition, energy, "local"))
         if args.update:
             cpd = ChemPotDiag.from_yaml(args.yaml)
             replace_comp_energy(cpd, comp_es)
         else:
             cpd = ChemPotDiag(comp_es, args.target)
-    cpd.to_yaml()
+    cpd.to_yaml(args.yaml)
 
 
 def plot_chem_pot_diag(args) -> None:

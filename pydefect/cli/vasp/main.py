@@ -102,7 +102,7 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['mcpd'])
 
-    parser_mcpd.add_argument("-y", "--yaml", type=str)
+    parser_mcpd.add_argument("-y", "--yaml", type=str, default="cpd.yaml")
     parser_mcpd.add_argument("-t", "--target", type=Composition, required=True)
     parser_mcpd.add_argument("-e", "--elements", type=str, nargs="+")
     parser_mcpd.add_argument("-f", "--functional", type=str)
