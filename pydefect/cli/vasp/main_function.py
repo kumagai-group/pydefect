@@ -61,8 +61,9 @@ def make_competing_phase_dirs(args):
 
 def make_chem_pot_diag(args) -> None:
     if args.elements:
-        cpd = make_chem_pot_diag_from_mp(args.elements, args.target,
-                                         args.functional)
+        cpd = make_chem_pot_diag_from_mp(elements=args.elements,
+                                         target=args.target,
+                                         atom_energy_yaml=args.functional)
     else:
         comp_es = set()
         for d in args.dirs:
@@ -239,7 +240,8 @@ def make_edge_states(args):
 def make_defect_formation_energy(args):
     title = latexify(
         args.perfect_calc_results.structure.composition.reduced_formula)
-    abs_chem_pot = args.chem_pot_diag.abs_chem_pot_dict(args.label)
+    chem_pot_diag = ChemPotDiag.from_yaml(args.chem_pot_diag)
+    abs_chem_pot = chem_pot_diag.abs_chem_pot_dict(args.label)
 
     single_energies = []
     for d in args.dirs:

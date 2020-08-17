@@ -199,7 +199,6 @@ def parse_args(args):
         aliases=['cr'])
     parser_calc_results.set_defaults(func=make_calc_results)
 
-
     # -- efnv correction ------------------------------------------------
     parser_efnv = subparsers.add_parser(
         name="efnv",
@@ -251,7 +250,7 @@ def parse_args(args):
         aliases=['e'])
 
     parser_energy.add_argument(
-        "-c", "--chem_pot_diag", required=True, type=loadfn)
+        "-c", "--chem_pot_diag", required=True, type=str)
     parser_energy.add_argument("-l", "--label", required=True, type=str)
     parser_energy.add_argument("-y", "--y_range", nargs=2, type=float)
     parser_energy.add_argument("-s", "--skip_shallow", action="store_true")
