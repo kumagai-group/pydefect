@@ -9,7 +9,6 @@ from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import EdgeCharacters, BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
-from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_calc_results, print_file, \
@@ -86,7 +85,7 @@ def test_make_chem_pot_diag(mocker, tmpdir):
 
     tmpdir.chdir()
     mock = mocker.patch("pydefect.cli.vasp.main_function.Vasprun", side_effect=side_effect)
-    args_1 = Namespace(elements=None, functional=None, yaml=None, update=False,
+    args_1 = Namespace(elements=None, functional=None, yaml="cpd.yaml", update=False,
                        dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
                        target=Composition("MgO"))
     make_chem_pot_diag(args_1)
@@ -94,7 +93,7 @@ def test_make_chem_pot_diag(mocker, tmpdir):
     args = Namespace(yaml="cpd.yaml")
     plot_chem_pot_diag(args)
 
-    args_2 = Namespace(elements=None, functional=None, yaml=None, update=False,
+    args_2 = Namespace(elements=None, functional=None, yaml="cpd.yaml", update=False,
                        dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
                        target=Composition("MgAl2O4"))
     make_chem_pot_diag(args_2)
@@ -344,8 +343,8 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
     mock_perfect_calc_results.vbm = 10
     mock_perfect_calc_results.cbm = 20
 
-    mock_chem_pot_diag = mocker.Mock(spec=ChemPotDiag)
-    mock_chem_pot_diag.abs_chem_pot_dict.return_value = {Element.H: 0}
+    mock_chem_pot_diag = mocker.patch("pydefect.cli.vasp.main_function.ChemPotDiag")
+    mock_chem_pot_diag.from_yaml.return_value.abs_chem_pot_dict.return_value = {Element.H: 0}
 
     mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
@@ -379,15 +378,13 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
     args = Namespace(dirs=[Path("Va_O1_2")],
                      perfect_calc_results=mock_perfect_calc_results,
                      unitcell=mock_unitcell,
-                     chem_pot_diag=mock_chem_pot_diag,
+                     chem_pot_diag="cpd.yaml",
                      label="A",
                      y_range=[-100, 100],
                      skip_shallow=skip_shallow,
                      print=True)
 
     make_defect_formation_energy(args)
-
-    mock_chem_pot_diag.abs_chem_pot_dict.assert_called_once_with("A")
 
     if skip_shallow is True:
         mock_loadfn.assert_any_call(Path("Va_O1_2") / "band_edge_states.json")

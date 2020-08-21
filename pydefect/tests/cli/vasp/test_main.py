@@ -69,7 +69,7 @@ def test_make_cpd_options():
         target=Composition("MgO"),
         elements=None,
         functional=None,
-        yaml=None,
+        yaml="cpd.yaml",
         update=False,
         func=parsed_args.func)
     assert parsed_args == expected
@@ -276,8 +276,6 @@ def test_defect_formation_energy(mocker):
             return mock_calc_results
         elif filename == "unitcell.json":
             return mock_unitcell
-        elif filename == "chem_pot_diag.json":
-            return mock_chem_pot_diag
         else:
             raise ValueError
 
@@ -286,7 +284,7 @@ def test_defect_formation_energy(mocker):
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-pcr", "perfect/calc_results.json",
                               "-u", "unitcell.json",
-                              "-c", "chem_pot_diag.json",
+                              "-c", "cpd.yaml",
                               "-l", "A",
                               "-y", "-5", "5",
                               "-s",
@@ -296,7 +294,7 @@ def test_defect_formation_energy(mocker):
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         perfect_calc_results=mock_calc_results,
         unitcell=mock_unitcell,
-        chem_pot_diag=mock_chem_pot_diag,
+        chem_pot_diag="cpd.yaml",
         label="A",
         y_range=[-5, 5],
         skip_shallow=True,
