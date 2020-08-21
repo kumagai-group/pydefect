@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
 
 from monty.json import MSONable
-from pydefect.util.mix_in import ToJsonFileMixIn
 from vise.util.enum import ExtendedEnum
+from vise.util.mix_in import ToJsonFileMixIn
 
 
 @dataclass

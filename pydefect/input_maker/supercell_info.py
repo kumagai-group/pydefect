@@ -7,10 +7,10 @@ from monty.json import MSONable
 from more_itertools import consecutive_groups
 from numpy.linalg import det
 from pydefect.database.database import electronegativity, oxidation_state
-from pydefect.util.mix_in import ToJsonFileMixIn
 from pydefect.util.structure_tools import Distances
 from pymatgen import IStructure
 from vise.util.logger import get_logger
+from vise.util.mix_in import ToJsonFileMixIn
 
 logger = get_logger(__name__)
 
