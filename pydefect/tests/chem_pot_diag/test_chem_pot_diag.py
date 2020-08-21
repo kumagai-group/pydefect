@@ -73,7 +73,8 @@ def test_chem_pot_diag(cpd):
 
 
 def test_abs_chem_pots(cpd):
-    assert cpd.abs_chem_pot_dict("A") == {Element.H: 0.0, Element.O: -3.0 + 1.0, Element.Cl: 5.0}
+    assert cpd.abs_chem_pot_dict("A") == \
+           {Element.H: 0.0, Element.O: -1.999999999985448, Element.Cl: 4.999999999985448}
 
 
 def test_host_ele_abs_energies_per_atom(cpd):
@@ -103,11 +104,11 @@ def test_cpd_plot_info_lacking_element_data():
 
 
 def test_chem_pot_diag_min_energy(cpd):
-    assert cpd.lowest_relative_energy == -3
+    assert cpd.lowest_relative_energy == -2.999999999985448
 
 
 def test_impurity_abs_energy(cpd):
-    expected = CompositionEnergy(Composition("Cl2O2"), 6.0, 'd'), 5.0
+    expected = CompositionEnergy(Composition("Cl2O2"), 6.0, 'd'), 4.999999999985448
     assert cpd.impurity_abs_energy(Element.Cl, "A") == expected
 
 
@@ -134,9 +135,9 @@ def test_cpd_plot_info(cpd_plot_info):
 
 def test_cpd_plot_info_with_defaults(cpd_plot_info_wo_min_range):
     assert cpd_plot_info_wo_min_range.comp_vertices == \
-           {Composition('H2'): [[0.0, -3.0], [0.0, -3.3]],
-            Composition('H2O'): [[-1.5, 0.0], [0.0, -3.0]],
-            Composition('O2'): [[-3.3, 0.0], [-1.5, 0.0]]}
+           {Composition('H2'): [[-0.0, -3.3], [0.0, -3.0]],
+            Composition('H2O'): [[0.0, -3.0], [-1.5, 0.0]],
+            Composition('O2'): [[-3.3, -0.0], [-1.5, 0.0]]}
 
 
 def test_replace_comp_energy():
