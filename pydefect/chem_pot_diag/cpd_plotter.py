@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from abc import abstractmethod, ABC
-from random import random
 from typing import Optional
 
 import numpy as np
@@ -289,17 +288,21 @@ class ChemPotDiagPlotly3DMplPlotter:
     @property
     def figure(self):
         data = []
-        for comp, vertices in self.info.comp_vertices.items():
-            x = [v[0] + random() * 1e-5 for v in vertices]
-            y = [v[1] + random() * 1e-5 for v in vertices]
-            z = [v[2] + random() * 1e-5 for v in vertices]
-            data.append(go.Mesh3d(x=x, y=y, z=z, opacity=0.3))
+        for comp, vertex_coords in self.info.comp_vertices.items():
+            vertex_coords = sort_coords(np.array(vertex_coords))
+            x = [v[0] for v in vertex_coords]
+            y = [v[1] for v in vertex_coords]
+            z = [v[2] for v in vertex_coords]
+            n_vertices = len(x)
+            i = [0] * (n_vertices - 2)
+            j = [x for x in range(1, n_vertices - 1)]
+            k = [x for x in range(2, n_vertices)]
+            data.append(go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k,
+                                  alphahull=-1, opacity=0.3))
 
-            # fig.add_shape(dict(type="line", x0=x0, y0=y0, x1=x1, y1=y1,
-            #                    line=dict(color="RoyalBlue", width=3)))
-            x_ave = sum(x) / len(vertices)
-            y_ave = sum(y) / len(vertices)
-            z_ave = sum(z) / len(vertices)
+            x_ave = sum(x) / len(vertex_coords)
+            y_ave = sum(y) / len(vertex_coords)
+            z_ave = sum(z) / len(vertex_coords)
 
             data.append(go.Scatter3d(x=[x_ave], y=[y_ave], z=[z_ave],
                                      text=[clean_formula(comp)],
