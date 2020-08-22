@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+import argparse
+import sys
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 from crystal_toolkit.core.scene import Scene, Surface
 from monty.json import MSONable
+from monty.serialization import loadfn
+from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
 from pymatgen import Spin, Structure
 from pymatgen.analysis.graphs import StructureGraph
 from pymatgen.io.vasp import Chgcar, VolumetricData
 from skimage.measure import marching_cubes
+from vise.util.mix_in import ToJsonFileMixIn
 
 
 @dataclass
-class SceneDicts(MSONable):
+class SceneDicts(MSONable, ToJsonFileMixIn):
     scene_dicts: Dict[str, Dict[str, np.ndarray]]
     structure_graph: StructureGraph
 
@@ -137,3 +143,26 @@ def make_single_scene(volmetric_data: VolumetricData, step_size=3):
                                              lattice_matrix,
                                              step_size=step_size)
     return SingleScene({"vertices": vertices, "faces": faces})
+
+
+def make_scene_dicts_json(parchg_list: List[str],
+                          calc_results: CalcResults,
+                          perfect_calc_results: CalcResults):
+    structure_analyzer = DefectStructureAnalyzer(calc_results.structure,
+                                                 perfect_calc_results.structure)
+    defect_pos = structure_analyzer.defect_center_coord
+    scene_dicts = make_scene_dicts(parchg_list, defect_pos)
+    scene_dicts.to_json_file()
+
+
+def parse_args(args):
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument("--parchgs", type=str, nargs="+")
+    parser.add_argument("-c", "--calc_results", type=loadfn)
+    parser.add_argument("-p", "--perfect_calc_results", type=loadfn)
+    return parser.parse_args(args)
+
+
+if __name__ == "__main__":
+    x = parse_args(sys.argv[1:])
+    make_scene_dicts_json(x.parchgs, x.calc_results, x.perfect_calc_results)

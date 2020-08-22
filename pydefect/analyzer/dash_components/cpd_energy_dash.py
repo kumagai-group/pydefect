@@ -66,7 +66,9 @@ class CpdEnergyComponent(MPComponent):
             abs_chem_pot = self.cpd_plot_info.cpd.abs_chem_pot_dict(label)
 
             single_energies = []
-            for d, e, c in zip(self.defects, self.defect_entries, self.corrections):
+            for d, e, c in zip(self.defects,
+                               self.defect_entries,
+                               self.corrections):
                 single_energies.append(
                     make_single_defect_energy(self.perfect, d, e, abs_chem_pot, c))
             defect_energies = make_defect_energies(single_energies)
@@ -79,4 +81,5 @@ class CpdEnergyComponent(MPComponent):
                                                 supercell_cbm=self.perfect.cbm)
 
             return plotter.create_figure()
+
 
