@@ -140,7 +140,8 @@ class ChemPotDiag:
             x[i] = -1.0
             x.append(min_range)
             half_spaces.append(x)
-        feasible_point = np.array([min_range + 1e-4] * self.dim, dtype=float)
+        # When used in vertex_coords  min_range is large_minum_number
+        feasible_point = np.array([min_range + 1] * self.dim, dtype=float)
         hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
 
         return hs

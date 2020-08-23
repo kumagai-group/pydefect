@@ -73,8 +73,7 @@ def test_chem_pot_diag(cpd):
 
 
 def test_abs_chem_pots(cpd):
-    assert cpd.abs_chem_pot_dict("A") == \
-           {Element.H: 0.0, Element.O: -1.999999999985448, Element.Cl: 4.999999999985448}
+    assert cpd.abs_chem_pot_dict("A") == {Element.H: 0.0, Element.O: -3.0 + 1.0, Element.Cl: 5.0}
 
 
 def test_host_ele_abs_energies_per_atom(cpd):
@@ -104,11 +103,11 @@ def test_cpd_plot_info_lacking_element_data():
 
 
 def test_chem_pot_diag_min_energy(cpd):
-    assert cpd.lowest_relative_energy == -2.999999999985448
+    assert cpd.lowest_relative_energy == -3
 
 
 def test_impurity_abs_energy(cpd):
-    expected = CompositionEnergy(Composition("Cl2O2"), 6.0, 'd'), 4.999999999985448
+    expected = CompositionEnergy(Composition("Cl2O2"), 6.0, 'd'), 5.0
     assert cpd.impurity_abs_energy(Element.Cl, "A") == expected
 
 
@@ -135,9 +134,9 @@ def test_cpd_plot_info(cpd_plot_info):
 
 def test_cpd_plot_info_with_defaults(cpd_plot_info_wo_min_range):
     assert cpd_plot_info_wo_min_range.comp_vertices == \
-           {Composition('H2'): [[-0.0, -3.3], [0.0, -3.0]],
-            Composition('H2O'): [[0.0, -3.0], [-1.5, 0.0]],
-            Composition('O2'): [[-3.3, -0.0], [-1.5, 0.0]]}
+           {Composition('H2'): [[0.0, -3.0], [0.0, -3.3]],
+            Composition('H2O'): [[-1.5, 0.0], [0.0, -3.0]],
+            Composition('O2'): [[-3.3, 0.0], [-1.5, 0.0]]}
 
 
 def test_replace_comp_energy():
@@ -155,13 +154,44 @@ def test_replace_comp_energy():
                            target={"H": 1})
     assert cpd == expected
 
+
+def test(tmpdir):
+    tmpdir.chdir()
+    tmpdir.join("cpd.yaml").write("""F8:
+  energy: -6.69753983
+  source: local
+Mg2F4:
+  energy: -31.54326603
+  source: local
+Mg3:
+  energy: -4.50835875
+  source: local
+Na1F1:
+  energy: -8.67062716
+  source: local
+Na20:
+  energy: -25.85889772
+  source: local
+Na4Mg4F12:
+  energy: -98.24594267
+  source: local
+target: MgF2
+vertex_elements:
+- Na
+- Mg
+- F
+""")
+    cpd = ChemPotDiag.from_yaml("cpd.yaml")
+    expected = [[0, 0, -6.5404898],
+                [-1.83646145e-01, 0, -6.35684365e+00],
+                [-3.62484384e-01, 0, -6.29723090e+00],
+                [-6.5404898, -12.7136873, 0],
+                [-6.65971529, -12.59446181, 0]]
+    actual = cpd.vertex_coords
+    np.testing.assert_array_almost_equal(expected, actual)
+
 """
 TODO
-1. Implement impurity_abs_energy
-4. implement print
-
-
-DONE
-2. change energies types from Dict[str, float] to CompoundEnergy
-3. to yaml
+* Implement impurity_abs_energy
+* implement print
 """
