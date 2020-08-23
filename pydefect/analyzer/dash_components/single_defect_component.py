@@ -82,8 +82,8 @@ class SingleDefectComponent(MPComponent):
                 sceneSize="100%",
             ),
             style={
-                "width": "100%",
-                "height": "100%",
+                "width": "500px",
+                "height": "500px",
                 "overflow": "hidden",
                 "margin": "0 auto",
             },
@@ -99,10 +99,12 @@ class SingleDefectComponent(MPComponent):
         """
         pot = html.Div(self._sub_layouts["pot_graph"])
         eig = html.Div(self._sub_layouts["eig_graph"])
-        structure = html.Div([html.Div(self._sub_layouts["structure"], style={"width": "350px", "height": "350px"}),
-                              self._sub_layouts["locpot"]])
+        structure = html.Div(
+            [html.Div(self._sub_layouts["structure"],
+                      style={"width": "400px", "height": "450px"}),
+             self._sub_layouts["locpot"]])
 
-        return Columns([H3(self.name), pot, eig, Column([structure])])
+        return html.Div([H3(self.name), Columns([pot, eig, structure])])
 
     @staticmethod
     def get_scene_and_legend(graph: StructureGraph, scene_additions=None

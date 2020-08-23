@@ -22,6 +22,7 @@ from pydefect.input_maker.defect_entry import DefectEntry
 app = Dash(suppress_callback_exceptions=True,
            assets_folder=SETTINGS.ASSETS_PATH)
 
+
 def create_ctk(cpd_energy_layout, single_defect_layouts):
     _layout = Container(
         [

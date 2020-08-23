@@ -66,13 +66,13 @@ class SitePotentialPlotter:
 
 class SitePotentialPlotlyPlotter(SitePotentialPlotter):
     def create_figure(self):
-        common = {"mode": "markers", "marker_size": 15}
+        common = {"mode": "markers", "marker_size": 10}
         fig = go.Figure()
         fig.update_layout(
             title="Potential",
             xaxis_title=f"Distance ({self._x_unit})",
             yaxis_title=f"Potential ({self._y_unit})",
-            font_size=15)
+            font_size=15, width=700, height=500)
         all_distances = []
         pc_pot_distances = []
         all_potentials = []

@@ -270,7 +270,7 @@ class ChemPotDiagPlotly2DMplPlotter:
             title=f"Chemical potential diagram of {'-'.join(elements_str)}",
             xaxis_title=f"Chemical potential of {vertex_elements[0]}",
             yaxis_title=f"Chemical potential of {vertex_elements[1]}",
-            width=500, height=500,
+            width=700, height=700,
             font_size=15,
             showlegend=False)
 
@@ -298,7 +298,7 @@ class ChemPotDiagPlotly3DMplPlotter:
             j = [x for x in range(1, n_vertices - 1)]
             k = [x for x in range(2, n_vertices)]
             data.append(go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k,
-                                  alphahull=-1, opacity=0.3))
+                                  alphahull=-1, opacity=0.3, hoverinfo='skip'))
 
             x_ave = sum(x) / len(vertex_coords)
             y_ave = sum(y) / len(vertex_coords)
@@ -339,7 +339,7 @@ class ChemPotDiagPlotly3DMplPlotter:
                 yaxis_range=_range,
                 zaxis_range=_range,
             ),
-            width=1000, height=1000,
+            width=700, height=700,
             font_size=15,
             showlegend=False)
 

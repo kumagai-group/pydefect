@@ -73,7 +73,7 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
             xaxis_title=f"Fermi level ({self._x_unit})",
             yaxis_title=f"Energy ({self._y_unit})",
             font_size=15,
-            width=500, height=500)
+            width=700, height=700)
 
         all_y = []
         for de in self._defect_energies:

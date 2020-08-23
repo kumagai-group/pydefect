@@ -95,7 +95,7 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
         fig.update_layout(
             title="Eigenvalues",
             yaxis_title="Energy (eV)",
-            font_size=15)
+            font_size=15,width=700, height=500)
 
         common = {"mode": "markers", "marker_size": 10}
 
