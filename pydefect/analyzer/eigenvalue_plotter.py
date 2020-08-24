@@ -95,14 +95,15 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
         fig.update_layout(
             title="Eigenvalues",
             yaxis_title="Energy (eV)",
-            font_size=15,width=700, height=500)
+            font_size=15, width=500, height=500,
+            showlegend=False)
 
         common = {"mode": "markers", "marker_size": 10}
 
         for spin_idx, eo_by_spin in enumerate(self._energies_and_occupations, 1):
-            occupied = [[], [], []]
-            partially_occupied = [[], [], []]
-            unoccupied = [[], [], []]
+            occupied = [[], [], [], []]
+            partially_occupied = [[], [], [], []]
+            unoccupied = [[], [], [], []]
             for kpt_idx, eo_by_k_idx in enumerate(eo_by_spin):
                 for band_idx, (energy, occup) \
                         in enumerate(eo_by_k_idx, self._lowest_band_idx):
@@ -110,14 +111,17 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
                         occupied[0].append(kpt_idx)
                         occupied[1].append(energy)
                         occupied[2].append(band_idx + 1)
+                        occupied[3].append(occup)
                     elif occup < 0.1:
                         unoccupied[0].append(kpt_idx)
                         unoccupied[1].append(energy)
                         unoccupied[2].append(band_idx + 1)
+                        unoccupied[3].append(occup)
                     else:
                         partially_occupied[0].append(kpt_idx)
                         partially_occupied[1].append(energy)
                         partially_occupied[2].append(band_idx + 1)
+                        partially_occupied[3].append(occup)
 
             fig.add_shape(type="line",
                           x0=-0.5,
@@ -140,9 +144,11 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
                         ["occupied", "partial", "unoccupied"]):
                 fig.add_trace(go.Scatter(x=points[0], y=points[1],
                                          text=points[2],
+                                         customdata=points[3],
                                          hovertemplate=
                                          '<i>band index</i>: %{text}' +
-                                         '<br><b>Energy</b>: %{y:.2f}',
+                                         '<br><b>Energy</b>: %{y:.2f}' +
+                                         '<br><b>Occupation</b>: %{customdata:.2f}',
                                          marker_color=color, name=name, **common),
                               row=1, col=spin_idx)
 
