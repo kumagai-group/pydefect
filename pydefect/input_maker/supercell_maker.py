@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
-from collections import defaultdict
-from itertools import groupby
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 import numpy as np
 from pydefect.input_maker.supercell import Supercell, TetragonalSupercells, \
     Supercells
-from pydefect.input_maker.supercell_info import SupercellInfo, Site
+from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.util.error_classes import NotPrimitiveError, SupercellError
 from pymatgen import IStructure
 from vise.util.centering import Centering
 from vise.util.logger import get_logger
-from vise.util.structure_symmetrizer import StructureSymmetrizer
+from vise.util.structure_symmetrizer import StructureSymmetrizer, create_sites
 
 logger = get_logger(__name__)
 
@@ -76,23 +74,3 @@ class SupercellMaker:
         matrix = np.dot(self.conv_trans_mat, self.supercell.matrix).astype(int)
         return matrix.tolist()
 
-
-def create_sites(symmetrizer: StructureSymmetrizer) -> Dict[str, Site]:
-    wyckoffs = symmetrizer.spglib_sym_data["wyckoffs"]
-    equivalent_atoms = symmetrizer.spglib_sym_data["equivalent_atoms"]
-    site_symmetries = symmetrizer.spglib_sym_data["site_symmetry_symbols"]
-    equiv_indices = sorted(enumerate(equivalent_atoms), key=lambda x: x[1])
-    sites = {}
-    element_idx_dict = defaultdict(int)
-    for _, equiv_sites in groupby(equiv_indices, lambda x: x[1]):
-        equiv_site_list = list(equiv_sites)
-        repr_idx = equiv_site_list[0][0]
-        element = symmetrizer.structure[repr_idx].specie.name
-        element_idx_dict[element] += 1
-        index = str(element_idx_dict[str(element)])
-        name = element + index
-        sites[name] = Site(element=element,
-                           wyckoff_letter=wyckoffs[repr_idx],
-                           site_symmetry=site_symmetries[repr_idx],
-                           equivalent_atoms=[s[0] for s in equiv_site_list])
-    return sites

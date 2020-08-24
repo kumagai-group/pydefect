@@ -4,34 +4,15 @@ from dataclasses import dataclass, field
 from typing import List, Dict
 
 from monty.json import MSONable
-from more_itertools import consecutive_groups
 from numpy.linalg import det
 from pydefect.database.database import electronegativity, oxidation_state
 from pydefect.util.structure_tools import Distances
 from pymatgen import IStructure
 from vise.util.logger import get_logger
 from vise.util.mix_in import ToJsonFileMixIn
+from vise.util.structure_symmetrizer import Site
 
 logger = get_logger(__name__)
-
-
-@dataclass(frozen=True)
-class Site(MSONable):
-    element: str
-    wyckoff_letter: str
-    site_symmetry: str
-    equivalent_atoms: List[int]
-
-    @property
-    def pprint_equiv_atoms(self):
-        str_list = []
-        for consecutive_ints in consecutive_groups(self.equivalent_atoms):
-            ints = list(consecutive_ints)
-            if len(ints) >= 3:
-                str_list.append("..".join([str(ints[0]), str(ints[-1])]))
-            else:
-                str_list.append(" ".join([str(j) for j in ints]))
-        return " ".join(str_list)
 
 
 @dataclass(frozen=True)

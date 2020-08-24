@@ -3,26 +3,10 @@
 
 import pytest
 
-from pydefect.input_maker.supercell_info import Site, Interstitial
+from pydefect.input_maker.supercell_info import Interstitial
 from pydefect.tests.helpers.assertion import assert_msonable, \
     assert_json_roundtrip
 from pydefect.util.structure_tools import Coordination
-
-
-@pytest.fixture
-def site():
-    return Site(element="H",
-                wyckoff_letter="a",
-                site_symmetry="m3m",
-                equivalent_atoms=[0, 1, 2, 3, 5, 6])
-
-
-def test_site_msonable(site):
-    assert_msonable(site)
-
-
-def test_site_pprint_equiv_atoms(site):
-    assert site.pprint_equiv_atoms == "0..3 5 6"
 
 
 @pytest.fixture
