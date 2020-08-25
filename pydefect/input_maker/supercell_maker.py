@@ -11,7 +11,7 @@ from pydefect.util.error_classes import NotPrimitiveError, SupercellError
 from pymatgen import IStructure
 from vise.util.centering import Centering
 from vise.util.logger import get_logger
-from vise.util.structure_symmetrizer import StructureSymmetrizer, create_sites
+from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 logger = get_logger(__name__)
 
@@ -62,12 +62,10 @@ class SupercellMaker:
         if symmetrizer.sg_number != self.sg:
             raise SupercellError
 
-        sites = create_sites(symmetrizer)
-
         self.supercell_info = SupercellInfo(self.supercell.structure,
                                             self.sg_symbol,
                                             self.transformation_matrix,
-                                            sites)
+                                            symmetrizer.sites)
 
     @property
     def transformation_matrix(self):
