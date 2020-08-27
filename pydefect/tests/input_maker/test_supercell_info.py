@@ -3,7 +3,7 @@
 
 import pytest
 
-from pydefect.input_maker.supercell_info import Interstitial
+from pydefect.input_maker.supercell_info import Interstitial, SupercellInfo
 from pydefect.tests.helpers.assertion import assert_msonable, \
     assert_json_roundtrip
 from pydefect.util.structure_tools import Coordination
@@ -22,6 +22,13 @@ def test_interstitial(interstitial):
 
 def test_supercell_info_msonable(supercell_info):
     assert_msonable(supercell_info)
+
+
+def test_supercell_info_from_dict(supercell_info):
+    d = supercell_info.as_dict()
+    d["transform_matrix"] = d.pop("transformation_matrix")
+    expected = SupercellInfo.from_dict(d)
+    assert expected == supercell_info
 
 
 def test_supercell_info_distances(supercell_info):

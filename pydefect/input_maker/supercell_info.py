@@ -30,6 +30,12 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
     sites: Dict[str, Site]
     interstitials: List[Interstitial] = field(default_factory=list)
 
+    @classmethod
+    def from_dict(cls, d):
+        if "transform_matrix" in d:
+            d["transformation_matrix"] = d.pop("transform_matrix")
+        return super().from_dict(d)
+
     def coords(self, name):
         site = self.sites[name]
         coord = list(self.structure[site.equivalent_atoms[0]].frac_coords)
