@@ -8,15 +8,13 @@ from crystal_toolkit.core.legend import Legend
 from crystal_toolkit.core.mpcomponent import MPComponent
 from crystal_toolkit.core.scene import Scene
 from crystal_toolkit.helpers.layouts import *
-from crystal_toolkit.renderables.structuregraph import StructureGraph, \
-    get_structure_graph_scene
+from crystal_toolkit.renderables.structuregraph import get_structure_graph_scene
 from dash.dependencies import Output, Input
 from dash_mp_components import Simple3DScene
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotlyPlotter
 from pydefect.corrections.efnv_correction.site_potential_plotter import \
     SitePotentialPlotlyPlotter
-
-Legend.uniform_radius = 0.2
+from pymatgen import Site, DummySpecie
 
 
 class SingleDefectComponent(MPComponent):
@@ -28,8 +26,9 @@ class SingleDefectComponent(MPComponent):
                  eigenvalue_plotter: EigenvaluePlotlyPlotter,
                  scene_dicts: SceneDicts,
                  name: str,
+                 vacancy_sites: List[Dict[str, List[float]]] = None,
                  id: str = None,
-                 scene_settings: Optional[Dict] = None,
+                 scene_settings: Optional[dict] = None,
                  **kwargs):
 
         self.scene_dicts = scene_dicts
@@ -38,6 +37,8 @@ class SingleDefectComponent(MPComponent):
         super().__init__(id=id, **kwargs)
         self.options = [{"label": i, "value": i} for i in scene_dicts.scenes.keys()]
         self.create_store("scene_dicts", initial_data=scene_dicts)
+        self.graph = scene_dicts.structure_graph
+        self.vacancy_sites = vacancy_sites or []
 
 #        default_data=scene_dicts.structure_graph,
         self.initial_scene_settings = {"extractAxis": True,
@@ -54,7 +55,6 @@ class SingleDefectComponent(MPComponent):
                           initial_data=initial_scene_additions)
 
         scene, legend = self.get_scene_and_legend(
-            scene_dicts.structure_graph,
             scene_additions=initial_scene_additions)
         self.create_store("legend_data", initial_data=legend)
         self.create_store("graph", initial_data=scene_dicts.structure_graph)
@@ -74,6 +74,7 @@ class SingleDefectComponent(MPComponent):
         choice_locpot = self.get_choice_input(kwarg_label="orbital",
                                               options=self.options,
                                               state={"orbital": self.options[0]["value"]})
+
         structure = html.Div(
             Simple3DScene(
                 id=f"{self.id()}_scene",
@@ -89,8 +90,27 @@ class SingleDefectComponent(MPComponent):
             },
         )
 
+        defect_structure = Column(
+            [
+                Box(
+                    structure,
+                    style={
+                        "width": "30vmin",
+                        "height": "30vmin",
+                        "minWidth": "300px",
+                        "minHeight": "300px",
+                        "maxWidth": "600px",
+                        "maxHeight": "600px",
+                        "overflow": "hidden",
+                        "padding": "0.25rem",
+                        "marginBottom": "0.5rem",
+                    },
+                ),
+            ],
+            narrow=True,
+        )
         return {"pot_graph": pot_graph, "eig_graph": eig_graph,
-                "locpot": choice_locpot, "structure": structure}
+                "locpot": choice_locpot, "structure": defect_structure}
 
     def layout(self) -> html.Div:
         """
@@ -104,19 +124,19 @@ class SingleDefectComponent(MPComponent):
                       style={"width": "400px", "height": "450px"}),
              self._sub_layouts["locpot"]])
 
-        return html.Div([H3(self.name), Columns([pot, eig, structure])])
+        return html.Div([H4(self.name), Columns([pot, eig, structure])])
 
-    @staticmethod
-    def get_scene_and_legend(graph: StructureGraph, scene_additions=None
+    def get_scene_and_legend(self, scene_additions=None
                              ) -> Tuple[Scene, Dict[str, str]]:
 
-        legend = Legend(graph.structure,
+        legend = Legend(self.graph.structure,
                         color_scheme="VESTA",
                         radius_scheme="uniform",
                         cmap_range=None)
+        legend.uniform_radius = 0.2
 
         scene = get_structure_graph_scene(
-            graph,
+            self.graph,
             draw_image_atoms=True,
             bonded_sites_outside_unit_cell=False,
             hide_incomplete_edges=True,
@@ -132,8 +152,18 @@ class SingleDefectComponent(MPComponent):
 
         scene = scene.to_json()
         if scene_additions:
-            # raise NotImplementedError
             scene["contents"].append(scene_additions)
+
+        lattice = self.graph.structure.lattice
+        origin = -self.graph.structure.lattice.get_cartesian_coords([0.5, 0.5, 0.5])
+
+        for name, frac_coords in self.vacancy_sites:
+            site = Site(species=DummySpecie(name),
+                        coords=lattice.get_cartesian_coords(frac_coords))
+            vac_scene = site.get_scene(origin=origin)
+            vac_scene.name = f"{name}_{frac_coords}"
+            vac_scene.contents[0].contents[0].tooltip = name
+            scene["contents"].append(vac_scene.to_json())
 
         return scene, legend.get_legend()
 
@@ -150,6 +180,5 @@ class SingleDefectComponent(MPComponent):
                                               #        clickable=True,
                                               #        headWidth=0.3)])
             scene, _ = self.get_scene_and_legend(
-                self.scene_dicts.structure_graph,
                 scene_additions=scene_additions)
             return scene

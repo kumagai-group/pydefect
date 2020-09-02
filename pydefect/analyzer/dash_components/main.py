@@ -13,20 +13,114 @@ from pydefect.analyzer.dash_components.scenes_from_volumetric_data import \
     SceneDicts
 from pydefect.analyzer.dash_components.single_defect_component import \
     SingleDefectComponent
+from pydefect.analyzer.dash_components.supercell_component import \
+    SupercellComponent
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotlyPlotter
 from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo, ChemPotDiag
 from pydefect.corrections.efnv_correction.site_potential_plotter import \
     SitePotentialPlotlyPlotter
+from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry
+from pymatgen import Structure
+from vise.analyzer.dash_components.band_dos_dash import BandDosComponent
+from vise.analyzer.dash_components.main import symmetry_layout, site_layout, \
+    mpid_and_link
+from vise.analyzer.dash_components.structure_component import StructureComponent
+from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 app = Dash(suppress_callback_exceptions=True,
            assets_folder=SETTINGS.ASSETS_PATH)
 
 
-def create_ctk(cpd_energy_layout, single_defect_layouts):
+def create_ctk(struct_component,
+               crystal_symmetry,
+               mpid_and_link,
+               sites,
+               band_dos_component,
+               supercell_component_layout,
+               cpd_energy_layout,
+               single_defect_layouts):
+    box_size = "30vmin"
+    supercell = Column(
+        [
+            Box(
+                supercell_component_layout,
+                style={
+                    "width": box_size,
+                    "height": box_size,
+                    "minWidth": "300px",
+                    "minHeight": "300px",
+                    "maxWidth": "600px",
+                    "maxHeight": "600px",
+                    "overflow": "hidden",
+                    "padding": "0.25rem",
+                    "marginBottom": "0.5rem",
+                },
+            ),
+        ],
+        narrow=True,
+    )
+
+
     _layout = Container(
         [
-            Section([Column(cpd_energy_layout),
+            Section(
+                [
+                    Columns(
+                        [
+                            Column(
+                                [struct_component.title_layout()]
+                            )
+                        ]
+                    ),
+                    Columns(
+                        [
+                            Column(
+                                [
+                                    Box(
+                                        struct_component.layout(size="100%"),
+                                        style={
+                                            "width": box_size,
+                                            "height": box_size,
+                                            "minWidth": "300px",
+                                            "minHeight": "300px",
+                                            "maxWidth": "800px",
+                                            "maxHeight": "800px",
+                                            "overflow": "hidden",
+                                            "padding": "0.25rem",
+                                            "marginBottom": "0.5rem",
+                                        },
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                struct_component.legend_layout(),
+                                                style={"float": "left"},
+                                            ),
+                                        ],
+                                        style={
+                                            "width": box_size,
+                                            "minWidth": "300px",
+                                            "marginBottom": "40px",
+                                        },
+                                    ),
+                                ],
+                                narrow=True,
+                            ),
+                            Column(
+                                [crystal_symmetry, mpid_and_link],
+                                style={"width": box_size, "max-width": box_size},
+                            ),
+                        ],
+                        desktop_only=False,
+                        centered=False,
+                    ),
+                    Columns(Column([sites])),
+                ]
+            ),
+            Section([band_dos_component.layout()]
+                    ),
+            Section([Columns(cpd_energy_layout + [supercell]),
                      Column(single_defect_layouts)])
         ]
     )
@@ -34,7 +128,8 @@ def create_ctk(cpd_energy_layout, single_defect_layouts):
     return _layout
 
 
-def make_layouts(perfect_dirname, defect_dirnames, chem_pot_diag):
+def make_layouts(structure: Structure, dos_plot_data, band_plot_data,
+                 perfect_dirname, defect_dirnames, supercell_info, chem_pot_diag):
     cpd_plot_info = CpdPlotInfo(ChemPotDiag.from_yaml(chem_pot_diag))
     perfect: CalcResults = loadfn(perfect_dirname / "calc_results.json")
 
@@ -65,20 +160,41 @@ def make_layouts(perfect_dirname, defect_dirnames, chem_pot_diag):
 
     cpd_energy_comp = CpdEnergyComponent(cpd_plot_info, perfect, defects,
                                          defect_entries, corrections)
-    return create_ctk(cpd_energy_comp.layout, single_defect_layouts)
+
+    structure_component = StructureComponent(structure)
+    comp = structure.composition.reduced_formula
+    band_dos_component = BandDosComponent(dos_plot_data, band_plot_data, id=f"band_dos_{comp}",)
+    supercell_component = SupercellComponent(supercell_info)
+    symmetrizer = StructureSymmetrizer(structure)
+    return create_ctk(structure_component,
+                      symmetry_layout(structure),
+                      mpid_and_link(symmetrizer),
+                      site_layout(symmetrizer),
+                      band_dos_component,
+                      supercell_component.layout,
+                      cpd_energy_comp.layout,
+                      single_defect_layouts)
 
 
 def parse_args(args):
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("-p", "--perfect", type=Path)
-    parser.add_argument("-d", "--defects", type=Path, nargs="+")
-    parser.add_argument("-c", "--chem_pot_diag", type=str)
+    parser.add_argument("-b", "--band", type=Path, required=True)
+    parser.add_argument("-d", "--dos", type=Path, required=True)
+    parser.add_argument("-p", "--perfect", type=Path, required=True)
+    parser.add_argument("-def", "--defects", type=Path, nargs="+", required=True)
+    parser.add_argument("-s", "--supercell_info", type=loadfn, required=True)
+    parser.add_argument("-c", "--chem_pot_diag", type=str, required=True)
     parser.add_argument("--port", type=int)
     return parser.parse_args(args)
 
 
 if __name__ == "__main__":
     args = parse_args(sys.argv[1:])
-    layout = make_layouts(args.perfect, args.defects, args.chem_pot_diag)
+    structure = Structure.from_file(args.dos / defaults.contcar)
+    dos_plot_data = loadfn(args.dos / "dos_plot_data.json")
+    band_plot_data = loadfn(args.band / "band_plot_info.json")
+    layout = make_layouts(structure, dos_plot_data, band_plot_data,
+                          args.perfect, args.defects, args.supercell_info,
+                          args.chem_pot_diag)
     ctc.register_crystal_toolkit(app=app, layout=layout, cache=None)
     app.run_server(debug=True, port=args.port)

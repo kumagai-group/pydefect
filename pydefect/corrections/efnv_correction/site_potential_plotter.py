@@ -81,11 +81,13 @@ class SitePotentialPlotlyPlotter(SitePotentialPlotter):
         for _, grouped_sites in groupby(self.sites, key=lambda x: x.specie):
             distances = []
             potentials = []
+            atom_idxs = []
             for site in grouped_sites:
                 distances.append(site.distance)
                 all_distances.append(site.distance)
                 all_potentials.append(site.potential)
                 potentials.append(site.potential)
+#                atom_idxs.append(site.)
 
                 if site.pc_potential:
                     pc_pot_distances.append(site.distance)
@@ -93,6 +95,7 @@ class SitePotentialPlotlyPlotter(SitePotentialPlotter):
                     potential_diffs.append(site.diff_pot)
 
             fig.add_trace(go.Scatter(x=distances, y=potentials,
+                                     text=atom_idxs,
                                      name=site.specie,
                                      marker_symbol="circle",
                                      **common))

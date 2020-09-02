@@ -4,7 +4,7 @@
 from typing import List
 
 from crystal_toolkit.core.mpcomponent import MPComponent
-from crystal_toolkit.helpers.layouts import Column, Columns, dcc, html
+from crystal_toolkit.helpers.layouts import Column, dcc, html
 from dash.dependencies import Input, Output
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import make_defect_energies
@@ -46,13 +46,8 @@ class CpdEnergyComponent(MPComponent):
 
     @property
     def layout(self):
-        return Columns(
-                    [
-                        Column(html.Div(self._sub_layouts["cpd"])),
-                        Column(html.Div(self._sub_layouts["energy"])),
-                    ],
-                    centered=True,
-                )
+        return [Column(html.Div(self._sub_layouts["cpd"])),
+                Column(html.Div(self._sub_layouts["energy"]))]
 
     def generate_callbacks(self, app, cache):
         @app.callback(
