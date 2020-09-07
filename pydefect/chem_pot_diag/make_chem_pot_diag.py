@@ -30,12 +30,14 @@ class AtomEnergyType(ExtendedEnum):
             return loadfn(parent / "datasets/vise_pbesol_atom_energy.yaml")
 
 
-def make_chem_pot_diag_from_mp(elements: List[str],
-                               target: Union[Composition, str],
+def make_chem_pot_diag_from_mp(target: Union[Composition, str],
+                               elements: List[str] = None,
                                vertex_elements: List[str] = None,
                                atom_energy_yaml: Optional[str] = None):
     """Obtain the energies from Materials Project."""
     properties = ["task_id", "full_formula", "final_energy"]
+    target = target if isinstance(target, Composition) else Composition(target)
+    elements = elements or target.chemical_system.split("-")
     query = MpQuery(elements, properties=properties)
     comp_es = []
     for m in query.materials:
@@ -53,7 +55,6 @@ def make_chem_pot_diag_from_mp(elements: List[str],
 
     comp_es = remove_higher_energy_comp(comp_es)
 
-    # Composition.from_dict("MgO2") is accepted.
     return ChemPotDiag(comp_es, target, vertex_elements)
 
 
