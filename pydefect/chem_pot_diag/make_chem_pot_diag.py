@@ -40,14 +40,18 @@ def make_chem_pot_diag_from_mp(target: Union[Composition, str],
     elements = elements or target.chemical_system.split("-")
     query = MpQuery(elements, properties=properties)
     comp_es = []
+    if atom_energy_yaml:
+        if ".yaml" in atom_energy_yaml:
+            energies = loadfn(atom_energy_yaml)
+        else:
+            energies = AtomEnergyType.from_string(atom_energy_yaml).energies
+        diff = {e: energies[e] - mp_energies[e] for e in elements}
+    else:
+        diff = None
+
     for m in query.materials:
         energy = m["final_energy"]
-        if atom_energy_yaml:
-            if ".yaml" in atom_energy_yaml:
-                energies = loadfn(atom_energy_yaml)
-            else:
-                energies = AtomEnergyType.from_string(atom_energy_yaml).energies
-            diff = {e: energies[e] - mp_energies[e] for e in elements}
+        if diff:
             for k, v in Composition(m["full_formula"]).as_dict().items():
                 energy += diff[k] * v
         comp_es.append(CompositionEnergy(
