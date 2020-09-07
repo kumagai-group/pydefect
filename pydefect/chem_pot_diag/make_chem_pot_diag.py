@@ -4,7 +4,7 @@ import argparse
 import sys
 from itertools import groupby
 from pathlib import Path
-from typing import List, Optional, Set
+from typing import List, Optional, Union
 
 from monty.serialization import loadfn
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CompositionEnergy, \
@@ -31,13 +31,13 @@ class AtomEnergyType(ExtendedEnum):
 
 
 def make_chem_pot_diag_from_mp(elements: List[str],
-                               target: Composition,
+                               target: Union[Composition, str],
                                vertex_elements: List[str] = None,
                                atom_energy_yaml: Optional[str] = None):
     """Obtain the energies from Materials Project."""
     properties = ["task_id", "full_formula", "final_energy"]
     query = MpQuery(elements, properties=properties)
-    comp_es = set()
+    comp_es = []
     for m in query.materials:
         energy = m["final_energy"]
         if atom_energy_yaml:
@@ -48,19 +48,20 @@ def make_chem_pot_diag_from_mp(elements: List[str],
             diff = {e: energies[e] - mp_energies[e] for e in elements}
             for k, v in Composition(m["full_formula"]).as_dict().items():
                 energy += diff[k] * v
-        comp_es.add(CompositionEnergy(
+        comp_es.append(CompositionEnergy(
             Composition(m["full_formula"]), energy, m["task_id"]))
 
     comp_es = remove_higher_energy_comp(comp_es)
 
+    # Composition.from_dict("MgO2") is accepted.
     return ChemPotDiag(comp_es, target, vertex_elements)
 
 
-def remove_higher_energy_comp(comp_energies: Set[CompositionEnergy]):
-    result = set()
+def remove_higher_energy_comp(comp_energies: List[CompositionEnergy]):
+    result = []
     for _, grouped_comp_energies in groupby(
             comp_energies, key=lambda x: x.composition.reduced_formula):
-        result.add(min(list(grouped_comp_energies),
+        result.append(min(list(grouped_comp_energies),
                        key=lambda y: y.abs_energy_per_atom))
     return result
 

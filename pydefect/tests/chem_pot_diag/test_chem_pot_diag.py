@@ -8,19 +8,25 @@ import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
     NoElementEnergyError, CompositionEnergy, replace_comp_energy
 # When same keys are inserted, only the latter one is accepted.
+from pydefect.tests.helpers.assertion import assert_msonable
 from pymatgen import Composition, Element
 
-energies = {CompositionEnergy(Composition("H"), 0.0, "a"),
-            CompositionEnergy(Composition("O"), 1.0, "b"),
+energies = [CompositionEnergy(Composition("H"), 0.0, "a"),
             CompositionEnergy(Composition("H4O2"), -4.0, "c"),
+            CompositionEnergy(Composition("O"), 1.0, "b"),
+            CompositionEnergy(Composition("O2Cl"), 3.0, "e"),
             CompositionEnergy(Composition("O2Cl2"), 6.0, "d"),
-            CompositionEnergy(Composition("O2Cl"), 3.0, "e")}
+            ]
 
 
 @pytest.fixture
 def cpd():
     return ChemPotDiag(energies, target=Composition("H2O"),
                        vertex_elements=[Element.H, Element.O])
+
+
+def test_msonable(cpd):
+    assert_msonable(cpd)
 
 
 def test_chem_pot_diag_yaml(cpd, tmpdir):
@@ -84,7 +90,7 @@ def test_host_ele_abs_energies_per_atom(cpd):
 
 def test_host_ele_abs_energies_per_atom_2():
     energies_with_cl = deepcopy(energies)
-    energies_with_cl.add(CompositionEnergy(Composition("Cl"), 10.0, "z"))
+    energies_with_cl.append(CompositionEnergy(Composition("Cl"), 10.0, "z"))
     cpd = ChemPotDiag(energies_with_cl, target=Composition("H2O"),
                       vertex_elements=[Element.H, Element.O, Element.Cl])
     assert cpd.host_ele_abs_energies_per_atom == {Composition("H2"): 0.0,
@@ -97,7 +103,7 @@ def test_host_ele_abs_energies_per_atom_2():
 
 def test_cpd_plot_info_lacking_element_data():
     new_energies = deepcopy(energies)
-    new_energies.add(CompositionEnergy(Composition("MgO"), -3.0, "f"))
+    new_energies.append(CompositionEnergy(Composition("MgO"), -3.0, "f"))
     with pytest.raises(NoElementEnergyError):
         ChemPotDiag(new_energies, target={"Mg": 1, "O": 1}).offset_to_abs
 
@@ -140,17 +146,17 @@ def test_cpd_plot_info_with_defaults(cpd_plot_info_wo_min_range):
 
 
 def test_replace_comp_energy():
-    cpd = ChemPotDiag({CompositionEnergy(Composition("H"), 0.0, "a"),
+    cpd = ChemPotDiag([CompositionEnergy(Composition("H"), 0.0, "a"),
                        CompositionEnergy(Composition("O"), 1.0, "b"),
-                       CompositionEnergy(Composition("F"), 1.0, "c")},
+                       CompositionEnergy(Composition("F"), 1.0, "c")],
                       target={"H": 1})
     replace_comp_energy(cpd,
                         {CompositionEnergy(Composition("H"), -1.0, "x"),
                          CompositionEnergy(Composition("O"), 0.0, "y")})
 
-    expected = ChemPotDiag({CompositionEnergy(Composition("H"), -1.0, "x"),
+    expected = ChemPotDiag([CompositionEnergy(Composition("H"), -1.0, "x"),
                             CompositionEnergy(Composition("O"), 0.0, "y"),
-                            CompositionEnergy(Composition("F"), 1.0, "c")},
+                            CompositionEnergy(Composition("F"), 1.0, "c")],
                            target={"H": 1})
     assert cpd == expected
 

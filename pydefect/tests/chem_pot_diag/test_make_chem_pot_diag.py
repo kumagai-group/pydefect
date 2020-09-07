@@ -22,10 +22,10 @@ def mp_query(mocker):
 
 @pytest.fixture
 def cpd():
-    return ChemPotDiag({
+    return ChemPotDiag([
         CompositionEnergy(Composition('O8'), -39.58364375, "mp-1"),
         CompositionEnergy(Composition('Mg3'), -4.79068775, "mp-2"),
-        CompositionEnergy(Composition('Mg1O1'), -11.96742144, "mp-3")},
+        CompositionEnergy(Composition('Mg1O1'), -11.96742144, "mp-3")],
         target=Composition("MgO"))
 
 
@@ -38,19 +38,22 @@ diff = {elem: pbesol[elem] - mp[elem] for elem in ["O", "Mg"]}
 
 @pytest.fixture
 def cpd_corr():
-    return ChemPotDiag({
+    return ChemPotDiag([
         CompositionEnergy(Composition('O8'), -39.58364375 + diff["O"] * 8, "mp-1"),
         CompositionEnergy(Composition('Mg3'), -4.79068775 + diff["Mg"] * 3, "mp-2"),
-        CompositionEnergy(Composition('Mg1O1'), -11.96742144 + diff["Mg"] + diff["O"], "mp-3")},
+        CompositionEnergy(Composition('Mg1O1'), -11.96742144 + diff["Mg"] + diff["O"], "mp-3")],
         target=Composition("MgO"))
 
 
-def test_make_chem_pot_diag_from_mp(mp_query, cpd):
+@pytest.mark.parametrize("composition", [Composition("MgO"), "MgO"])
+def test_make_chem_pot_diag_from_mp(composition, mp_query, cpd):
     actual = make_chem_pot_diag_from_mp(elements=["Mg", "O"],
-                                        target=Composition("MgO"))
+                                        target=composition)
     mp_query.assert_called_once_with(
         ["Mg", "O"], properties=["task_id", "full_formula", "final_energy"])
     assert actual == cpd
+    assert actual.target == cpd.target
+    assert actual.vertex_elements == cpd.vertex_elements
 
 
 def test_make_chem_pot_diag_from_mp_yaml(mp_query, tmpdir, cpd_corr):
@@ -71,12 +74,12 @@ def test_make_chem_pot_diag_from_mp_w_vise_functional(mp_query, cpd_corr):
 
 
 def test_remove_higher_energy_comp():
-    comp_es = {CompositionEnergy(Composition('O2'), -2.1, "mp-1"),
+    comp_es = [CompositionEnergy(Composition('O2'), -2.1, "mp-1"),
                CompositionEnergy(Composition('O4'), -4.0, "mp-2"),
-               CompositionEnergy(Composition('Mg1'), -10, "mp-3")}
+               CompositionEnergy(Composition('Mg1'), -10, "mp-3")]
     actual = remove_higher_energy_comp(comp_es)
-    expected = {CompositionEnergy(Composition('O2'), -2.1, "mp-1"),
-                CompositionEnergy(Composition('Mg1'), -10, "mp-3")}
+    expected = [CompositionEnergy(Composition('O2'), -2.1, "mp-1"),
+                CompositionEnergy(Composition('Mg1'), -10, "mp-3")]
     assert actual == expected
 
 """

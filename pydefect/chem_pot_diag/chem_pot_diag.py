@@ -9,6 +9,7 @@ from typing import Dict, Optional, Union, List, Set
 
 import numpy as np
 import yaml
+from monty.json import MSONable
 from monty.serialization import loadfn
 from pydefect.error import PydefectError
 from pydefect.util.error_classes import CpdNotSupportedError
@@ -19,7 +20,7 @@ alphabets = list(string.ascii_uppercase)
 
 
 @dataclass(frozen=True)
-class CompositionEnergy:
+class CompositionEnergy(MSONable):
     composition: Composition
     energy: float
     source: str
@@ -30,8 +31,8 @@ class CompositionEnergy:
 
 
 @dataclass
-class ChemPotDiag:
-    comp_energies: Set[CompositionEnergy]
+class ChemPotDiag(MSONable):
+    comp_energies: List[CompositionEnergy]
     target: InitVar[Union[Composition, dict]]
     vertex_elements: InitVar[Optional[List[Element]]] = None
 
@@ -54,9 +55,9 @@ class ChemPotDiag:
         d = loadfn(filename)
         target = d.pop("target")
         vertex_elements = [Element(e) for e in d.pop("vertex_elements")]
-        composition_energies = set()
+        composition_energies = []
         for k, v in d.items():
-            composition_energies.add(
+            composition_energies.append(
                 CompositionEnergy(Composition(k), v["energy"], v["source"]))
         return cls(composition_energies, target, vertex_elements)
 
@@ -231,15 +232,15 @@ def on_composition(atomic_fractions, coord, energy) -> bool:
 
 def replace_comp_energy(chem_pot_diag: ChemPotDiag,
                         replaced_comp_energies: Set[CompositionEnergy]):
-    new_comp_energies = set()
+    new_comp_energies = []
     for ce in chem_pot_diag.comp_energies:
         for replaced_comp_energy in replaced_comp_energies:
             if (ce.composition.reduced_composition
                     == replaced_comp_energy.composition.reduced_composition):
-                new_comp_energies.add(replaced_comp_energy)
+                new_comp_energies.append(replaced_comp_energy)
                 break
         else:
-            new_comp_energies.add(ce)
+            new_comp_energies.append(ce)
     chem_pot_diag.comp_energies = new_comp_energies
 
 
