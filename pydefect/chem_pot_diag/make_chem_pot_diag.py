@@ -31,13 +31,15 @@ class AtomEnergyType(ExtendedEnum):
 
 
 def make_chem_pot_diag_from_mp(target: Union[Composition, str],
-                               elements: List[str] = None,
+                               additional_elements: List[str] = None,
                                vertex_elements: List[str] = None,
                                atom_energy_yaml: Optional[str] = None):
     """Obtain the energies from Materials Project."""
     properties = ["task_id", "full_formula", "final_energy"]
     target = target if isinstance(target, Composition) else Composition(target)
-    elements = elements or target.chemical_system.split("-")
+    elements = target.chemical_system.split("-")
+    if additional_elements:
+        elements.extend(additional_elements)
     query = MpQuery(elements, properties=properties)
     comp_es = []
     if atom_energy_yaml:

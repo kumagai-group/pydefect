@@ -61,7 +61,7 @@ def make_competing_phase_dirs(args):
 
 def make_chem_pot_diag(args) -> None:
     if args.elements:
-        cpd = make_chem_pot_diag_from_mp(elements=args.elements,
+        cpd = make_chem_pot_diag_from_mp(additional_elements=args.elements,
                                          target=args.target,
                                          atom_energy_yaml=args.functional)
     else:

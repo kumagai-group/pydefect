@@ -47,8 +47,7 @@ def cpd_corr():
 
 @pytest.mark.parametrize("composition", [Composition("MgO"), "MgO"])
 def test_make_chem_pot_diag_from_mp(composition, mp_query, cpd):
-    actual = make_chem_pot_diag_from_mp(elements=["Mg", "O"],
-                                        target=composition)
+    actual = make_chem_pot_diag_from_mp(target=composition)
     mp_query.assert_called_once_with(
         ["Mg", "O"], properties=["task_id", "full_formula", "final_energy"])
     assert actual == cpd
@@ -60,14 +59,20 @@ def test_make_chem_pot_diag_from_mp_yaml(mp_query, tmpdir, cpd_corr):
     tmpdir.chdir()
     tmpdir.join("tmp.yaml").write("""O:  -1.61154565
 Mg: -0.00912097""")
-    actual = make_chem_pot_diag_from_mp(elements=["Mg", "O"],
-                                        target=Composition("MgO"),
+    actual = make_chem_pot_diag_from_mp(target=Composition("MgO"),
                                         atom_energy_yaml="tmp.yaml")
     assert actual == cpd_corr
 
 
 def test_make_chem_pot_diag_from_mp_w_vise_functional(mp_query, cpd_corr):
     actual = make_chem_pot_diag_from_mp(target=Composition("MgO"),
+                                        atom_energy_yaml="pbesol")
+    assert actual == cpd_corr
+
+
+def test_make_chem_pot_diag_from_mp_additional_elem(mp_query, cpd_corr):
+    actual = make_chem_pot_diag_from_mp(target=Composition("Mg"),
+                                        additional_elements=["O"],
                                         atom_energy_yaml="pbesol")
     assert actual == cpd_corr
 
