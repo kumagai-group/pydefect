@@ -73,8 +73,10 @@ def test_make_chem_pot_diag_from_mp_w_vise_functional(mp_query, cpd_corr):
 def test_make_chem_pot_diag_from_mp_additional_elem(mp_query, cpd_corr):
     actual = make_chem_pot_diag_from_mp(target=Composition("Mg"),
                                         additional_elements=["O"],
-                                        atom_energy_yaml="pbesol")
+                                        atom_energy_yaml="pbesol",
+                                        vertex_elements=["Mg", "O"])
     assert actual == cpd_corr
+    assert actual.vertex_elements == cpd_corr.vertex_elements
 
 
 def test_remove_higher_energy_comp():

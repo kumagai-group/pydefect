@@ -38,6 +38,8 @@ def make_chem_pot_diag_from_mp(target: Union[Composition, str],
     properties = ["task_id", "full_formula", "final_energy"]
     target = target if isinstance(target, Composition) else Composition(target)
     elements = target.chemical_system.split("-")
+    vertex_elements = vertex_elements or elements
+    vertex_elements = [Element(e) for e in vertex_elements]
     if additional_elements:
         elements.extend(additional_elements)
     query = MpQuery(elements, properties=properties)
@@ -60,7 +62,6 @@ def make_chem_pot_diag_from_mp(target: Union[Composition, str],
             Composition(m["full_formula"]), energy, m["task_id"]))
 
     comp_es = remove_higher_energy_comp(comp_es)
-
     return ChemPotDiag(comp_es, target, vertex_elements)
 
 
