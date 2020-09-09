@@ -4,6 +4,7 @@ from copy import deepcopy
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
     NoElementEnergyError, CompositionEnergy, replace_comp_energy
@@ -83,9 +84,9 @@ def test_abs_chem_pots(cpd):
 
 
 def test_host_ele_abs_energies_per_atom(cpd):
-    assert cpd.host_ele_abs_energies_per_atom == {Composition("H2"): 0.0,
-                                                  Composition("O2"): 1.0,
-                                                  Composition("H2O"): -2/3}
+    assert cpd.vertex_elements_abs_energies_per_atom == {Composition("H2"): 0.0,
+                                                         Composition("O2"): 1.0,
+                                                         Composition("H2O"): -2/3}
 
 
 def test_host_ele_abs_energies_per_atom_2():
@@ -93,12 +94,12 @@ def test_host_ele_abs_energies_per_atom_2():
     energies_with_cl.append(CompositionEnergy(Composition("Cl"), 10.0, "z"))
     cpd = ChemPotDiag(energies_with_cl, target=Composition("H2O"),
                       vertex_elements=[Element.H, Element.O, Element.Cl])
-    assert cpd.host_ele_abs_energies_per_atom == {Composition("H2"): 0.0,
-                                                  Composition("O2"): 1.0,
-                                                  Composition("H2O"): -2/3,
-                                                  Composition("ClO"): 1.5,
-                                                  Composition("ClO2"): 1.0,
-                                                  Composition("Cl2"): 10.0}
+    assert cpd.vertex_elements_abs_energies_per_atom == {Composition("H2"): 0.0,
+                                                         Composition("O2"): 1.0,
+                                                         Composition("H2O"): -2/3,
+                                                         Composition("ClO"): 1.5,
+                                                         Composition("ClO2"): 1.0,
+                                                         Composition("Cl2"): 10.0}
 
 
 def test_cpd_plot_info_lacking_element_data():
@@ -115,6 +116,33 @@ def test_chem_pot_diag_min_energy(cpd):
 def test_impurity_abs_energy(cpd):
     expected = CompositionEnergy(Composition("Cl2O2"), 6.0, 'd'), 5.0
     assert cpd.impurity_abs_energy(Element.Cl, "A") == expected
+
+
+def test_vertex_list(cpd):
+    index = ['A', 'B']
+    columns = ['mu_H', 'mu_O', 'Phase for Cl']
+    data = [[0.0, -3.0, 'Cl2'], [-1.5, 0.0, 'Cl2']]
+    expected = pd.DataFrame(data, index=index, columns=columns)
+    pd.testing.assert_frame_equal(cpd.target_vertex_list_dataframe, expected)
+    print(cpd)
+
+
+energies = [CompositionEnergy(Composition("H"), 0.0, "a"),
+            CompositionEnergy(Composition("H4O2"), -4.0, "c"),
+            CompositionEnergy(Composition("O"), 1.0, "b"),
+            CompositionEnergy(Composition("Cl2"), 3.0, "e"),
+            ]
+
+
+@pytest.fixture
+def cpd2():
+    return ChemPotDiag(energies, target=Composition("H2O"),
+                       vertex_elements=[Element.H, Element.O])
+
+
+def test_impurity_abs_energy2(cpd2):
+    expected = CompositionEnergy(Composition("Cl2"), 3.0, 'e'), 1.5
+    assert cpd2.impurity_abs_energy(Element.Cl, "A") == expected
 
 
 @pytest.fixture()

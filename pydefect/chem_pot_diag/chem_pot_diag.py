@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Dict, Optional, Union, List, Set
 
 import numpy as np
+import pandas as pd
 import yaml
 from monty.json import MSONable
 from monty.serialization import loadfn
@@ -15,6 +16,7 @@ from pydefect.error import PydefectError
 from pydefect.util.error_classes import CpdNotSupportedError
 from pymatgen import Composition, Element
 from scipy.spatial.qhull import HalfspaceIntersection
+from tabulate import tabulate
 
 alphabets = list(string.ascii_uppercase)
 
@@ -83,7 +85,7 @@ class ChemPotDiag(MSONable):
         return len(self.vertex_elements)
 
     @property
-    def host_ele_abs_energies_per_atom(self):
+    def vertex_elements_abs_energies_per_atom(self):
         result = {}
         for k, v in self.abs_energies_per_atom.items():
             if set(k.elements).issubset(set(self.vertex_elements)):
@@ -96,7 +98,7 @@ class ChemPotDiag(MSONable):
         for vertex_element in self.vertex_elements:
             target = Composition({vertex_element: 1.0}).reduced_composition
             candidates = filter(lambda x: x[0] == target,
-                                self.host_ele_abs_energies_per_atom.items())
+                                self.vertex_elements_abs_energies_per_atom.items())
             try:
                 result.append(min([x[1] for x in candidates]))
             except ValueError:
@@ -106,7 +108,7 @@ class ChemPotDiag(MSONable):
     @property
     def rel_energies(self):
         result = {}
-        for c, e in self.host_ele_abs_energies_per_atom.items():
+        for c, e in self.vertex_elements_abs_energies_per_atom.items():
             sub = sum(f * offset for f, offset
                       in zip(self.atomic_fractions(c), self.offset_to_abs))
             result[c] = e - sub
@@ -154,6 +156,28 @@ class ChemPotDiag(MSONable):
         energy = self.rel_energies[self.target]
         return {next(label): c for c in self.vertex_coords
                 if on_composition(fractions, c, energy)}
+
+    @property
+    def target_vertex_list_dataframe(self):
+        index = []
+        result = []
+        for k, v in self.target_vertices.items():
+            index.append(k)
+            result.append([])
+            for k2, v2 in zip(self.vertex_elements, v):
+                result[-1].append(round(v2, 3))
+
+            for ie in self.impurity_elements:
+                competing_comp_for_impurity, _ = self.impurity_abs_energy(ie, k)
+                comp_name = str(competing_comp_for_impurity.composition)
+                result[-1].append(comp_name)
+
+        columns = [f"mu_{e}" for e in self.vertex_elements]
+        columns += [f"Phase for {e}" for e in self.impurity_elements]
+        return pd.DataFrame(result, index=index, columns=columns)
+
+    def __str__(self):
+        return tabulate(self.target_vertex_list_dataframe, headers='keys', tablefmt='psql')
 
     def host_abs_chem_pot_dict(self, label) -> Dict[Element, float]:
         rel_chem_pots = self.target_vertices[label]
