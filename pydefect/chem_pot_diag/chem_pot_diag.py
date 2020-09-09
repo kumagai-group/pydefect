@@ -5,7 +5,7 @@ from copy import deepcopy
 from dataclasses import dataclass, InitVar
 from itertools import chain
 from pathlib import Path
-from typing import Dict, Optional, Union, List, Set
+from typing import Dict, Optional, Union, List
 
 import numpy as np
 import pandas as pd
@@ -21,11 +21,15 @@ from tabulate import tabulate
 alphabets = list(string.ascii_uppercase)
 
 
-@dataclass(frozen=True)
+@dataclass
 class CompositionEnergy(MSONable):
-    composition: Composition
+    composition: InitVar[Union[Composition, dict]]
     energy: float
     source: str
+
+    def __post_init__(self, composition):
+        self.composition: Composition = composition if isinstance(composition, Composition) \
+            else Composition.from_dict(composition)
 
     @property
     def abs_energy_per_atom(self):

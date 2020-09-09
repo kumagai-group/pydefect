@@ -29,8 +29,6 @@ def cpd():
 def test_composition_roundtrip(cpd):
     comp_e = CompositionEnergy(Composition("H"), 0.0, "a")
     rounded_comp_e = comp_e.__class__.from_dict(comp_e.as_dict())
-    print(comp_e)
-    print(rounded_comp_e)
     assert comp_e == rounded_comp_e
 
 
