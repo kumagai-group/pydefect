@@ -255,7 +255,7 @@ def on_composition(atomic_fractions, coord, energy) -> bool:
 
 
 def replace_comp_energy(chem_pot_diag: ChemPotDiag,
-                        replaced_comp_energies: Set[CompositionEnergy]):
+                        replaced_comp_energies: List[CompositionEnergy]):
     new_comp_energies = []
     for ce in chem_pot_diag.comp_energies:
         for replaced_comp_energy in replaced_comp_energies:

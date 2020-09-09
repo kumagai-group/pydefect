@@ -13,9 +13,9 @@ from pymatgen.core.composition import Composition
 
 @pytest.fixture
 def cpd_plot_info_2d():
-    energies = {CompositionEnergy(Composition("H"), 0.0, ""),
+    energies = [CompositionEnergy(Composition("H"), 0.0, ""),
                 CompositionEnergy(Composition("O"), 1.0, ""),
-                CompositionEnergy(Composition("H4O2"), -4.0, "")}
+                CompositionEnergy(Composition("H4O2"), -4.0, "")]
     cpd = ChemPotDiag(energies, target=Composition("H2O"))
     return CpdPlotInfo(cpd, min_range=-10)
 
@@ -28,12 +28,12 @@ def test_cpd_2d_draw(cpd_plot_info_2d):
 
 @pytest.fixture
 def cpd_3d_info():
-    energies = {CompositionEnergy(Composition("H"), 0.0, ""),
+    energies = [CompositionEnergy(Composition("H"), 0.0, ""),
                 CompositionEnergy(Composition("O"), 1.0, ""),
                 CompositionEnergy(Composition("H4O2"), -4.0, ""),
                 CompositionEnergy(Composition("MgH2O"), -10.0, ""),
                 CompositionEnergy(Composition("Mg"), 0.0, ""),
-                CompositionEnergy(Composition("MgO"), -3.0, "")}
+                CompositionEnergy(Composition("MgO"), -3.0, "")]
     cpd = ChemPotDiag(energies, target=Composition("MgH2O"))
     return CpdPlotInfo(cpd)
 

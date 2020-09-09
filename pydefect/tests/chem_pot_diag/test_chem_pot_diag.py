@@ -26,6 +26,14 @@ def cpd():
                        vertex_elements=[Element.H, Element.O])
 
 
+def test_composition_roundtrip(cpd):
+    comp_e = CompositionEnergy(Composition("H"), 0.0, "a")
+    rounded_comp_e = comp_e.__class__.from_dict(comp_e.as_dict())
+    print(comp_e)
+    print(rounded_comp_e)
+    assert comp_e == rounded_comp_e
+
+
 def test_msonable(cpd):
     assert_msonable(cpd)
 
@@ -121,22 +129,20 @@ def test_impurity_abs_energy(cpd):
 def test_vertex_list(cpd):
     index = ['A', 'B']
     columns = ['mu_H', 'mu_O', 'Phase for Cl']
-    data = [[0.0, -3.0, 'Cl2'], [-1.5, 0.0, 'Cl2']]
+    data = [[0.0, -3.0, 'O2 Cl2'], [-1.5, 0.0, 'O2 Cl1']]
     expected = pd.DataFrame(data, index=index, columns=columns)
+    print(cpd.target_vertex_list_dataframe)
     pd.testing.assert_frame_equal(cpd.target_vertex_list_dataframe, expected)
-    print(cpd)
-
-
-energies = [CompositionEnergy(Composition("H"), 0.0, "a"),
-            CompositionEnergy(Composition("H4O2"), -4.0, "c"),
-            CompositionEnergy(Composition("O"), 1.0, "b"),
-            CompositionEnergy(Composition("Cl2"), 3.0, "e"),
-            ]
 
 
 @pytest.fixture
 def cpd2():
-    return ChemPotDiag(energies, target=Composition("H2O"),
+    energies_here = [CompositionEnergy(Composition("H"), 0.0, "a"),
+                     CompositionEnergy(Composition("H4O2"), -4.0, "c"),
+                     CompositionEnergy(Composition("O"), 1.0, "b"),
+                     CompositionEnergy(Composition("Cl2"), 3.0, "e"),
+                     ]
+    return ChemPotDiag(energies_here, target=Composition("H2O"),
                        vertex_elements=[Element.H, Element.O])
 
 
@@ -179,8 +185,8 @@ def test_replace_comp_energy():
                        CompositionEnergy(Composition("F"), 1.0, "c")],
                       target={"H": 1})
     replace_comp_energy(cpd,
-                        {CompositionEnergy(Composition("H"), -1.0, "x"),
-                         CompositionEnergy(Composition("O"), 0.0, "y")})
+                        [CompositionEnergy(Composition("H"), -1.0, "x"),
+                         CompositionEnergy(Composition("O"), 0.0, "y")])
 
     expected = ChemPotDiag([CompositionEnergy(Composition("H"), -1.0, "x"),
                             CompositionEnergy(Composition("O"), 0.0, "y"),
