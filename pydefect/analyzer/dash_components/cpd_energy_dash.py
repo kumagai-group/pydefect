@@ -3,8 +3,9 @@
 
 from typing import List
 
+import dash_table
 from crystal_toolkit.core.mpcomponent import MPComponent
-from crystal_toolkit.helpers.layouts import Column, dcc, html
+from crystal_toolkit.helpers.layouts import Column, dcc, html, Columns
 from dash.dependencies import Input, Output
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import make_defect_energies
@@ -30,51 +31,85 @@ class CpdEnergyComponent(MPComponent):
         self.defects = defects
         self.defect_entries = defect_entries
         self.corrections = corrections
+        df = self.cpd_plot_info.cpd.target_vertex_list_dataframe.copy()
+        df.reset_index(inplace=True)
+        self.vertex_list = dash_table.DataTable(
+            id='table',
+            columns=[{"name": i, "id": i} for i in df.columns],
+            data=df.to_dict('records'))
 
         super().__init__(*args, **kwargs)
 
+    def energy_fig(self, abs_chem_pot, label):
+        single_energies = []
+        for d, e, c in zip(self.defects,
+                           self.defect_entries,
+                           self.corrections):
+            single_energies.append(
+                make_single_defect_energy(self.perfect, d, e, abs_chem_pot,
+                                          c))
+        defect_energies = make_defect_energies(single_energies)
+        plotter = DefectEnergyPlotlyPlotter(title=f"Label {label[0]}",
+                                            defect_energies=defect_energies,
+                                            vbm=self.perfect.vbm,
+                                            cbm=self.perfect.cbm,
+                                            supercell_vbm=self.perfect.vbm,
+                                            supercell_cbm=self.perfect.cbm)
+        return plotter.create_figure()
+
+
+class CpdEnergyOtherComponent(CpdEnergyComponent):
     @property
     def _sub_layouts(self):
-        if self.cpd_plot_info.dim == 2:
-            plotter = ChemPotDiagPlotly2DMplPlotter(self.cpd_plot_info)
-        else:
-            plotter = ChemPotDiagPlotly3DMplPlotter(self.cpd_plot_info)
+        d = [{"label": v, "value": v}
+             for v in self.cpd_plot_info.cpd.target_vertices.keys()]
+        cpd_label = self.get_choice_input(
+            kwarg_label="label",
+            state={"label": "A", "value": "A"},
+            label="Equilibrium label",
+            options=d)
+        energy = dcc.Graph(id="energy")
+        return {"cpd_label": cpd_label, "energy": energy}
 
-        cpd = dcc.Graph(id="cpd", figure=plotter.figure)
+    @property
+    def layout(self):
+        return Columns([Column([self.vertex_list,
+                                self._sub_layouts["cpd_label"]]),
+                        Column(html.Div(self._sub_layouts["energy"]))])
+
+    def generate_callbacks(self, app, cache):
+        @app.callback(
+            Output('energy', 'figure'),
+            [Input(self.get_kwarg_id("label"), "value")])
+        def display_cpd(label):
+            label = label if label else "A"
+            abs_chem_pot = self.cpd_plot_info.cpd.abs_chem_pot_dict(label[0])
+            return self.energy_fig(abs_chem_pot, label)
+
+
+class CpdEnergy2D3DComponent(CpdEnergyComponent):
+    @property
+    def _sub_layouts(self):
+
+        if self.cpd_plot_info.dim == 2:
+            fig = ChemPotDiagPlotly2DMplPlotter(self.cpd_plot_info).figure
+        else:
+            fig = ChemPotDiagPlotly3DMplPlotter(self.cpd_plot_info).figure
+        cpd = dcc.Graph(id="cpd", figure=fig)
         energy = dcc.Graph(id="energy")
         return {"cpd": cpd, "energy": energy}
 
     @property
     def layout(self):
-        return [Column(html.Div(self._sub_layouts["cpd"])),
+        return [Column([self.vertex_list, self._sub_layouts["cpd"]]),
                 Column(html.Div(self._sub_layouts["energy"]))]
 
     def generate_callbacks(self, app, cache):
         @app.callback(
             Output('energy', 'figure'),
             [Input('cpd', 'clickData')])
-        def display_click_data(click_data):
-            if click_data is None:
-                label = "A"
-            else:
-                label = click_data["points"][0]["text"]
+        def display_cpd(click_data):
+            label = click_data["points"][0]["text"] if click_data else "A"
             abs_chem_pot = self.cpd_plot_info.cpd.abs_chem_pot_dict(label)
-
-            single_energies = []
-            for d, e, c in zip(self.defects,
-                               self.defect_entries,
-                               self.corrections):
-                single_energies.append(
-                    make_single_defect_energy(self.perfect, d, e, abs_chem_pot, c))
-            defect_energies = make_defect_energies(single_energies)
-
-            plotter = DefectEnergyPlotlyPlotter(title=f"Label {label}",
-                                                defect_energies=defect_energies,
-                                                vbm=self.perfect.vbm,
-                                                cbm=self.perfect.cbm,
-                                                supercell_vbm=self.perfect.vbm,
-                                                supercell_cbm=self.perfect.cbm)
-
-            return plotter.create_figure()
-
+            return self.energy_fig(abs_chem_pot, label)
 

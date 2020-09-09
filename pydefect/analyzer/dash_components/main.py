@@ -8,7 +8,8 @@ import crystal_toolkit.components as ctc
 from crystal_toolkit.helpers.layouts import *
 from dash import Dash
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.dash_components.cpd_energy_dash import CpdEnergyComponent
+from pydefect.analyzer.dash_components.cpd_energy_dash import \
+    CpdEnergy2D3DComponent, CpdEnergyOtherComponent
 from pydefect.analyzer.dash_components.scenes_from_volumetric_data import \
     SceneDicts
 from pydefect.analyzer.dash_components.single_defect_component import \
@@ -158,8 +159,12 @@ def make_layouts(structure: Structure, dos_plot_data, band_plot_data,
             SingleDefectComponent(pot, eig, scene_dicts, defect_entry.full_name,
                                   id=f"{defect_entry.full_name}").layout())
 
-    cpd_energy_comp = CpdEnergyComponent(cpd_plot_info, perfect, defects,
-                                         defect_entries, corrections)
+    if cpd_plot_info.cpd.dim in [2, 3]:
+        cpd_energy_comp = CpdEnergy2D3DComponent(cpd_plot_info, perfect, defects,
+                                             defect_entries, corrections)
+    else:
+        cpd_energy_comp = CpdEnergyOtherComponent(cpd_plot_info, perfect, defects,
+                                                  defect_entries, corrections)
 
     structure_component = StructureComponent(structure)
     comp = structure.composition.reduced_formula
