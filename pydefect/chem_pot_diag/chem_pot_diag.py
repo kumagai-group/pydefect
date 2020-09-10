@@ -15,7 +15,7 @@ from monty.serialization import loadfn
 from pydefect.error import PydefectError
 from pydefect.util.error_classes import CpdNotSupportedError
 from pymatgen import Composition, Element
-from scipy.spatial.qhull import HalfspaceIntersection
+from scipy.spatial.qhull import HalfspaceIntersection, QhullError
 from tabulate import tabulate
 
 alphabets = list(string.ascii_uppercase)
@@ -138,7 +138,7 @@ class ChemPotDiag(MSONable):
     def lowest_relative_energy(self):
         return min(chain(*self.vertex_coords))
 
-    def get_half_space_intersection(self, min_range):
+    def get_half_space_intersection(self, min_range, feasible_dist=1.0):
         half_spaces = []
         for c, e in self.rel_energies.items():
             half_spaces.append(self.atomic_fractions(c) + [-e])
@@ -148,7 +148,7 @@ class ChemPotDiag(MSONable):
             x.append(min_range)
             half_spaces.append(x)
         # When used in vertex_coords  min_range is large_minum_number
-        feasible_point = np.array([min_range + 1] * self.dim, dtype=float)
+        feasible_point = np.array([min_range + feasible_dist] * self.dim, dtype=float)
         hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
 
         return hs
@@ -228,7 +228,12 @@ class CpdPlotInfo:
 
     def _get_comp_vertices(self, min_range
                            ) -> Dict[Composition, List[List[float]]]:
-        hs = self.cpd.get_half_space_intersection(min_range)
+        try:
+            hs = self.cpd.get_half_space_intersection(min_range)
+        except QhullError:
+            hs = self.cpd.get_half_space_intersection(min_range,
+                                                      feasible_dist=0.01)
+
         intersections = hs.intersections.tolist()
         result = {}
         for c, e in self.cpd.rel_energies.items():
