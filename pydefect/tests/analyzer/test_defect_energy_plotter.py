@@ -6,6 +6,7 @@ from pydefect.analyzer.defect_energy import DefectEnergy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter, \
     DefectEnergiesMplSettings, DefectEnergyPlotlyPlotter
 from pydefect.defaults import defaults
+from pydefect.tests.util.dash_helper import show_png
 from pymatgen.util.string import latexify
 
 
@@ -39,7 +40,9 @@ def test_defect_energies_mpl_actual_plot(defect_energy_plotters):
 def test_defect_energies_plotly_actual_plot(defect_energy_plotters):
     _, plotter = defect_energy_plotters
     fig = plotter.create_figure()
-    fig.show()
+#    fig.show()
+    show_png(fig)
+
 
 """
 TODO

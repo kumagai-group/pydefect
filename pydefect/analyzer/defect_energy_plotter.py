@@ -75,12 +75,17 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
             font_size=15,
             width=700, height=700)
 
+        base_e = self._supercell_vbm
+        e_min = min(self._supercell_vbm, self._vbm)
+        e_max = max(self._supercell_cbm, self._cbm)
+
         all_y = []
         for de in self._defect_energies:
-            cp = de.cross_points(self._supercell_vbm, self._supercell_cbm)
-            x, y = cp.t_all_sorted_points
-            all_y.extend(y)
-            fig.add_trace(go.Scatter(x=x, y=y, name=de.name,
+            cp = de.cross_points(e_min, e_max)
+            xs, ys = cp.t_all_sorted_points
+            xs = [x - base_e for x in xs]
+            all_y.extend(ys)
+            fig.add_trace(go.Scatter(x=xs, y=ys, name=de.name,
                                      text=cp.charge_list,
                                      hovertemplate=
                                      f'{de.name}<br>' +
@@ -90,17 +95,30 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
         y_min = min(all_y) - 0.2
         y_max = max(all_y) + 0.2
 
-        fig["layout"]["xaxis"]["range"] = [self._supercell_vbm,
-                                           self._supercell_cbm]
+        fig["layout"]["xaxis"]["range"] = [e_min - base_e - 0.1, e_max - base_e + 0.1]
         fig["layout"]["yaxis"]["range"] = [y_min, y_max]
 
-        fig.add_shape(type="line",
-                      y0=y_min, y1=y_max, x0=self._vbm, x1=self._vbm,
-                      line=dict(width=2, dash="dot"))
-        fig.add_shape(type="line",
-                      y0=y_min, y1=y_max, x0=self._cbm, x1=self._cbm,
-                      line=dict(width=2, dash="dot"))
+        fig.add_trace(go.Scatter(x=[self._vbm - base_e, self._vbm - base_e],
+                                 y=[y_min, y_max],
+                                 line=dict(width=2, dash="dot"),
+                                 showlegend=False,
+                                 line_color="black"))
 
+        fig.add_trace(go.Scatter(x=[self._cbm - base_e, self._cbm - base_e],
+                                 y=[y_min, y_max],
+                                 line=dict(width=2, dash="dot"),
+                                 line_color="black",
+                                 name="Unitcell"))
+        fig.add_trace(go.Scatter(x=[self._supercell_vbm - base_e, self._supercell_vbm - base_e],
+                                 y=[y_min, y_max],
+                                 line=dict(width=1, dash="dash"),
+                                 showlegend=False,
+                                 line_color="black"))
+        fig.add_trace(go.Scatter(x=[self._supercell_cbm - base_e, self._supercell_cbm - base_e],
+                                 y=[y_min, y_max],
+                                 line=dict(width=1, dash="dash"),
+                                 line_color="black",
+                                 name="Supercell"))
         return fig
 
 
