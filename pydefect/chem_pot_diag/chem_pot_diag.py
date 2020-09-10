@@ -18,7 +18,7 @@ from pymatgen import Composition, Element
 from scipy.spatial.qhull import HalfspaceIntersection, QhullError
 from tabulate import tabulate
 
-alphabets = list(string.ascii_uppercase)
+alphabets = list(string.ascii_uppercase) + list(string.ascii_lowercase)
 
 
 @dataclass
