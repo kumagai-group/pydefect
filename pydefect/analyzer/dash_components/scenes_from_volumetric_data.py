@@ -53,7 +53,7 @@ class SceneDicts(MSONable, ToJsonFileMixIn):
         return cls(scene_dicts, StructureGraph.from_dict(d["structure_graph"]))
 
 
-def make_scene_dicts(parchg_list, defect_pos):
+def make_scene_dicts(parchg_list, defect_pos, level=None):
     band_indices = [c.split(".")[-2] for c in parchg_list]
     # parchgs = [Chgcar.from_file(c) for c in parchg_list]
     parchgs = []
@@ -90,7 +90,8 @@ def make_scene_dicts(parchg_list, defect_pos):
             try:
                 vertices, faces = get_vertices_and_faces(xyz_shifted,
                                                          lattice_matrix,
-                                                         step_size=step_size)
+                                                         step_size=step_size,
+                                                         level=level)
                 results[key] = {"vertices": vertices, "faces": faces}
             except RuntimeError:
                 continue
@@ -136,22 +137,24 @@ class SingleScene(MSONable):
         return cls(scene_dicts)
 
 
-def make_single_scene(volmetric_data: VolumetricData, step_size=3):
+def make_single_scene(volmetric_data: VolumetricData, step_size=3, level=None):
     lattice_matrix = volmetric_data.structure.lattice.matrix
     data = volmetric_data.data["total"]
     vertices, faces = get_vertices_and_faces(data,
                                              lattice_matrix,
-                                             step_size=step_size)
+                                             step_size=step_size,
+                                             level=level)
     return SingleScene({"vertices": vertices, "faces": faces})
 
 
 def make_scene_dicts_json(parchg_list: List[str],
                           calc_results: CalcResults,
-                          perfect_calc_results: CalcResults):
+                          perfect_calc_results: CalcResults,
+                          scene_level):
     structure_analyzer = DefectStructureAnalyzer(calc_results.structure,
                                                  perfect_calc_results.structure)
     defect_pos = structure_analyzer.defect_center_coord
-    scene_dicts = make_scene_dicts(parchg_list, defect_pos)
+    scene_dicts = make_scene_dicts(parchg_list, defect_pos, level=scene_level)
     scene_dicts.to_json_file()
 
 
@@ -165,4 +168,5 @@ def parse_args(args):
 
 if __name__ == "__main__":
     x = parse_args(sys.argv[1:])
-    make_scene_dicts_json(x.parchgs, x.calc_results, x.perfect_calc_results)
+    make_scene_dicts_json(x.parchgs, x.calc_results, x.perfect_calc_results,
+                          x.level)
