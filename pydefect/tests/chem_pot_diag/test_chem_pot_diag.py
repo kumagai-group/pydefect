@@ -133,6 +133,10 @@ def test_vertex_list(cpd):
     pd.testing.assert_frame_equal(cpd.target_vertex_list_dataframe, expected)
 
 
+def test_target_formation_energy(cpd):
+    assert cpd.target_formation_energy == ((-4.0) - (0.0 * 4 + 1.0 * 2)) / 6
+
+
 @pytest.fixture
 def cpd2():
     energies_here = [CompositionEnergy(Composition("H"), 0.0, "a"),

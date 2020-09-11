@@ -183,13 +183,13 @@ class ChemPotDiag(MSONable):
     def __str__(self):
         return tabulate(self.target_vertex_list_dataframe, headers='keys', tablefmt='psql')
 
-    def host_abs_chem_pot_dict(self, label) -> Dict[Element, float]:
+    def target_abs_chem_pot_dict(self, label) -> Dict[Element, float]:
         rel_chem_pots = self.target_vertices[label]
         abs_chem_pots = [x + y for x, y in zip(rel_chem_pots, self.offset_to_abs)]
         return dict(zip(self.vertex_elements, abs_chem_pots))
 
     def abs_chem_pot_dict(self, label) -> Dict[Element, float]:
-        result = deepcopy(self.host_abs_chem_pot_dict(label))
+        result = deepcopy(self.target_abs_chem_pot_dict(label))
         for e in self.impurity_elements:
             _, result[e] = self.impurity_abs_energy(e, label)
         return result
@@ -203,7 +203,7 @@ class ChemPotDiag(MSONable):
                 if set(ce.composition.elements).issubset(comp_set) is False:
                     raise CpdNotSupportedError(
                         "Other element(s) than host elements exists.")
-                abs_chem_pot = self.host_abs_chem_pot_dict(label)
+                abs_chem_pot = self.target_abs_chem_pot_dict(label)
                 mu = ce.energy
                 comp_d = ce.composition.as_dict()
                 for ve in self.vertex_elements:
@@ -214,6 +214,10 @@ class ChemPotDiag(MSONable):
         if competing_comp_e is None:
             raise CpdNotSupportedError(f"No compounds with element {element}.")
         return competing_comp_e, y
+
+    @property
+    def target_formation_energy(self):
+        return self.rel_energies[self.target]
 
 
 class CpdPlotInfo:
