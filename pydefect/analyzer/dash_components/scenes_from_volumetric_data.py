@@ -106,7 +106,7 @@ def make_scene_dicts(parchg_list, defect_pos, level=None):
 def get_vertices_and_faces(array_data, lattice_matrix, step_size=10, level=None):
     # normals and values are removed.
     vertices, faces, _, _ = marching_cubes(array_data,
-                                           level=level,
+                                           level=level * array_data.max(),
                                            step_size=step_size)
     # normalize to fractional coordinates
     vertices = vertices / array_data.shape
