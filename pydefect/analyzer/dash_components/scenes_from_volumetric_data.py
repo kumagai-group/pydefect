@@ -163,6 +163,7 @@ def parse_args(args):
     parser.add_argument("--parchgs", type=str, nargs="+")
     parser.add_argument("-c", "--calc_results", type=loadfn)
     parser.add_argument("-p", "--perfect_calc_results", type=loadfn)
+    parser.add_argument("-l", "--level", type=float)
     return parser.parse_args(args)
 
 
