@@ -12,13 +12,16 @@ from dash_mp_components import Simple3DScene
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pymatgen import Structure, DummySpecie, Lattice
 from pymatgen.analysis.graphs import StructureGraph
-from pymatgen.analysis.local_env import CrystalNN
 
 
 class SupercellComponent(MPComponent):
     def __init__(self, supercell_info: SupercellInfo, *args, **kwargs):
-        structure = Structure.from_dict(supercell_info.structure.as_dict())
-        self.graph = StructureGraph.with_local_env_strategy(structure, CrystalNN())
+        s = Structure.from_dict(supercell_info.structure.as_dict())
+        coords = [[f % 1 for f in x.frac_coords] for x in s]
+        structure = Structure(lattice=s.lattice, species=s.species,
+                              coords=coords)
+        self.graph = StructureGraph.with_empty_graph(structure=structure)
+
         self.transformation_matrix = supercell_info.transformation_matrix
         self.interstitials = supercell_info.interstitials
         super().__init__(*args, **kwargs)
