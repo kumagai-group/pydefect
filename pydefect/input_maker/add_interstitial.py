@@ -5,7 +5,6 @@ from typing import List
 import numpy as np
 from numpy.linalg import inv
 from pydefect.input_maker.supercell_info import SupercellInfo, Interstitial
-from pydefect.util.error_classes import NotPrimitiveError
 from pymatgen import Structure, Element
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
@@ -23,9 +22,9 @@ def append_interstitial(supercell_info: SupercellInfo,
     (a_u, b_u, c_u) = (a_s, b_s, c_s) . trans_mat
     so, (a_s, b_s, c_s) = (a_u, b_u, c_u) . inv_trans_mat
     """
-    supercell_symmetrizer = StructureSymmetrizer(supercell_info.structure)
-    if supercell_symmetrizer.primitive != based_structure:
-        raise NotPrimitiveError
+#    supercell_symmetrizer = StructureSymmetrizer(supercell_info.structure)
+#    if supercell_symmetrizer.primitive != based_structure:
+#        raise NotPrimitiveError
 
     based_structure.append(species=Element.H, coords=frac_coords)
     symmetrizer = StructureSymmetrizer(based_structure)
