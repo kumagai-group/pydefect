@@ -18,13 +18,14 @@ logger = get_logger(__name__)
 
 class SupercellMaker:
     def __init__(self,
-                 input_structure: IStructure,
+                 primitive_structure: IStructure,
                  matrix: Optional[List[List[int]]] = None,
                  **supercell_kwargs):
 
-        symmetrizer = StructureSymmetrizer(input_structure)
-        if input_structure.lattice != symmetrizer.primitive.lattice:
-            logger.warning(f"Input structure: {input_structure}")
+        self.primitive_structure = primitive_structure
+        symmetrizer = StructureSymmetrizer(primitive_structure)
+        if primitive_structure != symmetrizer.primitive:
+            logger.warning(f"Input structure: {primitive_structure}")
             logger.warning(f"Primitive structure:{symmetrizer.primitive}")
             raise NotPrimitiveError
 
@@ -64,7 +65,8 @@ class SupercellMaker:
         self.supercell_info = SupercellInfo(self.supercell.structure,
                                             self.sg_symbol,
                                             self.transformation_matrix,
-                                            symmetrizer.sites)
+                                            symmetrizer.sites,
+                                            self.primitive_structure)
 
     @property
     def transformation_matrix(self):

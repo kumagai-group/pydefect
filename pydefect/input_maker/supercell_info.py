@@ -29,6 +29,7 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
     transformation_matrix: List[List[int]]
     sites: Dict[str, Site]
     interstitials: List[Interstitial] = field(default_factory=list)
+    unitcell_structure: IStructure = None
 
     @classmethod
     def from_dict(cls, d):
