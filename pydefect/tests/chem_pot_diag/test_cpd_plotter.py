@@ -8,6 +8,7 @@ from pydefect.chem_pot_diag.cpd_plotter import (
     ChemPotDiagMpl2DMplPlotter, transpose, sort_coords,
     ChemPotDiagMpl3DMplPlotter, ChemPotDiagPlotly2DMplPlotter,
     ChemPotDiagPlotly3DMplPlotter)
+from pydefect.tests.util.dash_helper import show_png
 from pymatgen.core.composition import Composition
 
 
@@ -60,10 +61,12 @@ def test_sort_coords():
 def test_plotly_2d(cpd_plot_info_2d):
     plotter = ChemPotDiagPlotly2DMplPlotter(cpd_plot_info_2d)
     fig = plotter.figure
-    fig.show()
+    # fig.show()
+    show_png(fig)
 
 
 def test_plotly_3d(cpd_3d_info):
     plotter = ChemPotDiagPlotly3DMplPlotter(cpd_3d_info)
     fig = plotter.figure
-    fig.show()
+    # fig.show()
+    show_png(fig)

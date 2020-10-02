@@ -8,6 +8,7 @@ from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.efnv_correction.site_potential_plotter import \
     SitePotentialMplPlotter, SitePotentialPlotlyPlotter
+from pydefect.tests.util.dash_helper import show_png
 
 
 @pytest.fixture
@@ -44,4 +45,5 @@ def test_site_potential_plotter_with_actual_file():
 def test_defect_energies_plotly_actual_plot(efnv_cor):
     fig = SitePotentialPlotlyPlotter(title="ZnO Va_O1_2",
                                      efnv_correction=efnv_cor).create_figure()
-    fig.show()
+    # fig.show()
+    show_png(fig)

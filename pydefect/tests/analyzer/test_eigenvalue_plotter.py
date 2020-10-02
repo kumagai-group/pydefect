@@ -7,6 +7,7 @@ from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter, \
     EigenvaluePlotlyPlotter
+from pydefect.tests.util.dash_helper import show_png
 
 eig = BandEdgeEigenvalues(energies_and_occupations=[
     [[[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]], [[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]]],
@@ -40,4 +41,5 @@ def test_plotly_with_actual_file():
     plotter = EigenvaluePlotlyPlotter(title="test", band_edge_eigenvalues=eig,
                                       supercell_vbm=0.5, supercell_cbm=2.6)
     fig = plotter.create_figure()
-    fig.show()
+    # fig.show()
+    show_png(fig)
