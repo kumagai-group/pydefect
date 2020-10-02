@@ -50,6 +50,7 @@ def test_create_supercell_generate_supercell_info(simple_cubic):
     assert info.transformation_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
     assert info.sites["H1"].wyckoff_letter == "a"
     assert info.sites["H1"].equivalent_atoms == list(range(8))
+    assert info.unitcell_structure == simple_cubic
 
 
 def test_spglib_cyclic_behavior():

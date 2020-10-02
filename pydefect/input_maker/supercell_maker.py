@@ -66,7 +66,7 @@ class SupercellMaker:
                                             self.sg_symbol,
                                             self.transformation_matrix,
                                             symmetrizer.sites,
-                                            self.primitive_structure)
+                                            unitcell_structure=self.primitive_structure)
 
     @property
     def transformation_matrix(self):
