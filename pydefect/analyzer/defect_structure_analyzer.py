@@ -74,7 +74,14 @@ class DefectStructureAnalyzer:
             coords.append(self._perfect_structure[v].frac_coords)
         for i in self.inserted_indices:
             coords.append(self._defective_structure[i].frac_coords)
-        return np.average(coords, axis=0)
+
+        lattice = self._perfect_structure.lattice
+        repr_coords = coords[0]
+        translated_coords = [list(repr_coords)]
+        for c in coords[1:]:
+            _, trans = lattice.get_distance_and_image(repr_coords, c)
+            translated_coords.append([c[i] + trans[i] for i in range(3)])
+        return np.average(translated_coords, axis=0) % 1
 
     def distance_from_center(self, index):
         frac_coords = self._defective_structure[index].frac_coords

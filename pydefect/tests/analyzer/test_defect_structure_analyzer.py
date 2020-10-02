@@ -18,7 +18,7 @@ def structure_analyzer():
     cu2o_perfect = IStructure(Lattice.cubic(5),
                               species=["Cu"] * 4 + ["O"] * 2,
                               coords=[[0.25, 0.25, 0.25],
-                                      [0.25, 0.75, 0.75],
+                                      [0.25, 0.74, 0.74],
                                       [0.75, 0.75, 0.25],
                                       [0.75, 0.25, 0.75],
                                       [0, 0, 0],
@@ -32,12 +32,37 @@ def structure_analyzer():
     # [0.6, 0.4, 0.5] - [0.5, 0.5, 0.5] = [0.1, -0.1, 0]
     cu2o_defect = IStructure(Lattice.cubic(5),
                              species=["Cu"] * 3 + ["O"] * 2 + ["H"],
-                             coords=[[0.25, 0.5, 0.5],
+                             coords=[[0.25, 0.5, 0.5],   # defect
                                      [0.76, 0.73, 0.24],
                                      [0.75, 0.25, 0.73],
                                      [0.1, 0.9, 0],
                                      [0.5, 0.5, 0.5],
-                                     [0.25]*3])
+                                     [0.25]*3])   # defect
+
+    return DefectStructureAnalyzer(defective_structure=cu2o_defect,
+                                   perfect_structure=cu2o_perfect)
+
+
+@pytest.fixture
+def structure_analyzer_periodic_issue():
+    cu2o_perfect = IStructure(Lattice.cubic(5),
+                              species=["Cu"] * 4 + ["O"] * 2,
+                              coords=[[0.25, 0.25, 0.25],
+                                      [0.25, 0.75, 0.75],
+                                      [0.75, 0.75, 0.25],
+                                      [0.75, 0.25, 0.75],
+                                      [0, 0, 0],
+                                      [0.5, 0.5, 0.5]])
+
+    # defect center is ([1.0, 1.0, 1.0] + [0.99, 0.99, 0.99]) / 2 = [0.995]*3
+    cu2o_defect = IStructure(Lattice.cubic(5),
+                             species=["Cu"] * 4 + ["O"] + ["H"],
+                             coords=[[0.25, 0.25, 0.25],
+                                     [0.25, 0.75, 0.75],
+                                     [0.75, 0.75, 0.25],
+                                     [0.75, 0.25, 0.75],
+                                     [0.5, 0.5, 0.5],
+                                     [0.99, 0.99, 0.99]])
 
     return DefectStructureAnalyzer(defective_structure=cu2o_defect,
                                    perfect_structure=cu2o_perfect)
@@ -50,12 +75,17 @@ def test_atom_mapping_to_perfect(structure_analyzer):
 
 
 def test_defect_structure_analyzer_defect_center(structure_analyzer):
-    expected = np.array([0.25, 0.4375, 0.4375])
+    expected = np.array([0.25, 0.435, 0.435])
     assert (structure_analyzer.defect_center_coord == expected).all()
 
 
+def test_defect_center_periodicity(structure_analyzer_periodic_issue):
+    expected = np.array([0.995]*3)
+    assert (structure_analyzer_periodic_issue.defect_center_coord == expected).all()
+
+
 def test_defect_structure_analyzer_distance(structure_analyzer):
-    assert structure_analyzer.distance_from_center(4) == 1.3258252147247767
+    assert structure_analyzer.distance_from_center(4) == 1.3318220601867203
 
 
 def test_neighboring_atom_indices(cubic_supercell):
