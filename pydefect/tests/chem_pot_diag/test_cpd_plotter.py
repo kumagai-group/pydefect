@@ -8,8 +8,8 @@ from pydefect.chem_pot_diag.cpd_plotter import (
     ChemPotDiagMpl2DMplPlotter, transpose, sort_coords,
     ChemPotDiagMpl3DMplPlotter, ChemPotDiagPlotly2DMplPlotter,
     ChemPotDiagPlotly3DMplPlotter)
-from pydefect.tests.util.dash_helper import show_png
 from pymatgen.core.composition import Composition
+from vise.util.dash_helper import show_png
 
 
 @pytest.fixture

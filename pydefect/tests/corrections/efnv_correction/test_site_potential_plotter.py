@@ -8,7 +8,7 @@ from pydefect.corrections.efnv_correction.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.efnv_correction.site_potential_plotter import \
     SitePotentialMplPlotter, SitePotentialPlotlyPlotter
-from pydefect.tests.util.dash_helper import show_png
+from vise.util.dash_helper import show_png
 
 
 @pytest.fixture

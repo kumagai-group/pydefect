@@ -61,7 +61,7 @@ def test_get_vertices_and_faces(mocker):
     expected_vertices = np.array([[-5.0, -5.0, -5.0],
                                   [-4.0, -4.5, -4.75],
                                   [-3.0, -4.0, -4.5]])
-    mock.assert_called_once_with(array_data, step_size=20, level=10)
+    mock.assert_called_once_with(array_data, step_size=20, level=10 * 0.8)
 
     np.testing.assert_array_almost_equal(actual_vertices, expected_vertices)
     np.testing.assert_array_almost_equal(actual_faces, faces)

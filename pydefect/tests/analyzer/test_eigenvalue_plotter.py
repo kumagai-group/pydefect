@@ -7,7 +7,7 @@ from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter, \
     EigenvaluePlotlyPlotter
-from pydefect.tests.util.dash_helper import show_png
+from vise.util.dash_helper import show_png
 
 eig = BandEdgeEigenvalues(energies_and_occupations=[
     [[[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]], [[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]]],
