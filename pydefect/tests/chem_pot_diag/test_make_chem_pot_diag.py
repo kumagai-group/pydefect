@@ -67,6 +67,7 @@ Mg: -0.00912097""")
 def test_make_chem_pot_diag_from_mp_w_vise_functional(mp_query, cpd_corr):
     actual = make_chem_pot_diag_from_mp(target=Composition("MgO"),
                                         atom_energy_yaml="pbesol")
+    cpd_corr.to_yaml()
     assert actual == cpd_corr
 
 

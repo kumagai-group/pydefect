@@ -261,8 +261,12 @@ def cubic_supercell_info_wo_int(mocker, cubic_supercell):
                         equivalent_atoms=[0, 1, 2, 3]),
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="m-3m",
                          equivalent_atoms=[4, 5, 6, 7])}
+    unitcell = Structure(Lattice.rhombohedral(7.071068, 60),
+                         species=["H", "He"],
+                         coords=[[0.0]*3, [0.5]*3])
     return SupercellInfo(cubic_supercell,
-                         "Fm-3m", [[-2, 2, 2], [2, -2, 2], [2, 2, -2]], sites)
+                         "Fm-3m", [[-2, 2, 2], [2, -2, 2], [2, 2, -2]], sites,
+                         unitcell_structure=unitcell)
 
 
 @pytest.fixture
