@@ -14,8 +14,10 @@ from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagPlotly3DMplPlotter, \
 from pydefect.util.mp_tools import MpQuery
 from pymatgen import Composition, Element
 from vise.util.enum import ExtendedEnum
+from vise.util.logger import get_logger
 
 parent = Path(__file__).parent
+logger = get_logger(__name__)
 
 mp_energies = loadfn(parent / "datasets/mp_atom_energy.yaml")
 
@@ -48,6 +50,7 @@ def make_chem_pot_diag_from_mp(target: Union[Composition, str],
         if ".yaml" in atom_energy_yaml:
             energies = loadfn(atom_energy_yaml)
         else:
+            logger.info(f"Atom energy set for {atom_energy_yaml} is used.")
             energies = AtomEnergyType.from_string(atom_energy_yaml).energies
         diff = {e: energies[e] - mp_energies[e] for e in elements}
     else:

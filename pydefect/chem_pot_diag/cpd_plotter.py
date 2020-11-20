@@ -9,6 +9,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from numpy import concatenate, clip, dot, arctan2
 from numpy.linalg import det
 from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo
+from pymatgen import Composition
 from pymatgen.util.string import latexify
 
 
@@ -346,7 +347,7 @@ class ChemPotDiagPlotly3DMplPlotter:
         return fig
 
 
-def clean_formula(comp):
+def clean_formula(comp: Composition):
     s = []
     for char in str(comp):
         if char == "1" or char == " ":
@@ -357,42 +358,3 @@ def clean_formula(comp):
             s.append(char)
 
     return "".join(s)
-
-
-# class ChemPotDiagMpl3DMplPlotter(ChemPotDiagMplPlotter):
-#     def _add_ax(self):
-#         self._ax = plt.figure().add_subplot(111, projection='3d')
-#
-#     @property
-#     def _text_kwargs(self):
-#         return {"ha": "center", "va": "center"}
-#
-#     def _set_lims(self):
-#         self._ax.set_xlim3d(self.info.min_range, 0)
-#         self._ax.set_ylim3d(0, self.info.min_range)
-#         self._ax.set_zlim3d(self.info.min_range, 0)
-#
-#     def _set_labels(self):
-#         vertex_elements = self.info.cpd.vertex_elements
-#         self._ax.set_xlabel(f"Chemical potential of {vertex_elements[0]}")
-#         self._ax.set_ylabel(f"Chemical potential of {vertex_elements[1]}")
-#         self._ax.set_zlabel(f"Chemical potential of {vertex_elements[2]}")
-#
-#     def _set_grid(self):
-#         pass
-#
-#     def draw_simplex(self, composition):
-#         vertex_coords = self.info.comp_vertices[composition]
-#         atomic_fractions = self.info.atomic_fractions(composition)
-#
-#         face = Poly3DCollection([sort_coords(np.array(vertex_coords))])
-#         face.set_color(self._3d_simplex_color(atomic_fractions))
-#         face.set_edgecolor("black")
-#         self._ax.add_collection3d(face)
-#
-#     @staticmethod
-#     def _3d_simplex_color(atomic_fractions):
-#         return [(f + 1.5) / 2.5 for f in atomic_fractions]
-#
-#
-#

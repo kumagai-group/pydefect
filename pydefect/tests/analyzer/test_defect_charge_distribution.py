@@ -2,7 +2,6 @@
 #  Copyright (c) 2020 Kumagai group.
 
 import numpy as np
-import pytest
 from pydefect.analyzer.defect_charge_distribution import RadialDist
 from pymatgen import Structure, Lattice, Spin
 from pymatgen.io.vasp import Chgcar
@@ -22,12 +21,5 @@ def test():
 
     hist_data, half_point, summed = rad.histogram(Spin.up)
     np.testing.assert_almost_equal(hist_data[0], [5.00000000e-02, 1.16355283e-03])
-
-
-@pytest.mark.skip
-def test_actual_files():
-    chgcar = Chgcar.from_file("PARCHG.0125.ALLK")
-    rad = RadialDist(chgcar, [0.25, 0, 0])
-    print(rad.histogram(Spin.up))
 
 
