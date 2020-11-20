@@ -2,11 +2,10 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import numpy as np
 import pytest
-from pymatgen import Element
-
 from pydefect.input_maker.supercell import (
     Supercell, Supercells, TetragonalSupercells, RhombohedralSupercells)
 from pydefect.util.error_classes import SupercellError
+from pymatgen import Element
 
 
 def test_supercell(simple_cubic, simple_cubic_2x1x1):
@@ -64,7 +63,7 @@ def test_tetragonal_supercells(elongated_tetragonal):
                                       max_num_atoms=300)
     actual = supercells.most_isotropic_supercell.lattice.lengths
     expected = (4.242640687119285, 4.242640687119285, 4.242640687119286)
-    assert actual == expected
+    np.testing.assert_array_almost_equal(actual, expected)
 
     actual = supercells.most_isotropic_supercell.matrix
     expected = np.array([[3, 3, 0], [-3, 3, 0], [0, 0, 1]])

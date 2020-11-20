@@ -19,8 +19,8 @@ def test_distances_w_specie(ortho_conventional):
     distances = Distances(ortho_conventional, center_coord=[0.25, 0.26, 0.0])
     expected = [float("inf")] * 4 + [4.030645109656765, 1.9068560512005097,
                                      1.9990247622278219, 3.985737071107425]
-    np.testing.assert_equal(distances.distances(remove_self=False, specie="He"),
-                            expected)
+    np.testing.assert_almost_equal(
+        distances.distances(remove_self=False, specie="He"), expected)
 
 
 def test_distances_mapped_atom_idx(ortho_conventional):
