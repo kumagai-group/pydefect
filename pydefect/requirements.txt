@@ -2,4 +2,3 @@ numpy
 monty
 pymatgen
 fire
-scikit-image
