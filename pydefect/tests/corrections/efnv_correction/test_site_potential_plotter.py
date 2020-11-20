@@ -10,6 +10,12 @@ from pydefect.corrections.efnv_correction.site_potential_plotter import \
     SitePotentialMplPlotter, SitePotentialPlotlyPlotter
 from vise.util.dash_helper import show_png
 
+try:
+    import psutil
+    PSUTIL_NOT_PRESENT = False
+except ModuleNotFoundError:
+    PSUTIL_NOT_PRESENT = True
+
 
 @pytest.fixture
 def efnv_cor():
@@ -42,8 +48,8 @@ def test_site_potential_plotter_with_actual_file():
     plotter.plt.show()
 
 
+@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
 def test_defect_energies_plotly_actual_plot(efnv_cor):
     fig = SitePotentialPlotlyPlotter(title="ZnO Va_O1_2",
                                      efnv_correction=efnv_cor).create_figure()
-    # fig.show()
     show_png(fig)

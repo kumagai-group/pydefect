@@ -9,6 +9,13 @@ from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter, \
     EigenvaluePlotlyPlotter
 from vise.util.dash_helper import show_png
 
+try:
+    import psutil
+    PSUTIL_NOT_PRESENT = False
+except ModuleNotFoundError:
+    PSUTIL_NOT_PRESENT = True
+
+
 eig = BandEdgeEigenvalues(energies_and_occupations=[
     [[[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]], [[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]]],
     [[[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]], [[0.0, 1.0], [0.5, 0.5], [1.0, 0.0]]],
@@ -36,6 +43,7 @@ def test_plot_with_actual_file():
     plotter.plt.show()
 
 
+@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
 def test_plotly_with_actual_file():
     eig = loadfn(Path(__file__).parent / "band_edge_eigenvalues.json")
     plotter = EigenvaluePlotlyPlotter(title="test", band_edge_eigenvalues=eig,

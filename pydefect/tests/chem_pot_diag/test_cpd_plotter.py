@@ -12,6 +12,13 @@ from pymatgen.core.composition import Composition
 from vise.util.dash_helper import show_png
 
 
+try:
+    import psutil
+    PSUTIL_NOT_PRESENT = False
+except ModuleNotFoundError:
+    PSUTIL_NOT_PRESENT = True
+
+
 @pytest.fixture
 def cpd_plot_info_2d():
     energies = [CompositionEnergy(Composition("H"), 0.0, ""),
@@ -58,6 +65,7 @@ def test_sort_coords():
     np.testing.assert_array_equal(sort_coords(coords), expected)
 
 
+@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
 def test_plotly_2d(cpd_plot_info_2d):
     plotter = ChemPotDiagPlotly2DMplPlotter(cpd_plot_info_2d)
     fig = plotter.figure
@@ -65,6 +73,7 @@ def test_plotly_2d(cpd_plot_info_2d):
     show_png(fig)
 
 
+@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
 def test_plotly_3d(cpd_3d_info):
     plotter = ChemPotDiagPlotly3DMplPlotter(cpd_3d_info)
     fig = plotter.figure

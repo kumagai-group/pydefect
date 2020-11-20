@@ -10,6 +10,13 @@ from pymatgen.util.string import latexify
 from vise.util.dash_helper import show_png
 
 
+try:
+    import psutil
+    PSUTIL_NOT_PRESENT = False
+except ModuleNotFoundError:
+    PSUTIL_NOT_PRESENT = True
+
+
 def test_defect_energies_mpl_settings():
     mpl_defaults = DefectEnergiesMplSettings()
     assert next(mpl_defaults.colors) == next(defaults.defect_energy_colors)
@@ -37,10 +44,10 @@ def test_defect_energies_mpl_actual_plot(defect_energy_plotters):
     plotter.plt.show()
 
 
+@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
 def test_defect_energies_plotly_actual_plot(defect_energy_plotters):
     _, plotter = defect_energy_plotters
     fig = plotter.create_figure()
-#    fig.show()
     show_png(fig)
 
 
