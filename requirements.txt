@@ -2,3 +2,7 @@ numpy
 monty
 pymatgen
 fire
+vise
+crystal-toolkit
+sklearn
+scikit-image
