@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from monty.serialization import loadfn
+from pydefect import __version__
 from pydefect.cli.main_tools import str_int_to_int
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
@@ -16,7 +17,6 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
     plot_chem_pot_diag
 from pydefect.defaults import defaults
-from pydefect.version import __version__
 from pymatgen import IStructure, Composition, Structure
 from pymatgen.io.vasp import Vasprun, Outcar
 
