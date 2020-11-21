@@ -33,6 +33,7 @@ def efnv_cor():
         defect_coords=(0.0, 0.0, 0.0))
 
 
+@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="skipped for circle CI")
 def test_site_potential_plotter_with_simple_example(efnv_cor):
     plotter = SitePotentialMplPlotter(title="ZnO Va_O1_2",
                                       efnv_correction=efnv_cor)
@@ -40,6 +41,7 @@ def test_site_potential_plotter_with_simple_example(efnv_cor):
     plotter.plt.show()
 
 
+@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="skipped for circle CI")
 def test_site_potential_plotter_with_actual_file():
     efnv_cor = loadfn(Path(__file__).parent / "NaCl_Va_Na_-1_correction.json")
     plotter = SitePotentialMplPlotter(title="NaCl Va_Na_-1",
