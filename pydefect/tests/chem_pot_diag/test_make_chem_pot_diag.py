@@ -30,8 +30,8 @@ def cpd():
 
 
 to_datasets = Path(__file__).parent / "../../chem_pot_diag/datasets"
-pbesol = loadfn(str(to_datasets / "vise_pbesol_atom_energy.yaml"))
-mp = loadfn(str(to_datasets / "mp_atom_energy.yaml"))
+pbesol = loadfn(str(to_datasets / "vise_pbesol_vasp544_atom_energy.yaml"))
+mp = loadfn(str(to_datasets / "mp_vasp544_atom_energy.yaml"))
 
 diff = {elem: pbesol[elem] - mp[elem] for elem in ["O", "Mg"]}
 
