@@ -19,7 +19,7 @@ from vise.util.logger import get_logger
 parent = Path(__file__).parent
 logger = get_logger(__name__)
 
-mp_energies = loadfn(parent / "datasets/mp_atom_energy.yaml")
+mp_energies = loadfn(parent / "datasets/mp_vasp544_atom_energy.yaml")
 
 
 class AtomEnergyType(ExtendedEnum):
@@ -29,7 +29,7 @@ class AtomEnergyType(ExtendedEnum):
     @property
     def energies(self):
         if self.pbesol:
-            return loadfn(parent / "datasets/vise_pbesol_atom_energy.yaml")
+            return loadfn(parent / "datasets/vise_pbesol_vasp544_atom_energy.yaml")
 
 
 def make_chem_pot_diag_from_mp(target: Union[Composition, str],
