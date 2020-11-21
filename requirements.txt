@@ -4,5 +4,5 @@ pymatgen
 fire
 vise
 crystal-toolkit
-sklearn
+scikit-learn
 scikit-image
