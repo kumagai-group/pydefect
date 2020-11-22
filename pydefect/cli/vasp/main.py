@@ -4,6 +4,7 @@
 
 import argparse
 import sys
+import warnings
 from pathlib import Path
 
 from monty.serialization import loadfn
@@ -19,6 +20,9 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
 from pydefect.defaults import defaults
 from pymatgen import IStructure, Composition, Structure
 from pymatgen.io.vasp import Vasprun, Outcar
+from pymatgen.io.vasp.inputs import UnknownPotcarWarning
+
+warnings.simplefilter('ignore', UnknownPotcarWarning)
 
 
 def parse_args(args):
@@ -53,7 +57,7 @@ def parse_args(args):
     # -- print ------------------------------------------------
     parser_print = subparsers.add_parser(
         name="print",
-        description="",
+        description="Print the json file info.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['p'])
 
@@ -84,7 +88,8 @@ def parse_args(args):
     # -- make_poscars ------------------------------------------------
     parser_make_poscars = subparsers.add_parser(
         name="make_poscars",
-        description="",
+        description="Make poscar files in directories retrieved from "
+                    "Materials Project.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['mp'])
 
@@ -98,7 +103,7 @@ def parse_args(args):
     # -- make_cpd ------------------------------------------------
     parser_mcpd = subparsers.add_parser(
         name="make_cpd",
-        description="",
+        description="Make chemical potential diagram.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['mcpd'])
 
@@ -114,7 +119,7 @@ def parse_args(args):
     # -- plot_cpd ------------------------------------------------
     parser_pcpd = subparsers.add_parser(
         name="plot_cpd",
-        description="",
+        description="Plot chemical potential diagram and make pdf file.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pcpd'])
 
@@ -125,7 +130,7 @@ def parse_args(args):
     # -- supercell ------------------------------------------------
     parser_supercell = subparsers.add_parser(
         name="supercell",
-        description="",
+        description="Make SPOSCAR file.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['s'])
 
@@ -140,7 +145,7 @@ def parse_args(args):
     # -- defect_set ------------------------------------------------
     parser_defect_set = subparsers.add_parser(
         name="defect_set",
-        description="",
+        description="Make defect_in.yaml file.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['ds'])
 
@@ -154,7 +159,8 @@ def parse_args(args):
     # -- defect_entries ------------------------------------------------
     parser_defect_entries = subparsers.add_parser(
         name="defect_entries",
-        description="",
+        description="Make POSCAR files and defect entries in defect "
+                    "directories",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['de'])
 
@@ -163,7 +169,7 @@ def parse_args(args):
     # -- append_interstitial ------------------------------------------------
     parser_append_interstitial = subparsers.add_parser(
         name="append_interstitial",
-        description="",
+        description="Append interstitial information to supercell_info.yaml",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['ai'])
 
@@ -174,12 +180,14 @@ def parse_args(args):
     parser_append_interstitial.add_argument(
         "-c", "--frac_coords", required=True, nargs=3, type=float)
 
-    parser_append_interstitial.set_defaults(func=append_interstitial_to_supercell_info)
+    parser_append_interstitial.set_defaults(
+        func=append_interstitial_to_supercell_info)
 
     # -- pop_interstitial ------------------------------------------------
     parser_pop_interstitial = subparsers.add_parser(
         name="pop",
-        description="",
+        description="Pop interstitial site from supercell_info.json. "
+                    "Note that the indices begin from 1.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pi'])
 
@@ -188,12 +196,14 @@ def parse_args(args):
     parser_pop_interstitial.add_argument(
         "-i", "--index", required=True, type=int)
 
-    parser_pop_interstitial.set_defaults(func=pop_interstitial_from_supercell_info)
+    parser_pop_interstitial.set_defaults(
+        func=pop_interstitial_from_supercell_info)
 
     # -- calc_results ------------------------------------------------
     parser_calc_results = subparsers.add_parser(
         name="calc_results",
-        description="",
+        description="Generate calc_results.json files. "
+                    "Run after VASP calculations.",
         parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cr'])
@@ -202,7 +212,8 @@ def parse_args(args):
     # -- efnv correction ------------------------------------------------
     parser_efnv = subparsers.add_parser(
         name="efnv",
-        description="",
+        description="Generate extended FNV-correction related efnv_correction "
+                    "files. ",
         parents=[dirs_parser, pcr_parser, unitcell_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['efnv'])
@@ -212,7 +223,7 @@ def parse_args(args):
     # -- defect eigenvalues ------------------------------------------------
     parser_eig = subparsers.add_parser(
         name="eig",
-        description="",
+        description="Generate plot of eigenvalues and occupations.",
         parents=[dirs_parser, pcr_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['eig'])
@@ -221,18 +232,19 @@ def parse_args(args):
 
     # -- band edge characters ------------------------------------------------
     parser_ec = subparsers.add_parser(
-        name="edge_characters",
-        description="",
+        name="make_edge_characters",
+        description="Make edge_characters.json files that are used for "
+                    "analyzing the eigenvalues.",
         parents=[dirs_parser, pcr_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['ec'])
+        aliases=['mec'])
 
     parser_ec.set_defaults(func=make_edge_characters)
 
     # -- band edge states ------------------------------------------------
     parser_es = subparsers.add_parser(
         name="edge_states",
-        description="",
+        description="Show edge state for each spin channel.",
         parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['es'])
@@ -244,7 +256,7 @@ def parse_args(args):
     # -- defect formation energy ----------------------------------------------
     parser_energy = subparsers.add_parser(
         name="defect_formation_energy",
-        description="",
+        description="Show and plot defect formation energies.",
         parents=[dirs_parser, pcr_parser, unitcell_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['e'])
