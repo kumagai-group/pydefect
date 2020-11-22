@@ -242,7 +242,7 @@ def test_defect_eigenvalues(mocker):
 
 def test_band_edge_characters(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
-    parsed_args = parse_args(["ec",
+    parsed_args = parse_args(["mec",
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-pcr", "perfect/calc_results.json"])
     expected = Namespace(
