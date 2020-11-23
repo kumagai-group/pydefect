@@ -14,10 +14,10 @@ class Defaults:
         self._symmetry_angle_tolerance = 5.0
         self._ewald_accuracy = 15.0
         self._e_above_hull = 1e-5
-        self._e_above_hull = 1e-5
         self._cutoff_distance_factor = 1.3
         self._displace_distance = 0.2
         self._same_distance_criterion = 0.1
+        self._ele_neg_diff = 2.0
         self._kpoint_density = 5.0
         self._band_gap_criterion = 0.2  # in eV
         self._similar_orb_criterion = 0.12
@@ -68,6 +68,10 @@ class Defaults:
     @property
     def same_distance_criterion(self):
         return self._same_distance_criterion
+
+    @property
+    def ele_neg_diff(self):
+        return self._ele_neg_diff
 
     @property
     def kpoint_density(self):

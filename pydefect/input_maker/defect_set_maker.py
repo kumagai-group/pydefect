@@ -4,6 +4,7 @@ from itertools import product
 from typing import Dict, List
 
 from pydefect.database.database import oxidation_state, electronegativity
+from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_set import DefectSet, screen_defect_set
 from pydefect.input_maker.supercell_info import SupercellInfo
@@ -14,7 +15,7 @@ class DefectSetMaker:
                  supercell_info: SupercellInfo,
                  overwritten_oxi_states: Dict[str, int] = None,
                  dopants: List[str] = None,
-                 ele_neg_diff: float = 2.0,
+                 ele_neg_diff: float = defaults.ele_neg_diff,
                  keywords: List[str] = None):
 
         self.supercell_info = supercell_info
