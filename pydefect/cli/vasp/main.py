@@ -31,8 +31,7 @@ def parse_args(args):
         description="""                            
     pydefect is a package that helps researchers to do first-principles point 
     defect calculations with the VASP code.""",
-        epilog=f"Author: Yu Kumagai Version: {__version__}",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        epilog=f"Author: Yu Kumagai Version: {__version__}")
 
     subparsers = parser.add_subparsers()
 
@@ -62,10 +61,7 @@ def parse_args(args):
         aliases=['p'])
 
     parser_print.add_argument(
-        "-f", "--filename",
-        dest="obj",
-        required=True,
-        type=loadfn)
+        "-f", "--filename", dest="obj", required=True, type=loadfn)
 
     parser_print.set_defaults(func=print_file)
 
@@ -136,9 +132,12 @@ def parse_args(args):
 
     parser_supercell.add_argument(
         "-p", "--unitcell", default="POSCAR", type=IStructure.from_file)
-    parser_supercell.add_argument("--matrix", default=None, nargs="+", type=int)
-    parser_supercell.add_argument("--min_num_atoms", default=50, type=int)
-    parser_supercell.add_argument("--max_num_atoms", default=300, type=int)
+    parser_supercell.add_argument(
+        "--matrix", nargs="+", type=int, help="Supercell matrix")
+    parser_supercell.add_argument(
+        "--min_atoms", dest="min_num_atoms", default=50, type=int, help="Minimum number of atoms")
+    parser_supercell.add_argument(
+        "--max_atoms", dest="max_num_atoms", default=300, type=int, help="Maximum number of atoms")
 
     parser_supercell.set_defaults(func=make_supercell)
 
@@ -150,9 +149,13 @@ def parse_args(args):
         aliases=['ds'])
 
     parser_defect_set.add_argument(
-        "-o", "--oxi_states", nargs="+", type=str_int_to_int)
-    parser_defect_set.add_argument("-d", "--dopants", nargs="+", type=str)
-    parser_defect_set.add_argument("-k", "--kwargs", nargs="+", type=str)
+        "-o", "--oxi_states", nargs="+", type=str_int_to_int,
+        help="Oxidation states in integers, e.g., Mg 2 O -2.")
+    parser_defect_set.add_argument(
+        "-d", "--dopants", nargs="+", type=str,
+        help="Dopant element names, e.g., Al Ga.")
+    parser_defect_set.add_argument(
+        "-k", "--kwargs", nargs="+", type=str)
 
     parser_defect_set.set_defaults(func=make_defect_set)
 
@@ -273,12 +276,7 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def main():
-    args = parse_args(sys.argv[1:])
-    args.func(args)
-
-
 if __name__ == "__main__":
-    main()
+    parse_args(sys.argv[1:])
 
 

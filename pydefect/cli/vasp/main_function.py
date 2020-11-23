@@ -88,6 +88,7 @@ def plot_chem_pot_diag(args) -> None:
     else:
         raise CpdNotSupportedError("Number of elements must be 2 or 3. "
                                    f"Now {cpd.vertex_elements}.")
+    print(cpd)
     plt = plotter.draw_diagram()
     plt.savefig(fname="cpd.pdf")
     plt.show()
