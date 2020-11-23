@@ -104,8 +104,8 @@ def test_make_supercell_w_options(mocker):
     parsed_args = parse_args(["s",
                               "-p", "POSCAR-tmp",
                               "--matrix", "1", "2", "3",
-                              "--min_num_atoms", "1000",
-                              "--max_num_atoms", "2000"])
+                              "--min_atoms", "1000",
+                              "--max_atoms", "2000"])
     # func is a pointer so need to point the same address.
     expected = Namespace(
         unitcell=mock.from_file.return_value,
