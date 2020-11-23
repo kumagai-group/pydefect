@@ -239,7 +239,7 @@ Values at the vertices at the MgO region written in :code:`vertices_MgO.yaml` ar
     FILLED LATER
 
 .. Here, :code:`standard_energy` are the energies of the most stable simple substances or simple gas phases,
-and A--B show the relative chemical potentials at the vertices shown in :code:`cpd_MgO.pdf`.
+.. and A--B show the relative chemical potentials at the vertices shown in :code:`cpd_MgO.pdf`.
 
 ============================================================================
 5. Construction of a supercell and defect initial setting file.
@@ -477,7 +477,7 @@ Sometimes, one want to treat complex defects.
 For instance, in MgO<sub>2</sub>, O<sub>2</sub> molecules act as anions.
 In such a case, it is possible that O<sub>2</sub> molecules make a vacancy.
 Other important examples are the methylammonium lead halides(MAPI),
-where methylammonium ions acts as singly positive cations (CH<sub>3</sup>NH<sub>3</sup><sup>+</sup>),
+where methylammonium ions acts as singly positive cations (CH<sub>3</sub>NH<sub>3</sub><sup>+</sup>),
 and DX centers.
 
 Or, researchers already finished the defect calculations, but want to use :code:`pydefect` for the post-processing.
@@ -498,37 +498,43 @@ The directory name is parsed as
 ============================================================================
 9. Parsing supercell calculation results
 ============================================================================
+
 Then, let's run the vasp calculations.
 <p> We recommend the users to use &Gamma; version of vasp if the k-point sampling is only &Gamma; point for very large supercells.</p>
 
 After (partly) finishing the vasp calculations, we generate the `dft_results.json`
 that contains the first-principles calculation results related to the defect properties.
 
-By using the `supercell_results` (=`sr`) sub-command like,
-```
-python ~/my_bin/pydefect/pydefect/main.py sr --dir_all
-```
+By using the `calc_results` (=`cr`) sub-command as follows,
 you can generate `dft_results.json` in all the directories.
-When you want to generate `dft_results.json` for some particular directories, *e.g.*, Va_O1_0, type
-```
-python ~/my_bin/pydefect/pydefect/main.py sr --dirs Va_O1_0
-```
 
-Here, the name of `perfect/` has special meaning, so users **must** use `perfect/` for the supercells without defects.
+::
+
+    pydefect cr -d *_* perfect
+
+When you want to generate `dft_results.json` for some particular directories, *e.g.*, Va_O1_0, type
+
+::
+
+    pydefect cr -d Va_O1_0
+
 
 ============================================================================
 10. Corrections of defect formation energies in finite-size supercells
 ============================================================================
-When the supercell method is adopted, the total energies for **charged defects** are not properly estimated due to interaction between a defect, its images, and background charge.
+When the supercell method is adopted, the total energies for **charged defects**
+are not properly estimated due to interactions between a defect, its images, and background charge.
 Therefore, we need to correct the total energies of the charged defect supercells to those in the dilution limit.
 
 The corrections are attained using the `extended_fnv_correction` (=`efc`) sub-command,
-```
-python ~/my_bin/pydefect/pydefect/main.py efc --unitcell_json ../unitcell/unitcell.json --perfect_json perfect/dft_results.json
-```
+
+::
+
+    pydefect efnv -d *_* -pcr perfect/calc_results.json -u ../unitcell/unitcell.json
+
 
 For the corrections, we need the dielectric constants and atomic site potentials in the perfect supercell.
-Therefore, the paths to `unitcell.json` and `dft_results.json` of `perfect` must be assigned.
+Therefore, the paths to `unitcell.json` and `calc_results.json` of `perfect` must be assigned.
 Bear also in mind that this command takes some time, so we recommend the users to prepare coffee or go on a walk outside during this process.
 
 The correction method adopted in `pydefect` at this moment is the so-called extended Freysoldt-Neugebauer-Van de Walle (eFNV) method.
@@ -539,25 +545,78 @@ so if one uses the corrections, please cite the following papers.
 You obtain `potential.eps` file, which contains information about defect-induced and point-charge potential,
 and their differences at each atomic site as shown below.
 
-The width and height of the horizontal line indicate the averaged region and ∆VPC, q/b|far, respectively.
-When performing the corrections, I strongly recommend you to check all the `potential.eps` files for your calculated defects so as to reduce careless mistakes as much as possible.
+The width and height of the horizontal line indicate the averaged region and *∆V<sub>PC</sub>*, *q/b*|far, respectively.
+When performing the corrections, I strongly recommend you to check
+all the `potential.eps` files for your calculated defects so as to reduce careless mistakes as much as possible.
+
 
 ============================================================================
-11. Gathering defect related information
+11. Check defect eigenvalues and band-edge states in supercell calculations
 ============================================================================
-Then, we need to generate `defect.json` files in all the defect directories.
-For this purpose, type,
-```
-python ~/my_bin/pydefect/pydefect/main.py d
-```
+Generally, point defects are divided into three types.
 
-Some calculations might not be finished properly or still ongoing.
-To see whether the calculations are properly finished, one can use the `diagnose` (=`d`) option
-```
-python ~/my_bin/pydefect/pydefect/main.py d -d
-```
-which shows like
-```
+(1) Defects with deep localized states inside the band gap.
+This type of defect is generally considered to be detrimental for device performances as the carriers are trapped by the localized states.
+Furthermore, they could act as color centers, as represented by vacancies in NaCl.
+Therefore, it is important to know the position of the localized state and its origin.
+
+(2) Defects without any defect states inside the band gap,
+which would not affect the electronic properties as long as their concentrations are sufficiently low.
+
+(3) Defects with hydrogenic carrier states, or perturbed host states (PHS),
+where carriers locate at the band edges with loosely trapped by the charged defect centers.
+Examples are the B-on-Si (p-type) and P-on-Si (n-type) substitutional dopants in Si.
+These defects also do little harm for device performances, but introduce the carrier electrons or holes or compensate other charged defects.
+The wavefunctions of the PHS widespread to several million atoms,
+so we need to adopt supergiant supercells for estimating their thermodynamical transition levels,
+which is prohibitive with first-principles calculations thus far.
+Therefore, we instead usually avoid calculating these quantities and
+denote that the defects have PHS and their transition energies locate near band edges only qualitatively.
+
+See some examples from our published papers.
+- [Y. Kumagai*, M. Choi, Y. Nose, and F. Oba, First-principles study of point defects in chalcopyrite ZnSnP2, Phys. Rev. B, 90 125202 (2014).](https://link.aps.org/pdf/10.1103/PhysRevB.90.125202)
+- [Y. Kumagai*, L. A. Burton, A. Walsh, and F. Oba, Electronic structure and defect physics of tin sulfides: SnS, Sn2S3, and SnS2, Phys. Rev. Applied, 6 014009 (2016).](https://link.aps.org/doi/10.1103/PhysRevApplied.6.014009)
+- [Y. Kumagai*, K. Harada, H. Akamatsu, K. Matsuzaki, and F. Oba, Carrier-Induced Band-Gap Variation and Point Defects in Zn3N2 from First Principles, Phys. Rev. Applied, 8 014015 (2017).](https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.8.014015)
+- [Y. Kumagai*, N. Tsunoda, and F. Oba, Point defects and p-type doping in ScN from first principles, Phys. Rev. Applied, 9 034019 (2018).](https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.9.034019)
+- [N. Tsunoda, Y. Kumagai*, A. Takahashi, and F. Oba, Electrically benign defect behavior in ZnSnN2 revealed from first principles, Phys. Rev. Applied, 10 011001 (2018).](https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.10.011001)
+
+To distinguish the defect types, one needs to see the defect levels and judge if the defects create the PHS or defect localized states.
+`Pydefect` shows the eigenvalues and band-edge states by the following three steps.
+Firstly, one can generate the `band_edge_eigenvalues.json` and `eigenvalues.pdf` files with the following command.
+
+::
+
+    pydefect eig -d *_* -pcr perfect/calc_results.json
+
+The `eigenvalues.pdf` file shows the
+These are examples of V<sub>Mg</sub><sup>-2</sup> and V<sub>Mg</sub><sup>0</sup> in MgSe.
+Here, one can see occupations of single-particle levels in the spin-up and -down channels.
+The x-axis and y-axis are fractional coordinates of sampled k points and single-particle energy in the absolute scale, respectively.
+Filled circles inside the figures are eigenenergies in the defect supercells.
+There are also five lines, namely VBM and CBM in the unitcell (**blue**), those in the perfect supercell (**red**), and the Fermi level in the defect supercells.
+The numbers in the figures indicate the band indices, which are shown discretely.
+The filled circles are categorized into blue, green, and orange ones
+which mean the occupied, partially occupied (from 0.1 to 0.9), and unoccupied eigenstates in the defect supercell, respectively.
+
+![V<sub>Mg</sub><sup>-2</sup>](eig1.png)
+![V<sub>Mg</sub><sup>0</sup>](eig2.png)
+![Mg<sub>i</sub><sup>0</sup>](eig3.png)
+
+
+Secondly, we generate edge_characters.json with the command.
+
+::
+
+    pydefect make_edge_characters -d *_* -pcr perfect/calc_results.json
+
+Finally, we can show the edge states
+
+::
+
+    pydefect edge_states -d *_* -pcr perfect/calc_results.json
+
+::
+
   Va_Ba1_-1/  convergence : F    band edge : UP  :    No in-gap state  DOWN  :       Acceptor PHS
   Va_Ba1_-2/  convergence : T    band edge : UP  :    No in-gap state  DOWN  :    No in-gap state
    Va_Ba1_0/  No supercell results file.
@@ -569,83 +628,28 @@ which shows like
   Va_Sn1_-3/  convergence : T    band edge : UP  :    Localized state  DOWN  :    Localized state
   Va_Sn1_-4/  convergence : T    band edge : UP  :    Localized state  DOWN  :    Localized state
    Va_Sn1_0/  convergence : T    band edge : UP  :    No in-gap state  DOWN  :    Localized state
-```
-If the convergences at the electronic and/or ionic steps are not attained, convergence is shown as `F`.
-Further, we can see the band edge information at the spin up (UP) and down (DOWN) channels, which will be explained later.
 
-============================================================================
-12. Check defect eigenvalues
-============================================================================
-Generally, point defects are divided into three types.
-
-(1) Defects with deep localized states inside the band gap.
-This type of defect is generally considered to be detrimental for device performances as the carriers are trapped by the localized states.
-Furthermore, they could act as color centers, as represented by vacancies in NaCl.
-Therefore, it is important to know the position of the localized state and its origin.
-
-(2) Defects without any defect states inside the band gap, which would not affect the electronic properties as long as their concentrations are sufficiently low.
-
-(3) Defects with hydrogenic carrier states, or perturbed host states (PHS), where carriers locate at the band edges with loosely trapped by the defects.
-An examples are the B-on-Si (p-type) and P-on-Si (n-type) substitutional dopants in Si.
-This type of defect also does little harm for device performances, but introduce the carrier electrons or holes or compensate other charged defects.
-The wavefunctions of the PHS widespread to several million atoms, so to estimate their thermodynamical transition levels, we need to calculate such supergiant supercells.
-Instead, we usually avoid calculating these quantities and describe `the defects have PHS and their transition energies locate near band edges` only qualitatively.
-See, for examples.
-- [Y. Kumagai*, M. Choi, Y. Nose, and F. Oba, First-principles study of point defects in chalcopyrite ZnSnP2, Phys. Rev. B, 90 125202 (2014).](https://link.aps.org/pdf/10.1103/PhysRevB.90.125202)
-- [Y. Kumagai*, L. A. Burton, A. Walsh, and F. Oba, Electronic structure and defect physics of tin sulfides: SnS, Sn2S3, and SnS2, Phys. Rev. Applied, 6 014009 (2016).](https://link.aps.org/doi/10.1103/PhysRevApplied.6.014009)
-- [Y. Kumagai*, K. Harada, H. Akamatsu, K. Matsuzaki, and F. Oba, Carrier-Induced Band-Gap Variation and Point Defects in Zn3N2 from First Principles, Phys. Rev. Applied, 8 014015 (2017).](https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.8.014015)
-- [Y. Kumagai*, N. Tsunoda, and F. Oba, Point defects and p-type doping in ScN from first principles, Phys. Rev. Applied, 9 034019 (2018).](https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.9.034019)
-- [N. Tsunoda, Y. Kumagai*, A. Takahashi, and F. Oba, Electrically benign defect behavior in ZnSnN2 revealed from first principles, Phys. Rev. Applied, 10 011001 (2018).](https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.10.011001)
-
-Therefore, it is important to see the defect levels and judge if the carriers create the PHS or defect localized states.
-pydefect show the calculated eigenvalues and the band-edge states by the `eigenvalues` (=`eig`) sub-command
-```
-python ~/my_bin/pydefect/pydefect/main.py eig --defect_dir . --unitcell ../../unitcell/unitcell.json --perfect ../perfect/dft_results.json -s eig.png
-```
-or using the diagnose sub-command as shown above.
-
-The given `eig.png` looks like
-![V<sub>Mg</sub><sup>-2</sup>](eig1.png)
-![V<sub>Mg</sub><sup>0</sup>](eig2.png)
-![Mg<sub>i</sub><sup>0</sup>](eig3.png)
-
-These are examples of V<sub>Mg</sub><sup>-2</sup> and V<sub>Mg</sub><sup>0</sup> in MgSe.
-Here, one can see occupations of single-particle levels in the spin-up and -down channels.
-The x-axis and y-axis are fractional coordinates of sampled k points and single-particle energy in the absolute scale, respectively.
-Filled circles inside the figures are eigenenergies in the defect supercells.
-There are also five lines, namely VBM and CBM in the unitcell (**blue**), those in the perfect supercell (**red**), and the Fermi level in the defect supercells.
-The numbers in the figure indicate the band indices, which are shown discretely.
-
-The filled circles are categorized into blue, green, and orange ones
-which mean the occupied, partially occupied (from 0.1 to 0.9), and unoccupied eigenstates in the defect supercell, respectively.
+There are four supported states `donor_phs`, `acceptor_phs`, `localized_state`, `no_in_gap`,
+the former two are considered as shallow states, and omitted for energy plot by default.
 
 We emphasize that the automatically determined band-edge states could be incorrect as it is difficult to determine them.
-Therefore, please carefully check the band-edge states, and draw the band-decomposed charge density states if the band-edge states are not so obvious.
-
-If you find automatically determined band-edge states are incorrect, you can modify them by
-```
-python ~/my_bin/pydefect/pydefect/main.py sr -be up acceptor_phs --dirs .
-```
-and
-```
-python ~/my_bin/pydefect/pydefect/main.py sr -be down acceptor_phs --dirs .
-```
-for both spin-up and -down states.
-There are four supported states `donor_phs`, `acceptor_phs`, `localized_state`, `no_in_gap`, the former two are considered as shallow states, and omitted for energy plot by default.
+Therefore, please carefully check the band-edge states, and draw their band-decomposed charge density if the band-edge states are not so obvious.
 
 
 ============================================================================
-13. Plot defect formation energies
+12. Plot defect formation energies
 ============================================================================
 Here, we show how to plot the defect formation energies.
 
-The plot of the defect formation energies requires a wide variety of information, namely
-band edges, chemical potentials of competing phases, total energy of perfect supercell.
+The plot of the defect formation energies requires multiple information, namely
+band edges, chemical potentials of competing phases, total energies of perfect and defecitive supercells.
 
 Here, we plot the defect formation energies as a function of the Fermi level with the `plot_energy` (=`pe`) sub-command
-```
-python ~/my_bin/pydefect/pydefect/main.py pe --unitcell ../unitcell/unitcell.json --perfect perfect/dft_results.json --defect_dirs Va*_* --chem_pot_yaml ../competing_phases/vertices_*.yaml -x -1 8 -s energy_A.pdf
-```
+
+::
+
+    pydefect e --unitcell ../unitcell/unitcell.json --perfect perfect/dft_results.json --defect_dirs Va*_* --chem_pot_yaml ../competing_phases/vertices_*.yaml -x -1 8 -s energy_A.pdf
+
 which shows like,
 ![](energy.pdf)
 
@@ -659,18 +663,21 @@ the chemical potential diagram, please use the `--chem_pot_label` option.
 There are many options for this sub-command.
 For instance, if one wants to restrict the plot only for the nitrogen vacancies, one
 can use `--filtering` option like,
-```
-python ~/my_bin/pydefect/pydefect/main.py pe --unitcell ../unitcell/unitcell.json --perfect perfect/dft_results.json --defect_dirs Va*_* --chem_pot_yaml ../competing_phases/vertices_*.yaml -x -1 8 -s energy_A.pdf
-```
+
+::
+
+    pydefect e --unitcell ../unitcell/unitcell.json --perfect perfect/dft_results.json --defect_dirs Va*_* --chem_pot_yaml ../competing_phases/vertices_*.yaml -x -1 8 -s energy_A.pdf
+
 
 ============================================================================
-14. Show local structure information
+13. Show local structure information
 ============================================================================
 We also regularly check the local structures around defects as they show various information.
 `pydefect` can show the local structure information by text using the following command.
-```
-python ~/my_bin/pydefect/pydefect/main.py ls
-```
+
+::
+    pydefect ls
+
 which shows e.g.,
 ```
 2020-01-27 12:28:22,556 INFO pydefect.main_functions parsing directory Va_Mg1_-1/...
@@ -698,7 +705,7 @@ In this case, the Mg vacancies in three charge states have the same structure, i
 
 
 ============================================================================
-15. Calculate the carrier and defect concentrations
+14. Calculate the carrier and defect concentrations
 ============================================================================
 We can also calculate the carrier and defect concentrations using the defect formation energies using `pydefect`.
 For the calculations, `unitcell.json` and `defect_energies.json` are needed.
@@ -706,7 +713,7 @@ When one wants to calculate the equilibrium carrier and defect concentrations at
 ```
  python ~/my_bin/pydefect/pydefect/main.py c --unitcell ../unitcell/unitcell.json -t 1000
 ```
-which shows
+which show
 
 ::
 
