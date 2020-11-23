@@ -39,7 +39,7 @@ class CompositionEnergy(MSONable):
         return self.energy / self.composition.num_atoms
 
 
-@dataclass
+@dataclass(repr=False)
 class ChemPotDiag(MSONable):
     comp_energies: List[CompositionEnergy]
     target: InitVar[Union[Composition, dict]]
@@ -183,8 +183,9 @@ class ChemPotDiag(MSONable):
         columns += [f"Phase for {e}" for e in self.impurity_elements]
         return pd.DataFrame(result, index=index, columns=columns)
 
-    def __str__(self):
-        return tabulate(self.target_vertex_list_dataframe, headers='keys', tablefmt='psql')
+    def __repr__(self):
+        return tabulate(self.target_vertex_list_dataframe,
+                        headers='keys', tablefmt='psql')
 
     def target_abs_chem_pot_dict(self, label) -> Dict[Element, float]:
         rel_chem_pots = self.target_vertices[label]
