@@ -26,6 +26,16 @@ def cpd():
                        vertex_elements=[Element.H, Element.O])
 
 
+def test_print(cpd):
+    expected = """+----+--------+--------+----------------+
+|    |   mu_H |   mu_O | Phase for Cl   |
+|----+--------+--------+----------------|
+| A  |    0   |     -3 | O2 Cl2         |
+| B  |   -1.5 |      0 | O2 Cl1         |
++----+--------+--------+----------------+"""
+    assert cpd.__repr__() == expected
+
+
 def test_composition_roundtrip(cpd):
     comp_e = CompositionEnergy(Composition("H"), 0.0, "a")
     rounded_comp_e = comp_e.__class__.from_dict(comp_e.as_dict())
