@@ -22,9 +22,9 @@ setup(
     packages=find_packages(),
     license='MIT license',
     description="Integrated environment for first-principles point-defect "
-                "calculations using vasp",
+                "calculations",
     classifiers=[
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         "License :: OSI Approved :: MIT License",
     ],
     install_requires=reqs_list,
