@@ -43,7 +43,13 @@ def test_coord_distances(mocker, ortho_conventional):
     mock.cutoff_distance_factor = 3.9051248 / 2.5 + 1e-5  # = 1.562
     distances = Distances(ortho_conventional, center_coord=[0.5, 0.5, 0.5])
 
-    actual = distances.coordination
+    actual = distances.coordination(include_on_site=True)
+    expected = Coordination({"H": [2.5, 3.0, 3.5], "He": [0.0, 3.91]},
+                            3.905,
+                            neighboring_atom_indices={1, 2, 3, 4, 7})
+    assert actual == expected
+
+    actual = distances.coordination()
     expected = Coordination({"H": [2.5, 3.0, 3.5], "He": [3.91]},
                             3.905,
                             neighboring_atom_indices={1, 2, 3, 4})

@@ -42,8 +42,7 @@ class Distances:
     def shortest_distance(self) -> float:
         return min(self.distances())
 
-    @property
-    def coordination(self) -> "Coordination":
+    def coordination(self, include_on_site=False) -> "Coordination":
         cutoff = self.shortest_distance * defaults.cutoff_distance_factor
         elements = [element.specie.name for element in self.structure]
         e_d = zip(elements, self.distances(remove_self=False))
@@ -51,9 +50,11 @@ class Distances:
         unsorted_distances = defaultdict(list)
         neighboring_atom_indices = set()
         for i, (element, distance) in enumerate(e_d):
-            if 1e-5 < distance < cutoff:
-                unsorted_distances[element].append(round(distance, 2))
-                neighboring_atom_indices.add(i)
+            if distance < cutoff:
+                if include_on_site or \
+                        (include_on_site is False and distance > 1e-5):
+                    unsorted_distances[element].append(round(distance, 2))
+                    neighboring_atom_indices.add(i)
 
         distance_dict = {}
         for element, distances in unsorted_distances.items():

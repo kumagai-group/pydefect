@@ -41,12 +41,12 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
         site = self.sites[name]
         coord = list(self.structure[site.equivalent_atoms[0]].frac_coords)
         distances = Distances(self.structure, coord)
-        return distances.coordination
+        return distances.coordination()
 
     def interstitial_coords(self, idx: int):
         interstitial = self.interstitials[idx]
         distances = Distances(self.structure, interstitial.frac_coords)
-        return distances.coordination
+        return distances.coordination(include_on_site=True)
 
     @property
     def multiplicity(self):
