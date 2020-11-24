@@ -3,13 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pydefect's documentation!
+Welcome to pydefect documentation!
 ====================================
 
 .. toctree::
    :maxdepth: 2
 
    tutorial
+   first_principles_calc
+   vertical_transition_level
    change_log
 
 Indices and tables

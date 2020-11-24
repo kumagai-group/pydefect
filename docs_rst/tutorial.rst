@@ -117,9 +117,9 @@ Note that the structure optimization must be generally iterated with 1.3 times l
 until the forces and stresses converge at the first ionic step.
 Such iteration of the vasp calculations is not supported by :code:`pydefect`, but one can easily write the simple runshell scripts to do so.
 
-============================================================================
+=====================================================
 2. Calculation of band, DOS, and dielectric tensor
-============================================================================
+=====================================================
 
 We then calculate the band structure (BS), density of states (DOS), and dielectric constant.
 In the defect calculations, the BS and DOS are used for determining the valence band maximum (VBM) and conduction band minimum (CBM), 
@@ -129,7 +129,7 @@ is needed for correcting the defect formation energies and eigenvalues of defect
 First, we create :code:`band/`, :code:`dos/` and :code:`dielectric/` in :code:`unitcell/`
 and copy :code:`POSCAR` from :code:`unitcell/structure_opt/` and type the following command in each directory,
 
-::
+:
 
     vise vs -x pbesol -t <band, dos or dielectric_dfpt>
 
@@ -141,17 +141,16 @@ See the manual of :code:`vise` for details.
 3. Gathering unitcell information related to point-defect calculations
 ============================================================================
 
-We next collect the bulk information relevant to point-defect calculations,
-namely band edges (for defect-formation energies), and
-electronic and ionic contributions to dielectric tensor (for total-energy corrections),
-using the :code:`unitcell` (= :code:`u`) sub-command.
+We next collect the bulk information,  namely band edges and ion-clamped and
+ionic dielectric tensor using the :code:`unitcell` (=:code:`u`) sub-command.
 
 ::
 
-    pydefect u -vb band/vasprun.xml -ob band/OUTCAR -od dielectric/OUTCAR-finish
+    pydefect u -vb band/vasprun.xml -ob band/OUTCAR-finish -od dielectric/OUTCAR-finish
 
 This command supposes that OUTCAR is renamed to OUTCAR-finish as an example.
-With this command, :code:`unitcell.json` is generated, which will be used for the analysis later.
+With this command, :code:`unitcell.json` is generated,
+which will be used for the analysis of defect calculations later.
 Generally, json files are less readable for human beings,
 so we implement :code:`print` option to generate readable output from json files, like
 
@@ -168,28 +167,32 @@ Here, we show an example of the unitcell information.
 ============================================================================
 4. Calculation of competing phases
 ============================================================================
-When a defect is introduced, atoms are exchanged with the hypothetical atomic reservoirs within the thermodynamics framework.
-In order to calculate a free energy of defect formation that is approximated with the defect formation energy without entropic effect in most cases,
+When a defect is introduced, atoms are exchanged with the hypothetical atomic
+reservoirs within the thermodynamics framework.
+In order to calculate a free energy of defect formation that is approximated
+with the defect formation energy without entropic effect in most cases,
 we need to determine chemical potentials of exchanged atoms accompanied with creating defects.
-Usually, we consider the chemical potentials at the condition where competing phases coexist with the host material,
-which are determined from the chemical potential diagram.
+Usually, we consider the chemical potentials at the condition
+where competing phases coexist with the host material,
+which are determined from the chemical potential diagram (CPD).
 
-For this purpose, we create directories in :code:`competing_phases/` for competing phases including VASP input sets in each directory.
-We can retrieve POSCARs of the stable or slightly unstable competing phases from [the Materials Project (MP)](https://materialsproject.org).
-For this purpose, one needs [the API keys](https://materialsproject.org/open) of the MP as mentioned above.
+For this purpose, we create directories in :code:`competing_phases/`.
+We can retrieve POSCARs of the stable or slightly unstable competing phases from `[the Materials Project (MP)] <https://materialsproject.org>`_.
+For this purpose, one needs `[the API keys] <https://materialsproject.org/open>`_ of the MP as mentioned above.
 Here, as an example, we obtain the competing materials with MgO of which energy above hull is less than 0.5 meV/atom using
 
 ::
 
-    pydefect mp -e Mg O
+    pydefect mp -e Mg O --e_above_hull 0.0005
 
 Particular molecules, namely O :sub:`2`, H :sub:`2`, N :sub:`2`, NH :sub:`3`, and NO :sub:`2`
-are not retrieved from MP but created by :code:`pydefect` itself since these molecules have been calculated as solids in MP,
-which could be inadequate for competing phases for defect calculations.
+are not retrieved from MP but created by :code:`pydefect` itself
+since these molecules have been calculated as solids in MP,
+which could be inadequate for competing phases for the defect calculations.
 
 The bulk structure, namely MgO in this example, has already been calculated, so we do not have to iterate the same calculations,
 but make a symbolic link by :code:`ln -s ../unitcell/structure_opt MgO` after removing :code:`Mg1O1_mp-126/`.
-At this point, you can find these directories under 2020/11/23),
+At this point, you may find these directories,
 
 ::
 
@@ -204,18 +207,20 @@ In case of MgO, :code:`ENMAX` of Mg and O are 200.0 and 400.0, so we need to set
 
     for i in *_*/;do cd $i; python ~/my_bin/vise/vise/cli/main.py vs -uis ENCUT 520 ; cd ../;done
 
-<p>Note, if competing phases are gases, we need to change :code:`ISIF` to 2 so as not to relax the lattice constants (see [vasp manual](https://cms.mpi.univie.ac.at/wiki/index.php/ISIF)),
-and :code:`KPOINTS` to the &Gamma; point sampling.
-This kind of tuning is automatically done with :code:`vise`.</p>
+Note that, if competing phases are gases, we need to change
+:code:`ISIF` to 2 so as not to relax the lattice constants
+(see `[vasp manual] <https://cms.mpi.univie.ac.at/wiki/index.php/ISIF>`_),
+and :code:`KPOINTS` to the Gamma point sampling.
+This kind of tuning is automatically done with :code:`vise`.
 
-After finishing the vasp calculations, we can generate the chemical potential diagram file with
+After finishing the vasp calculations, we can generate the json file for the CPD with
 
 ::
 
     pydefect mcpd -d *_*/
 
 If you rename the CONTCAR and OUTCAR files to e.g., CONTCAR-finish and OUTCAR-finish,
-you have to write the following in the :code:`pydefect.yaml` file,
+you need to write the following in the :code:`pydefect.yaml` file,
 
 ::
 
@@ -224,26 +229,32 @@ you have to write the following in the :code:`pydefect.yaml` file,
     contcar: CONTCAR-finish
     vasprun: vasprun.xml
 
-To plot the chemical potential diagram, type
+To plot the CPD, type
 
 ::
 
-    pydefect pcpd -d *_*/ -y cpd.yaml
+    pydefect pcpd -y cpd.yaml
 
-With this command, we depict the Mg-O chemical potential diagram that is saved as :code:`cpd.pdf` which looks like
+With this command, we can depict the Mg-O CPD that is saved as :code:`cpd.pdf` as well which looks like
 
-![](cpd_MgO.png)
+.. image:: cpd_MgO.png
 
-<!--
 In ternary case, it looks like
-![](cpd_BaSnO3.png)
--->
 
-Values at the vertices at the MgO region written in :code:`vertices_MgO.yaml` are shown as follows.
+.. image:: cpd_BaSnO3.png
+
+If one wants to modify the energies for the CPD, one can directly modify the :code:`vertices_MgO.yaml`.
+
+Calculations of the competing phases are often laborious, and sometimes
+one wants to check the defect formation energies as soon as possible.
+Then, one can generate the CPD from the Materials Project database.
+To do this, however, one needs to align the energy standard with atom energies.
+In pydefect, we also prepare atom energies for PBE, PBEsol, and HSE06.
+
 
 ::
 
-    FILLED LATER
+    pydefect mcpd -e Ba Sn O -t BaSnO3 -f $PYDEFECT_PATH/pydefect/chem_pot_diag/datasets/vise_pbe_vasp544_atom_energy.yaml
 
 .. Here, :code:`standard_energy` are the energies of the most stable simple substances or simple gas phases,
 .. and A--B show the relative chemical potentials at the vertices shown in :code:`cpd_MgO.pdf`.
@@ -560,7 +571,7 @@ so if one uses the corrections, please cite the following papers.
 You obtain :code:`potential.eps` file, which contains information about defect-induced and point-charge potential,
 and their differences at each atomic site as shown below.
 
-The width and height of the horizontal line indicate the averaged region and *∆V<sub>PC</sub>*, *q/b*|far, respectively.
+The width and height of the horizontal line indicate the averaged region and *∆V* :sub:`PC`, *qb* | :sub:`far`, respectively.
 When performing the corrections, I strongly recommend you to check
 all the :code:`potential.eps` files for your calculated defects so as to reduce careless mistakes as much as possible.
 
@@ -672,8 +683,8 @@ This command
 Once the calculation directories are parsed, :code:`defect_energies.json` is automatically generated.
 If one wants to regenerate the results, one needs to remove it.
 
-When changing the condition for chemical potential, namely the position of the vertex in
-the chemical potential diagram, please use the :code:`--chem_pot_label` option.
+When changing the condition for chemical potential, namely the position of the vertex in the CPD,
+please use the :code:`--chem_pot_label` option.
 
 There are many options for this sub-command.
 For instance, if one wants to restrict the plot only for the nitrogen vacancies, one
