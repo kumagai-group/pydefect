@@ -63,7 +63,7 @@ def make_chem_pot_diag(args) -> None:
     if args.elements:
         cpd = make_chem_pot_diag_from_mp(additional_elements=args.elements,
                                          target=args.target,
-                                         atom_energy_yaml=args.functional)
+                                         atom_energy_yaml=args.atom_energy_yaml)
     else:
         comp_es = []
         for d in args.dirs:

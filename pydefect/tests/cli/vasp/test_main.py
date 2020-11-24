@@ -68,7 +68,7 @@ def test_make_cpd_options():
         dirs=[Path("Mg"), Path("O")],
         target=Composition("MgO"),
         elements=None,
-        functional=None,
+        atom_energy_yaml=None,
         yaml="cpd.yaml",
         update=False,
         func=parsed_args.func)

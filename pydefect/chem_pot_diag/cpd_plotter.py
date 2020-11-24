@@ -109,7 +109,6 @@ class ChemPotDiagMplPlotter(ABC):
     def _add_alphabet_labels(self):
         if self.info.cpd.target:
             for label, cp in self.info.cpd.target_vertices.items():
-                print(cp)
                 self._ax.text(*transpose(cp), label,
                               **self._mpl_defaults.alphabet_label)
 

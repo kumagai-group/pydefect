@@ -92,23 +92,35 @@ def parse_args(args):
     parser_make_poscars.add_argument(
         "-e", "--elements", required=True, nargs="+", type=str)
     parser_make_poscars.add_argument(
-        "--e_above_hull", default=defaults.e_above_hull, type=float)
+        "--e_above_hull", default=defaults.e_above_hull, type=float,
+        help="Energy above hull in eV / atom")
 
     parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
 
     # -- make_cpd ------------------------------------------------
     parser_mcpd = subparsers.add_parser(
         name="make_cpd",
+        parents=[dirs_parser],
         description="Make chemical potential diagram.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['mcpd'])
 
-    parser_mcpd.add_argument("-y", "--yaml", type=str, default="cpd.yaml")
-    parser_mcpd.add_argument("-t", "--target", type=Composition, required=True)
-    parser_mcpd.add_argument("-e", "--elements", type=str, nargs="+")
-    parser_mcpd.add_argument("-f", "--functional", type=str)
-    parser_mcpd.add_argument("-d", "--dirs", nargs="+", type=Path)
-    parser_mcpd.add_argument("-u", "--update", action="store_true")
+    parser_mcpd.add_argument(
+        "-y", "--yaml", type=str, default="cpd.yaml", help="Saved file name.")
+    parser_mcpd.add_argument(
+        "-t", "--target", type=Composition, required=True,
+        help="Target composition, e.g., MgO")
+    parser_mcpd.add_argument(
+        "-e", "--elements", type=str, nargs="+",
+        help="Element names considered in chemical potential diagram. Used for"
+             "creating the diagram from mp data with atom energy alignment.")
+    parser_mcpd.add_argument(
+        "-a", "--atom_energy_yaml", type=str,
+        help="Yaml file storing atom energies for energy alignment.")
+    parser_mcpd.add_argument(
+        "-u", "--update", action="store_true",
+        help="Used when one wants to update the cpd.yaml with calculation "
+             "results")
 
     parser_mcpd.set_defaults(func=make_chem_pot_diag)
 
@@ -119,7 +131,8 @@ def parse_args(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pcpd'])
 
-    parser_pcpd.add_argument("-y", "--yaml", type=str)
+    parser_pcpd.add_argument(
+        "-y", "--yaml", default="cpd.yaml", type=str, help="cpd.yaml file name")
 
     parser_pcpd.set_defaults(func=plot_chem_pot_diag)
 
@@ -135,9 +148,11 @@ def parse_args(args):
     parser_supercell.add_argument(
         "--matrix", nargs="+", type=int, help="Supercell matrix")
     parser_supercell.add_argument(
-        "--min_atoms", dest="min_num_atoms", default=50, type=int, help="Minimum number of atoms")
+        "--min_atoms", dest="min_num_atoms", default=50, type=int,
+        help="Minimum number of atoms")
     parser_supercell.add_argument(
-        "--max_atoms", dest="max_num_atoms", default=300, type=int, help="Maximum number of atoms")
+        "--max_atoms", dest="max_num_atoms", default=300, type=int,
+        help="Maximum number of atoms")
 
     parser_supercell.set_defaults(func=make_supercell)
 
@@ -276,7 +291,12 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
+def main():
+    args = parse_args(sys.argv[1:])
+    args.func(args)
+
+
 if __name__ == "__main__":
-    parse_args(sys.argv[1:])
+    main()
 
 
