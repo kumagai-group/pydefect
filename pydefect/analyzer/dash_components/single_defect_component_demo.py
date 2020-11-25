@@ -13,7 +13,7 @@ from monty.serialization import loadfn
 from pydefect.analyzer.dash_components.scenes_from_volumetric_data import \
     SceneDicts
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotlyPlotter
-from pydefect.corrections.efnv_correction.site_potential_plotter import \
+from pydefect.corrections.site_potential_plotter import \
     SitePotentialPlotlyPlotter
 
 

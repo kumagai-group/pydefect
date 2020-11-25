@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 from monty.serialization import loadfn
-from pydefect.corrections.efnv_correction.efnv_correction import \
+from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
-from pydefect.corrections.efnv_correction.site_potential_plotter import \
+from pydefect.corrections.site_potential_plotter import \
     SitePotentialMplPlotter, SitePotentialPlotlyPlotter
 from vise.util.dash_helper import show_png
 

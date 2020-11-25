@@ -18,7 +18,7 @@ from pydefect.analyzer.dash_components.supercell_component import \
     SupercellComponent
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotlyPlotter
 from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo, ChemPotDiag
-from pydefect.corrections.efnv_correction.site_potential_plotter import \
+from pydefect.corrections.site_potential_plotter import \
     SitePotentialPlotlyPlotter
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry

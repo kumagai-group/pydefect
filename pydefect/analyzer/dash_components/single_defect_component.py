@@ -1,7 +1,7 @@
 # coding: utf-8
 #  Copyright (c) 2020 Kumagai group.
 
-from typing import Optional, Tuple
+from typing import Tuple
 
 from ace.dbs.utils.scenes_from_volumetric_data import SceneDicts
 from crystal_toolkit.core.legend import Legend
@@ -12,7 +12,7 @@ from crystal_toolkit.renderables.structuregraph import get_structure_graph_scene
 from dash.dependencies import Output, Input
 from dash_mp_components import Simple3DScene
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotlyPlotter
-from pydefect.corrections.efnv_correction.site_potential_plotter import \
+from pydefect.corrections.site_potential_plotter import \
     SitePotentialPlotlyPlotter
 from pymatgen import Site, DummySpecie
 

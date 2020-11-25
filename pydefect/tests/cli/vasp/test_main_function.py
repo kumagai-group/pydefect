@@ -16,7 +16,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_eigenvalues, make_edge_characters, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
     plot_chem_pot_diag
-from pydefect.corrections.efnv_correction.efnv_correction import \
+from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect

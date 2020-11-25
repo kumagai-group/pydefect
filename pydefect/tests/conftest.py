@@ -6,7 +6,7 @@ from math import sqrt
 from pathlib import Path
 
 import pytest
-from pydefect.corrections.efnv_correction.efnv_correction import PotentialSite, \
+from pydefect.corrections.efnv_correction import PotentialSite, \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
 from pydefect.input_maker.supercell_info import Site, SupercellInfo, \

@@ -5,8 +5,9 @@ from typing import List
 
 import numpy as np
 from pydefect.corrections.abstract_correction import Correction
-from pydefect.corrections.efnv_correction.efnv_correction import \
+from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
+from tabulate import tabulate
 
 
 @dataclass
@@ -22,6 +23,17 @@ class GkfoCorrection(Correction):
     gkfo_sites: List[PotentialSite]
     ave_dielectric_tensor: float
     ave_electronic_dielectric_tensor: float
+
+    def __repr__(self):
+        d = [["charge", self.charge],
+             ["additional charge", self.additional_charge],
+             ["pc 1st term", self.pc_1st_term],
+             ["pc 2nd term", self.pc_2nd_term],
+             ["alignment 1st term", self.alignment_1st_term],
+             ["alignment 2nd term", self.alignment_2nd_term],
+             ["alignment 3rd term", self.alignment_3rd_term],
+             ["correction energy", self.correction_energy]]
+        return tabulate(d, tablefmt='psql')
 
     @property
     def charge(self):

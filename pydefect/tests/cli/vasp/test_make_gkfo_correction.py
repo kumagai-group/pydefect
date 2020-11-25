@@ -5,9 +5,9 @@ import numpy as np
 from monty.serialization import loadfn
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.make_gkfo_correction import make_gkfo_correction
-from pydefect.corrections.efnv_correction.efnv_correction import \
+from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
-from pydefect.corrections.gkfo_correction.gkfo_correction import GkfoCorrection
+from pydefect.corrections.gkfo_correction import GkfoCorrection
 
 
 def test_make_gkfo_correction(vasp_files):

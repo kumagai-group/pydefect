@@ -3,7 +3,7 @@
 
 from pydefect.corrections.abstract_correction import Correction
 
-from pydefect.corrections.efnv_correction.efnv_correction import \
+from pydefect.corrections.efnv_correction import \
     PotentialSite
 from pydefect.tests.helpers.assertion import assert_msonable
 

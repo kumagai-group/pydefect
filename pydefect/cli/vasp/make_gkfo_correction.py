@@ -4,10 +4,10 @@
 import numpy as np
 
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.corrections.efnv_correction.efnv_correction import \
+from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.ewald import Ewald
-from pydefect.corrections.gkfo_correction.gkfo_correction import GkfoCorrection
+from pydefect.corrections.gkfo_correction import GkfoCorrection
 from pydefect.defaults import defaults
 
 

@@ -5,7 +5,7 @@ from typing import Optional, List
 
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
-from pydefect.corrections.efnv_correction.efnv_correction import \
+from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.defaults import defaults
 from vise.util.matplotlib import float_to_int_formatter

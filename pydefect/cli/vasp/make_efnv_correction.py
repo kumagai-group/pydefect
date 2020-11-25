@@ -7,7 +7,7 @@ from numpy.linalg import norm
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
-from pydefect.corrections.efnv_correction.efnv_correction import \
+from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.ewald import Ewald
 from pydefect.defaults import defaults

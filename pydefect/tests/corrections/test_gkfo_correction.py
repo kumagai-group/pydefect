@@ -3,8 +3,8 @@
 
 import pytest
 from pydefect.corrections.abstract_correction import Correction
-from pydefect.corrections.efnv_correction.efnv_correction import PotentialSite
-from pydefect.corrections.gkfo_correction.gkfo_correction import GkfoCorrection
+from pydefect.corrections.efnv_correction import PotentialSite
+from pydefect.corrections.gkfo_correction import GkfoCorrection
 
 
 @pytest.fixture

@@ -22,9 +22,10 @@ from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
 from pydefect.cli.vasp.make_edge_characters import MakeEdgeCharacters
 from pydefect.cli.vasp.make_efnv_correction import \
     make_efnv_correction
+from pydefect.cli.vasp.make_gkfo_correction import make_gkfo_correction
 from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
 from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
-from pydefect.corrections.efnv_correction.site_potential_plotter import \
+from pydefect.corrections.site_potential_plotter import \
     SitePotentialMplPlotter
 from pydefect.defaults import defaults
 from pydefect.input_maker.add_interstitial import append_interstitial
