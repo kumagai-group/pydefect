@@ -35,8 +35,8 @@ def efnv_cor():
 
 @pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="skipped for circle CI")
 def test_site_potential_plotter_with_simple_example(efnv_cor):
-    plotter = SitePotentialMplPlotter(title="ZnO Va_O1_2",
-                                      efnv_correction=efnv_cor)
+    plotter = SitePotentialMplPlotter.from_efnv_corr(
+        title="ZnO Va_O1_2", efnv_correction=efnv_cor)
     plotter.construct_plot()
     plotter.plt.show()
 
@@ -44,14 +44,14 @@ def test_site_potential_plotter_with_simple_example(efnv_cor):
 @pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="skipped for circle CI")
 def test_site_potential_plotter_with_actual_file():
     efnv_cor = loadfn(Path(__file__).parent / "NaCl_Va_Na_-1_correction.json")
-    plotter = SitePotentialMplPlotter(title="NaCl Va_Na_-1",
-                                      efnv_correction=efnv_cor)
+    plotter = SitePotentialMplPlotter.from_efnv_corr(
+        title="NaCl Va_Na_-1", efnv_correction=efnv_cor)
     plotter.construct_plot()
     plotter.plt.show()
 
 
 @pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
 def test_defect_energies_plotly_actual_plot(efnv_cor):
-    fig = SitePotentialPlotlyPlotter(title="ZnO Va_O1_2",
-                                     efnv_correction=efnv_cor).create_figure()
+    fig = SitePotentialPlotlyPlotter.from_efnv_corr(
+        title="ZnO Va_O1_2", efnv_correction=efnv_cor).create_figure()
     show_png(fig)

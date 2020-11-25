@@ -233,9 +233,9 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
     mock_make_efnv.assert_called_with(mock_defect_entry.charge, mock_calc_results, mock_perfect_calc_results, mock_unitcell.dielectric_constant)
     mock_efnv.to_json_file.assert_called_with(Path("Va_O1_2") / "correction.json")
 
-    mock_pot_plotter.assert_called_with(title="Va_O1_2", efnv_correction=mock_efnv)
-    mock_pot_plotter.return_value.construct_plot.assert_called_once_with()
-    mock_pot_plotter.return_value.plt.savefig.assert_called_once_with(fname=Path("Va_O1_2") / "correction.pdf")
+    mock_pot_plotter.from_efnv_corr.assert_called_with(title="Va_O1_2", efnv_correction=mock_efnv)
+    mock_pot_plotter.from_efnv_corr.return_value.construct_plot.assert_called_once_with()
+    mock_pot_plotter.from_efnv_corr.return_value.plt.savefig.assert_called_once_with(fname=Path("Va_O1_2") / "correction.pdf")
 
 
 def test_make_defect_eigenvalues(mocker):

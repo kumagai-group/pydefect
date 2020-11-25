@@ -184,7 +184,8 @@ def make_efnv_correction_from_vasp(args):
         efnv.to_json_file(d / "correction.json")
 
         title = defect_entry.full_name
-        plotter = SitePotentialMplPlotter(title=title, efnv_correction=efnv)
+        plotter = SitePotentialMplPlotter.from_efnv_corr(
+            title=title, efnv_correction=efnv)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "correction.pdf")
         plotter.plt.clf()

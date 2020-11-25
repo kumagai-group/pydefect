@@ -21,7 +21,7 @@ def make_efnv_correction(charge: int,
                          unit_conversion: float = 180.95128169876497):
     """
     Notes:
-    (1) The formula written in YK2014 are divided by 4pi to keep the SI unit.
+    (1) The formula written in YK2014 need to be divided by 4pi in the SI unit.
     (2) When assuming an element charge locate at the defect_coords and
         angstrom for length, relative dielectric tensor, Multiply
         elementary_charge * 1e10 / epsilon_0 = 180.95128169876497

@@ -6,7 +6,7 @@ from typing import Optional, List
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from pydefect.corrections.efnv_correction.efnv_correction import \
-    ExtendedFnvCorrection
+    ExtendedFnvCorrection, PotentialSite
 from pydefect.defaults import defaults
 from vise.util.matplotlib import float_to_int_formatter
 
@@ -51,17 +51,30 @@ class PotentialPlotterMplSettings:
 class SitePotentialPlotter:
     def __init__(self,
                  title: str,
-                 efnv_correction: ExtendedFnvCorrection,
+                 sites: List[PotentialSite],
+                 defect_region_radius: float,
+                 ave_pot_diff: float,
                  x_unit: Optional[str] = "Å",
-                 y_unit: Optional[str] = "V",
-                 **plot_setting):
+                 y_unit: Optional[str] = "V"):
         self._title = title
-        self.sites = efnv_correction.sites
-        self.defect_region_radius = efnv_correction.defect_region_radius
-        self.ave_pot_diff = efnv_correction.average_potential_diff
+        self.sites = sites
+        self.defect_region_radius = defect_region_radius
+        self.ave_pot_diff = ave_pot_diff
 
         self._x_unit = x_unit
         self._y_unit = y_unit
+
+    @classmethod
+    def from_efnv_corr(cls,
+                       title,
+                       efnv_correction: ExtendedFnvCorrection,
+                       x_unit: Optional[str] = "Å",
+                       y_unit: Optional[str] = "V"):
+        return cls(title=title,
+                   sites=efnv_correction.sites,
+                   defect_region_radius=efnv_correction.defect_region_radius,
+                   ave_pot_diff=efnv_correction.average_potential_diff,
+                   x_unit=x_unit, y_unit=y_unit)
 
 
 class SitePotentialPlotlyPlotter(SitePotentialPlotter):

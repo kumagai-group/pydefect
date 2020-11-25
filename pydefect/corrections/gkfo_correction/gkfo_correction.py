@@ -12,11 +12,11 @@ from pydefect.corrections.efnv_correction.efnv_correction import \
 @dataclass
 class GkfoCorrection(Correction):
     """
-    potential of gkfo_sites is the difference of potential in the final state
+    Potential of gkfo_sites is the difference of potential in the final state
     from that in the initial state.
     And, pc_potential is caused by the additional_charge.
     """
-    efnv_correction: ExtendedFnvCorrection
+    init_efnv_correction: ExtendedFnvCorrection
     additional_charge: int
     pc_2nd_term: float
     gkfo_sites: List[PotentialSite]
@@ -25,16 +25,16 @@ class GkfoCorrection(Correction):
 
     @property
     def charge(self):
-        return self.efnv_correction.charge
+        return self.init_efnv_correction.charge
 
     @property
     def defect_region_radius(self):
-        return self.efnv_correction.defect_region_radius
+        return self.init_efnv_correction.defect_region_radius
 
     @property
     def pc_1st_term(self):
-        return (self.efnv_correction.point_charge_correction * 2 / self.charge
-                * self.additional_charge)
+        return (self.init_efnv_correction.point_charge_correction * 2
+                / self.charge * self.additional_charge)
 
     @property
     def sum_pc_correction(self):
@@ -47,11 +47,13 @@ class GkfoCorrection(Correction):
 
     @property
     def alignment_1st_term(self) -> float:
-        return - self.average_potential_diff_by_addition * self.additional_charge
+        return (- self.average_potential_diff_by_addition
+                * self.additional_charge)
 
     @property
     def alignment_2nd_term(self) -> float:
-        return - self.efnv_correction.average_potential_diff * self.additional_charge
+        return (- self.init_efnv_correction.average_potential_diff
+                * self.additional_charge)
 
     @property
     def alignment_3rd_term(self) -> float:
@@ -61,7 +63,8 @@ class GkfoCorrection(Correction):
 
     @property
     def sum_alignment_term(self) -> float:
-        return self.alignment_1st_term + self.alignment_2nd_term + self.alignment_3rd_term
+        return (self.alignment_1st_term + self.alignment_2nd_term
+                + self.alignment_3rd_term)
 
     @property
     def correction_energy(self) -> float:

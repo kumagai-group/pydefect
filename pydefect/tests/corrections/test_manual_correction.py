@@ -12,10 +12,3 @@ def test_no_correction():
 def test_manual_correction():
     assert ManualCorrection(7.9).correction_energy == 7.9
 
-
-"""
-TODO
--
-
-DONE
-"""
