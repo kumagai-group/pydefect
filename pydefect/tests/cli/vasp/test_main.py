@@ -294,7 +294,7 @@ def test_defect_formation_energy(mocker):
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         perfect_calc_results=mock_calc_results,
         unitcell=mock_unitcell,
-        chem_pot_diag="cpd.yaml",
+        cpd_yaml="cpd.yaml",
         label="A",
         y_range=[-5, 5],
         skip_shallow=True,
