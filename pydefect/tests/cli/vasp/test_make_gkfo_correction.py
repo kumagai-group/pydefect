@@ -32,7 +32,7 @@ def test_make_gkfo_correction(vasp_files):
     np.testing.assert_almost_equal(gkfo.alignment_3rd_term, -0.0234452481649620)
     np.testing.assert_almost_equal(gkfo.correction_energy, 1.2141290151659327)
 
-
+    gkfo.to_json_file("gkfo_correction.json")
 
 
 

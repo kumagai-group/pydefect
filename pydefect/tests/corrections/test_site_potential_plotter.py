@@ -55,3 +55,14 @@ def test_defect_energies_plotly_actual_plot(efnv_cor):
     fig = SitePotentialPlotlyPlotter.from_efnv_corr(
         title="ZnO Va_O1_2", efnv_correction=efnv_cor).create_figure()
     show_png(fig)
+
+
+@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="skipped for circle CI")
+def test_gkfo_site_potential_plotter():
+    gkfo = loadfn(Path(__file__).parent / "gkfo_correction.json")
+    plotter = SitePotentialMplPlotter.from_gkfo_corr(
+        title="GKFO", gkfo_correction=gkfo)
+    plotter.construct_plot()
+    plotter.plt.show()
+
+

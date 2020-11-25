@@ -7,6 +7,8 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
 from pydefect.cli.vasp.main import parse_args
+from pydefect.corrections.efnv_correction import \
+    ExtendedFnvCorrection
 from pydefect.defaults import defaults
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pymatgen import Composition
@@ -215,6 +217,41 @@ def test_efnv_correction(mocker):
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         perfect_calc_results=mock_calc_results,
+        unitcell=mock_unitcell,
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
+def test_gkfo_correction(mocker):
+    mock_i_correction = mocker.Mock(spec=ExtendedFnvCorrection, autospec=True)
+    mock_i_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_f_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_unitcell = mocker.Mock(spec=Unitcell, autospec=True)
+
+    def side_effect(filename):
+        if filename == "a/correction.json":
+            return mock_i_correction
+        elif filename == "a/calc_results.json":
+            return mock_i_calc_results
+        elif filename == "a/absorption/calc_results.json":
+            return mock_f_calc_results
+        elif filename == "unitcell.json":
+            return mock_unitcell
+        else:
+            raise ValueError
+
+    mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
+    parsed_args = parse_args(["gkfo",
+                              "-iefnv", "a/correction.json",
+                              "-cd", "1",
+                              "-icr", "a/calc_results.json",
+                              "-fcr", "a/absorption/calc_results.json",
+                              "-u", "unitcell.json"])
+    expected = Namespace(
+        initial_efnv_correction=mock_i_correction,
+        initial_calc_results=mock_i_calc_results,
+        final_calc_results=mock_f_calc_results,
+        charge_diff=1,
         unitcell=mock_unitcell,
         func=parsed_args.func)
     assert parsed_args == expected

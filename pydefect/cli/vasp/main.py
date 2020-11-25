@@ -16,7 +16,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_calc_results, make_defect_formation_energy, make_defect_eigenvalues, \
     make_edge_characters, make_edge_states, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
-    plot_chem_pot_diag
+    plot_chem_pot_diag, make_gkfo_correction_from_vasp
 from pydefect.defaults import defaults
 from pymatgen import IStructure, Composition, Structure
 from pymatgen.io.vasp import Vasprun, Outcar
@@ -257,6 +257,29 @@ def parse_args(args):
         aliases=['efnv'])
 
     parser_efnv.set_defaults(func=make_efnv_correction_from_vasp)
+
+    # -- gkfo correction ------------------------------------------------
+    parser_gkfo = subparsers.add_parser(
+        name="gkfo",
+        description="Generate GKFO correction files.",
+        parents=[unitcell_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['gkfo'])
+
+    parser_gkfo.add_argument(
+        "-iefnv", "--initial_efnv_correction", required=True, type=loadfn,
+        help="Path to the initial efnv correction.json file.")
+    parser_gkfo.add_argument(
+        "-icr", "--initial_calc_results", required=True, type=loadfn,
+        help="Path to the initial calc_results.json file.")
+    parser_gkfo.add_argument(
+        "-fcr", "--final_calc_results", required=True, type=loadfn,
+        help="Path to the final calc_results.json file.")
+    parser_gkfo.add_argument(
+        "-cd", "--charge_diff", required=True, type=int,
+        help="Charge difference of final state from initial state.")
+
+    parser_gkfo.set_defaults(func=make_gkfo_correction_from_vasp)
 
     # -- defect eigenvalues ------------------------------------------------
     parser_eig = subparsers.add_parser(

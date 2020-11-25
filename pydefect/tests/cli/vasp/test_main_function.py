@@ -15,7 +15,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_efnv_correction_from_vasp, make_defect_formation_energy, \
     make_defect_eigenvalues, make_edge_characters, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
-    plot_chem_pot_diag
+    plot_chem_pot_diag, make_gkfo_correction_from_vasp
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
@@ -236,6 +236,32 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
     mock_pot_plotter.from_efnv_corr.assert_called_with(title="Va_O1_2", efnv_correction=mock_efnv)
     mock_pot_plotter.from_efnv_corr.return_value.construct_plot.assert_called_once_with()
     mock_pot_plotter.from_efnv_corr.return_value.plt.savefig.assert_called_once_with(fname=Path("Va_O1_2") / "correction.pdf")
+
+
+def test_make_gkfo_correction_from_vasp(tmpdir, mocker):
+    mock_i_correction = mocker.Mock(spec=ExtendedFnvCorrection, autospec=True)
+    mock_i_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_f_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_unitcell = mocker.Mock()
+
+    mock_pot_plotter = mocker.patch("pydefect.cli.vasp.main_function.SitePotentialMplPlotter")
+    mock_make_gkfo = mocker.patch("pydefect.cli.vasp.main_function.make_gkfo_correction")
+
+    args = Namespace(
+        initial_efnv_correction=mock_i_correction,
+        initial_calc_results=mock_i_calc_results,
+        final_calc_results=mock_f_calc_results,
+        charge_diff=1,
+        unitcell=mock_unitcell)
+
+    make_gkfo_correction_from_vasp(args)
+    mock_make_gkfo.assert_called_with(
+        efnv_correction=mock_i_correction,
+        additional_charge=1,
+        final_calc_results=mock_f_calc_results,
+        initial_calc_results=mock_i_calc_results,
+        diele_tensor=mock_unitcell.dielectric_constant,
+        ion_clamped_diele_tensor=mock_unitcell.ele_dielectric_const)
 
 
 def test_make_defect_eigenvalues(mocker):

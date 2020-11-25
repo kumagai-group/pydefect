@@ -192,6 +192,23 @@ def make_efnv_correction_from_vasp(args):
         plotter.plt.clf()
 
 
+def make_gkfo_correction_from_vasp(args):
+    gkfo = make_gkfo_correction(
+        efnv_correction=args.initial_efnv_correction,
+        additional_charge=args.charge_diff,
+        final_calc_results=args.final_calc_results,
+        initial_calc_results=args.initial_calc_results,
+        diele_tensor=args.unitcell.dielectric_constant,
+        ion_clamped_diele_tensor=args.unitcell.ele_dielectric_const)
+    print(gkfo)
+    gkfo.to_json_file("gkfo_correction.json")
+    plotter = SitePotentialMplPlotter.from_gkfo_corr(
+        title="GKFO correction", gkfo_correction=gkfo)
+    plotter.construct_plot()
+    plotter.plt.savefig(fname="gkfo_correction.pdf")
+    plotter.plt.clf()
+
+
 def make_defect_eigenvalues(args):
     supercell_vbm = args.perfect_calc_results.vbm
     supercell_cbm = args.perfect_calc_results.cbm

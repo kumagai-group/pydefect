@@ -28,6 +28,20 @@ def test_is_correction(gkfo_correction):
     assert isinstance(gkfo_correction, Correction)
 
 
+def test_repr(gkfo_correction):
+    expected = """+--------------------+-------+
+| charge             |  10   |
+| additional charge  |   1   |
+| pc 1st term        |   0.2 |
+| pc 2nd term        |  10   |
+| alignment 1st term | -15   |
+| alignment 2nd term |  -1.5 |
+| alignment 3rd term | -75   |
+| correction energy  | -81.3 |
++--------------------+-------+"""
+    assert repr(gkfo_correction) == expected
+
+
 def test_gkfo_correction_charge(gkfo_correction):
     assert gkfo_correction.charge == 10
 

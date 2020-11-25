@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
+from pydefect.corrections.gkfo_correction import GkfoCorrection
 from pydefect.defaults import defaults
 from vise.util.matplotlib import float_to_int_formatter
 
@@ -74,6 +75,19 @@ class SitePotentialPlotter:
                    sites=efnv_correction.sites,
                    defect_region_radius=efnv_correction.defect_region_radius,
                    ave_pot_diff=efnv_correction.average_potential_diff,
+                   x_unit=x_unit, y_unit=y_unit)
+
+    @classmethod
+    def from_gkfo_corr(cls,
+                       title,
+                       gkfo_correction: GkfoCorrection,
+                       x_unit: Optional[str] = "Å",
+                       y_unit: Optional[str] = "V"):
+        efnv = gkfo_correction.init_efnv_correction
+        return cls(title=title,
+                   sites=gkfo_correction.gkfo_sites,
+                   defect_region_radius=efnv.defect_region_radius,
+                   ave_pot_diff=efnv.average_potential_diff,
                    x_unit=x_unit, y_unit=y_unit)
 
 
