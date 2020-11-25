@@ -662,43 +662,46 @@ The numbers in the figures indicate the band indices, which are shown discretely
 The filled circles are categorized into blue, green, and orange ones
 which mean the occupied, partially occupied (from 0.1 to 0.9), and unoccupied eigenstates in the defect supercell, respectively.
 
-![V<sub>Mg</sub><sup>-2</sup>](eig1.png)
-![V<sub>Mg</sub><sup>0</sup>](eig2.png)
-![Mg<sub>i</sub><sup>0</sup>](eig3.png)
-
+.. image:: eigenvalues_MgSe_Va_Mg_0.png
 
 Secondly, we generate edge_characters.json with the command.
 
 ::
 
-    pydefect make_edge_characters -d *_* -pcr perfect/calc_results.json
+    pydefect edge_characters -d *_* -pcr perfect/calc_results.json
 
 Finally, we can show the edge states
 
 ::
 
-    pydefect edge_states -d *_* -pcr perfect/calc_results.json
+    pydefect edge_states -d *_* -p perfect/edge_characters.json
 
 ::
 
-  Va_Ba1_-1/  convergence : F    band edge : UP  :    No in-gap state  DOWN  :       Acceptor PHS
-  Va_Ba1_-2/  convergence : T    band edge : UP  :    No in-gap state  DOWN  :    No in-gap state
-   Va_Ba1_0/  No supercell results file.
-    Va_O1_0/  convergence : T    band edge : UP  :    Localized state  DOWN  :    Localized state
-    Va_O1_1/  convergence : T    band edge : UP  :    Localized state  DOWN  :    Localized state
-    Va_O1_2/  convergence : T    band edge : UP  :    Localized state  DOWN  :    Localized state
-  Va_Sn1_-1/  convergence : T    band edge : UP  :    No in-gap state  DOWN  :    Localized state
-  Va_Sn1_-2/  convergence : T    band edge : UP  :    Localized state  DOWN  :    Localized state
-  Va_Sn1_-3/  convergence : T    band edge : UP  :    Localized state  DOWN  :    Localized state
-  Va_Sn1_-4/  convergence : T    band edge : UP  :    Localized state  DOWN  :    Localized state
-   Va_Sn1_0/  convergence : T    band edge : UP  :    No in-gap state  DOWN  :    Localized state
+    -- Mg_i1_0
+    spin up   Donor PHS
+    spin down Donor PHS
+    -- Mg_i1_1
+    spin up   Donor PHS
+    spin down No in-gap state
+    -- Mg_i1_2
+    spin up   No in-gap state
+    spin down No in-gap state
+    -- Va_Mg1_-1
+    spin up   No in-gap state
+    spin down In-gap state
+    -- Va_Mg1_-2
+    spin up   In-gap state
+    spin down In-gap state
+    -- Va_Mg1_0
+    spin up   No in-gap state
+    spin down In-gap state
 
-There are four supported states :code:`donor_phs`, :code:`acceptor_phs`, :code:`localized_state`, :code:`no_in_gap`,
+There are four states :code:`donor_phs`, :code:`acceptor_phs`, :code:`localized_state`, :code:`no_in_gap`,
 the former two are considered as shallow states, and omitted for energy plot by default.
 
 We emphasize that the automatically determined band-edge states could be incorrect as it is difficult to determine them.
 Therefore, please carefully check the band-edge states, and draw their band-decomposed charge density if the band-edge states are not so obvious.
-
 
 =====================================
 12. Plot defect formation energies
@@ -712,24 +715,11 @@ Here, we plot the defect formation energies as a function of the Fermi level wit
 
 ::
 
-    pydefect e --unitcell ../unitcell/unitcell.json --perfect perfect/dft_results.json --defect_dirs Va*_* --chem_pot_yaml ../competing_phases/vertices_*.yaml -x -1 8 -s energy_A.pdf
+    pydefect e --unitcell ../unitcell/unitcell.json --perfect perfect/calc_results.json -d Va*_* -c ../competing_phases/cpd.yaml -l A
 
 which shows like,
-![](energy.pdf)
 
-This command
-Once the calculation directories are parsed, :code:`defect_energies.json` is automatically generated.
-If one wants to regenerate the results, one needs to remove it.
+.. image:: energy_MgSe_A.png
 
 When changing the condition for chemical potential, namely the position of the vertex in the CPD,
-please use the :code:`--chem_pot_label` option.
-
-There are many options for this sub-command.
-For instance, if one wants to restrict the plot only for the nitrogen vacancies, one
-can use :code:`--filtering` option like,
-
-::
-
-    pydefect e --unitcell ../unitcell/unitcell.json --perfect perfect/dft_results.json --defect_dirs Va*_* --chem_pot_yaml ../competing_phases/vertices_*.yaml -x -1 8 -s energy_A.pdf
-
-
+use the :code:`-c` option.
