@@ -39,19 +39,22 @@ def parse_args(args):
     dirs_parser = argparse.ArgumentParser(
         description="", add_help=False)
     dirs_parser.add_argument(
-        "-d", "--dirs", required=True, nargs="+", type=Path)
+        "-d", "--dirs", required=True, nargs="+", type=Path,
+        help="Directory paths to be parsed.")
 
     # ++ parent parser: pcr
     pcr_parser = argparse.ArgumentParser(
         description="", add_help=False)
     pcr_parser.add_argument(
-        "-pcr", "--perfect_calc_results", required=True, type=loadfn)
+        "-pcr", "--perfect_calc_results", required=True, type=loadfn,
+        help="Path to the calc_results.json for the perfect supercell.")
 
     # ++ parent parser: unitcell
     unitcell_parser = argparse.ArgumentParser(
         description="", add_help=False)
     unitcell_parser.add_argument(
-        "-u", "--unitcell", required=True, type=loadfn)
+        "-u", "--unitcell", required=True, type=loadfn,
+        help="Path to the unitcell.json file.")
 
     # -- print ------------------------------------------------
     parser_print = subparsers.add_parser(
@@ -61,7 +64,8 @@ def parse_args(args):
         aliases=['p'])
 
     parser_print.add_argument(
-        "-f", "--filename", dest="obj", required=True, type=loadfn)
+        "-f", "--filename", dest="obj", required=True, type=loadfn,
+        help="Path to the json file to be printed.")
 
     parser_print.set_defaults(func=print_file)
 
@@ -73,11 +77,14 @@ def parse_args(args):
         aliases=['u'])
 
     parser_unitcell.add_argument(
-        "-vb", "--vasprun_band", required=True, type=Vasprun)
+        "-vb", "--vasprun_band", required=True, type=Vasprun,
+        help="vasprun.xml file of band structure calculation.")
     parser_unitcell.add_argument(
-        "-ob", "--outcar_band", required=True, type=Outcar)
+        "-ob", "--outcar_band", required=True, type=Outcar,
+        help="OUTCAR file of band structure calculation.")
     parser_unitcell.add_argument(
-        "-od", "--outcar_dielectric", required=True, type=Outcar)
+        "-od", "--outcar_dielectric", required=True, type=Outcar,
+        help="OUTCAR file of dielectric constant calculation.")
 
     parser_unitcell.set_defaults(func=make_unitcell)
 
@@ -90,7 +97,8 @@ def parse_args(args):
         aliases=['mp'])
 
     parser_make_poscars.add_argument(
-        "-e", "--elements", required=True, nargs="+", type=str)
+        "-e", "--elements", required=True, nargs="+", type=str,
+        help="Element names considered in chemical potential diagram. ")
     parser_make_poscars.add_argument(
         "--e_above_hull", default=defaults.e_above_hull, type=float,
         help="Energy above hull in eV / atom")
@@ -106,7 +114,8 @@ def parse_args(args):
         aliases=['mcpd'])
 
     parser_mcpd.add_argument(
-        "-y", "--yaml", type=str, default="cpd.yaml", help="Saved file name.")
+        "-y", "--yaml", type=str, default="cpd.yaml",
+        help="Saved yaml file name.")
     parser_mcpd.add_argument(
         "-t", "--target", type=Composition, required=True,
         help="Target composition, e.g., MgO")
@@ -132,7 +141,8 @@ def parse_args(args):
         aliases=['pcpd'])
 
     parser_pcpd.add_argument(
-        "-y", "--yaml", default="cpd.yaml", type=str, help="cpd.yaml file name")
+        "-y", "--yaml", default="cpd.yaml", type=str,
+        help="cpd.yaml file name")
 
     parser_pcpd.set_defaults(func=plot_chem_pot_diag)
 
@@ -144,9 +154,11 @@ def parse_args(args):
         aliases=['s'])
 
     parser_supercell.add_argument(
-        "-p", "--unitcell", default="POSCAR", type=IStructure.from_file)
+        "-p", "--unitcell", default="POSCAR", type=IStructure.from_file,
+        help="Base POSCAR, which must be the standardized primitive cell.")
     parser_supercell.add_argument(
-        "--matrix", nargs="+", type=int, help="Supercell matrix")
+        "--matrix", nargs="+", type=int,
+        help="Supercell matrix. 1, 3 or 9 components are accepted.")
     parser_supercell.add_argument(
         "--min_atoms", dest="min_num_atoms", default=50, type=int,
         help="Minimum number of atoms")
@@ -168,9 +180,11 @@ def parse_args(args):
         help="Oxidation states in integers, e.g., Mg 2 O -2.")
     parser_defect_set.add_argument(
         "-d", "--dopants", nargs="+", type=str,
-        help="Dopant element names, e.g., Al Ga.")
+        help="Names of dopant element, e.g., Al Ga.")
     parser_defect_set.add_argument(
-        "-k", "--kwargs", nargs="+", type=str)
+        "-k", "--kwargs", nargs="+", type=str,
+        help="Keywords used to screen the target defects. "
+             "Regular expression can be used.")
 
     parser_defect_set.set_defaults(func=make_defect_set)
 
@@ -192,11 +206,16 @@ def parse_args(args):
         aliases=['ai'])
 
     parser_append_interstitial.add_argument(
-        "-s", "--supercell_info", required=True, type=loadfn)
+        "-s", "--supercell_info", required=True, type=loadfn,
+        help="Path to the supercell_info.json file.")
     parser_append_interstitial.add_argument(
-        "-p", "--base_structure", required=True, type=Structure.from_file)
+        "-p", "--base_structure", required=True, type=Structure.from_file,
+        help="POSCAR file used for generating AECCAR files, which must be the "
+             "standardized primitive cell.")
     parser_append_interstitial.add_argument(
-        "-c", "--frac_coords", required=True, nargs=3, type=float)
+        "-c", "--frac_coords", required=True, nargs=3, type=float,
+        help="Fractional coordinates in the standardized primitive cell added "
+             "as an interstitial ")
 
     parser_append_interstitial.set_defaults(
         func=append_interstitial_to_supercell_info)
@@ -204,15 +223,16 @@ def parse_args(args):
     # -- pop_interstitial ------------------------------------------------
     parser_pop_interstitial = subparsers.add_parser(
         name="pop",
-        description="Pop interstitial site from supercell_info.json. "
-                    "Note that the indices begin from 1.",
+        description="Pop interstitial site from supercell_info.json. ",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pi'])
 
     parser_pop_interstitial.add_argument(
-        "-s", "--supercell_info", required=True, type=loadfn)
+        "-s", "--supercell_info", required=True, type=loadfn,
+        help="Path to the supercell_info.json file.")
     parser_pop_interstitial.add_argument(
-        "-i", "--index", required=True, type=int)
+        "-i", "--index", required=True, type=int,
+        help="Popped interstitial index. Note that the indices begin from 1.")
 
     parser_pop_interstitial.set_defaults(
         func=pop_interstitial_from_supercell_info)
@@ -268,9 +288,11 @@ def parse_args(args):
         aliases=['es'])
 
     parser_es.add_argument(
-        "-p", "--perfect_edge_characters", required=True, type=loadfn)
+        "-p", "--perfect_edge_characters", required=True, type=loadfn,
+        help="Path to the edge_characters.json for the perfect supercell.")
 
     parser_es.set_defaults(func=make_edge_states)
+
     # -- defect formation energy ----------------------------------------------
     parser_energy = subparsers.add_parser(
         name="defect_formation_energy",
@@ -280,11 +302,20 @@ def parse_args(args):
         aliases=['e'])
 
     parser_energy.add_argument(
-        "-c", "--chem_pot_diag", required=True, type=str)
-    parser_energy.add_argument("-l", "--label", required=True, type=str)
-    parser_energy.add_argument("-y", "--y_range", nargs=2, type=float)
-    parser_energy.add_argument("-s", "--skip_shallow", action="store_true")
-    parser_energy.add_argument("-p", "--print", action="store_true")
+        "-c", "--cpd_yaml", required=True, type=str,
+        help="cpd.yaml file path.")
+    parser_energy.add_argument(
+        "-l", "--label", required=True, type=str,
+        help="Label in cpd.pdf")
+    parser_energy.add_argument(
+        "-y", "--y_range", nargs=2, type=float,
+        help="Energy range in y-axis")
+    parser_energy.add_argument(
+        "-s", "--skip_shallow", action="store_true",
+        help="Set when the energies of shallow defects are omitted.")
+    parser_energy.add_argument(
+        "-p", "--print", action="store_true",
+        help="Print the defect formation energy as a list.")
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------
