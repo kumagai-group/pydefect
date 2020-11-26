@@ -45,6 +45,8 @@ class GkfoCorrection(Correction):
 
     @property
     def pc_1st_term(self):
+        if self.charge == 0:
+            return 0.0
         return (self.init_efnv_correction.point_charge_correction * 2
                 / self.charge * self.additional_charge)
 
