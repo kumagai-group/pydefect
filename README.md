@@ -56,19 +56,19 @@ More information in the online manual at: https://kumagai-group.github.io/pydefe
 Files and directories included in pydefect distribution
 --------------------------------------------------------
 ~~~
-  README                : introduction
-  LICENSE               : the MIT license 
-  setup.py              : installation script
-  requirements.txt      : list of required packages
+  README                 : introduction
+  LICENSE                : the MIT license 
+  setup.py               : installation script
+  requirements.txt       : list of required packages
 
-  /pydefect/analysis    : analysis tools for point-defect calculations
-  /pydefect/cli         : command line interfaces
-  /pydefect/core        : core modules
-  /pydefect/corrections : energy and eigenvalue correction related modules
-  /pydefect/database    : database related to atoms and symmetries
-  /pydefect/input_maker : tools for generating VASP input files
-  /pydefect/test_files  : test files used mainly for unittests
-  /pydefect/util        : useful tools 
+  /pydefect/analyzer     : analysis tools for point-defect calculations
+  /pydefect/chem_pot_diag: tools for calculating and drawing the chemical potential diagram
+  /pydefect/cli          : command line interfaces
+  /pydefect/corrections  : energy and eigenvalue correction related modules
+  /pydefect/database     : database related to atoms and symmetries
+  /pydefect/input_maker  : tools for generating VASP input files
+  /pydefect/tests        : test files used mainly for unittests
+  /pydefect/util         : useful tools 
 ~~~~
 
 License
