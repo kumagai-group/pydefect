@@ -4,19 +4,40 @@ Tips for first-principles calculations for point defects
 -----------------------------------------
 1. How to treat symmetry of point defects
 -----------------------------------------
-As mentioned in the :doc:`tutorial`, the neighboring atoms near the defect
-are initially slightly perturbed to break the symmetry.
+As mentioned in the :doc:`tutorial`, the neighboring atoms near the defect are initially slightly perturbed to break the symmetry.
 And, some defects tend to move back to the symmetric atomic configuration during the structure optimization.
 Some other defects might recover a part of symmetry operations.
 
-Even in these cases, the s
+Even in these cases, the final structures do not look symmetric.
+When one wants to symmetrize the defect structure, use the following command.
 
+::
 
+    python $PYDEFECT_PATH/pydefect/cli/vasp/util_commands/make_refined_poscar.py
+
+which will create the symmetrized :code:`POSCAR` file if the structure is not the P1 symmetry.
+Then, the previous :code:`OUTCAR` and :code:`CONTCAR` are moved to
+:code:`OUTCAR.sym_1` and:code:`CONTCAR.sym_1`, respectively.
+
+It is also possible to include the command in the runshell script as an example:
+
+::
+
+    $VASP_cmd
+
+    hostname > host
+    name=`basename "$PWD"`
+    echo $name
+    if [ $name != "perfect" ]; then
+        python $PYDEFECT_PATH/pydefect/cli/vasp/util_commands/make_refined_poscar.py
+        if [ -e CONTCAR.sym_1 ]; then
+            $VASP_cmd
+        fi
+    fi
 
 ------------------------------------------
 2. Tips for hybrid functional calculations
 ------------------------------------------
-
 Hybrid functionals, especially the HSE06 functional
 and those with different exchange mixing parameters and/or screening distances,
 have been regularly used for point-defect calculations.

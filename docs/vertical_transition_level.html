@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <title>Tutorial for calculation of vertical transition level &mdash; pydefect  documentation</title>
+  
+
+  
+  <link href="_static/css/theme.css" rel="stylesheet" type="text/css" />
+  <link href="_static/pygments.css" rel="stylesheet" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js" type="text/javascript"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script src="_static/js/theme.js" type="text/javascript"></script>
+
+    
+    <link href="genindex.html" rel="index" title="Index" />
+    <link href="search.html" rel="search" title="Search" />
+    <link href="change_log.html" rel="next" title="Change log" />
+    <link href="first_principles_calc.html" rel="prev" title="Tips for first-principles calculations for point defects" />
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a alt="Documentation Home" class="icon icon-home" href="index.html"> pydefect
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form action="search.html" class="wy-form" id="rtd-search-form" method="get">
+    <input name="q" placeholder="Search docs" type="text" />
+    <input name="check_keywords" type="hidden" value="yes" />
+    <input name="area" type="hidden" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial of pydefect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="first_principles_calc.html">Tips for first-principles calculations for point defects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="first_principles_calc.html#tips-for-hybrid-functional-calculations">Tips for hybrid functional calculations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial for calculation of vertical transition level</a></li>
+<li class="toctree-l1"><a class="reference internal" href="change_log.html">Change log</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+
+      
+      <nav aria-label="top navigation" class="wy-nav-top">
+        
+          <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+          <a href="index.html">pydefect</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a class="icon icon-home" href="index.html"></a> &raquo;</li>
+        
+      <li>Tutorial for calculation of vertical transition level</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/vertical_transition_level.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial-for-calculation-of-vertical-transition-level">
+<h1>Tutorial for calculation of vertical transition level<a class="headerlink" href="#tutorial-for-calculation-of-vertical-transition-level" title="Permalink to this headline">¶</a></h1>
+<p>We here illustrate how to calculate the vertical transition level (VTL)
+with an example of NaCl.
+For the calculation of the VTL, we need to apply special correction scheme,
+here we call it the GKFO correction.
+Please read
+<a class="reference external" href="link.aps.org/doi/10.1103/PhysRevB.101.020102">T. Gake, Y. Kumagai*, C. Freysoldt, and F. Oba, Phys. Rev. B, 101, 020102(R) (2020).</a></p>
+<p>Assuming that the typical defect calculations based on the PBEsol functional
+as introduced in the tutorial have been done already
+and one further wants to calculate the photo-absorption energy
+via Cl vacancy in the neutral charge state.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>NaCl
+ │
+ ├ unitcell/ ── unitcell.json
+ │
+ └ defects/ ── perfect/
+             └ Va_Cl_0/ ── absorption/
+</pre></div>
+</div>
+<p>Firstly, create the <code class="code docutils literal notranslate"><span class="pre">absorption/</span></code> directory at the <code class="code docutils literal notranslate"><span class="pre">Va_Cl_0/</span></code>
+and copy the vasp input files.
+Then, edit <code class="code docutils literal notranslate"><span class="pre">INCAR</span></code> to change <code class="code docutils literal notranslate"><span class="pre">NSW</span></code> to 1 and add <code class="code docutils literal notranslate"><span class="pre">NELECT</span></code> with
+reducing it by 1, and run vasp.</p>
+<p>Or one can type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vise</span> <span class="n">vs</span> <span class="o">-</span><span class="n">uis</span> <span class="n">NSW</span> <span class="mi">1</span> <span class="o">--</span><span class="n">options</span> <span class="n">charge</span> <span class="o">-</span><span class="mi">1</span> <span class="o">-</span><span class="n">d</span> <span class="o">../</span> <span class="o">-</span><span class="n">t</span> <span class="n">defect</span>
+</pre></div>
+</div>
+<p>We then create <code class="code docutils literal notranslate"><span class="pre">calc_results.json</span></code> using the following command in the
+<code class="code docutils literal notranslate"><span class="pre">absorption/</span></code> directory.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">cr</span> <span class="o">-</span><span class="n">d</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>Then, type</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">gkfo</span> <span class="o">-</span><span class="n">u</span> <span class="o">../../../</span><span class="n">unitcell</span><span class="o">/</span><span class="n">unitcell</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">iefnv</span> <span class="o">../</span><span class="n">correction</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">icr</span> <span class="o">../</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">fcr</span> <span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">cd</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>With this command, one can obtain <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.pdf</span></code> and <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.json</span></code> files,
+and the correction energy is shown as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+--------------------+------------+</span>
+<span class="o">|</span> <span class="n">charge</span>             <span class="o">|</span>  <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span> <span class="n">additional</span> <span class="n">charge</span>  <span class="o">|</span>  <span class="mi">1</span>         <span class="o">|</span>
+<span class="o">|</span> <span class="n">pc</span> <span class="mi">1</span><span class="n">st</span> <span class="n">term</span>        <span class="o">|</span>  <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span> <span class="n">pc</span> <span class="mi">2</span><span class="n">nd</span> <span class="n">term</span>        <span class="o">|</span>  <span class="mf">0.731247</span>  <span class="o">|</span>
+<span class="o">|</span> <span class="n">alignment</span> <span class="mi">1</span><span class="n">st</span> <span class="n">term</span> <span class="o">|</span> <span class="o">-</span><span class="mf">0.0338952</span> <span class="o">|</span>
+<span class="o">|</span> <span class="n">alignment</span> <span class="mi">2</span><span class="n">nd</span> <span class="n">term</span> <span class="o">|</span> <span class="o">-</span><span class="mf">0.113709</span>  <span class="o">|</span>
+<span class="o">|</span> <span class="n">alignment</span> <span class="mi">3</span><span class="n">rd</span> <span class="n">term</span> <span class="o">|</span> <span class="o">-</span><span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span> <span class="n">correction</span> <span class="n">energy</span>  <span class="o">|</span>  <span class="mf">0.583643</span>  <span class="o">|</span>
+<span class="o">+--------------------+------------+</span>
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.pdf</span></code> shows the potential profile caused by addition/removal
+of the electron and its alignment term.</p>
+<img alt="_images/gkfo_correction.png" src="_images/gkfo_correction.png" />
+<p>For the absorption energy, one needs to know the conduction band minimum position,
+which is now 4.7777. And the total energies of initial and final states are
+-219.02114546 and -222.32750506.
+Therefore, the absorption energy is</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">222.32750506</span><span class="o">+</span><span class="mf">219.02114546</span><span class="o">+</span><span class="mf">4.7777</span><span class="o">+</span><span class="mf">0.583643</span> <span class="o">=</span> <span class="mf">2.0549834</span>
+</pre></div>
+</div>
+<p>It is also worthwhile to check the eigenvalues of initial and final states.
+Using the <code class="code docutils literal notranslate"><span class="pre">eig</span></code> sub-parser as follows,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="o">-</span><span class="n">d</span> <span class="o">.</span> <span class="o">-</span><span class="n">pcr</span> <span class="o">../../</span><span class="n">perfect</span><span class="o">/</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+<p>we can obtain the <code class="code docutils literal notranslate"><span class="pre">eigenvalues.pdf</span></code>, which looks as</p>
+<img alt="_images/NaCl_final_eigenvalues.png" src="_images/NaCl_final_eigenvalues.png" />
+<p>and the initial <code class="code docutils literal notranslate"><span class="pre">eigenvalues.pdf</span></code> looks as</p>
+<img alt="_images/NaCl_initial_eigenvalues.png" src="_images/NaCl_initial_eigenvalues.png" />
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div aria-label="footer navigation" class="rst-footer-buttons" role="navigation">
+      
+        <a accesskey="n" class="btn btn-neutral float-right" href="change_log.html" rel="next" title="Change log">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a accesskey="p" class="btn btn-neutral float-left" href="first_principles_calc.html" rel="prev" title="Tips for first-principles calculations for point defects"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Yu Kumagai
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
