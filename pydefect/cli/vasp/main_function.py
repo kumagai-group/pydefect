@@ -214,8 +214,11 @@ def make_defect_eigenvalues(args):
     supercell_cbm = args.perfect_calc_results.cbm
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
-        defect_entry = loadfn(d / "defect_entry.json")
-        title = defect_entry.name
+        try:
+            defect_entry = loadfn(d / "defect_entry.json")
+            title = defect_entry.name
+        except FileNotFoundError:
+            title = "No name"
         vasprun = Vasprun(d / defaults.vasprun)
         band_edge_eigenvalues = make_band_edge_eigenvalues(
             vasprun, supercell_vbm, supercell_cbm)

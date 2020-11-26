@@ -84,10 +84,11 @@ class SitePotentialPlotter:
                        x_unit: Optional[str] = "Å",
                        y_unit: Optional[str] = "V"):
         efnv = gkfo_correction.init_efnv_correction
+        ave_pot_diff = gkfo_correction.average_potential_diff_by_addition
         return cls(title=title,
                    sites=gkfo_correction.gkfo_sites,
                    defect_region_radius=efnv.defect_region_radius,
-                   ave_pot_diff=efnv.average_potential_diff,
+                   ave_pot_diff=ave_pot_diff,
                    x_unit=x_unit, y_unit=y_unit)
 
 
