@@ -20,7 +20,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # -- Project information -----------------------------------------------------
 
-project = 'vise'
+project = 'pydefect'
 copyright = '2020, Yu Kumagai'
 author = 'Yu Kumagai'
 

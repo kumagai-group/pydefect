@@ -1,6 +1,9 @@
 Tips for first-principles calculations for point defects
 --------------------------------------------------------
 
+-----------------------------------------
+1. How to treat symmetry of point defects
+-----------------------------------------
 As mentioned in the :doc:`tutorial`, the neighboring atoms near the defect
 are initially slightly perturbed to break the symmetry.
 And, some defects tend to move back to the symmetric atomic configuration during the structure optimization.
@@ -10,10 +13,11 @@ Even in these cases, the s
 
 
 
-Tips for hybrid functional calculations
----------------------------------------
+------------------------------------------
+2. Tips for hybrid functional calculations
+------------------------------------------
 
-Hybrid functionals, especially HSE06 functional
+Hybrid functionals, especially the HSE06 functional
 and those with different exchange mixing parameters and/or screening distances,
 have been regularly used for point-defect calculations.
 
@@ -29,6 +33,7 @@ Furthermore, electronic structures of defects could also be different.)
 One can create the INCAR file for generating WAVECAR files using the GGA with the following command, for instance.
 
 ::
+
     grep -v LHFCALC INCAR | grep -v ALGO | sed s/"NSW     =  50"/"NSW     =   1"/ > INCAR-pre
 
 
