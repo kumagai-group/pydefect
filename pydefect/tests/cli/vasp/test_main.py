@@ -24,21 +24,25 @@ def test_print(mocker):
 def test_unitcell(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.Vasprun")
     mock_outcar = mocker.patch("pydefect.cli.vasp.main.Outcar")
+
     parsed_args = parse_args(["u",
                               "-vb", "vasprun.xml",
                               "-ob", "OUTCAR-1",
-                              "-od", "OUTCAR-2"])
+                              "-odc", "OUTCAR-2",
+                              "-odi", "OUTCAR-3"])
     # func is a pointer so need to point the same address.
     expected = Namespace(
         vasprun_band=mock.return_value,
         outcar_band=mock_outcar.return_value,
-        outcar_dielectric=mock_outcar.return_value,
+        outcar_dielectric_clamped=mock_outcar.return_value,
+        outcar_dielectric_ionic=mock_outcar.return_value,
         func=parsed_args.func,
     )
     assert parsed_args == expected
     mock.assert_called_once_with("vasprun.xml")
     mock_outcar.assert_any_call("OUTCAR-1")
-    mock_outcar.assert_called_with("OUTCAR-2")
+    mock_outcar.assert_any_call("OUTCAR-2")
+    mock_outcar.assert_called_with("OUTCAR-3")
 
 
 def test_make_poscars_wo_options():

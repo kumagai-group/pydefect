@@ -83,8 +83,11 @@ def parse_args(args):
         "-ob", "--outcar_band", required=True, type=Outcar,
         help="OUTCAR file of band structure calculation.")
     parser_unitcell.add_argument(
-        "-od", "--outcar_dielectric", required=True, type=Outcar,
-        help="OUTCAR file of dielectric constant calculation.")
+        "-odc", "--outcar_dielectric_clamped", required=True, type=Outcar,
+        help="OUTCAR file for ion-clamped dielectric constant.")
+    parser_unitcell.add_argument(
+        "-odi", "--outcar_dielectric_ionic", required=True, type=Outcar,
+        help="OUTCAR file for dielectric constant of ionic contribution.")
 
     parser_unitcell.set_defaults(func=make_unitcell)
 

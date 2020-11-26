@@ -31,14 +31,15 @@ def test_print():
     print_file(args)
 
 
-def test_make_unitcell(mocker, tmpdir):
-    tmpdir.chdir()
+def test_make_unitcell(mocker):
     vasprun_band_mock = mocker.Mock(spec=Vasprun, autospec=True)
     outcar_band_mock = mocker.Mock(spec=Outcar, autospec=True)
     outcar_dielectric_mock = mocker.Mock(spec=Outcar, autospec=True)
     args = Namespace(vasprun_band=vasprun_band_mock,
                      outcar_band=outcar_band_mock,
-                     outcar_dielectric=outcar_dielectric_mock)
+                     outcar_dielectric_clamped=outcar_dielectric_mock,
+                     outcar_dielectric_ionic=outcar_dielectric_mock)
+
     mock = mocker.patch("pydefect.cli.vasp.main_function.make_unitcell_from_vasp")
     mock.return_value = Unitcell(vbm=1.0,
                                  cbm=2.0,
@@ -47,7 +48,8 @@ def test_make_unitcell(mocker, tmpdir):
     make_unitcell(args)
     mock.assert_called_once_with(vasprun_band=vasprun_band_mock,
                                  outcar_band=outcar_band_mock,
-                                 outcar_dielectric=outcar_dielectric_mock)
+                                 outcar_dielectric_clamped=outcar_dielectric_mock,
+                                 outcar_dielectric_ionic=outcar_dielectric_mock)
 
 
 def test_make_competing_phase_dirs(mocker):

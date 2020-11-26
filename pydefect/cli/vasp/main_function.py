@@ -49,9 +49,11 @@ def print_file(args):
 
 
 def make_unitcell(args):
-    unitcell = make_unitcell_from_vasp(vasprun_band=args.vasprun_band,
-                                       outcar_band=args.outcar_band,
-                                       outcar_dielectric=args.outcar_dielectric)
+    unitcell = make_unitcell_from_vasp(
+        vasprun_band=args.vasprun_band,
+        outcar_band=args.outcar_band,
+        outcar_dielectric_clamped=args.outcar_dielectric_clamped,
+        outcar_dielectric_ionic=args.outcar_dielectric_ionic)
     unitcell.to_json_file()
 
 
