@@ -36,7 +36,7 @@ def test_create_supercell_raise_not_primitive_error(bcc):
 
 def test_create_supercell_matrix(a_centered_orthorhombic):
     matrix = [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
-    cs = SupercellMaker(a_centered_orthorhombic, matrix=matrix)
+    cs = SupercellMaker(a_centered_orthorhombic, matrix_to_conv_cell=matrix)
     actual = cs.supercell.matrix
     np.testing.assert_array_equal(actual, matrix)
 
@@ -45,7 +45,7 @@ def test_create_supercell_matrix(a_centered_orthorhombic):
 
 
 def test_create_supercell_generate_supercell_info(simple_cubic):
-    cs = SupercellMaker(simple_cubic, matrix=[[2, 0, 0], [0, 2, 0], [0, 0, 2]])
+    cs = SupercellMaker(simple_cubic, matrix_to_conv_cell=[[2, 0, 0], [0, 2, 0], [0, 0, 2]])
     info = cs.supercell_info
     assert info.transformation_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
     assert info.sites["H1"].wyckoff_letter == "a"
@@ -80,23 +80,35 @@ direct
     assert sm.conv_structure == structure
 
 
-"""
-TODO
+def test_transformation_matrix():
+    structure = Structure.from_str("""
+   1.0
+    -2.5007160000000002    2.5007160000000002    3.6755999999999993
+     2.5007160000000002   -2.5007159999999988    3.6755999999999993
+     2.5007160000000002    2.5007159999999988   -3.6755999999999993
+Si
+   2    
+Direct
+  0.7500000000000001  0.2500000000000001  0.5000000000000000
+  0.0000000000000000  0.0000000000000000  0.0000000000000000""", fmt="POSCAR")
+
+    conv_structure = Structure.from_str("""
+  1.0
+5.001432 0.000000 0.000000
+0.000000 5.001432 0.000000
+0.000000 0.000000 7.351200
+Si 
+4 
+direct
+0.000000 0.500000 0.250000 Si
+0.500000 1.000000 0.750000 Si
+0.000000 0.000000 0.000000 Si
+0.500000 0.500000 0.500000 Si""", fmt="POSCAR")
+
+    matrix_to_conv_cell = [[3, 0, 0], [0, 3, 0], [0, 0, 2]]
+    sm = SupercellMaker(structure, matrix_to_conv_cell=matrix_to_conv_cell)
+    actual = structure * sm.transformation_matrix
+    expected = conv_structure * matrix_to_conv_cell
+    assert actual == expected
 
 
-DONE
-- Create SupercellInfo at CreateSupercell
-- Expand for rhombohedral cell.
-- Expand for tetragonal cell.
-- Input of structure and trans_mat returns supercell
-- Return isotropy
-- Return average angle
-- Recommend the least isotropic supercell of simple cubic within a given number of atom range.
-  When the isotropy is the same, smallest supercell is returned.
-- Check max_num_atoms
-- Raise NoSupercellError 
-
-REJECT
-+ Allow to write the supercell down a file.
-    -> Structure already has to, which should be used.
-"""

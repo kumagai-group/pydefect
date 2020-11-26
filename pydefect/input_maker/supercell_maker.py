@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 class SupercellMaker:
     def __init__(self,
                  primitive_structure: IStructure,
-                 matrix: Optional[List[List[int]]] = None,
+                 matrix_to_conv_cell: Optional[List[List[int]]] = None,
                  **supercell_kwargs):
 
         self.primitive_structure = primitive_structure
@@ -38,7 +38,7 @@ class SupercellMaker:
         self.conv_multiplicity = centering.conv_multiplicity
         self.conv_trans_mat = centering.primitive_to_conv
 
-        self._matrix = matrix
+        self._matrix = matrix_to_conv_cell
         self._supercell_kwargs = supercell_kwargs
 
         self._generate_supercell(crystal_system)
@@ -70,6 +70,12 @@ class SupercellMaker:
 
     @property
     def transformation_matrix(self):
-        matrix = np.dot(self.conv_trans_mat, self.supercell.matrix).astype(int)
+        """
+        Definition of transformation_matrix is different from that in spglib.
+        https://spglib.github.io/spglib/definition.html#transformation-matrix-boldsymbol-p-and-origin-shift-boldsymbol-p
+        This is because we need to keep the consistency with the pymatgen.
+        See also the unittest.
+        """
+        matrix = np.dot(self.supercell.matrix, self.conv_trans_mat).astype(int)
         return matrix.tolist()
 
