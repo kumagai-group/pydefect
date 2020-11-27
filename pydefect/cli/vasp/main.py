@@ -161,7 +161,8 @@ def parse_args(args):
         help="Base POSCAR, which must be the standardized primitive cell.")
     parser_supercell.add_argument(
         "--matrix", nargs="+", type=int,
-        help="Supercell matrix. 1, 3 or 9 components are accepted.")
+        help="Supercell matrix applied to the conventional cell. "
+             "1, 3 or 9 components are accepted.")
     parser_supercell.add_argument(
         "--min_atoms", dest="min_num_atoms", default=50, type=int,
         help="Minimum number of atoms")

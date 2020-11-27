@@ -8,13 +8,13 @@ from vise.util.logger import get_logger
 logger = get_logger(__name__)
 
 
-def make_defect_entry_from_poscars(dirname, perf_poscar, defect_poscar):
-    names = dirname.split("_")
+def make_defect_entry_from_poscars(original_name, perf_poscar, defect_poscar):
+    names = original_name.split("_")
     try:
         name = "_".join(names[:-1])
         charge = int(names[-1])
     except ValueError:
-        logger.warning(f"Directory name {dirname} is invalid.")
+        logger.warning(f"Name {original_name} is invalid.")
         raise
 
     perfect = IStructure.from_file(perf_poscar)
