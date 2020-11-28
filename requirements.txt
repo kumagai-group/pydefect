@@ -7,3 +7,4 @@ crystal-toolkit
 scikit-learn
 scikit-image
 tabulate
+adjustText
