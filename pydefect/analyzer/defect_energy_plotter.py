@@ -132,6 +132,7 @@ class DefectEnergyMplPlotter(DefectEnergyPlotter):
         self._mpl_defaults = kwargs.get("mpl_defaults",
                                         DefectEnergiesMplSettings())
         self.plt = plt
+        self.texts = []
 
     def construct_plot(self):
         self._add_energies()
@@ -143,6 +144,7 @@ class DefectEnergyMplPlotter(DefectEnergyPlotter):
         self._set_formatter()
         self.plt.gca().legend(bbox_to_anchor=(1, 0.5), loc='center left')
         self.plt.tight_layout()
+        adjust_text(self.texts, force_points=(1.0, 2.5))
 
     def _add_energies(self):
         for de in self._defect_energies:
@@ -155,10 +157,9 @@ class DefectEnergyMplPlotter(DefectEnergyPlotter):
             if cp.t_inner_cross_points:
                 self.plt.scatter(*cp.t_inner_cross_points, marker="o",
                                  color=color, s=self._mpl_defaults.circle_size)
-            texts = [self.plt.text(x, y, charge, color=color)
-                     for charge, (x, y)
-                     in cp.annotated_charge_positions.items()]
-            adjust_text(texts)
+            self.texts.extend(
+                [self.plt.text(x, y, charge, color=color)
+                 for charge, (x, y) in cp.annotated_charge_positions.items()])
 
     def _set_x_range(self):
         self.plt.xlim(self._supercell_vbm - self._vbm,
