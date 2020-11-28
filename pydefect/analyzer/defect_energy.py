@@ -23,7 +23,7 @@ class DefectEnergy:
     energies: List[float]
     corrections: List[float]
 
-    def cross_points(self, ef_min, ef_max):
+    def cross_points(self, ef_min, ef_max, base_ef=0.0):
         large_minus_number = -1e4
         half_spaces = []
         for charge, energy, correction in zip(self.charges, self.energies, self.corrections):
@@ -42,9 +42,9 @@ class DefectEnergy:
         for intersection in hs.intersections:
             x, y = np.round(intersection, 8)
             if ef_min < x < ef_max:
-                inner_cross_points.append([x, y])
+                inner_cross_points.append([x - base_ef, y])
             elif y > large_minus_number:
-                boundary_points.append([x, y])
+                boundary_points.append([x - base_ef, y])
 
         return CrossPoints(inner_cross_points, boundary_points)
 
@@ -90,6 +90,16 @@ class CrossPoints:
     def charge_list(self):
         charges = [None] + self.charges + [None]
         return list(zip(charges[:-1], charges[1:]))
+
+    @property
+    def annotated_charge_positions(self):
+        result = {}
+        for ((x1, y1), (x2, y2)), charge \
+                in zip(zip(self.all_sorted_points[:-1],
+                           self.all_sorted_points[1:]),
+                       self.charges):
+            result[charge] = [(x1 + x2) / 2, (y1 + y2) / 2]
+        return result
 
     def __str__(self):
         lines = []

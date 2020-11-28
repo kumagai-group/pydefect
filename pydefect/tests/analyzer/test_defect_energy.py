@@ -20,6 +20,10 @@ def test_defect_energy_cross_points(defect_energy):
     expected = CrossPoints([[5.0, 6.0]], [[1.0, -2.0], [6.0, 6.0]])
     assert actual == expected
 
+    actual = defect_energy.cross_points(1, 6, 1)
+    expected = CrossPoints([[4.0, 6.0]], [[0.0, -2.0], [5.0, 6.0]])
+    assert actual == expected
+
 
 def test_defect_energy_str(defect_energy):
     expected = """     Va_O1    0       4.0000       2.0000
@@ -42,6 +46,8 @@ def test_cross_points(cross_points):
     assert cross_points.t_boundary_points == [[1, 4], [10, 40]]
     assert cross_points.charges == [20, 10, 0]
     assert cross_points.charge_list == [(None, 20), (20, 10), (10, 0), (0, None)]
+    assert cross_points.annotated_charge_positions == \
+           {20: [1.5, 20], 10: [2.5, 35], 0: [3.5, 40]}
 
 
 def test_cross_points_str(cross_points):

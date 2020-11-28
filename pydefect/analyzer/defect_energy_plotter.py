@@ -4,6 +4,7 @@ from itertools import cycle
 from typing import List, Optional
 
 import plotly.graph_objects as go
+from adjustText import adjust_text
 from matplotlib import pyplot as plt
 from pydefect.analyzer.defect_energy import DefectEnergy
 from pydefect.defaults import defaults
@@ -75,15 +76,13 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
             font_size=15,
             width=700, height=700)
 
-        base_e = self._supercell_vbm
         e_min = min(self._supercell_vbm, self._vbm)
         e_max = max(self._supercell_cbm, self._cbm)
 
         all_y = []
         for de in self._defect_energies:
-            cp = de.cross_points(e_min, e_max)
+            cp = de.cross_points(e_min, e_max, self._vbm)
             xs, ys = cp.t_all_sorted_points
-            xs = [x - base_e for x in xs]
             all_y.extend(ys)
             fig.add_trace(go.Scatter(x=xs, y=ys, name=de.name,
                                      text=cp.charge_list,
@@ -92,33 +91,38 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
                                      'Charges %{text}<br>' +
                                      'Energy: %{y:.2f}'))
 
-        y_min = min(all_y) - 0.2
-        y_max = max(all_y) + 0.2
+        y_min, y_max = min(all_y) - 0.2, max(all_y) + 0.2
 
-        fig["layout"]["xaxis"]["range"] = [e_min - base_e - 0.1, e_max - base_e + 0.1]
+        fig["layout"]["xaxis"]["range"] = [e_min - self._vbm - 0.1,
+                                           e_max - self._vbm + 0.1]
         fig["layout"]["yaxis"]["range"] = [y_min, y_max]
 
-        fig.add_trace(go.Scatter(x=[self._vbm - base_e, self._vbm - base_e],
-                                 y=[y_min, y_max],
-                                 line=dict(width=2, dash="dot"),
-                                 showlegend=False,
-                                 line_color="black"))
-
-        fig.add_trace(go.Scatter(x=[self._cbm - base_e, self._cbm - base_e],
-                                 y=[y_min, y_max],
-                                 line=dict(width=2, dash="dot"),
-                                 line_color="black",
-                                 name="Unitcell"))
-        fig.add_trace(go.Scatter(x=[self._supercell_vbm - base_e, self._supercell_vbm - base_e],
-                                 y=[y_min, y_max],
-                                 line=dict(width=1, dash="dash"),
-                                 showlegend=False,
-                                 line_color="black"))
-        fig.add_trace(go.Scatter(x=[self._supercell_cbm - base_e, self._supercell_cbm - base_e],
-                                 y=[y_min, y_max],
-                                 line=dict(width=1, dash="dash"),
-                                 line_color="black",
-                                 name="Supercell"))
+        fig.add_trace(go.Scatter(
+            x=[self._vbm - self._vbm, self._vbm - self._vbm],
+            y=[y_min, y_max],
+            line=dict(width=2, dash="dot"),
+            showlegend=False,
+            line_color="black"))
+        fig.add_trace(go.Scatter(
+            x=[self._cbm - self._vbm, self._cbm - self._vbm],
+            y=[y_min, y_max],
+            line=dict(width=2, dash="dot"),
+            line_color="black",
+            name="Unitcell"))
+        fig.add_trace(go.Scatter(
+            x=[self._supercell_vbm - self._vbm,
+               self._supercell_vbm - self._vbm],
+            y=[y_min, y_max],
+            line=dict(width=1, dash="dash"),
+            showlegend=False,
+            line_color="black"))
+        fig.add_trace(go.Scatter(
+            x=[self._supercell_cbm - self._vbm,
+               self._supercell_cbm - self._vbm],
+            y=[y_min, y_max],
+            line=dict(width=1, dash="dash"),
+            line_color="black",
+            name="Supercell"))
         return fig
 
 
@@ -143,16 +147,22 @@ class DefectEnergyMplPlotter(DefectEnergyPlotter):
     def _add_energies(self):
         for de in self._defect_energies:
             color = next(self._mpl_defaults.colors)
-            cp = de.cross_points(self._supercell_vbm, self._supercell_cbm)
+            cp = de.cross_points(
+                self._supercell_vbm, self._supercell_cbm, self._vbm)
             self.plt.plot(*cp.t_all_sorted_points, color=color,
                           linewidth=self._mpl_defaults.line_width,
                           label=de.name)
             if cp.t_inner_cross_points:
                 self.plt.scatter(*cp.t_inner_cross_points, marker="o",
                                  color=color, s=self._mpl_defaults.circle_size)
+            texts = [self.plt.text(x, y, charge, color=color)
+                     for charge, (x, y)
+                     in cp.annotated_charge_positions.items()]
+            adjust_text(texts)
 
     def _set_x_range(self):
-        self.plt.xlim(self._supercell_vbm, self._supercell_cbm)
+        self.plt.xlim(self._supercell_vbm - self._vbm,
+                      self._supercell_cbm - self._vbm)
 
     def _set_y_range(self):
         if self._y_range:
@@ -173,8 +183,13 @@ class DefectEnergyMplPlotter(DefectEnergyPlotter):
         axis.tick_params(labelsize=self._mpl_defaults.tick_label_size)
 
     def _add_band_edges(self):
-        self.plt.axvline(x=self._vbm, **self._mpl_defaults.vline)
-        self.plt.axvline(x=self._cbm, **self._mpl_defaults.vline)
-        self.plt.axvline(x=self._supercell_vbm, **self._mpl_defaults.svline)
-        self.plt.axvline(x=self._supercell_cbm, **self._mpl_defaults.svline)
+        self.plt.axvline(x=0.0, **self._mpl_defaults.vline)
+        self.plt.axvline(x=self._cbm - self._vbm, **self._mpl_defaults.vline)
+        self.plt.axvline(
+            x=self._supercell_vbm - self._vbm, **self._mpl_defaults.svline)
+        self.plt.axvline(
+            x=self._supercell_cbm - self._vbm, **self._mpl_defaults.svline)
+
+    # def _add_charges(self):
+    #     text = [self.plt.text(x, y ,charge) for x, y, charge in
 
