@@ -2,9 +2,11 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 
 from monty.json import MSONable
+from monty.serialization import loadfn
 from vise.util.enum import ExtendedEnum
 from vise.util.mix_in import ToJsonFileMixIn
 
@@ -28,11 +30,6 @@ class EdgeState(MSONable, ExtendedEnum):
     def is_shallow(self):
         return self in [self.acceptor_phs, self.donor_phs]
 
-    def as_dict(self):
-        return {"@module": "pydefect.analyzer.band_edge_states",
-                "@class": self.__class__.__name__,
-                "value": self.value}
-
 
 @dataclass
 class BandEdgeStates(MSONable, ToJsonFileMixIn):
@@ -41,6 +38,20 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
     @property
     def is_shallow(self):
         return any([s.is_shallow for s in self.states])
+
+    def to_yaml(self, filename="band_edge_states.yaml"):
+        d = [f"up: {self.states[0]}"]
+        if len(self.states) == 2:
+            d.append(f"down: {self.states[1]}")
+        Path(filename).write_text("\n".join(d))
+
+    @classmethod
+    def from_yaml(cls, filename="band_edge_states.yaml"):
+        d = loadfn(filename)
+        states = [EdgeState(d.pop("up"))]
+        if d:
+            states.append(EdgeState(d.pop("down")))
+        return cls(states)
 
 
 class EdgeCharacters(Sequence, MSONable, ToJsonFileMixIn):
