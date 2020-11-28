@@ -406,7 +406,7 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
     args = Namespace(dirs=[Path("Va_O1_2")],
                      perfect_calc_results=mock_perfect_calc_results,
                      unitcell=mock_unitcell,
-                     chem_pot_diag="cpd.yaml",
+                     cpd_yaml="cpd.yaml",
                      label="A",
                      y_range=[-100, 100],
                      skip_shallow=skip_shallow,

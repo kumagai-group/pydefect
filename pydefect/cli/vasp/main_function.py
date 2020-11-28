@@ -266,7 +266,7 @@ def make_edge_states(args):
 def make_defect_formation_energy(args):
     title = latexify(
         args.perfect_calc_results.structure.composition.reduced_formula)
-    chem_pot_diag = ChemPotDiag.from_yaml(args.chem_pot_diag)
+    chem_pot_diag = ChemPotDiag.from_yaml(args.cpd_yaml)
     abs_chem_pot = chem_pot_diag.abs_chem_pot_dict(args.label)
 
     single_energies = []
