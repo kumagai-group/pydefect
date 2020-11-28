@@ -260,7 +260,7 @@ def make_edge_states(args):
             edge_states.append(edge_state)
             print(spin, edge_state)
 
-        BandEdgeStates(edge_states).to_json_file(d / "band_edge_states.json")
+        BandEdgeStates(edge_states).to_yaml(d / "band_edge_states.yaml")
 
 
 def make_defect_formation_energy(args):
@@ -271,7 +271,8 @@ def make_defect_formation_energy(args):
 
     single_energies = []
     for d in args.dirs:
-        if args.skip_shallow and loadfn(d / "band_edge_states.json").is_shallow:
+        if args.skip_shallow \
+                and BandEdgeStates.from_yaml(d / "band_edge_states.yaml").is_shallow:
             continue
         single_energies.append(
             make_single_defect_energy(args.perfect_calc_results,
@@ -290,7 +291,9 @@ def make_defect_formation_energy(args):
         print("-- cross points -- ")
         for e in defect_energies:
             print(e.name)
-            print(e.cross_points(args.unitcell.vbm, args.unitcell.cbm))
+            print(e.cross_points(ef_min=args.unitcell.vbm,
+                                 ef_max=args.unitcell.cbm,
+                                 base_ef=args.unitcell.vbm))
             print("")
         return
 
