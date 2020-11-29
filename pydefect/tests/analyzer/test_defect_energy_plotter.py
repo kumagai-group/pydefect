@@ -33,7 +33,8 @@ def defect_energy_plotters():
 
     d = dict(title=latexify("MgAl2O4"),
              defect_energies=[va_o, va_mg, mg_i],
-             vbm=1.5, cbm=5.5, supercell_vbm=1.0, supercell_cbm=6.0)
+             vbm=1.5, cbm=5.5, supercell_vbm=1.0, supercell_cbm=6.0,
+             supercell_edge=True)
 
     return DefectEnergyMplPlotter(**d), DefectEnergyPlotlyPlotter(**d)
 

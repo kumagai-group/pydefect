@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from copy import deepcopy
 from dataclasses import dataclass
 from itertools import groupby
 from typing import List
 
 import numpy as np
+from pymatgen import Element
 from scipy.spatial import HalfspaceIntersection
 
 
@@ -121,4 +123,55 @@ def make_defect_energies(single_energies: List[SingleDefectEnergy]
             energies.append(single_energy.energy)
             corrections.append(single_energy.correction)
         result.append(DefectEnergy(single_energy.name, charges, energies, corrections))
+    return result
+
+
+def remove_digits(name):
+    return ''.join([i for i in name if not i.isdigit()])
+
+
+def only_digits(name):
+    return ''.join([i for i in name if i.isdigit()])
+
+
+elements = [str(e) for e in Element]
+
+
+def defect_mpl_name(name):
+    in_name, out_name = name.split("_")
+    if in_name in elements:
+        in_name = "{\\rm " + in_name + "}"
+    elif in_name == "Va":
+        in_name = "V"
+
+    r_out_name = remove_digits(out_name)
+    if r_out_name in elements:
+        out_name = "{{\\rm " + r_out_name + "}" + only_digits(out_name) + "}"
+    else:
+        out_name = "{" + out_name + "}"
+
+    return f"${in_name}_{out_name}$"
+
+
+def sanitize_defect_energies_for_plot(defect_energies: List[DefectEnergy]):
+    result = []
+    out_names = [remove_digits(e.name.split("_")[1]) for e in defect_energies]
+
+    for e in defect_energies:
+        ee = deepcopy(e)
+        in_name, out_name = e.name.split("_")
+        r_out_name = remove_digits(out_name)
+        out_name = r_out_name if out_names.count(r_out_name) == 1 else out_name
+        ee.name = defect_mpl_name("_".join([in_name, out_name]))
+        result.append(ee)
+
+    return result
+
+
+def slide_energy(defect_energies: List[DefectEnergy], base_level: float):
+    result = []
+    for e in defect_energies:
+        ee = deepcopy(e)
+        ee.energies = [e + base_level * c for e, c in zip(e.energies, e.charges)]
+        result.append(ee)
     return result

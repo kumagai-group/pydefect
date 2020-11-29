@@ -4,7 +4,8 @@
 import pytest
 
 from pydefect.analyzer.defect_energy import (
-    DefectEnergy, CrossPoints, SingleDefectEnergy, make_defect_energies)
+    DefectEnergy, CrossPoints, SingleDefectEnergy, make_defect_energies,
+    defect_mpl_name, slide_energy)
 
 
 @pytest.fixture
@@ -71,12 +72,25 @@ def test_generate_defect_energies():
                 DefectEnergy("Va_O1", [0, 1, 2], [-1, 7, 15], [1, 3, 5])]
     assert actual == expected
 
-"""
-TODO
-- Evaluate the crossing points at given Fermi level range.
+
+def test_defect_mpl_name():
+    assert defect_mpl_name(name="Va_O1") == "$V_{{\\rm O}1}$"
+    assert defect_mpl_name(name="Mg_i1") == "${\\rm Mg}_{i1}$"
 
 
-DONE
-- Draw a single defect
-- Correction.
-"""
+def test_slide_energy():
+    energies = [DefectEnergy("Va_Mg1", [0], [0], [0]),
+                DefectEnergy("Va_O1", [1], [0], [0]),
+                DefectEnergy("Va_O2", [2], [0], [0]),
+                DefectEnergy("Mg_i1", [0], [0], [0])]
+    actual = slide_energy(energies, 1.0)
+    expected = [DefectEnergy("Va_Mg1", [0], [0], [0]),
+                DefectEnergy("Va_O1", [1], [1.0], [0]),
+                DefectEnergy("Va_O2", [2], [2.0], [0]),
+                DefectEnergy("Mg_i1", [0], [0], [0])]
+    assert actual == expected
+
+    """
+    TODO
+    - Evaluate the crossing points at given Fermi level range.
+    """
