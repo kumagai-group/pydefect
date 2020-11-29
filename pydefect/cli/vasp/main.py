@@ -343,6 +343,10 @@ def parse_args(args):
     parser_energy.add_argument(
         "-p", "--print", action="store_true",
         help="Print the defect formation energy as a list.")
+    parser_energy.add_argument(
+        "--supercell_edge", action="store_true",
+        help="Whether set the band edges to supercell ones instead of "
+             "unitcell ones.")
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------

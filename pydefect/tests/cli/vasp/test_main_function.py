@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from monty.serialization import loadfn
-from pydefect.analyzer.band_edge_states import EdgeCharacters, BandEdgeStates
+from pydefect.analyzer.band_edge_states import EdgeCharacters
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
@@ -390,14 +390,11 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
         elif str(key) == "Va_O1_2/correction.json":
             mock_correction.correction_energy = 20
             return mock_correction
-        elif str(key) == "Va_O1_2/band_edge_states.json":
-            mock_band_edge_states = mocker.Mock(spec=BandEdgeStates, autospec=True)
-            mock_band_edge_states.is_shallow = True
-            return mock_band_edge_states
         else:
             raise ValueError
 
     mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+    mock_band_edge_states = mocker.patch("pydefect.cli.vasp.main_function.BandEdgeStates")
 
     mock_unitcell = mocker.Mock(spec=Unitcell)
     mock_unitcell.vbm = 11
@@ -410,12 +407,13 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
                      label="A",
                      y_range=[-100, 100],
                      skip_shallow=skip_shallow,
+                     supercell_edge=True,
                      print=True)
 
     make_defect_formation_energy(args)
 
     if skip_shallow is True:
-        mock_loadfn.assert_any_call(Path("Va_O1_2") / "band_edge_states.json")
+        mock_band_edge_states.from_yaml.assert_any_call(Path("Va_O1_2") / "band_edge_states.yaml")
     else:
         mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
         mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")

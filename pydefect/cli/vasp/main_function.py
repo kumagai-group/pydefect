@@ -4,7 +4,7 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeStates
-from pydefect.analyzer.defect_energy import make_defect_energies
+from pydefect.analyzer.defect_energy import make_defect_energies, slide_energy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
@@ -264,10 +264,11 @@ def make_edge_states(args):
 
 
 def make_defect_formation_energy(args):
-    title = latexify(
-        args.perfect_calc_results.structure.composition.reduced_formula)
+    formula = args.perfect_calc_results.structure.composition.reduced_formula
     chem_pot_diag = ChemPotDiag.from_yaml(args.cpd_yaml)
     abs_chem_pot = chem_pot_diag.abs_chem_pot_dict(args.label)
+
+    title = " ".join([latexify(formula), "point", args.label])
 
     single_energies = []
     for d in args.dirs:
@@ -282,6 +283,7 @@ def make_defect_formation_energy(args):
                                       loadfn(d / "correction.json")))
 
     defect_energies = make_defect_energies(single_energies)
+    defect_energies = slide_energy(defect_energies, args.unitcell.vbm)
     if args.print:
         print("         charge          E_f   correction    ")
         for e in defect_energies:
@@ -303,7 +305,8 @@ def make_defect_formation_energy(args):
                                      cbm=args.unitcell.cbm,
                                      supercell_vbm=args.perfect_calc_results.vbm,
                                      supercell_cbm=args.perfect_calc_results.cbm,
-                                     y_range=args.y_range)
+                                     y_range=args.y_range,
+                                     supercell_edge=args.supercell_edge)
 
     plotter.construct_plot()
     plotter.plt.savefig(f"energy_{args.label}.pdf")

@@ -340,5 +340,6 @@ def test_defect_formation_energy(mocker):
         y_range=[-5, 5],
         skip_shallow=True,
         print=True,
+        supercell_edge=False,
         func=parsed_args.func)
     assert parsed_args == expected
