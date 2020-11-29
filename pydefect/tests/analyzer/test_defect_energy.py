@@ -5,7 +5,7 @@ import pytest
 
 from pydefect.analyzer.defect_energy import (
     DefectEnergy, CrossPoints, SingleDefectEnergy, make_defect_energies,
-    defect_mpl_name, slide_energy)
+    defect_mpl_name, slide_energy, sanitize_defect_energies_for_plot)
 
 
 @pytest.fixture
@@ -76,6 +76,29 @@ def test_generate_defect_energies():
 def test_defect_mpl_name():
     assert defect_mpl_name(name="Va_O1") == "$V_{{\\rm O}1}$"
     assert defect_mpl_name(name="Mg_i1") == "${\\rm Mg}_{i1}$"
+
+
+def test_generate_defect_energies():
+    energies = [DefectEnergy("Va_Mg1", [0], [0], [0]),
+                DefectEnergy("Va_O1", [0], [0], [0]),
+                DefectEnergy("Va_O2", [0], [0], [0]),
+                DefectEnergy("Mg_i1", [0], [0], [0]),
+                DefectEnergy("O_i1", [0], [0], [0])]
+    actual = sanitize_defect_energies_for_plot(energies)
+    expected = [DefectEnergy("$V_{{\\rm Mg}}$", [0], [0], [0]),
+                DefectEnergy("$V_{{\\rm O}1}$", [0], [0], [0]),
+                DefectEnergy("$V_{{\\rm O}2}$", [0], [0], [0]),
+                DefectEnergy("${\\rm Mg}_{i}$", [0], [0], [0]),
+                DefectEnergy("${\\rm O}_{i}$", [0], [0], [0])]
+    assert actual == expected
+
+    energies = [DefectEnergy("Mg_i1", [0], [0], [0]),
+                DefectEnergy("Mg_i2", [0], [0], [0]),]
+    actual = sanitize_defect_energies_for_plot(energies)
+    expected = [DefectEnergy("${\\rm Mg}_{i1}$", [0], [0], [0]),
+                DefectEnergy("${\\rm Mg}_{i2}$", [0], [0], [0])]
+    assert actual == expected
+
 
 
 def test_slide_energy():

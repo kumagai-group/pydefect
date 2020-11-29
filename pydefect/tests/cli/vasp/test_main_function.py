@@ -408,6 +408,8 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
                      y_range=[-100, 100],
                      skip_shallow=skip_shallow,
                      supercell_edge=True,
+                     label_line=True,
+                     add_charges=True,
                      print=True)
 
     make_defect_formation_energy(args)

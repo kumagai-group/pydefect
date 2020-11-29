@@ -155,13 +155,13 @@ def defect_mpl_name(name):
 
 def sanitize_defect_energies_for_plot(defect_energies: List[DefectEnergy]):
     result = []
-    out_names = [remove_digits(e.name.split("_")[1]) for e in defect_energies]
+    out_names = [e.name.split("_")[1] for e in defect_energies]
 
     for e in defect_energies:
         ee = deepcopy(e)
         in_name, out_name = e.name.split("_")
         r_out_name = remove_digits(out_name)
-        out_name = r_out_name if out_names.count(r_out_name) == 1 else out_name
+        out_name = r_out_name if f"{r_out_name}2" not in out_names else out_name
         ee.name = defect_mpl_name("_".join([in_name, out_name]))
         result.append(ee)
 

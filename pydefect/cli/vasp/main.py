@@ -347,6 +347,12 @@ def parse_args(args):
         "--supercell_edge", action="store_true",
         help="Whether set the band edges to supercell ones instead of "
              "unitcell ones.")
+    parser_energy.add_argument(
+        "--no_label_line", dest="label_line", action="store_false",
+        help="")
+    parser_energy.add_argument(
+        "--no_add_charges", dest="add_charges", action="store_false",
+        help="")
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------

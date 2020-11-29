@@ -306,7 +306,9 @@ def make_defect_formation_energy(args):
                                      supercell_vbm=args.perfect_calc_results.vbm,
                                      supercell_cbm=args.perfect_calc_results.cbm,
                                      y_range=args.y_range,
-                                     supercell_edge=args.supercell_edge)
+                                     supercell_edge=args.supercell_edge,
+                                     label_line=args.label_line,
+                                     add_charges=args.add_charges)
 
     plotter.construct_plot()
     plotter.plt.savefig(f"energy_{args.label}.pdf")
