@@ -35,7 +35,6 @@ from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.input_maker.supercell_maker import SupercellMaker
-from pydefect.util.error_classes import CpdNotSupportedError
 from pydefect.util.mp_tools import MpQuery
 from pymatgen.io.vasp import Vasprun, Outcar, Procar
 from pymatgen.util.string import latexify
@@ -84,14 +83,15 @@ def make_chem_pot_diag(args) -> None:
 
 def plot_chem_pot_diag(args) -> None:
     cpd = ChemPotDiag.from_yaml(args.yaml)
+    print(cpd)
     if cpd.dim == 2:
         plotter = ChemPotDiagMpl2DMplPlotter(CpdPlotInfo(cpd))
     elif cpd.dim == 3:
         plotter = ChemPotDiagMpl3DMplPlotter(CpdPlotInfo(cpd))
     else:
-        raise CpdNotSupportedError("Number of elements must be 2 or 3. "
-                                   f"Now {cpd.vertex_elements}.")
-    print(cpd)
+        logger.info("Number of elements must be 2 or 3. "
+                    f"Now, elements are {cpd.vertex_elements}.")
+        return
     plt = plotter.draw_diagram()
     plt.savefig(fname="cpd.pdf")
     plt.show()
