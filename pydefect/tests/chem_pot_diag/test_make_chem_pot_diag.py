@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from pathlib import Path
 
 import pytest
-from monty.serialization import loadfn
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CompositionEnergy
 from pydefect.chem_pot_diag.make_chem_pot_diag import \
     make_chem_pot_diag_from_mp, remove_higher_energy_comp
-from pymatgen import Composition
+from pymatgen import Composition, Element
 
 
 @pytest.fixture
@@ -27,13 +25,11 @@ def cpd():
         CompositionEnergy(Composition('Mg3'), -4.79068775, "mp-2"),
         CompositionEnergy(Composition('Mg1O1'), -11.96742144, "mp-3")],
         target=Composition("MgO"))
+# mp
+# O:  -1.54794890
+# Mg: -0.01731593
 
-
-to_datasets = Path(__file__).parent / "../../chem_pot_diag/datasets"
-pbesol = loadfn(str(to_datasets / "vise_pbesol_vasp544_atom_energy.yaml"))
-mp = loadfn(str(to_datasets / "mp_vasp544_atom_energy.yaml"))
-
-diff = {elem: pbesol[elem] - mp[elem] for elem in ["O", "Mg"]}
+diff = {"Mg": -0.00912097 - -0.01731593, "O": -1.61154565 - -1.54794890}
 
 
 @pytest.fixture
@@ -64,20 +60,15 @@ Mg: -0.00912097""")
     assert actual == cpd_corr
 
 
-def test_make_chem_pot_diag_from_mp_w_vise_functional(mp_query, cpd_corr):
-    actual = make_chem_pot_diag_from_mp(target=Composition("MgO"),
-                                        atom_energy_yaml="pbesol")
-    cpd_corr.to_yaml()
-    assert actual == cpd_corr
-
-
-def test_make_chem_pot_diag_from_mp_additional_elem(mp_query, cpd_corr):
+def test_make_chem_pot_diag_from_mp_additional_elem(mp_query, tmpdir, cpd_corr):
+    tmpdir.chdir()
+    tmpdir.join("tmp.yaml").write("""O:  -1.61154565
+Mg: -0.00912097""")
     actual = make_chem_pot_diag_from_mp(target=Composition("Mg"),
                                         additional_elements=["O"],
-                                        atom_energy_yaml="pbesol",
+                                        atom_energy_yaml="tmp.yaml",
                                         vertex_elements=["Mg", "O"])
-    assert actual == cpd_corr
-    assert actual.vertex_elements == cpd_corr.vertex_elements
+    assert actual.vertex_elements == [Element.Mg, Element.O]
 
 
 def test_remove_higher_energy_comp():
@@ -89,9 +80,3 @@ def test_remove_higher_energy_comp():
                 CompositionEnergy(Composition('Mg1'), -10, "mp-3")]
     assert actual == expected
 
-"""
-TODO
-- Raise an error when the elements the MP does not support are given.
-
-DONE
-"""

@@ -13,30 +13,23 @@ from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagPlotly3DMplPlotter, \
     ChemPotDiagPlotly2DMplPlotter
 from pydefect.util.mp_tools import MpQuery
 from pymatgen import Composition, Element
-from vise.util.enum import ExtendedEnum
+from vise.atom_energies.atom_energy import mp_energies
 from vise.util.logger import get_logger
 
 parent = Path(__file__).parent
 logger = get_logger(__name__)
-
-mp_energies = loadfn(parent / "datasets/mp_vasp544_atom_energy.yaml")
-
-
-class AtomEnergyType(ExtendedEnum):
-    pbesol = "pbesol"
-    hse = "hse"
-
-    @property
-    def energies(self):
-        if self.pbesol:
-            return loadfn(parent / "datasets/vise_pbesol_vasp544_atom_energy.yaml")
 
 
 def make_chem_pot_diag_from_mp(target: Union[Composition, str],
                                additional_elements: List[str] = None,
                                vertex_elements: List[str] = None,
                                atom_energy_yaml: Optional[str] = None):
-    """Obtain the energies from Materials Project."""
+    """Obtain the energies from Materials Project.
+
+    When the atom_energy_yaml is provided, the total energies are aligned
+    via atom energies.
+
+    """
     properties = ["task_id", "full_formula", "final_energy"]
     target = target if isinstance(target, Composition) else Composition(target)
     elements = target.chemical_system.split("-")
@@ -47,11 +40,7 @@ def make_chem_pot_diag_from_mp(target: Union[Composition, str],
     query = MpQuery(elements, properties=properties)
     comp_es = []
     if atom_energy_yaml:
-        if ".yaml" in atom_energy_yaml:
-            energies = loadfn(atom_energy_yaml)
-        else:
-            logger.info(f"Atom energy set for {atom_energy_yaml} is used.")
-            energies = AtomEnergyType.from_string(atom_energy_yaml).energies
+        energies = loadfn(atom_energy_yaml)
         diff = {e: energies[e] - mp_energies[e] for e in elements}
     else:
         diff = None
@@ -65,6 +54,7 @@ def make_chem_pot_diag_from_mp(target: Union[Composition, str],
             Composition(m["full_formula"]), energy, m["task_id"]))
 
     comp_es = remove_higher_energy_comp(comp_es)
+
     return ChemPotDiag(comp_es, target, vertex_elements)
 
 
@@ -73,7 +63,7 @@ def remove_higher_energy_comp(comp_energies: List[CompositionEnergy]):
     for _, grouped_comp_energies in groupby(
             comp_energies, key=lambda x: x.composition.reduced_formula):
         result.append(min(list(grouped_comp_energies),
-                       key=lambda y: y.abs_energy_per_atom))
+                          key=lambda y: y.abs_energy_per_atom))
     return result
 
 
