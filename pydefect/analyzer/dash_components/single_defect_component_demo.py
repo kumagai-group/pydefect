@@ -8,10 +8,11 @@ from pathlib import Path
 import crystal_toolkit.components as ctc
 import dash
 import dash_html_components as html
-from ace.htmls.single_defect_component import SingleDefectComponent
 from monty.serialization import loadfn
 from pydefect.analyzer.dash_components.scenes_from_volumetric_data import \
     SceneDicts
+from pydefect.analyzer.dash_components.single_defect_component import \
+    SingleDefectComponent
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotlyPlotter
 from pydefect.corrections.site_potential_plotter import \
     SitePotentialPlotlyPlotter

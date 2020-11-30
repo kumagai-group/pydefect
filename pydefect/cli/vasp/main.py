@@ -349,10 +349,10 @@ def parse_args(args):
              "unitcell ones.")
     parser_energy.add_argument(
         "--no_label_line", dest="label_line", action="store_false",
-        help="")
+        help="Set the labels not to locate on the lines.")
     parser_energy.add_argument(
         "--no_add_charges", dest="add_charges", action="store_false",
-        help="")
+        help="Set the charges not to appear.")
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------
