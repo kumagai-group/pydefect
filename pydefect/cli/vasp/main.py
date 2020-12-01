@@ -39,7 +39,7 @@ def parse_args(args):
     dirs_parser = argparse.ArgumentParser(
         description="", add_help=False)
     dirs_parser.add_argument(
-        "-d", "--dirs", required=True, nargs="+", type=Path,
+        "-d", "--dirs", nargs="+", type=Path,
         help="Directory paths to be parsed.")
 
     # ++ parent parser: pcr
