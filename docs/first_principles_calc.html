@@ -160,23 +160,24 @@
 <h1>Tips for first-principles calculations for point defects<a class="headerlink" href="#tips-for-first-principles-calculations-for-point-defects" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="how-to-treat-symmetry-of-point-defects">
 <h2>1. How to treat symmetry of point defects<a class="headerlink" href="#how-to-treat-symmetry-of-point-defects" title="Permalink to this headline">¶</a></h2>
-<p>As mentioned in the <a class="reference internal" href="tutorial.html"><span class="doc">Tutorial of pydefect</span></a>, the neighboring atoms near the defect are initially slightly perturbed to break the symmetry.
-And, some defects tend to move back to the symmetric atomic configuration during the structure optimization.
-Some other defects might recover a part of symmetry operations.</p>
-<p>Even in these cases, the final structures do not look symmetric.
-When one wants to symmetrize the defect structure, use the following command.</p>
+<p>As mentioned in the <a class="reference internal" href="tutorial.html"><span class="doc">Tutorial of pydefect</span></a>, the neighboring atoms near the defect are
+initially slightly perturbed to break the symmetry.
+However, some defects tend to move back to the symmetric atomic configuration
+or recover a part of symmetry operations during the structure optimization.</p>
+<p>Even in these cases, it is not apparent that the final structures are symmetric.
+<code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> provides a script that allows for symmetrizing the defect structure,
+which is used as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>python $PYDEFECT_PATH/pydefect/cli/vasp/util_commands/make_refined_poscar.py
 </pre></div>
 </div>
-<p>which will create the symmetrized <code class="code docutils literal notranslate"><span class="pre">POSCAR</span></code> file if the structure is not the P1 symmetry.
-Then, the previous <code class="code docutils literal notranslate"><span class="pre">OUTCAR</span></code> and <code class="code docutils literal notranslate"><span class="pre">CONTCAR</span></code> are moved to
+<p>This command creates the symmetrized <code class="code docutils literal notranslate"><span class="pre">POSCAR</span></code> file if the structure is not the P1 symmetry.
+Then, the previous <code class="code docutils literal notranslate"><span class="pre">OUTCAR</span></code> and <code class="code docutils literal notranslate"><span class="pre">CONTCAR</span></code> are renamed to
 <code class="code docutils literal notranslate"><span class="pre">OUTCAR.sym_1</span></code> and:code:<cite>CONTCAR.sym_1</cite>, respectively.</p>
-<p>It is also possible to include the command in the runshell script as an example:</p>
+<p>It is also possible to include this command in the runshell script, e.g.,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$VASP_cmd
 
 hostname &gt; host
 name=`basename &quot;$PWD&quot;`
-echo $name
 if [ $name != &quot;perfect&quot; ]; then
     python $PYDEFECT_PATH/pydefect/cli/vasp/util_commands/make_refined_poscar.py
     if [ -e CONTCAR.sym_1 ]; then
@@ -188,16 +189,16 @@ fi
 </div>
 <div class="section" id="tips-for-hybrid-functional-calculations">
 <h2>2. Tips for hybrid functional calculations<a class="headerlink" href="#tips-for-hybrid-functional-calculations" title="Permalink to this headline">¶</a></h2>
-<p>Hybrid functionals, especially the HSE06 functional
+<p>Hybrid functionals, especially the HSE06 functional,
 and those with different exchange mixing parameters and/or screening distances,
-have been regularly used for point-defect calculations.</p>
-<p>Usually, calculations with a hybrid functional are a few tens more expensive
+have been regularly used for point-defect calculations recently.</p>
+<p>Usually, hybrid functional calculations are a few tens more expensive
 than those with a functional based on the local or semilocal density approximation.
 Therefore, we need to take a little ingenuity to reduce their computational costs.</p>
-<p>For this purpose, we regularly prepare the WAVECAR files obtained using GGA.
-(Although we also relax the atomic positions using GGA beforehand in some cases, it would be inappropriate for point-defect
-calculations, because site symmetry of a defect calculated by GGA could be different from that by hybrid functionals.
-Furthermore, electronic structures of defects could also be different.)</p>
+<p>For this purpose, we regularly prepare the WAVECAR files obtained using a GGA functional.
+(Although we can also relax the atomic positions using GGA beforehand,
+it could be inappropriate for point-defect calculations,
+because site symmetry of a defect calculated by GGA could be different from that by hybrid functionals.)</p>
 <p>One can create the INCAR file for generating WAVECAR files using the GGA with the following command, for instance.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">LHFCALC</span> <span class="n">INCAR</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">ALGO</span> <span class="o">|</span> <span class="n">sed</span> <span class="n">s</span><span class="o">/</span><span class="s2">&quot;NSW     =  50&quot;</span><span class="o">/</span><span class="s2">&quot;NSW     =   1&quot;</span><span class="o">/</span> <span class="o">&gt;</span> <span class="n">INCAR</span><span class="o">-</span><span class="n">pre</span>
 </pre></div>

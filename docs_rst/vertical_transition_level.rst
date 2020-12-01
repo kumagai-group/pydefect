@@ -8,9 +8,10 @@ here we call it the GKFO correction.
 Please read
 `T. Gake, Y. Kumagai*, C. Freysoldt, and F. Oba, Phys. Rev. B, 101, 020102(R) (2020).
 <link.aps.org/doi/10.1103/PhysRevB.101.020102>`_
+for details.
 
-Assuming that the typical defect calculations based on the PBEsol functional
-as introduced in the tutorial have been done already
+Assuming that the typical defect calculations in NaCl based on the PBEsol functional
+have been done already as introduced in the tutorial
 and one further wants to calculate the photo-absorption energy
 via Cl vacancy in the neutral charge state.
 
@@ -24,18 +25,17 @@ via Cl vacancy in the neutral charge state.
                  └ Va_Cl_0/ ── absorption/
 
 Firstly, create the :code:`absorption/` directory at the :code:`Va_Cl_0/`
-and copy the vasp input files.
-Then, edit :code:`INCAR` to change :code:`NSW` to 1 and add :code:`NELECT` with
-reducing it by 1, and run vasp.
-
+and copy the vasp input files from :code:`Va_Cl_0/`.
+Then, edit :code:`INCAR` to change :code:`NSW` to 1 and add the :code:`NELECT` tag with
+reducing it by 1 from the neutral one.
 Or one can type:
 
 ::
 
     vise vs -uis NSW 1 --options charge -1 -d ../ -t defect
 
-We then create :code:`calc_results.json` using the following command in the
-:code:`absorption/` directory.
+After running vasp, we then create :code:`calc_results.json`
+using the following command in the :code:`absorption/` directory.
 
 ::
 
@@ -72,13 +72,13 @@ of the electron and its alignment term.
 
 
 For the absorption energy, one needs to know the conduction band minimum position,
-which is now 4.7777. And the total energies of initial and final states are
--219.02114546 and -222.32750506.
+which is now 4.7777 eV. And the total energies of initial and final states are
+-219.02114546 eV and -222.32750506 eV.
 Therefore, the absorption energy is
 
 ::
 
-    -222.32750506+219.02114546+4.7777+0.583643 = 2.0549834
+    -222.32750506+219.02114546+4.7777+0.583643 = 2.0549834 eV
 
 It is also worthwhile to check the eigenvalues of initial and final states.
 Using the :code:`eig` sub-parser as follows,
