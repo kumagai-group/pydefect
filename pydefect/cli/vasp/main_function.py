@@ -283,8 +283,9 @@ def make_defect_formation_energy(args):
                                       loadfn(d / "correction.json")))
 
     defect_energies = make_defect_energies(single_energies)
-    defect_energies = slide_energy(defect_energies, args.unitcell.vbm)
+
     if args.print:
+        defect_energies = slide_energy(defect_energies, args.unitcell.vbm)
         print("         charge          E_f   correction    ")
         for e in defect_energies:
             print(e)
