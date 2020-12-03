@@ -43,9 +43,9 @@ class DefectEnergy:
         inner_cross_points = []
         for intersection in hs.intersections:
             x, y = np.round(intersection, 8)
-            if ef_min < x < ef_max:
+            if ef_min + 0.001 < x < ef_max - 0.001:
                 inner_cross_points.append([x - base_ef, y])
-            elif y > large_minus_number:
+            elif y > large_minus_number + 1:
                 boundary_points.append([x - base_ef, y])
 
         return CrossPoints(inner_cross_points, boundary_points)
