@@ -81,7 +81,7 @@ class DefectEnergyPlotter:
                 cp = de.cross_points(self._x_range[0], self._x_range[1])
                 xs, ys = cp.t_all_sorted_points
                 all_y.extend(ys)
-            self._y_range = min(all_y) - 0.2, max(all_y) + 0.2
+            self._y_range = [min(all_y) - 0.2, max(all_y) + 0.2]
 
         self._vline_threshold = vline_threshold
         self._x_unit = x_unit
@@ -95,7 +95,8 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
             title=f"Defect formation energy: {self._title}",
             xaxis_title=f"Fermi level ({self._x_unit})",
             yaxis_title=f"Energy ({self._y_unit})",
-            font_size=15,
+            title_font_size=30,
+            font_size=24,
             width=900, height=700)
 
         for de in self._defect_energies:
@@ -106,26 +107,39 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
                                      hovertemplate=
                                      f'{de.name}<br>' +
                                      'Charges %{text}<br>' +
-                                     'Energy: %{y:.2f}'))
+                                     'Energy: %{y:.2f}',
+                                     line_width=3,
+                                     marker_size=15))
 
         fig["layout"]["xaxis"]["range"] = [self._x_range[0] - 0.1,
                                            self._x_range[1] + 0.1]
         fig["layout"]["yaxis"]["range"] = self._y_range
 
-        kwargs = dict(y=self._y_range, line=dict(width=1, dash="dot"),
-                      showlegend=False, line_color="black")
+        kwargs = dict(y=self._y_range + [None] + self._y_range,
+                      line=dict(width=2, dash="dash"),
+                      line_color="black")
+        name = "supercell" if self._supercell_edge else "unitcell"
+        fig.add_trace(go.Scatter(
+            x=[self._x_range[0]]*2 + [None] + [self._x_range[1]]*2,
+            name=name, showlegend=True, **kwargs))
+
+        x = [None] * 5
         if self._supercell_edge:
             if self._vbm > self._supercell_vbm + self._vline_threshold:
-                fig.add_trace(go.Scatter(x=[self._vbm, self._vbm], **kwargs))
+                x[0], x[1] = self._vbm, self._vbm
             if self._cbm < self._supercell_cbm - self._vline_threshold:
-                fig.add_trace(go.Scatter(x=[self._cbm, self._cbm], **kwargs))
+                x[3], x[4] = self._cbm, self._cbm
         else:
             if self._supercell_vbm > self._vline_threshold:
-                fig.add_trace(go.Scatter(
-                    x=[self._supercell_vbm, self._supercell_vbm], **kwargs))
+                x[0], x[1] = self._supercell_vbm, self._supercell_vbm
             if self._supercell_cbm < self._x_range[1] - self._vline_threshold:
-                fig.add_trace(go.Scatter(
-                    x=[self._supercell_cbm, self._supercell_cbm], **kwargs))
+                x[3], x[4] = self._supercell_cbm, self._supercell_cbm
+
+        if len(set(x)) > 1:
+            kwargs["name"] = "unitcell" if self._supercell_edge else "supercell"
+            kwargs["line_color"] = "blue"
+            kwargs["line"]["dash"] = "dot"
+            fig.add_trace(go.Scatter(x=x, showlegend=True, **kwargs))
 
         return fig
 

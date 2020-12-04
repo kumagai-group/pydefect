@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from abc import abstractmethod, ABC
+from itertools import cycle
 from typing import Optional
 
 import numpy as np
+import plotly.express as px
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -248,7 +250,7 @@ class ChemPotDiagPlotly2DMplPlotter:
                                      text=[clean_formula(comp)],
                                      mode="text",
                                      textposition=pos,
-                                     textfont=dict(color="RoyalBlue", size=20),
+                                     textfont=dict(color="black", size=24),
                                      hoverinfo='skip'))
 
         if self.info.cpd.target:
@@ -259,7 +261,7 @@ class ChemPotDiagPlotly2DMplPlotter:
                 text.append(label)
             fig.add_trace(go.Scatter(x=x, y=y, text=text, mode='markers+text',
                                      textposition="bottom left",
-                                     textfont=dict(size=20),
+                                     textfont=dict(size=24),
                                      hovertemplate="<b>label %{text}</b><br>"
                                                    "energy (%{x:.2f}, %{y:.2f})"))
 
@@ -268,10 +270,11 @@ class ChemPotDiagPlotly2DMplPlotter:
         elements_str = [str(elem) for elem in self.info.cpd.vertex_elements]
         fig.update_layout(
             title=f"Chemical potential diagram of {'-'.join(elements_str)}",
-            xaxis_title=f"Chemical potential of {vertex_elements[0]}",
-            yaxis_title=f"Chemical potential of {vertex_elements[1]}",
+            xaxis_title=f"&#181;<sub>{vertex_elements[0]}</sub> (eV)",
+            yaxis_title=f"&#181;<sub>{vertex_elements[1]}</sub> (eV)",
             width=700, height=700,
-            font_size=15,
+            title_font_size=30,
+            font_size=24,
             showlegend=False)
 
         _range = [self.info.min_range, -self.info.min_range * 0.1]
@@ -288,7 +291,11 @@ class ChemPotDiagPlotly3DMplPlotter:
     @property
     def figure(self):
         data = []
+        color_cycle = cycle(px.colors.qualitative.Dark24)
+
         for comp, vertex_coords in self.info.comp_vertices.items():
+
+            color = next(color_cycle)
             vertex_coords = sort_coords(np.array(vertex_coords))
             x = [v[0] for v in vertex_coords]
             y = [v[1] for v in vertex_coords]
@@ -297,18 +304,21 @@ class ChemPotDiagPlotly3DMplPlotter:
             i = [0] * (n_vertices - 2)
             j = [x for x in range(1, n_vertices - 1)]
             k = [x for x in range(2, n_vertices)]
+            # add surface
             data.append(go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k,
-                                  alphahull=-1, opacity=0.3, hoverinfo='skip'))
+                                  alphahull=-1, opacity=0.3, hoverinfo='skip',
+                                  color=color))
 
             x_ave = sum(x) / len(vertex_coords)
             y_ave = sum(y) / len(vertex_coords)
             z_ave = sum(z) / len(vertex_coords)
 
+            # add formula
             data.append(go.Scatter3d(x=[x_ave], y=[y_ave], z=[z_ave],
                                      text=[clean_formula(comp)],
                                      mode="text",
                                      textposition="middle center",
-                                     textfont=dict(color="RoyalBlue", size=20),
+                                     textfont=dict(color=color, size=24),
                                      hoverinfo='skip'))
 
         if self.info.cpd.target:
@@ -320,7 +330,7 @@ class ChemPotDiagPlotly3DMplPlotter:
                 text.append(label)
             data.append(go.Scatter3d(x=x, y=y, z=z, text=text,
                                      mode='markers+text',
-                                     textfont=dict(size=20),
+                                     textfont=dict(size=24),
                                      hovertemplate="<b>label %{text}</b><br>"
                                                    "energy (%{x:.2f}, %{y:.2f})"))
 
@@ -332,9 +342,9 @@ class ChemPotDiagPlotly3DMplPlotter:
         fig.update_layout(
             title=f"Chemical potential diagram of {'-'.join(elements_str)}",
             scene=dict(
-                xaxis_title=f"Chemical potential of {vertex_elements[0]}",
-                yaxis_title=f"Chemical potential of {vertex_elements[1]}",
-                zaxis_title=f"Chemical potential of {vertex_elements[2]}",
+                xaxis_title=f"Chemical potential of {vertex_elements[0]} (eV)",
+                yaxis_title=f"Chemical potential of {vertex_elements[1]} (eV)",
+                zaxis_title=f"Chemical potential of {vertex_elements[2]} (eV)",
                 xaxis_range=_range,
                 yaxis_range=_range,
                 zaxis_range=_range,

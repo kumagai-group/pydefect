@@ -4,12 +4,13 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeStates
-from pydefect.analyzer.defect_energy import make_defect_energies, slide_energy
+from pydefect.analyzer.dash_components.cpd_energy_dash import \
+    CpdEnergyComponent, make_energies
+from pydefect.analyzer.defect_energy import slide_energy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state
-from pydefect.analyzer.make_defect_energy import make_single_defect_energy
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
     CompositionEnergy, replace_comp_energy
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagMpl2DMplPlotter, \
@@ -266,23 +267,51 @@ def make_edge_states(args):
 def make_defect_formation_energy(args):
     formula = args.perfect_calc_results.structure.composition.reduced_formula
     chem_pot_diag = ChemPotDiag.from_yaml(args.cpd_yaml)
-    abs_chem_pot = chem_pot_diag.abs_chem_pot_dict(args.label)
+    pcr = args.perfect_calc_results
 
-    title = " ".join([latexify(formula), "point", args.label])
-
-    single_energies = []
+    defects, defect_entries, corrections, edge_states = [], [], [], []
     for d in args.dirs:
-        if args.skip_shallow \
-                and BandEdgeStates.from_yaml(d / "band_edge_states.yaml").is_shallow:
-            continue
-        single_energies.append(
-            make_single_defect_energy(args.perfect_calc_results,
-                                      loadfn(d / "calc_results.json"),
-                                      loadfn(d / "defect_entry.json"),
-                                      abs_chem_pot,
-                                      loadfn(d / "correction.json")))
+        if args.skip_shallow:
+            edge_states = BandEdgeStates.from_yaml(d / "band_edge_states.yaml")
+            if edge_states.is_shallow:
+                continue
+        defects.append(loadfn(d / "calc_results.json"))
+        defect_entries.append(loadfn(d / "defect_entry.json"))
+        corrections.append(loadfn(d / "correction.json"))
 
-    defect_energies = make_defect_energies(single_energies)
+    if args.web_gui:
+        from crystal_toolkit.settings import SETTINGS
+        import dash_html_components as html
+        from crystal_toolkit.helpers.layouts import Column
+        import crystal_toolkit.components as ctc
+        import dash
+
+        edge_states = []
+        for d in args.dirs:
+            edge_states.append(BandEdgeStates.from_yaml(d / "band_edge_states.yaml"))
+
+        app = dash.Dash(__name__,
+                        suppress_callback_exceptions=True,
+                        assets_folder=SETTINGS.ASSETS_PATH,
+                        external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'])
+
+        cpd_plot_info = CpdPlotInfo(chem_pot_diag)
+        cpd_e_component = CpdEnergyComponent(cpd_plot_info,
+                                             pcr,
+                                             defects,
+                                             defect_entries,
+                                             corrections,
+                                             args.unitcell.vbm,
+                                             args.unitcell.cbm,
+                                             edge_states)
+        my_layout = html.Div([Column(cpd_e_component.layout)])
+        ctc.register_crystal_toolkit(app=app, layout=my_layout, cache=None)
+        app.run_server(port=args.port)
+        return
+
+    abs_chem_pot = chem_pot_diag.abs_chem_pot_dict(args.label)
+    title = " ".join([latexify(formula), "point", args.label])
+    defect_energies = make_energies(pcr, defects, defect_entries, corrections, abs_chem_pot)
 
     if args.print:
         defect_energies = slide_energy(defect_energies, args.unitcell.vbm)
@@ -304,8 +333,8 @@ def make_defect_formation_energy(args):
                                      defect_energies=defect_energies,
                                      vbm=args.unitcell.vbm,
                                      cbm=args.unitcell.cbm,
-                                     supercell_vbm=args.perfect_calc_results.vbm,
-                                     supercell_cbm=args.perfect_calc_results.cbm,
+                                     supercell_vbm=pcr.vbm,
+                                     supercell_cbm=pcr.cbm,
                                      y_range=args.y_range,
                                      supercell_edge=args.supercell_edge,
                                      label_line=args.label_line,

@@ -3,10 +3,15 @@
 from copy import deepcopy
 from dataclasses import dataclass
 from itertools import groupby
-from typing import List
+from typing import List, Dict, Optional
 
 import numpy as np
-from pymatgen import Element
+from pydefect.analyzer.band_edge_states import BandEdgeStates
+from pydefect.analyzer.calc_results import CalcResults
+from pydefect.corrections.abstract_correction import Correction
+from pydefect.corrections.manual_correction import NoCorrection
+from pydefect.input_maker.defect_entry import DefectEntry
+from pymatgen import Element, IStructure
 from scipy.spatial import HalfspaceIntersection
 
 
@@ -123,6 +128,54 @@ def make_defect_energies(single_energies: List[SingleDefectEnergy]
             energies.append(single_energy.energy)
             corrections.append(single_energy.correction)
         result.append(DefectEnergy(single_energy.name, charges, energies, corrections))
+    return result
+
+
+def make_energies(perfect: CalcResults,
+                  defects: List[CalcResults],
+                  defect_entries: List[DefectEntry],
+                  corrections: List[Correction],
+                  abs_chem_pot: Dict[Element, float],
+                  allow_shallow: bool = True,
+                  band_edges: List[BandEdgeStates] = None):
+
+    single_energies = []
+    for i, (d, e, c) in enumerate(zip(defects, defect_entries, corrections)):
+        if allow_shallow is False:
+            if band_edges[i].is_shallow:
+                continue
+        single_energies.append(
+            make_single_defect_energy(perfect, d, e, abs_chem_pot, c))
+    return make_defect_energies(single_energies)
+
+
+def make_single_defect_energy(perfect: CalcResults,
+                              defect: CalcResults,
+                              defect_entry: DefectEntry,
+                              abs_chem_pot: Dict[Element, float],
+                              correction: Optional[Correction] = NoCorrection()
+                              ) -> SingleDefectEnergy:
+    n_diffs = num_atom_differences(defect.structure, perfect.structure)
+    energy = (defect.energy - perfect.energy
+              + reservoir_energy(n_diffs, abs_chem_pot))
+    return SingleDefectEnergy(defect_entry.name, defect_entry.charge, energy,
+                              correction.correction_energy)
+
+
+def reservoir_energy(diffs: Dict[Element, int],
+                     abs_chem_pot: Dict[Element, float]) -> float:
+    return sum([-diff * abs_chem_pot[elem] for elem, diff in diffs.items()])
+
+
+def num_atom_differences(structure: IStructure,
+                         ref_structure: IStructure) -> Dict[Element, int]:
+    target_composition = structure.composition.as_dict()
+    reference_composition = ref_structure.composition.as_dict()
+    result = {}
+    for k in set(target_composition.keys()) | set(reference_composition.keys()):
+        n_atom_diff = int(target_composition[k] - reference_composition[k])
+        if n_atom_diff:
+            result[Element(k)] = n_atom_diff
     return result
 
 

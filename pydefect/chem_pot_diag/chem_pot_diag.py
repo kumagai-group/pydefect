@@ -176,11 +176,11 @@ class ChemPotDiag(MSONable):
 
             for ie in self.impurity_elements:
                 competing_comp_for_impurity, _ = self.impurity_abs_energy(ie, k)
-                comp_name = str(competing_comp_for_impurity.composition)
+                comp_name = competing_comp_for_impurity.composition.reduced_formula
                 result[-1].append(comp_name)
 
         columns = [f"mu_{e}" for e in self.vertex_elements]
-        columns += [f"Phase for {e}" for e in self.impurity_elements]
+        columns += [f"{e} competing phase" for e in self.impurity_elements]
         return pd.DataFrame(result, index=index, columns=columns)
 
     def __repr__(self):

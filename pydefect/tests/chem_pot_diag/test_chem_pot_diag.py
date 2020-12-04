@@ -27,12 +27,14 @@ def cpd():
 
 
 def test_print(cpd):
-    expected = """+----+--------+--------+----------------+
-|    |   mu_H |   mu_O | Phase for Cl   |
-|----+--------+--------+----------------|
-| A  |    0   |     -3 | O2 Cl2         |
-| B  |   -1.5 |      0 | O2 Cl1         |
-+----+--------+--------+----------------+"""
+    expected = """+----+--------+--------+----------------------+
+|    |   mu_H |   mu_O | Cl competing phase   |
+|----+--------+--------+----------------------|
+| A  |    0   |     -3 | ClO                  |
+| B  |   -1.5 |      0 | ClO2                 |
++----+--------+--------+----------------------+"""
+
+
     assert cpd.__repr__() == expected
 
 
@@ -136,8 +138,8 @@ def test_impurity_abs_energy(cpd):
 
 def test_vertex_list(cpd):
     index = ['A', 'B']
-    columns = ['mu_H', 'mu_O', 'Phase for Cl']
-    data = [[0.0, -3.0, 'O2 Cl2'], [-1.5, 0.0, 'O2 Cl1']]
+    columns = ['mu_H', 'mu_O', 'Cl competing phase']
+    data = [[0.0, -3.0, 'ClO'], [-1.5, 0.0, 'ClO2']]
     expected = pd.DataFrame(data, index=index, columns=columns)
     print(cpd.target_vertex_list_dataframe)
     pd.testing.assert_frame_equal(cpd.target_vertex_list_dataframe, expected)

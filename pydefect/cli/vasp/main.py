@@ -332,8 +332,7 @@ def parse_args(args):
         "-c", "--cpd_yaml", required=True, type=str,
         help="cpd.yaml file path.")
     parser_energy.add_argument(
-        "-l", "--label", required=True, type=str,
-        help="Label in cpd.pdf")
+        "-l", "--label", type=str, help="Label in cpd.pdf")
     parser_energy.add_argument(
         "-y", "--y_range", nargs=2, type=float,
         help="Energy range in y-axis")
@@ -353,6 +352,12 @@ def parse_args(args):
     parser_energy.add_argument(
         "--no_add_charges", dest="add_charges", action="store_false",
         help="Set the charges not to appear.")
+    parser_energy.add_argument(
+        "-wg", "--web_gui", action="store_true",
+        help="Show web GUI.")
+    parser_energy.add_argument(
+        "--port", type=int, default=8050,
+        help="Port for web GUI.")
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
     # ------------------------------------------------------------------------
