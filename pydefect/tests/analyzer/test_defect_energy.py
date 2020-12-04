@@ -100,7 +100,6 @@ def test_generate_defect_energies():
     assert actual == expected
 
 
-
 def test_slide_energy():
     energies = [DefectEnergy("Va_Mg1", [0], [0], [0]),
                 DefectEnergy("Va_O1", [1], [0], [0]),

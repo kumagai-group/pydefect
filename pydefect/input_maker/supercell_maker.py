@@ -25,8 +25,11 @@ class SupercellMaker:
         self.primitive_structure = primitive_structure
         symmetrizer = StructureSymmetrizer(primitive_structure)
         if primitive_structure != symmetrizer.primitive:
-            logger.warning(f"Input structure: {primitive_structure}")
-            logger.warning(f"Primitive structure:{symmetrizer.primitive}")
+            logger.warning(
+                f"Input lattice: {primitive_structure.lattice}",
+                f"Primitive structure lattice: {symmetrizer.primitive.lattice}",
+                f"Input structure: {primitive_structure}",
+                f"Primitive structure:{symmetrizer.primitive}")
             raise NotPrimitiveError
 
         self.sg = symmetrizer.sg_number
