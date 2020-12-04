@@ -331,6 +331,7 @@ def test_defect_formation_energy(mocker):
                               "-s",
                               "-p"
                               ])
+
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         perfect_calc_results=mock_calc_results,
@@ -343,5 +344,7 @@ def test_defect_formation_energy(mocker):
         supercell_edge=False,
         label_line=True,
         add_charges=True,
+        web_gui=False,
+        port=8050,
         func=parsed_args.func)
     assert parsed_args == expected
