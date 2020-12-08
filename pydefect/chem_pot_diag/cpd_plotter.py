@@ -8,11 +8,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from numpy import concatenate, clip, dot, arctan2
-from numpy.linalg import det
 from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo
 from pymatgen import Composition
 from pymatgen.util.string import latexify
+from vise.util.plotly_util import sort_coords, make_triangles
 
 
 class CpdMplSettings:
@@ -178,49 +177,6 @@ class ChemPotDiagMpl3DMplPlotter(ChemPotDiagMplPlotter):
         return [(f + 1.5) / 2.5 for f in atomic_fractions]
 
 
-def sort_coords(coords: np.ndarray) -> np.ndarray:
-    """Sort coordinates based on the angle with first coord from the center.
-
-    Args:
-        coords (np.ndarray):
-            Coordinates to be sorted. The format of coords is as follows.
-            np.array([[x1, y1, z1], [x2, y2, z2], [x3, y3, z3]]
-
-    Returns:
-        np.ndarray for sorted coordinates.
-    """
-    if len(coords[0]) != 3:
-        raise ValueError("Only valid for 3D vector")
-
-    center = np.average(coords, axis=0)
-    relative_coords = coords - center
-    external_prod = np.cross(relative_coords[0], relative_coords[1])
-    if abs(np.linalg.norm(external_prod)) < 1e-8:  # Skip parallel vectors.
-        external_prod = np.cross(relative_coords[0], relative_coords[2])
-    normal_to_12_plane = external_prod / np.linalg.norm(external_prod)
-
-    v0 = relative_coords[0] / np.linalg.norm(relative_coords[0])
-
-    def angle_between_v0(index: int) -> float:
-        """
-        Args:
-            index (int): index of coords.
-
-        Returns (float):
-            Angle between rays from the center to rel_coords[0] and
-            rel_coords[int].
-        """
-        v = relative_coords[index] / np.linalg.norm(relative_coords[index])
-        matrix = concatenate(([v0], [v], [normal_to_12_plane]), axis=0)
-        determinant = det(matrix)
-        angle = arctan2(clip(dot(v0, v), -1.0, 1.0), determinant)
-        return angle
-
-    indices = [i for i in range(len(coords))]
-    indices.sort(key=angle_between_v0)
-    return coords[indices]
-
-
 def transpose(target_list) -> list:
     return np.array(target_list).transpose().tolist()
 
@@ -297,21 +253,15 @@ class ChemPotDiagPlotly3DMplPlotter:
 
             color = next(color_cycle)
             vertex_coords = sort_coords(np.array(vertex_coords))
-            x = [v[0] for v in vertex_coords]
-            y = [v[1] for v in vertex_coords]
-            z = [v[2] for v in vertex_coords]
-            n_vertices = len(x)
-            i = [0] * (n_vertices - 2)
-            j = [x for x in range(1, n_vertices - 1)]
-            k = [x for x in range(2, n_vertices)]
             # add surface
-            data.append(go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k,
+            d = make_triangles(vertex_coords)
+            data.append(go.Mesh3d(**d,
                                   alphahull=-1, opacity=0.3, hoverinfo='skip',
                                   color=color))
 
-            x_ave = sum(x) / len(vertex_coords)
-            y_ave = sum(y) / len(vertex_coords)
-            z_ave = sum(z) / len(vertex_coords)
+            x_ave = sum(d["x"]) / len(vertex_coords)
+            y_ave = sum(d["y"]) / len(vertex_coords)
+            z_ave = sum(d["z"]) / len(vertex_coords)
 
             # add formula
             data.append(go.Scatter3d(x=[x_ave], y=[y_ave], z=[z_ave],
@@ -342,15 +292,16 @@ class ChemPotDiagPlotly3DMplPlotter:
         fig.update_layout(
             title=f"Chemical potential diagram of {'-'.join(elements_str)}",
             scene=dict(
-                xaxis_title=f"Chemical potential of {vertex_elements[0]} (eV)",
-                yaxis_title=f"Chemical potential of {vertex_elements[1]} (eV)",
-                zaxis_title=f"Chemical potential of {vertex_elements[2]} (eV)",
+                xaxis_title=f"{vertex_elements[0]} (eV)",
+                yaxis_title=f"{vertex_elements[1]} (eV)",
+                zaxis_title=f"{vertex_elements[2]} (eV)",
                 xaxis_range=_range,
                 yaxis_range=_range,
                 zaxis_range=_range,
             ),
             width=700, height=700,
             font_size=15,
+            title_font_size=30,
             showlegend=False)
 
         return fig

@@ -100,7 +100,8 @@ class SitePotentialPlotlyPlotter(SitePotentialPlotter):
             title="Potential",
             xaxis_title=f"Distance ({self._x_unit})",
             yaxis_title=f"Potential ({self._y_unit})",
-            font_size=15, width=700, height=500)
+            title_font_size=30,
+            font_size=24, width=800, height=700)
         all_distances = []
         pc_pot_distances = []
         all_potentials = []
@@ -140,10 +141,10 @@ class SitePotentialPlotlyPlotter(SitePotentialPlotter):
         fig["layout"]["yaxis"]["range"] = [min_y, max_y]
 
         fig.add_trace(go.Scatter(x=pc_pot_distances, y=pc_potentials,
-                                 name="PC potential", marker_symbol="diamond",
+                                 name="PC", marker_symbol="diamond",
                                  **common))
         fig.add_trace(go.Scatter(x=pc_pot_distances, y=potential_diffs,
-                                 name="Potential diff", marker_symbol="cross",
+                                 name="Diff", marker_symbol="cross",
                                  **common))
 
         fig.add_shape(dict(type="line",

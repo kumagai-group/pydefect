@@ -99,7 +99,7 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
             font_size=24,
             width=900, height=700)
 
-        for de in self._defect_energies:
+        for de in sanitize_defect_energies_for_plot(self._defect_energies, for_plotly=True):
             cp = de.cross_points(self._x_range[0], self._x_range[1])
             xs, ys = cp.t_all_sorted_points
             fig.add_trace(go.Scatter(x=xs, y=ys, name=de.name,

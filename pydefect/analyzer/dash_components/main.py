@@ -14,7 +14,7 @@ from pydefect.analyzer.dash_components.scenes_from_volumetric_data import \
     SceneDicts
 from pydefect.analyzer.dash_components.single_defect_component import \
     SingleDefectComponent
-from pydefect.analyzer.dash_components.supercell_component import \
+from ace.htmls.components.supercell_component import \
     SupercellComponent
 from pydefect.analyzer.eigenvalue_plotter import EigenvaluePlotlyPlotter
 from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo, ChemPotDiag

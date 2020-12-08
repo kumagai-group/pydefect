@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+import re
 from copy import deepcopy
 from dataclasses import dataclass
 from itertools import groupby
@@ -13,6 +14,7 @@ from pydefect.corrections.manual_correction import NoCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import Element, IStructure
 from scipy.spatial import HalfspaceIntersection
+import dash_html_components as html
 
 
 @dataclass
@@ -142,7 +144,7 @@ def make_energies(perfect: CalcResults,
     single_energies = []
     for i, (d, e, c) in enumerate(zip(defects, defect_entries, corrections)):
         if allow_shallow is False:
-            if band_edges[i].is_shallow:
+            if band_edges and band_edges[i].is_shallow:
                 continue
         single_energies.append(
             make_single_defect_energy(perfect, d, e, abs_chem_pot, c))
@@ -206,7 +208,44 @@ def defect_mpl_name(name):
     return f"${in_name}_{out_name}$"
 
 
-def sanitize_defect_energies_for_plot(defect_energies: List[DefectEnergy]):
+def defect_plotly_name(name):
+    in_name, out_name = name.split("_")
+    if in_name == "Va":
+        in_name = "<i>V</i>"
+
+    out_name = f"<sub>{out_name}</sub>"
+    return f"{in_name}{out_name}"
+
+
+def defect_plotly_full_name(fullname):
+    in_name, out_name, charge = fullname.split("_")
+    if in_name == "Va":
+        in_name = "<i>V</i>"
+    return f"{in_name}<sub>{out_name}</sub><sup>{charge}</sup>"
+
+
+def defect_html_title_name(fullname):
+    x = fullname.split("_")
+    if len(x) == 2:
+        in_name, out_name = x
+    elif len(x) == 3:
+        in_name, out_name, charge = x
+    else:
+        raise ValueError
+
+    if in_name == "Va":
+        in_name = html.I("V")
+    else:
+        in_name = html.Span(in_name)
+
+    result = [in_name, html.Sub(out_name)]
+    if len(x) == 3:
+        result.append(html.Sup(charge))
+    return result
+
+
+def sanitize_defect_energies_for_plot(defect_energies: List[DefectEnergy],
+                                      for_plotly: bool = False):
     result = []
     out_names = [e.name.split("_")[1] for e in defect_energies]
 
@@ -215,7 +254,10 @@ def sanitize_defect_energies_for_plot(defect_energies: List[DefectEnergy]):
         in_name, out_name = e.name.split("_")
         r_out_name = remove_digits(out_name)
         out_name = r_out_name if f"{r_out_name}2" not in out_names else out_name
-        ee.name = defect_mpl_name("_".join([in_name, out_name]))
+        if for_plotly:
+            ee.name = defect_plotly_name("_".join([in_name, out_name]))
+        else:
+            ee.name = defect_mpl_name("_".join([in_name, out_name]))
         result.append(ee)
 
     return result

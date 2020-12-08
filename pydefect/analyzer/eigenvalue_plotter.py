@@ -78,6 +78,8 @@ class EigenvaluePlotter:
                     x_label.append("0")
                 else:
                     x_label.append(f"{frac.numerator}/{frac.denominator}")
+            if x_label == ["0", "0", "0"]:
+                result.append("Γ")
             result.append(line_break.join(x_label))
         return result
 
@@ -91,11 +93,14 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
                             subplot_titles=["up", "down"],
 #                            x_title="K-points",
                             )
+        for i in fig['layout']['annotations']:
+            i['font'] = dict(size=24)
 
         fig.update_layout(
             title="Eigenvalues",
             yaxis_title="Energy (eV)",
-            font_size=15, width=500, height=500,
+            title_font_size=30,
+            font_size=24, width=700, height=700,
             showlegend=False)
 
         common = {"mode": "markers", "marker_size": 10}
@@ -154,7 +159,7 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
 
                 fig.update_xaxes(tickvals=list(range(len(self._kpt_coords))),
                                  ticktext=self._x_labels(line_break="<br>"),
-                                 tickfont_size=15,
+                                 tickfont_size=24,
                                  row=1, col=spin_idx)
         return fig
 

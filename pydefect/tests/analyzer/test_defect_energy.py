@@ -7,7 +7,8 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import (
     DefectEnergy, CrossPoints, SingleDefectEnergy, make_defect_energies,
     defect_mpl_name, slide_energy, sanitize_defect_energies_for_plot,
-    make_single_defect_energy, reservoir_energy, num_atom_differences)
+    make_single_defect_energy, reservoir_energy, num_atom_differences,
+    defect_plotly_name)
 from pydefect.corrections.manual_correction import ManualCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import IStructure, Lattice, Element
@@ -83,6 +84,10 @@ def test_defect_mpl_name():
     assert defect_mpl_name(name="Mg_i1") == "${\\rm Mg}_{i1}$"
 
 
+def test_defect_plotly_name():
+    assert defect_plotly_name(name="Va_O1") == "<i>V</i><sub>O1</sub>"
+
+
 def test_generate_defect_energies():
     energies = [DefectEnergy("Va_Mg1", [0], [0], [0]),
                 DefectEnergy("Va_O1", [0], [0], [0]),
@@ -102,6 +107,13 @@ def test_generate_defect_energies():
     actual = sanitize_defect_energies_for_plot(energies)
     expected = [DefectEnergy("${\\rm Mg}_{i1}$", [0], [0], [0]),
                 DefectEnergy("${\\rm Mg}_{i2}$", [0], [0], [0])]
+    assert actual == expected
+
+    energies = [DefectEnergy("Mg_i1", [0], [0], [0]),
+                DefectEnergy("Mg_i2", [0], [0], [0]),]
+    actual = sanitize_defect_energies_for_plot(energies, for_plotly=True)
+    expected = [DefectEnergy("Mg<sub>i1</sub>", [0], [0], [0]),
+                DefectEnergy("Mg<sub>i2</sub>", [0], [0], [0])]
     assert actual == expected
 
 

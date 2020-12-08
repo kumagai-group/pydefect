@@ -77,5 +77,5 @@ def test_plotly_2d(cpd_plot_info_2d):
 def test_plotly_3d(cpd_3d_info):
     plotter = ChemPotDiagPlotly3DMplPlotter(cpd_3d_info)
     fig = plotter.figure
-    # fig.show()
-    show_png(fig)
+    fig.show()
+    # show_png(fig)
