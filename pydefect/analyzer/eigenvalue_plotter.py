@@ -80,7 +80,8 @@ class EigenvaluePlotter:
                     x_label.append(f"{frac.numerator}/{frac.denominator}")
             if x_label == ["0", "0", "0"]:
                 result.append("Γ")
-            result.append(line_break.join(x_label))
+            else:
+                result.append(line_break.join(x_label))
         return result
 
 
