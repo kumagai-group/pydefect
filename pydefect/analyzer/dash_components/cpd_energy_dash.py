@@ -99,7 +99,7 @@ class CpdEnergyComponent(MPComponent):
             else:
                 fig = ChemPotDiagPlotly3DMplPlotter(self.cpd_plot_info).figure
             cpd = dcc.Graph(id="cpd", figure=fig)
-            energy = dcc.Graph(id="energy")
+            energy = dcc.Graph(id=self.id('energy'))
             return {"cpd": cpd, "energy": energy, "allow_shallow": allow_shallow}
         else:
             d = [{"label": v, "value": v}
@@ -109,7 +109,7 @@ class CpdEnergyComponent(MPComponent):
                 state={"label": "A", "value": "A"},
                 label="Equilibrium label",
                 options=d)
-            energy = dcc.Graph(id="energy")
+            energy = dcc.Graph(id=self.id('energy'))
             return {"cpd_label": cpd_label, "energy": energy, "allow_shallow": allow_shallow}
 
     @property
@@ -130,7 +130,7 @@ class CpdEnergyComponent(MPComponent):
     def generate_callbacks(self, app, cache):
         if self.dim in [2, 3]:
             @app.callback(
-                Output('energy', 'figure'),
+                Output(self.id('energy'), 'figure'),
                 [Input('cpd', 'clickData'),
                  Input(self.get_kwarg_id('allow_shallow'), 'value')])
             def display_cpd(click_data, allow_shallow):
@@ -140,7 +140,7 @@ class CpdEnergyComponent(MPComponent):
                 return self.energy_fig(abs_chem_pot, label, allow_shallow)
         else:
             @app.callback(
-                Output('energy', 'figure'),
+                Output(self.id('energy'), 'figure'),
                 [Input(self.get_kwarg_id("label"), "value"),
                  Input(self.get_kwarg_id('allow_shallow'), 'value')])
             def display_cpd(label, allow_shallow):

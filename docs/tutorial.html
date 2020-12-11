@@ -185,7 +185,7 @@ so as to save time and reduce mistakes.</p>
 <img alt="_images/flowchart.png" src="_images/flowchart.png" />
 <p>Here, we suppose the following directory tree.
 The <code class="code docutils literal notranslate"><span class="pre">&lt;project_name&gt;</span></code> is usually the target material name with the
-crystal structure if needed, e.g., rutile-TiO <sub>2</sub>.</p>
+crystal structure if needed, e.g., rutile-TiO<sub>2</sub>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;project_name&gt;
  │
  ├ pydefect.yaml
@@ -338,7 +338,7 @@ which is useful for determining the first-principles calculation conditions.</p>
 <code class="code docutils literal notranslate"><span class="pre">Vise</span></code> parses the <code class="code docutils literal notranslate"><span class="pre">prior_info.yaml</span></code>
 and determines the k-point density in <code class="code docutils literal notranslate"><span class="pre">KPOINTS</span></code>
 and spin polarization via <code class="code docutils literal notranslate"><span class="pre">ISPIN</span></code> tag in <code class="code docutils literal notranslate"><span class="pre">INCAR</span></code>.</p>
-<p>Note that O <sub>2</sub>, H <sub>2</sub>, N <sub>2</sub>, NH <sub>3</sub>, and NO <sub>2</sub> molecules
+<p>Note that O<sub>2</sub>, H<sub>2</sub>, N<sub>2</sub>, NH<sub>3</sub>, and NO<sub>2</sub> molecules
 are not retrieved from MP but created by <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code>
 since these molecules have been calculated as solids in MP,
 which could be inadequate for competing phases for the defect calculations.</p>
@@ -409,7 +409,7 @@ from the Materials Project database.
 To do this, however, one needs to prepare atom energies
 that are needed to align the element energy standards.</p>
 <p>With <code class="code docutils literal notranslate"><span class="pre">vise</span></code>, we can easily prepare atom calculation directories.
-Here, we show an example of BaSnO <sub>3</sub>:</p>
+Here, we show an example of BaSnO<sub>3</sub>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vise</span> <span class="nb">map</span> <span class="o">-</span><span class="n">e</span> <span class="n">K</span> <span class="n">Al</span> <span class="n">Si</span> <span class="n">O</span>
 </pre></div>
 </div>
@@ -492,11 +492,11 @@ If we want to add dopants, we can type as follows:</p>
 <p>1. The antisites and substituted defects are determined from the difference of the electronegativity between the substituted and removed atoms.
 Default max difference is written in <code class="code docutils literal notranslate"><span class="pre">defaults.py</span></code>, but you can change it via <code class="code docutils literal notranslate"><span class="pre">pydefect.yaml</span></code> as mentioned above.</p>
 <p>2. The oxidation states determine the defect charge states.
-For instance, the vacancies (interstitials) of Sn <sup>2+</sup> may take 0, -(+)1, or -(+)2,
-while those of Sn <sup>4+</sup> between 0 and -(+)4 charge states.
+For instance, the vacancies (interstitials) of Sn<sup>2+</sup> may take 0, -(+)1, or -(+)2,
+while those of Sn<sup>4+</sup> between 0 and -(+)4 charge states.
 For the antisites and substituted defects,
 <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> considers all the possible combinations of vacancies and interstitials.
-So, for example, Sn <sup>2+</sup> -on-S <sup>2-</sup> takes 0, +1, +2, +3, and +4 charge states.
+So, for example, Sn<sup>2+</sup> -on-S<sup>2-</sup> takes 0, +1, +2, +3, and +4 charge states.
 The oxidation states are determined using the <code class="code docutils literal notranslate"><span class="pre">oxi_state_guesses</span></code> method of
 <code class="code docutils literal notranslate"><span class="pre">Composition</span></code> class in <code class="code docutils literal notranslate"><span class="pre">pymatgen</span></code>.
 The users can also manually set the oxidation states as follows:</p>
@@ -531,11 +531,11 @@ while there are a couple of procedures that recommend the interstitial sites.
 However, it is generally not an easy task to speculate the most likely interstitial sites
 because they depend on the substituted element.</p>
 <p>The largest vacant space should be most likely interstitial sites
-for positively charged cations with closed shells are substituted (e.g., Mg <sup>2+</sup>, Al <sup>3+</sup>),
+for positively charged cations with closed shells are substituted (e.g., Mg<sup>2+</sup>, Al<sup>3+</sup>),
 as they tend not to make strong bonding with other atoms.
-On the other hand, a proton (H <sup>+</sup>) prefers to locate near O <sup>2-</sup> or N <sup>3-</sup>
+On the other hand, a proton (H<sup>+</sup>) prefers to locate near O<sup>2-</sup> or N<sup>3-</sup>
 to form the strong O-H or N-H bonding.
-Conversely, a hydride ion (H <sup>-</sup>) should prefer to locate at very much different places.
+Conversely, a hydride ion (H<sup>-</sup>) should prefer to locate at very much different places.
 Therefore, we need to carefully determine the interstitial sites.</p>
 <p><code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> holds a utility that recommends the interstitial sites based on
 the all electron charge density in the unitcell
@@ -626,11 +626,11 @@ you can modify the <code class="code docutils literal notranslate"><span class="
 <div class="section" id="generation-of-defect-entry-json">
 <h2>8. Generation of defect_entry.json<a class="headerlink" href="#generation-of-defect-entry-json" title="Permalink to this headline">¶</a></h2>
 <p>Sometimes, one may want to treat complex defects.
-For instance, O <sub>2</sub> molecules act as anions in MgO <sub>2</sub>,
-where O <sub>2</sub> molecule vacancies are able to exist.
+For instance, O<sub>2</sub> molecules act as anions in MgO<sub>2</sub>,
+where O<sub>2</sub> molecule vacancies are able to exist.
 Other important examples are the methylammonium lead halides (MAPI),
 where methylammonium ions acts
-as singly positive cations (CH <sub>3</sub> NH <sub>3</sub> <sup>+</sup>), and DX centers,
+as singly positive cations (CH<sub>3</sub>NH<sub>3</sub><sup>+</sup>), and DX centers,
 where anion vacancies and interstitial cations coexist.</p>
 <p>In these cases, one needs to prepare the input files and runs the vasp calculations by oneself.
 However, <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> necessitates the <code class="code docutils literal notranslate"><span class="pre">defect_entry.json</span></code> file for the postprocess,

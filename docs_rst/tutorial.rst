@@ -24,7 +24,7 @@ so as to save time and reduce mistakes.
 
 Here, we suppose the following directory tree.
 The :code:`<project_name>` is usually the target material name with the
-crystal structure if needed, e.g., rutile-TiO :sub:`2`.
+crystal structure if needed, e.g., rutile-TiO\ :sub:`2`.
 
 ::
 
@@ -137,6 +137,13 @@ and type the following command in each directory,
 
 
 :code:`Vise` also provides the plotters for BS and DOS.
+If one wants to be recommended the interstitial sites from charge density,
+add the following argument to the DOS calculation.
+
+:
+
+    --user_incar_settings LCHARG True
+
 See the `document of vise <https://kumagai-group.github.io/vise/>`_ for details.
 
 ============================================================================
@@ -212,7 +219,7 @@ which means Mg is a non-magnetic metallic system.
 and determines the k-point density in :code:`KPOINTS`
 and spin polarization via :code:`ISPIN` tag in :code:`INCAR`.
 
-Note that O :sub:`2`, H :sub:`2`, N :sub:`2`, NH :sub:`3`, and NO :sub:`2` molecules
+Note that O\ :sub:`2`, H\ :sub:`2`, N\ :sub:`2`, NH\ :sub:`3`, and NO\ :sub:`2` molecules
 are not retrieved from MP but created by :code:`pydefect`
 since these molecules have been calculated as solids in MP,
 which could be inadequate for competing phases for the defect calculations.
@@ -302,7 +309,7 @@ To do this, however, one needs to prepare atom energies
 that are needed to align the element energy standards.
 
 With :code:`vise`, we can easily prepare atom calculation directories.
-Here, we show an example of BaSnO :sub:`3`:
+Here, we show an example of BaSnO\ :sub:`3`:
 
 ::
 
@@ -410,11 +417,11 @@ There are some tips related to :code:`supercell_info.json` and :code:`defect_in.
 Default max difference is written in :code:`defaults.py`, but you can change it via :code:`pydefect.yaml` as mentioned above.
 
 2. The oxidation states determine the defect charge states.
-For instance, the vacancies (interstitials) of Sn :sup:`2+` may take 0, -(+)1, or -(+)2,
-while those of Sn :sup:`4+` between 0 and -(+)4 charge states.
+For instance, the vacancies (interstitials) of Sn\ :sup:`2+` may take 0, -(+)1, or -(+)2,
+while those of Sn\ :sup:`4+` between 0 and -(+)4 charge states.
 For the antisites and substituted defects,
 :code:`pydefect` considers all the possible combinations of vacancies and interstitials.
-So, for example, Sn :sup:`2+` -on-S :sup:`2-` takes 0, +1, +2, +3, and +4 charge states.
+So, for example, Sn\ :sup:`2+` -on-S\ :sup:`2-` takes 0, +1, +2, +3, and +4 charge states.
 The oxidation states are determined using the :code:`oxi_state_guesses` method of
 :code:`Composition` class in :code:`pymatgen`.
 The users can also manually set the oxidation states as follows:
@@ -459,11 +466,11 @@ However, it is generally not an easy task to speculate the most likely interstit
 because they depend on the substituted element.
 
 The largest vacant space should be most likely interstitial sites
-for positively charged cations with closed shells are substituted (e.g., Mg :sup:`2+`, Al :sup:`3+`),
+for positively charged cations with closed shells are substituted (e.g., Mg\ :sup:`2+`, Al\ :sup:`3+`),
 as they tend not to make strong bonding with other atoms.
-On the other hand, a proton (H :sup:`+`) prefers to locate near O :sup:`2-` or N :sup:`3-`
+On the other hand, a proton (H\ :sup:`+`) prefers to locate near O\ :sup:`2-` or N\ :sup:`3-`
 to form the strong O-H or N-H bonding.
-Conversely, a hydride ion (H :sup:`-`) should prefer to locate at very much different places.
+Conversely, a hydride ion (H\ :sup:`-`) should prefer to locate at very much different places.
 Therefore, we need to carefully determine the interstitial sites.
 
 :code:`pydefect` holds a utility that recommends the interstitial sites based on
@@ -583,11 +590,11 @@ you can modify the :code:`defect_in.yaml` and type the :code:`de` option again.
 8. Generation of defect_entry.json
 ====================================
 Sometimes, one may want to treat complex defects.
-For instance, O :sub:`2` molecules act as anions in MgO :sub:`2`,
-where O :sub:`2` molecule vacancies are able to exist.
+For instance, O\ :sub:`2` molecules act as anions in MgO\ :sub:`2`,
+where O\ :sub:`2` molecule vacancies are able to exist.
 Other important examples are the methylammonium lead halides (MAPI),
 where methylammonium ions acts
-as singly positive cations (CH :sub:`3` NH :sub:`3` :sup:`+`), and DX centers,
+as singly positive cations (CH\ :sub:`3`\ NH\ :sub:`3`\ :sup:`+`), and DX centers,
 where anion vacancies and interstitial cations coexist.
 
 In these cases, one needs to prepare the input files and runs the vasp calculations by oneself.
@@ -615,7 +622,15 @@ for analyzing the defect calculations in progress.
 ==========================================
 Then, let's run the vasp calculations.
 
-We recommend the users to use the Gamma version of vasp
+To create the vasp input files, type
+
+::
+
+    for i in */;do cd $i; vise vs -t defect ; cd ../;done
+
+Do not forget to add :code:`-t defect`, to create the input files for defects.
+
+When running the vasp, We recommend the users to use the Gamma-only vasp
 if the k point is sampled only at the Gamma point for large supercells.
 
 After (partly) finishing the vasp calculations,
