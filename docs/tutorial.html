@@ -170,14 +170,14 @@
 <h1>Tutorial of pydefect<a class="headerlink" href="#tutorial-of-pydefect" title="Permalink to this headline">¶</a></h1>
 <p>This page illustrates how to use the <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> code.</p>
 <p><strong>Note1: Pydefect now supports only the vienna ab-initio simulation package (VASP),
-so we suppose its input and output file names (e.g., POSCAR, POTCAR, OUTCAR)
+so we suppose its input and output file names (e.g., POSCAR, POTCAR, OUTCAR),
 and computational techniques (e.g., periodic boundary condition) used in VASP.</strong></p>
 <p><strong>Note2: Units used in pydefect are eV for energy and Angstrom for length
 following the vasp convention.</strong></p>
 <p><strong>Note3: Only nonmagnetic host materials are supposed.</strong></p>
 <p>Workflow of a point-defect calculation in a non-metallic solid is shown below.
 One can see some tasks are performed concurrently, while others must follow some tasks.
-Usually, the processes are very intricate as shown below and time consuming
+Usually, the processes are very intricate and time consuming
 and researchers are prone to make some mistakes.
 The main purpose of <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> is to provide the researchers
 with automation of the point-defect calculation processes
@@ -212,8 +212,9 @@ with an example of MgSe calculated using the PBEsol functional.</p>
 <div class="section" id="relaxation-of-the-unit-cell">
 <h2>1. Relaxation of the unit cell<a class="headerlink" href="#relaxation-of-the-unit-cell" title="Permalink to this headline">¶</a></h2>
 <p>Point-defect calculations are generally performed at theoretically relaxed
-lattice constants under the given functional and projector augmented wave (PAW) potentials,
-as it avoids the artificial strain and stress
+structure under the given functional
+and projector augmented wave (PAW) potentials,
+as it is free from artificial strain and stress
 that is responsible for the unwanted supercell size dependency.
 Therefore, one usually begins with optimizing lattice constants
 and fractional coordinates of atomic positions in the unitcell.</p>
@@ -222,10 +223,10 @@ and create <code class="code docutils literal notranslate"><span class="pre">uni
 sub-directory ( <code class="code docutils literal notranslate"><span class="pre">mkdir</span> <span class="pre">-p</span> <span class="pre">unitcell/structure_opt/</span></code>) and move there.
 (In this tutorial, the name with <code class="code docutils literal notranslate"><span class="pre">/</span></code> at the end means a directory.)
 When <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> needs to construct the vasp input files,
-namely  <code class="code docutils literal notranslate"><span class="pre">INCAR</span></code>,  <code class="code docutils literal notranslate"><span class="pre">POTCAR</span></code>,  <code class="code docutils literal notranslate"><span class="pre">KPOINTS</span></code> files,
+namely <code class="code docutils literal notranslate"><span class="pre">INCAR</span></code>, <code class="code docutils literal notranslate"><span class="pre">POTCAR</span></code>, <code class="code docutils literal notranslate"><span class="pre">KPOINTS</span></code> files,
 we use <a class="reference external" href="https://kumagai-group.github.io/vise/">vise</a>
 (= <code class="code docutils literal notranslate"><span class="pre">vasp</span> <span class="pre">integrated</span> <span class="pre">supporting</span> <span class="pre">environment</span></code>) code,
-which can generate the input files for various tasks and exchange-correlation (XC) functionals.
+which generates the input files for various tasks and exchange-correlation (XC) functionals.
 <code class="code docutils literal notranslate"><span class="pre">Vise</span></code> relies on the <a class="reference external" href="http://pymatgen.org">pymatgen</a>, and
 therefore, as shown <a class="reference external" href="https://pymatgen.org/usage.html">pymatgen web page 1</a> or
 <a class="reference external" href="https://pymatgen.org/_modules/pymatgen/io/vasp/inputs.html">2</a>,
@@ -259,25 +260,25 @@ One can always refer its help with the <code class="code docutils literal notran
 cutoff energy until the forces and stresses converge at the first ionic step.
 See, <a class="reference external" href="https://www.vasp.at/wiki/index.php/Energy_vs_volume_Volume_relaxations_and_Pulay_stress">vasp manual</a> for details.
 Such iteration of the vasp calculations is not supported by <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code>,
-but one can easily write the simple runshell scripts to do so.</p>
+but one can easily write the simple runshell script to do so.</p>
 <p>In <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code>, users can control various default parameters
 as <code class="code docutils literal notranslate"><span class="pre">vise.yaml</span></code> file in <code class="code docutils literal notranslate"><span class="pre">vise</span></code>.
-See the <a class="reference external" href="https://kumagai-group.github.io/vise/">document of vise</a> for details.</p>
+See the <a class="reference external" href="https://kumagai-group.github.io/vise/">document of vise</a> for details.
+The controllable parameters are shown in <code class="code docutils literal notranslate"><span class="pre">defaults.py</span></code> in <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code>.</p>
 </div>
 <div class="section" id="calculation-of-band-dos-and-dielectric-tensor">
 <h2>2. Calculation of band, DOS, and dielectric tensor<a class="headerlink" href="#calculation-of-band-dos-and-dielectric-tensor" title="Permalink to this headline">¶</a></h2>
-<p>We then calculate the band structure (BS), density of states (DOS), and dielectric constant.
-In the defect calculations, the BS and DOS are used for determining
+<p>We then calculate the band structure (BS), density of states (DOS), and dielectric constants.
+In the defect calculations, the BS is used for determining
 the valence band maximum (VBM) and conduction band minimum (CBM),
 while the static dielectric constant, or a sum of ion-clamped and ionic dielectric tensors,
 is needed for correcting the defect formation energies.</p>
 <p>First, we create <code class="code docutils literal notranslate"><span class="pre">band/</span></code>, <code class="code docutils literal notranslate"><span class="pre">dos/</span></code> and <code class="code docutils literal notranslate"><span class="pre">dielectric/</span></code> in <code class="code docutils literal notranslate"><span class="pre">unitcell/</span></code>
 and copy <code class="code docutils literal notranslate"><span class="pre">POSCAR</span></code> from <code class="code docutils literal notranslate"><span class="pre">unitcell/structure_opt/</span></code>
 and type the following command in each directory,</p>
-<p>:</p>
-<blockquote>
-<div><p>vise vs -x pbesol -t &lt;band, dos or dielectric_dfpt&gt;</p>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vise</span> <span class="n">vs</span> <span class="o">-</span><span class="n">x</span> <span class="n">pbesol</span> <span class="o">-</span><span class="n">t</span> <span class="o">&lt;</span><span class="n">band</span><span class="p">,</span> <span class="n">dos</span> <span class="ow">or</span> <span class="n">dielectric_dfpt</span><span class="o">&gt;</span>
+</pre></div>
+</div>
 <p><code class="code docutils literal notranslate"><span class="pre">Vise</span></code> also provides the plotters for BS and DOS.
 See the <a class="reference external" href="https://kumagai-group.github.io/vise/">document of vise</a> for details.</p>
 </div>
@@ -299,6 +300,16 @@ sub-command to generate readable command line output from json files, which can 
 </div>
 <p>where the unitcell information is shown as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Unitcell</span><span class="p">(</span><span class="n">vbm</span><span class="o">=</span><span class="mf">0.5461</span><span class="p">,</span> <span class="n">cbm</span><span class="o">=</span><span class="mf">3.0807</span><span class="p">,</span> <span class="n">ele_dielectric_const</span><span class="o">=</span><span class="p">[[</span><span class="mf">4.645306</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.645306</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.645306</span><span class="p">]],</span> <span class="n">ion_dielectric_const</span><span class="o">=</span><span class="p">[[</span><span class="mf">2.584237</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.584192</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.584151</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>Users sometimes want to set the unitcell parameters by hands.
+In such cases, set parameters using the python script or ipython, and dump the yaml file as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">pydefect.analyzer.unitcell</span> <span class="kn">import</span> <span class="n">Unitcell</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">u</span> <span class="o">=</span> <span class="n">Unitcell</span><span class="p">(</span><span class="n">vbm</span><span class="o">=</span><span class="mf">3.0675</span><span class="p">,</span><span class="n">cbm</span><span class="o">=</span><span class="mf">7.7262</span><span class="p">,</span> <span class="n">ele_dielectric_const</span><span class="o">=</span><span class="p">[[</span><span class="mf">3.157296</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mf">3.157296</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">3.157296</span><span class="p">]],</span> <span class="n">ion_dielectric_const</span><span class="o">=</span><span class="p">[[</span><span class="mf">6.811496</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+   <span class="o">...</span><span class="p">:</span> <span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">6.811496</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">6.811496</span><span class="p">]])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">u</span><span class="o">.</span><span class="n">to_json_file</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -326,7 +337,7 @@ Here, we obtain the competing materials with MgSe whose energies above hull are 
 </pre></div>
 </div>
 <p>In each directory, there are <code class="code docutils literal notranslate"><span class="pre">POSCAR</span></code> and <code class="code docutils literal notranslate"><span class="pre">prior_info.yaml</span></code>.
-The <code class="code docutils literal notranslate"><span class="pre">prior_info.yaml</span></code> contains the some information in the Materials Project database,
+The <code class="code docutils literal notranslate"><span class="pre">prior_info.yaml</span></code> contains some information in the Materials Project database,
 which is useful for determining the first-principles calculation conditions.</p>
 <p>For example, <code class="code docutils literal notranslate"><span class="pre">Mg_mp-1094122/prior_info.yaml</span></code> is</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">band_gap</span><span class="p">:</span> <span class="mf">0.0</span>
@@ -410,35 +421,59 @@ To do this, however, one needs to prepare atom energies
 that are needed to align the element energy standards.</p>
 <p>With <code class="code docutils literal notranslate"><span class="pre">vise</span></code>, we can easily prepare atom calculation directories.
 Here, we show an example of BaSnO<sub>3</sub>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vise</span> <span class="nb">map</span> <span class="o">-</span><span class="n">e</span> <span class="n">K</span> <span class="n">Al</span> <span class="n">Si</span> <span class="n">O</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vise</span> <span class="nb">map</span> <span class="o">-</span><span class="n">e</span> <span class="n">Ba</span> <span class="n">Sn</span> <span class="n">O</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pydefect mcpd -e Ba Sn O -t BaSnO3 -f $PYDEFECT_PATH/pydefect/chem_pot_diag/datasets/vise_pbe_vasp544_atom_energy.yaml
+<p>Then, create the vasp input files</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>for i in */;do cd $i; vise vs ; cd ../;done
 </pre></div>
 </div>
-<p>However, we are not sure if the atom energies are always the same
-when using the same vasp version and PAW potential,
-so we strongly recommend the researchers to calculate atom energies by themselves.</p>
+<p>and run the vasp.
+The atomic energies are collected to yaml file using the following python script.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright (c) 2020. Distributed under the terms of the MIT License.</span>
+
+<span class="kn">from</span> <span class="nn">pymatgen</span> <span class="kn">import</span> <span class="n">Element</span>
+<span class="kn">from</span> <span class="nn">pymatgen.io.vasp</span> <span class="kn">import</span> <span class="n">Outcar</span>
+
+<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Element</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">Outcar</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/OUTCAR-finish&quot;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;3</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">final_energy</span><span class="si">:</span><span class="s2">11.8f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Assume the output is saved to atom_energies.yaml.
+The cpd.yaml file is then generated using the following command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">mcpd</span> <span class="o">-</span><span class="n">e</span> <span class="n">Ba</span> <span class="n">Sn</span> <span class="n">O</span> <span class="o">-</span><span class="n">t</span> <span class="n">BaSnO3</span> <span class="o">-</span><span class="n">a</span> <span class="n">atom_energies</span><span class="o">.</span><span class="n">yaml</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="construction-of-a-supercell-and-defect-initial-setting-file">
 <h2>5. Construction of a supercell and defect initial setting file<a class="headerlink" href="#construction-of-a-supercell-and-defect-initial-setting-file" title="Permalink to this headline">¶</a></h2>
-<p>We have finished the calculations of the unit cell and competing phases, and are eventually ready for point-defect calculations.
-Let’s create <code class="code docutils literal notranslate"><span class="pre">defect/</span></code> directory and copy unitcell <code class="code docutils literal notranslate"><span class="pre">POSCAR</span></code> file from e.g. <code class="code docutils literal notranslate"><span class="pre">unitcell/dos/</span></code> to <code class="code docutils literal notranslate"><span class="pre">defect/</span></code></p>
-<p>We then create a supercell and defect-type related files with the <code class="code docutils literal notranslate"><span class="pre">supercell</span></code> (= <code class="code docutils literal notranslate"><span class="pre">s</span></code>) and <code class="code docutils literal notranslate"><span class="pre">defect_set</span></code> (= <code class="code docutils literal notranslate"><span class="pre">ds</span></code>) sub-commands.
-<code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> recommends a nearly isotropic (and sometimes cubic-like) supercell composed of moderate number of atoms.
+<p>We have finished the calculations of the unit cell and competing phases,
+and are eventually ready for point-defect calculations.
+Let’s create <code class="code docutils literal notranslate"><span class="pre">defect/</span></code> directory and copy unitcell <code class="code docutils literal notranslate"><span class="pre">POSCAR</span></code> file from
+e.g. <code class="code docutils literal notranslate"><span class="pre">unitcell/dos/</span></code> to <code class="code docutils literal notranslate"><span class="pre">defect/</span></code></p>
+<p>We then create a supercell and defect-type related files with
+the <code class="code docutils literal notranslate"><span class="pre">supercell</span></code> (= <code class="code docutils literal notranslate"><span class="pre">s</span></code>) and <code class="code docutils literal notranslate"><span class="pre">defect_set</span></code> (= <code class="code docutils literal notranslate"><span class="pre">ds</span></code>) sub-commands.
+<code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> recommends a nearly isotropic (and sometimes cubic-like) supercell
+composed of moderate number of atoms.
 With the following command, one can create <code class="code docutils literal notranslate"><span class="pre">SPOSCAR</span></code> file</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">s</span>
 </pre></div>
 </div>
 <p>If the input structure is different from the standardized primitive cell, <code class="code docutils literal notranslate"><span class="pre">NotPrimitiveError</span></code> is raised.</p>
-<p>At present, <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> constructs the supercell by expanding the <em>conventional</em> unitcell isotropically.</p>
+<p>At present, <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> constructs the supercell by expanding the <em>conventional</em> unitcell.</p>
 <p>It is possible to change the lattice angle of the supercell from those of the conventional unitcell.
 For example, we can make a supercell in which a-, b-, and c-axes are mutually orthogonal for hexagonal systems.
 However, it is not a good idea for point-defect calculations because such lattice breaks the original symmetry,
 which reduces the accuracy of the point-defect calculations and makes it difficult to analyze the defect site symmetry.
 One exception in <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> is the tetragonal cell,
-where rotated supercells by 45 degrees are allowed with keeping the symmetry.</p>
-<p>In <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code>, a user can also specify the cell matrix, e.g.,</p>
+where the rotated supercell by 45 degrees keeps the original symmetry.</p>
+<p>In <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code>, users can also specify the cell matrix, e.g.,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">s</span> <span class="o">--</span><span class="n">matrix</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span>
 </pre></div>
 </div>
@@ -483,16 +518,18 @@ An example of <code class="code docutils literal notranslate"><span class="pre">
 </pre></div>
 </div>
 <p>where the combination of defect types and their charges are shown.
-We can modify this file using an editor if necessary.
+We can modify this using an editor if necessary.
 If we want to add dopants, we can type as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">ds</span> <span class="o">-</span><span class="n">d</span> <span class="n">Ca</span>
 </pre></div>
 </div>
 <p>There are some tips related to <code class="code docutils literal notranslate"><span class="pre">supercell_info.json</span></code> and <code class="code docutils literal notranslate"><span class="pre">defect_in.yaml</span></code>.</p>
-<p>1. The antisites and substituted defects are determined from the difference of the electronegativity between the substituted and removed atoms.
-Default max difference is written in <code class="code docutils literal notranslate"><span class="pre">defaults.py</span></code>, but you can change it via <code class="code docutils literal notranslate"><span class="pre">pydefect.yaml</span></code> as mentioned above.</p>
+<p>1. The antisites and substituted defects are determined from the difference of
+the electronegativity between the substituted and removed atoms.
+Default max difference is written in <code class="code docutils literal notranslate"><span class="pre">defaults.py</span></code>,
+but one can change it via <code class="code docutils literal notranslate"><span class="pre">pydefect.yaml</span></code> as mentioned above.</p>
 <p>2. The oxidation states determine the defect charge states.
-For instance, the vacancies (interstitials) of Sn<sup>2+</sup> may take 0, -(+)1, or -(+)2,
+For instance, the vacancies (interstitials) of Sn<sup>2+</sup> may take 0, -(+)1, or -(+)2 charge states,
 while those of Sn<sup>4+</sup> between 0 and -(+)4 charge states.
 For the antisites and substituted defects,
 <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> considers all the possible combinations of vacancies and interstitials.
@@ -512,7 +549,7 @@ Users have to add these outliers by themselves.</p>
 such that the symmetry is lowered to P1.
 This is, however, unwanted in some cases because it increases the number of irreducible k-points
 Then, <code class="code docutils literal notranslate"><span class="pre">displace_distance</span></code> needs to be set to 0 via <code class="code docutils literal notranslate"><span class="pre">pydefect.yaml</span></code>.</p>
-<p>4. If you want to calculate particular defects e.g., only oxygen vacancies,
+<p>4. If one wants to calculate particular defects e.g., only oxygen vacancies,
 you can restrict the calculated defects with <code class="code docutils literal notranslate"><span class="pre">-k</span></code> option and a python regular expression,
 For example, when typing as follows,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">ds</span> <span class="o">-</span><span class="n">k</span> <span class="s2">&quot;Va_O[0-9]?_[0-9]+&quot;</span>
@@ -531,7 +568,7 @@ while there are a couple of procedures that recommend the interstitial sites.
 However, it is generally not an easy task to speculate the most likely interstitial sites
 because they depend on the substituted element.</p>
 <p>The largest vacant space should be most likely interstitial sites
-for positively charged cations with closed shells are substituted (e.g., Mg<sup>2+</sup>, Al<sup>3+</sup>),
+for positively charged cations with closed shells (e.g., Mg<sup>2+</sup>, Al<sup>3+</sup>),
 as they tend not to make strong bonding with other atoms.
 On the other hand, a proton (H<sup>+</sup>) prefers to locate near O<sup>2-</sup> or N<sup>3-</sup>
 to form the strong O-H or N-H bonding.
@@ -549,8 +586,8 @@ The command of <code class="code docutils literal notranslate"><span class="pre"
 </div>
 <p>This should not be done at the BS calculations, because the primitive cells
 may be different from the standardized primitive cell in particular space groups.</p>
-<p>After running the vasp calculation, type</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>python $PATH_TO_FILE/recommend_interstitials.py AECCAR0 AECCAR2
+<p>After running the vasp calculation, run the recommend_interstitials.py in pydefect</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">pydefect</span><span class="o">/</span><span class="n">cli</span><span class="o">/</span><span class="n">vasp</span><span class="o">/</span><span class="n">util_commands</span><span class="o">/</span><span class="n">recommend_interstitials</span><span class="o">.</span><span class="n">py</span> <span class="n">AECCAR0</span> <span class="n">AECCAR2</span>
 </pre></div>
 </div>
 <p>, which shows the local minimum points of the charge density as follows.</p>
@@ -567,10 +604,11 @@ may be different from the standardized primitive cell in particular space groups
   <span class="mi">2</span>   <span class="mf">0.6111</span>   <span class="mf">0.6111</span>   <span class="mf">0.1667</span> <span class="o">.</span><span class="n">m</span>
 </pre></div>
 </div>
-<p>Note, again, that the local minimum points may not be the best initial points
+<p>Note, again, that the local minima may not be the best initial points
 for some particular interstitials,
 so users must need to recognize the limit of this procedure.</p>
 <p>To add the interstitial site at e.g., 0.75  0.75  0.75,
+where the fractional coordinates are based on the standardized primitive cell,
 we use the <code class="code docutils literal notranslate"><span class="pre">interstitial</span></code> (= <code class="code docutils literal notranslate"><span class="pre">i</span></code>) sub-command like</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">ai</span> <span class="o">-</span><span class="n">s</span> <span class="n">supercell_info</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">p</span> <span class="o">../</span><span class="n">unitcell</span><span class="o">/</span><span class="n">structure_opt</span><span class="o">/</span><span class="n">POSCAR</span> <span class="o">-</span><span class="n">c</span> <span class="mf">0.75</span> <span class="mf">0.75</span> <span class="mf">0.75</span>
 </pre></div>
@@ -640,8 +678,8 @@ which parses the <code class="code docutils literal notranslate"><span class="pr
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>python $PATH_TO_FILE/create_defect_entry.py complex_2 complex_2/POSCAR perfect/POSCAR
 </pre></div>
 </div>
-<p>which creates the <code class="code docutils literal notranslate"><span class="pre">defect_entry.json</span></code> file. The name is then parsed as</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A_B_C</span> <span class="o">-&gt;</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;A_B&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">C</span>
+<p>which creates the <code class="code docutils literal notranslate"><span class="pre">defect_entry.json</span></code> file. The directory name is then parsed as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A_B</span> <span class="o">-&gt;</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">B</span>
 </pre></div>
 </div>
 <p>This script can be used when one wants to use <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code>
@@ -650,14 +688,19 @@ for analyzing the defect calculations in progress.</p>
 <div class="section" id="parsing-supercell-calculation-results">
 <h2>9. Parsing supercell calculation results<a class="headerlink" href="#parsing-supercell-calculation-results" title="Permalink to this headline">¶</a></h2>
 <p>Then, let’s run the vasp calculations.</p>
-<p>We recommend the users to use the Gamma version of vasp
+<p>To create the vasp input files, type</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>for i in */;do cd $i; vise vs -t defect ; cd ../;done
+</pre></div>
+</div>
+<p>Do not forget to add <code class="code docutils literal notranslate"><span class="pre">-t</span> <span class="pre">defect</span></code>, to create the input files for defects.</p>
+<p>When running the vasp, We recommend the users to use the Gamma-only vasp
 if the k point is sampled only at the Gamma point for large supercells.</p>
 <p>After (partly) finishing the vasp calculations,
 we can generate the <code class="code docutils literal notranslate"><span class="pre">calc_results.json</span></code> that contains
 the first-principles calculation results related to the defect properties.</p>
 <p>By using the <code class="code docutils literal notranslate"><span class="pre">calc_results</span></code> (= <code class="code docutils literal notranslate"><span class="pre">cr</span></code>) sub-command,
 we can generate <code class="code docutils literal notranslate"><span class="pre">calc_results.json</span></code> in all the calculated directories.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">cr</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*</span> <span class="n">perfect</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">cr</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*/</span> <span class="n">perfect</span>
 </pre></div>
 </div>
 <p>When one wants to generate <code class="code docutils literal notranslate"><span class="pre">calc_results.json</span></code>
@@ -675,15 +718,15 @@ Therefore, we need to correct the total energies of the charged defect supercell
 to those in the dilution limit.</p>
 <p>The corrections are performed using the
 <code class="code docutils literal notranslate"><span class="pre">extended_fnv_correction</span></code> (= <code class="code docutils literal notranslate"><span class="pre">efnv</span></code>) sub-command,</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">efnv</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*</span> <span class="o">-</span><span class="n">pcr</span> <span class="n">perfect</span><span class="o">/</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">u</span> <span class="o">../</span><span class="n">unitcell</span><span class="o">/</span><span class="n">unitcell</span><span class="o">.</span><span class="n">json</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">efnv</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*/</span> <span class="o">-</span><span class="n">pcr</span> <span class="n">perfect</span><span class="o">/</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">u</span> <span class="o">../</span><span class="n">unitcell</span><span class="o">/</span><span class="n">unitcell</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 <p>For the corrections, we need the static dielectric constants
 and atomic site potentials in the perfect supercell.
-Therefore, the paths to <code class="code docutils literal notranslate"><span class="pre">unitcell.json</span></code> and <code class="code docutils literal notranslate"><span class="pre">calc_results.json</span></code>
-files must be assigned.
+Therefore, the paths to <code class="code docutils literal notranslate"><span class="pre">unitcell.json</span></code> and <code class="code docutils literal notranslate"><span class="pre">calc_results.json</span></code> of
+<code class="code docutils literal notranslate"><span class="pre">perfect</span></code> must be assigned.
 Bear also in mind that this command takes some time.</p>
-<p>The correction in <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> at this moment is now performed with
+<p>The energy correction in <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code> at this moment is now performed with
 the so-called extended Freysoldt-Neugebauer-Van de Walle (eFNV) method.
 If one uses the corrections, please cite the following papers.</p>
 <ul class="simple">
@@ -716,7 +759,7 @@ Therefore, it is important to know the position of the localized state and its o
 where carriers locate at the band edges with loosely trapped by the charged defect centers.
 Examples are the B-on-Si (p-type) and P-on-Si (n-type) substitutional dopants in Si.
 These defects also do little harm for device performances,
-but introduce the carrier electrons/holes or kill counter carriers.
+but introduce the carrier electrons/holes or kill counter carriers stemming from small trapping energies.
 The wavefunctions of the PHS widespread to several million atoms.
 Therefore, to calculate their thermodynamical transition levels,
 we need supergiant supercell calculations,
@@ -745,11 +788,11 @@ and <code class="code docutils literal notranslate"><span class="pre">eigenvalue
 <p>The <code class="code docutils literal notranslate"><span class="pre">eigenvalues.pdf</span></code> file looks like,</p>
 <img alt="_images/eigenvalues_MgSe_Va_Mg_0.png" src="_images/eigenvalues_MgSe_Va_Mg_0.png" />
 <p>Here, one can see single-particle levels and their occupation in the spin-up and -down channels.
-The x-axis is fractional coordinates of the sampled k points,
-while the y-axis in the absolute scale.
+The x-axis is fractional coordinates of the calculated k points,
+while the y-axis in the absolute energy scale.
 Filled circles inside the figures are single particle levels at each k point.</p>
 <p>Two horizontal dashed lines indicate
-the valence-band maximum and conduction-band minimum in the perfect supercell.
+the valence-band maximum and conduction-band minimum in the <strong>perfect supercell</strong>.
 The discrete numbers in the figures mean the band indices,
 and the filled red, green, and blue circles mean the occupied,
 partially occupied (from 0.1 to 0.9), and unoccupied eigenstates, respectively.</p>
