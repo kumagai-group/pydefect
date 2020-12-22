@@ -9,3 +9,7 @@ scikit-image
 tabulate
 adjustText
 matplotlib-label-lines
+dash
+dash-table
+dash-daq
+Flask-Caching
