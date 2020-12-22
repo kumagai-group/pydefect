@@ -782,7 +782,7 @@ and judge if the defects create the PHS and/or defect localized states.</p>
 <p><code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> shows the eigenvalues and band-edge states by the following steps.</p>
 <p>Firstly, one can generate the <code class="code docutils literal notranslate"><span class="pre">band_edge_eigenvalues.json</span></code>
 and <code class="code docutils literal notranslate"><span class="pre">eigenvalues.pdf</span></code> files with the following command.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">eig</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*</span> <span class="o">-</span><span class="n">pcr</span> <span class="n">perfect</span><span class="o">/</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">eig</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*/</span> <span class="o">-</span><span class="n">pcr</span> <span class="n">perfect</span><span class="o">/</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 <p>The <code class="code docutils literal notranslate"><span class="pre">eigenvalues.pdf</span></code> file looks like,</p>
@@ -793,15 +793,15 @@ while the y-axis in the absolute energy scale.
 Filled circles inside the figures are single particle levels at each k point.</p>
 <p>Two horizontal dashed lines indicate
 the valence-band maximum and conduction-band minimum in the <strong>perfect supercell</strong>.
-The discrete numbers in the figures mean the band indices,
+The discrete numbers in the figures mean the band indices starting from 1,
 and the filled red, green, and blue circles mean the occupied,
 partially occupied (from 0.1 to 0.9), and unoccupied eigenstates, respectively.</p>
 <p>We then generate the <code class="code docutils literal notranslate"><span class="pre">edge_characters.json</span></code> file with the following command.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">edge_characters</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*</span> <span class="o">-</span><span class="n">pcr</span> <span class="n">perfect</span><span class="o">/</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">make_edge_characters</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*/</span> <span class="o">-</span><span class="n">pcr</span> <span class="n">perfect</span><span class="o">/</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
-<p>and analyze the file and show the edge states with this command</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">edge_states</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*</span> <span class="o">-</span><span class="n">p</span> <span class="n">perfect</span><span class="o">/</span><span class="n">edge_characters</span><span class="o">.</span><span class="n">json</span>
+<p>and analyze the files and show the edge states with this command</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">edge_states</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*/</span> <span class="o">-</span><span class="n">p</span> <span class="n">perfect</span><span class="o">/</span><span class="n">edge_characters</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 <p>which shows as follows:</p>
@@ -830,11 +830,11 @@ the former two are considered as shallow states, and should be omitted for energ
 <p>In <code class="code docutils literal notranslate"><span class="pre">pydefect</span></code>, these states are determined from the highest occupied and lowest unoccupied eigenvalues
 and the similarity of wavefunction of the highest occupied (lowest unoccupied) state and that of the VBM (CBM).</p>
 <p>We emphasize that the automatically determined band-edge states could be incorrect
-as it is difficult to determine them.
+as it is generally difficult to determine them automatically.
 Therefore, please carefully check the band-edge states,
 and draw their band-decomposed charge density if the band-edge states are not obvious.</p>
-<p>To modify the band-edge states, modify the <code class="code docutils literal notranslate"><span class="pre">band_edge_states.yaml</span></code> file
-in each defect directory by hand, which will be parsed when plotting the defect
+<p>The band-edge states can be modified via the <code class="code docutils literal notranslate"><span class="pre">band_edge_states.yaml</span></code> file
+in each defect directory, which will be parsed when plotting the defect
 formation energies.</p>
 </div>
 <div class="section" id="plot-defect-formation-energies">

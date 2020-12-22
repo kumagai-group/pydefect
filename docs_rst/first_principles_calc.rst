@@ -19,7 +19,7 @@ which is used as:
 
 This command creates the symmetrized :code:`POSCAR` file if the structure is not the P1 symmetry.
 Then, the previous :code:`OUTCAR` and :code:`CONTCAR` are renamed to
-:code:`OUTCAR.sym_1` and:code:`CONTCAR.sym_1`, respectively.
+:code:`OUTCAR.sym_1` and :code:`CONTCAR.sym_1`, respectively.
 
 It is also possible to include this command in the runshell script, e.g.,
 
