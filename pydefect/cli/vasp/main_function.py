@@ -84,6 +84,10 @@ def make_chem_pot_diag(args) -> None:
 
 def plot_chem_pot_diag(args) -> None:
     cpd = ChemPotDiag.from_yaml(args.yaml)
+    if cpd.dim == 1:
+        logger.warning("Single element is not supported for the plot.")
+        return
+
     print(cpd)
     if cpd.dim == 2:
         plotter = ChemPotDiagMpl2DMplPlotter(CpdPlotInfo(cpd))

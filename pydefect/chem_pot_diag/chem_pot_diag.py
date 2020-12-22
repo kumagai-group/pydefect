@@ -31,8 +31,10 @@ class CompositionEnergy(MSONable):
     source: str
 
     def __post_init__(self, composition):
-        self.composition: Composition = composition if isinstance(composition, Composition) \
-            else Composition.from_dict(composition)
+        if isinstance(composition, Composition):
+            self.composition: Composition = composition
+        else:
+            self.composition: Composition = Composition.from_dict(composition)
 
     @property
     def abs_energy_per_atom(self):
@@ -104,8 +106,9 @@ class ChemPotDiag(MSONable):
         result = []
         for vertex_element in self.vertex_elements:
             target = Composition({vertex_element: 1.0}).reduced_composition
-            candidates = filter(lambda x: x[0] == target,
-                                self.vertex_elements_abs_energies_per_atom.items())
+            candidates = \
+                filter(lambda x: x[0] == target,
+                       self.vertex_elements_abs_energies_per_atom.items())
             try:
                 result.append(min([x[1] for x in candidates]))
             except ValueError:
@@ -127,6 +130,9 @@ class ChemPotDiag(MSONable):
 
     @property
     def vertex_coords(self):
+        if self.dim == 1:
+            return [np.array([0.0])]
+
         large_minus_number = -1e5
         hs = self.get_half_space_intersection(large_minus_number)
 
@@ -151,7 +157,8 @@ class ChemPotDiag(MSONable):
             x.append(min_range)
             half_spaces.append(x)
         # When used in vertex_coords  min_range is large_minum_number
-        feasible_point = np.array([min_range + feasible_dist] * self.dim, dtype=float)
+        feasible_point = np.array([min_range + feasible_dist] * self.dim,
+                                  dtype=float)
         hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
 
         return hs
@@ -176,7 +183,8 @@ class ChemPotDiag(MSONable):
 
             for ie in self.impurity_elements:
                 competing_comp_for_impurity, _ = self.impurity_abs_energy(ie, k)
-                comp_name = competing_comp_for_impurity.composition.reduced_formula
+                comp_name = \
+                    competing_comp_for_impurity.composition.reduced_formula
                 result[-1].append(comp_name)
 
         columns = [f"mu_{e}" for e in self.vertex_elements]
@@ -189,7 +197,8 @@ class ChemPotDiag(MSONable):
 
     def target_abs_chem_pot_dict(self, label) -> Dict[Element, float]:
         rel_chem_pots = self.target_vertices[label]
-        abs_chem_pots = [x + y for x, y in zip(rel_chem_pots, self.offset_to_abs)]
+        abs_chem_pots = [x + y for x, y in zip(rel_chem_pots,
+                                               self.offset_to_abs)]
         return dict(zip(self.vertex_elements, abs_chem_pots))
 
     def abs_chem_pot_dict(self, label) -> Dict[Element, float]:

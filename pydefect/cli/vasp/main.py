@@ -95,7 +95,7 @@ def parse_args(args):
     parser_make_poscars = subparsers.add_parser(
         name="make_poscars",
         description="Make poscar files in directories retrieved from "
-                    "Materials Project.",
+                    "the Materials Project.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['mp'])
 
@@ -104,7 +104,7 @@ def parse_args(args):
         help="Element names considered in chemical potential diagram. ")
     parser_make_poscars.add_argument(
         "--e_above_hull", default=defaults.e_above_hull, type=float,
-        help="Energy above hull in eV / atom")
+        help="Energy above hull in eV/atom.")
 
     parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
 
@@ -121,7 +121,7 @@ def parse_args(args):
         help="Saved yaml file name.")
     parser_mcpd.add_argument(
         "-t", "--target", type=Composition, required=True,
-        help="Target composition, e.g., MgO")
+        help="Target composition, e.g., MgO.")
     parser_mcpd.add_argument(
         "-e", "--elements", type=str, nargs="+",
         help="Element names considered in chemical potential diagram. Used for"
@@ -132,7 +132,7 @@ def parse_args(args):
     parser_mcpd.add_argument(
         "-u", "--update", action="store_true",
         help="Used when one wants to update the cpd.yaml with calculation "
-             "results")
+             "results.")
 
     parser_mcpd.set_defaults(func=make_chem_pot_diag)
 
