@@ -15,6 +15,7 @@ from pymatgen import Composition, Element
 energies = [CompositionEnergy(Composition("H"), 0.0, "a"),
             CompositionEnergy(Composition("H4O2"), -4.0, "c"),
             CompositionEnergy(Composition("O"), 1.0, "b"),
+            CompositionEnergy(Composition("Cl"), 12.0, "f"),
             CompositionEnergy(Composition("O2Cl"), 3.0, "e"),
             CompositionEnergy(Composition("O2Cl2"), 6.0, "d"),
             ]
@@ -27,14 +28,12 @@ def cpd():
 
 
 def test_print(cpd):
-    expected = """+----+--------+--------+----------------------+
-|    |   mu_H |   mu_O | Cl competing phase   |
-|----+--------+--------+----------------------|
-| A  |    0   |     -3 | ClO                  |
-| B  |   -1.5 |      0 | ClO2                 |
-+----+--------+--------+----------------------+"""
-
-
+    expected = """+----+--------+--------+---------+----------------------+
+|    |   mu_H |   mu_O |   mu_Cl | Cl competing phase   |
+|----+--------+--------+---------+----------------------|
+| A  |    0   |     -3 |      -7 | ClO                  |
+| B  |   -1.5 |      0 |     -11 | ClO2                 |
++----+--------+--------+---------+----------------------+"""
     assert cpd.__repr__() == expected
 
 
@@ -49,10 +48,12 @@ def test_msonable(cpd):
 
 
 def test_chem_pot_diag_yaml(cpd, tmpdir):
-    print(tmpdir)
     tmpdir.chdir()
     cpd.to_yaml()
-    expected = """H1:
+    expected = """Cl1:
+  energy: 12.0
+  source: f
+H1:
   energy: 0.0
   source: a
 H4O2:
@@ -75,7 +76,7 @@ vertex_elements:
     assert Path("cpd.yaml").read_text() == expected
 
     actual = ChemPotDiag.from_yaml("cpd.yaml")
-    assert actual == cpd
+    assert actual.target == cpd.target
 
 
 def test_host_comp_abs_energies(cpd):
@@ -136,12 +137,16 @@ def test_impurity_abs_energy(cpd):
     assert cpd.impurity_abs_energy(Element.Cl, "A") == expected
 
 
+def test_impurity_rel_energy(cpd):
+    expected = CompositionEnergy(Composition("Cl2O2"), 6.0, 'd'), -7.0
+    assert cpd.impurity_rel_energy(Element.Cl, "A") == expected
+
+
 def test_vertex_list(cpd):
     index = ['A', 'B']
-    columns = ['mu_H', 'mu_O', 'Cl competing phase']
-    data = [[0.0, -3.0, 'ClO'], [-1.5, 0.0, 'ClO2']]
+    columns = ['mu_H', 'mu_O', 'mu_Cl', 'Cl competing phase']
+    data = [[0.0, -3.0, -7.0, 'ClO'], [-1.5, 0.0, -11.0, 'ClO2']]
     expected = pd.DataFrame(data, index=index, columns=columns)
-    print(cpd.target_vertex_list_dataframe)
     pd.testing.assert_frame_equal(cpd.target_vertex_list_dataframe, expected)
 
 

@@ -18,6 +18,7 @@ from pymatgen import Composition, Element
 from scipy.spatial.qhull import HalfspaceIntersection, QhullError
 from tabulate import tabulate
 
+
 alphabets = list(string.ascii_uppercase) + \
             ["A"+i for i in string.ascii_uppercase] + \
             ["B"+i for i in string.ascii_uppercase] + \
@@ -101,6 +102,12 @@ class ChemPotDiag(MSONable):
                 result[k] = v
         return result
 
+    def impurity_abs_energy_per_atom(self, elem: Element):
+        for k, v in self.abs_energies_per_atom.items():
+            if len(k.elements) == 1 and k.elements[0] == elem:
+                return v
+        raise ValueError(f"{elem} is not included.")
+
     @property
     def offset_to_abs(self):
         result = []
@@ -182,13 +189,15 @@ class ChemPotDiag(MSONable):
                 result[-1].append(round(v2, 3))
 
             for ie in self.impurity_elements:
-                competing_comp_for_impurity, _ = self.impurity_abs_energy(ie, k)
+                competing_comp_for_impurity, energy = self.impurity_rel_energy(ie, k)
+                result[-1].append(round(energy, 3))
                 comp_name = \
                     competing_comp_for_impurity.composition.reduced_formula
                 result[-1].append(comp_name)
 
         columns = [f"mu_{e}" for e in self.vertex_elements]
-        columns += [f"{e} competing phase" for e in self.impurity_elements]
+        for e in self.impurity_elements:
+            columns += [f"mu_{e}", f"{e} competing phase"]
         return pd.DataFrame(result, index=index, columns=columns)
 
     def __repr__(self):
@@ -227,6 +236,10 @@ class ChemPotDiag(MSONable):
         if competing_comp_e is None:
             raise CpdNotSupportedError(f"No compounds with element {element}.")
         return competing_comp_e, y
+
+    def impurity_rel_energy(self, element: Element, label: str):
+        competing_comp_e, y = self.impurity_abs_energy(element, label)
+        return competing_comp_e,  y - self.impurity_abs_energy_per_atom(element)
 
     @property
     def target_formation_energy(self):
