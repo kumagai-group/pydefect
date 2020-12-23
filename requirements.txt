@@ -13,3 +13,4 @@ dash
 dash-table
 dash-daq
 Flask-Caching
+habanero
