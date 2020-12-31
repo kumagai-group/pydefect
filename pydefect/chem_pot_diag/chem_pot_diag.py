@@ -226,6 +226,16 @@ class ChemPotDiag(MSONable):
                 result, ref_e = label, vertex[target_index]
         return result
 
+    def label_at_poor_condition(self, element: Element) -> str:
+        """Return abs_chem_pot_dict at condition where an element is poor."""
+        ref_e = float("inf")
+        target_index = self.vertex_elements.index(element)
+        result = None
+        for label, vertex in self.target_vertices.items():
+            if vertex[target_index] < ref_e:
+                result, ref_e = label, vertex[target_index]
+        return result
+
     def impurity_abs_energy(self, element: Element, label: str):
         comp_set = set(self.vertex_elements) | {element}
         competing_comp_e = None

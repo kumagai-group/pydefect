@@ -102,6 +102,7 @@ def test_abs_chem_pots(cpd_h2o):
     assert cpd_h2o.abs_chem_pot_dict("A") == {Element.H: 0.0, Element.O: -3.0 + 1.0, Element.Cl: 5.0}
     assert cpd_h2o.label_at_rich_condition(Element.H) == "A"
     assert cpd_h2o.label_at_rich_condition(Element.O) == "B"
+    assert cpd_h2o.label_at_poor_condition(Element.O) == "A"
 
 
 def test_host_ele_abs_energies_per_atom(cpd_h2o):
