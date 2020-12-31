@@ -4,7 +4,7 @@ import re
 from copy import deepcopy
 from dataclasses import dataclass
 from itertools import groupby
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 
 import numpy as np
 from pydefect.analyzer.band_edge_states import BandEdgeStates
@@ -32,12 +32,18 @@ class DefectEnergy:
     energies: List[float]
     corrections: List[float]
 
+    @property
+    def corrected_energies(self):
+        result = []
+        for energy, correction in zip(self.energies, self.corrections):
+            result.append(energy + correction)
+        return result
+
     def cross_points(self, ef_min, ef_max, base_ef=0.0):
         large_minus_number = -1e4
         half_spaces = []
-        for charge, energy, correction in zip(self.charges, self.energies, self.corrections):
-            corrected_energy = energy + correction
-            half_spaces.append([-charge, 1, -corrected_energy])
+        for charge, corr_energy in zip(self.charges, self.corrected_energies):
+            half_spaces.append([-charge, 1, -corr_energy])
 
         half_spaces.append([-1, 0, ef_min])
         half_spaces.append([1, 0, -ef_max])
@@ -57,10 +63,41 @@ class DefectEnergy:
 
         return CrossPoints(inner_cross_points, boundary_points)
 
+    def pinning_level(self, ref_e: float = 0.0
+                      ) -> Tuple[Tuple[float, Optional[int]],
+                                 Tuple[float, Optional[int]]]:
+        """
+        :param ref_e: Reference to show the pinning level such as VBM.
+        :return: ((Lower pinning, its charge), (Upper pinning, its charge))
+        """
+        lower_pinning, upper_pinning = float("-inf"), float("inf")
+        lower_charge, upper_charge = None, None
+        for charge, corr_energy in zip(self.charges, self.corrected_energies):
+            if charge == 0:
+                continue
+            pinning = - corr_energy / charge
+            if charge > 0 and pinning > lower_pinning:
+                lower_pinning, lower_charge = pinning, charge
+            elif pinning < upper_pinning:
+                upper_pinning, upper_charge = pinning, charge
+        return ((lower_pinning - ref_e, lower_charge),
+                (upper_pinning - ref_e, upper_charge))
+
+    def energy_at_ef(self, ef: float) -> Tuple[float, int]:
+        """
+        :return: (Lowest energy, its charge)
+        """
+        result_e, result_charge = float("inf"), None
+        for charge, corr_energy in zip(self.charges, self.corrected_energies):
+            energy = corr_energy + charge * ef
+            if energy < result_e:
+                result_e, result_charge = energy, charge
+        return result_e, result_charge
+
     def __str__(self):
         lines = []
-        for charge, energy, correction in zip(self.charges, self.energies, self.corrections):
-            lines.append(f"{self.name:>10} {charge:>4} {energy:12.4f} {correction:12.4f}")
+        for c, e, cor in zip(self.charges, self.energies, self.corrections):
+            lines.append(f"{self.name:>10} {c:>4} {e:12.4f} {cor:12.4f}")
         return "\n".join(lines)
 
 

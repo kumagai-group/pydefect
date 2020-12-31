@@ -23,7 +23,12 @@ def test_mp_actual_query():
 
 def test_mp_query(mocker):
     mock = mocker.patch("pydefect.util.mp_tools.MPRester")
-    expected = [{'full_formula': 'Mg9'}, {'full_formula': 'Mg1O1'}, {'full_formula': 'O8'}, {'full_formula': 'O2'}, {'full_formula': 'O2'}, {'full_formula': 'O8'}]
+    expected = [{'full_formula': 'Mg9'},
+                {'full_formula': 'Mg1O1'},
+                {'full_formula': 'O8'},
+                {'full_formula': 'O2'},
+                {'full_formula': 'O2'},
+                {'full_formula': 'O8'}]
     mock.return_value.__enter__.return_value.query.return_value = expected
     element_list = ["Mg", "O"]
     excluded = list(set(elements) - set(element_list))

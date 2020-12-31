@@ -39,6 +39,16 @@ def test_defect_energy_str(defect_energy):
     assert str(defect_energy) == expected
 
 
+def test_pinning(defect_energy):
+    assert defect_energy.pinning_level() == ((2.0, 2), (float("inf"), None))
+    assert defect_energy.pinning_level(ref_e=1.0) == ((1.0, 2), (float("inf"), None))
+
+
+def test_energy_at_ef(defect_energy):
+    assert defect_energy.energy_at_ef(ef=0.0) == (-4.0, 2)
+    assert defect_energy.energy_at_ef(ef=10.0) == (6.0, 0)
+
+
 @pytest.fixture
 def cross_points():
     inner_cross_points = [[2, 30], [3, 40]]
