@@ -22,34 +22,34 @@ energies = [CompositionEnergy(Composition("H"), 0.0, "a"),
 
 
 @pytest.fixture
-def cpd():
+def cpd_h2o():
     return ChemPotDiag(energies, target=Composition("H2O"),
                        vertex_elements=[Element.H, Element.O])
 
 
-def test_print(cpd):
+def test_print(cpd_h2o):
     expected = """+----+--------+--------+---------+----------------------+
 |    |   mu_H |   mu_O |   mu_Cl | Cl competing phase   |
 |----+--------+--------+---------+----------------------|
 | A  |    0   |     -3 |      -7 | ClO                  |
 | B  |   -1.5 |      0 |     -11 | ClO2                 |
 +----+--------+--------+---------+----------------------+"""
-    assert cpd.__repr__() == expected
+    assert cpd_h2o.__repr__() == expected
 
 
-def test_composition_roundtrip(cpd):
+def test_composition_roundtrip(cpd_h2o):
     comp_e = CompositionEnergy(Composition("H"), 0.0, "a")
     rounded_comp_e = comp_e.__class__.from_dict(comp_e.as_dict())
     assert comp_e == rounded_comp_e
 
 
-def test_msonable(cpd):
-    assert_msonable(cpd)
+def test_msonable(cpd_h2o):
+    assert_msonable(cpd_h2o)
 
 
-def test_chem_pot_diag_yaml(cpd, tmpdir):
+def test_chem_pot_diag_yaml(cpd_h2o, tmpdir):
     tmpdir.chdir()
-    cpd.to_yaml()
+    cpd_h2o.to_yaml()
     expected = """Cl1:
   energy: 12.0
   source: f
@@ -76,34 +76,36 @@ vertex_elements:
     assert Path("cpd.yaml").read_text() == expected
 
     actual = ChemPotDiag.from_yaml("cpd.yaml")
-    assert actual.target == cpd.target
+    assert actual.target == cpd_h2o.target
 
 
-def test_host_comp_abs_energies(cpd):
-    assert cpd.rel_energies == {Composition("H2O1"): -1.0,
+def test_host_comp_abs_energies(cpd_h2o):
+    assert cpd_h2o.rel_energies == {Composition("H2O1"): -1.0,
                                 Composition("O2"): 0.0,
                                 Composition("H2"): 0.0}
 
 
-def test_impurity_elements(cpd):
-    assert cpd.impurity_elements == [Element.Cl]
+def test_impurity_elements(cpd_h2o):
+    assert cpd_h2o.impurity_elements == [Element.Cl]
 
 
-def test_chem_pot_diag(cpd):
-    assert cpd.vertex_elements == [Element.H, Element.O]
-    assert cpd.offset_to_abs == [0.0, 1.0]
-    assert cpd.rel_energies[Composition("H2O")] == (-2.0 - 1.0) / 3
-    np.testing.assert_array_almost_equal(cpd.vertex_coords,
+def test_chem_pot_diag(cpd_h2o):
+    assert cpd_h2o.vertex_elements == [Element.H, Element.O]
+    assert cpd_h2o.offset_to_abs == [0.0, 1.0]
+    assert cpd_h2o.rel_energies[Composition("H2O")] == (-2.0 - 1.0) / 3
+    np.testing.assert_array_almost_equal(cpd_h2o.vertex_coords,
                                          [[0.0, -3.0], [-1.5, 0.0]])
-    np.testing.assert_array_almost_equal(cpd.target_vertices["A"], [0.0, -3.0])
+    np.testing.assert_array_almost_equal(cpd_h2o.target_vertices["A"], [0.0, -3.0])
 
 
-def test_abs_chem_pots(cpd):
-    assert cpd.abs_chem_pot_dict("A") == {Element.H: 0.0, Element.O: -3.0 + 1.0, Element.Cl: 5.0}
+def test_abs_chem_pots(cpd_h2o):
+    assert cpd_h2o.abs_chem_pot_dict("A") == {Element.H: 0.0, Element.O: -3.0 + 1.0, Element.Cl: 5.0}
+    assert cpd_h2o.label_at_rich_condition(Element.H) == "A"
+    assert cpd_h2o.label_at_rich_condition(Element.O) == "B"
 
 
-def test_host_ele_abs_energies_per_atom(cpd):
-    assert cpd.vertex_elements_abs_energies_per_atom == {Composition("H2"): 0.0,
+def test_host_ele_abs_energies_per_atom(cpd_h2o):
+    assert cpd_h2o.vertex_elements_abs_energies_per_atom == {Composition("H2"): 0.0,
                                                          Composition("O2"): 1.0,
                                                          Composition("H2O"): -2/3}
 
@@ -128,30 +130,30 @@ def test_cpd_plot_info_lacking_element_data():
         ChemPotDiag(new_energies, target={"Mg": 1, "O": 1}).offset_to_abs
 
 
-def test_chem_pot_diag_min_energy(cpd):
-    assert cpd.lowest_relative_energy == -3
+def test_chem_pot_diag_min_energy(cpd_h2o):
+    assert cpd_h2o.lowest_relative_energy == -3
 
 
-def test_impurity_abs_energy(cpd):
+def test_impurity_abs_energy(cpd_h2o):
     expected = CompositionEnergy(Composition("Cl2O2"), 6.0, 'd'), 5.0
-    assert cpd.impurity_abs_energy(Element.Cl, "A") == expected
+    assert cpd_h2o.impurity_abs_energy(Element.Cl, "A") == expected
 
 
-def test_impurity_rel_energy(cpd):
+def test_impurity_rel_energy(cpd_h2o):
     expected = CompositionEnergy(Composition("Cl2O2"), 6.0, 'd'), -7.0
-    assert cpd.impurity_rel_energy(Element.Cl, "A") == expected
+    assert cpd_h2o.impurity_rel_energy(Element.Cl, "A") == expected
 
 
-def test_vertex_list(cpd):
+def test_vertex_list(cpd_h2o):
     index = ['A', 'B']
     columns = ['mu_H', 'mu_O', 'mu_Cl', 'Cl competing phase']
     data = [[0.0, -3.0, -7.0, 'ClO'], [-1.5, 0.0, -11.0, 'ClO2']]
     expected = pd.DataFrame(data, index=index, columns=columns)
-    pd.testing.assert_frame_equal(cpd.target_vertex_list_dataframe, expected)
+    pd.testing.assert_frame_equal(cpd_h2o.target_vertex_list_dataframe, expected)
 
 
-def test_target_formation_energy(cpd):
-    assert cpd.target_formation_energy == ((-4.0) - (0.0 * 4 + 1.0 * 2)) / 6
+def test_target_formation_energy(cpd_h2o):
+    assert cpd_h2o.target_formation_energy == ((-4.0) - (0.0 * 4 + 1.0 * 2)) / 6
 
 
 @pytest.fixture
@@ -177,8 +179,8 @@ def cpd_plot_info():
 
 
 @pytest.fixture
-def cpd_plot_info_wo_min_range(cpd):
-    return CpdPlotInfo(cpd)
+def cpd_plot_info_wo_min_range(cpd_h2o):
+    return CpdPlotInfo(cpd_h2o)
 
 
 def test_cpd_plot_info(cpd_plot_info):

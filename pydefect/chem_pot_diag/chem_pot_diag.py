@@ -5,7 +5,7 @@ from copy import deepcopy
 from dataclasses import dataclass, InitVar
 from itertools import chain
 from pathlib import Path
-from typing import Dict, Optional, Union, List
+from typing import Dict, Optional, Union, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -171,7 +171,7 @@ class ChemPotDiag(MSONable):
         return hs
 
     @property
-    def target_vertices(self):
+    def target_vertices(self) -> Dict[str, List[float]]:
         label = iter(alphabets)
         fractions = self.atomic_fractions(self.target)
         energy = self.rel_energies[self.target]
@@ -214,6 +214,16 @@ class ChemPotDiag(MSONable):
         result = deepcopy(self.target_abs_chem_pot_dict(label))
         for e in self.impurity_elements:
             _, result[e] = self.impurity_abs_energy(e, label)
+        return result
+
+    def label_at_rich_condition(self, element: Element) -> str:
+        """Return abs_chem_pot_dict at condition where an element is rich."""
+        ref_e = -float("inf")
+        target_index = self.vertex_elements.index(element)
+        result = None
+        for label, vertex in self.target_vertices.items():
+            if vertex[target_index] > ref_e:
+                result, ref_e = label, vertex[target_index]
         return result
 
     def impurity_abs_energy(self, element: Element, label: str):
