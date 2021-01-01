@@ -39,6 +39,13 @@ def test_defect_energy_str(defect_energy):
     assert str(defect_energy) == expected
 
 
+def test_stable_charges(defect_energy):
+    actual = defect_energy.stable_charges(ef_min=4.9, ef_max=5.1)
+    assert actual == {0, 2}
+    actual = defect_energy.stable_charges(ef_min=0.0, ef_max=0.1)
+    assert actual == {2}
+
+
 def test_pinning(defect_energy):
     assert defect_energy.pinning_level() == ((2.0, 2), (float("inf"), None))
     assert defect_energy.pinning_level(ref_e=1.0) == ((1.0, 2), (float("inf"), None))

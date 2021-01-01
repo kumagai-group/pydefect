@@ -32,6 +32,9 @@ class DefectEnergy:
     energies: List[float]
     corrections: List[float]
 
+    def stable_charges(self, ef_min, ef_max):
+        return set(self.cross_points(ef_min, ef_max).charges)
+
     @property
     def corrected_energies(self):
         result = []
