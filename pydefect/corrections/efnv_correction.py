@@ -6,6 +6,7 @@ from typing import List, Optional, Tuple
 import numpy as np
 from monty.json import MSONable
 from pydefect.corrections.abstract_correction import Correction
+from tabulate import tabulate
 
 
 @dataclass
@@ -28,6 +29,13 @@ class ExtendedFnvCorrection(Correction):
     sites: List["PotentialSite"]
     defect_coords: Tuple[float, float, float]
     additional_correction: float = 0.0
+
+    def __repr__(self):
+        d = [["charge", self.charge],
+             ["pc term", self.point_charge_correction],
+             ["alignment term", self.alignment_correction],
+             ["correction energy", self.correction_energy]]
+        return tabulate(d, tablefmt='psql')
 
     @property
     def average_potential_diff(self):

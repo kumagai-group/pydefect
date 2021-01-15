@@ -12,6 +12,16 @@ def test_extended_fnv_correction_msonable(efnv_correction):
     assert isinstance(efnv_correction, Correction)
 
 
+def test_repr(efnv_correction):
+    expected = """+-------------------+-----+
+| charge            |  10 |
+| pc term           |   1 |
+| alignment term    | -15 |
+| correction energy |  86 |
++-------------------+-----+"""
+    assert repr(efnv_correction) == expected
+
+
 def test_extended_fnv_correction_ave_pot_diff(efnv_correction):
     expected = ((1.5 - 0.2) + (2.0 - 0.3)) / 2
     assert efnv_correction.average_potential_diff == expected
