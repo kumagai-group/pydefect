@@ -318,7 +318,12 @@ def make_defect_formation_energy(args):
     defect_energies = make_energies(pcr, defects, defect_entries, corrections, abs_chem_pot)
 
     if args.print:
-        defect_energies = slide_energy(defect_energies, args.unitcell.vbm)
+        if args.supercell_edge:
+            vbm, cbm = pcr.vbm, pcr.cbm
+        else:
+            vbm, cbm = args.unitcell.vbm, args.unitcell.cbm
+
+        defect_energies = slide_energy(defect_energies, vbm)
         print("         charge          E_f   correction    ")
         for e in defect_energies:
             print(e)
@@ -327,9 +332,7 @@ def make_defect_formation_energy(args):
         print("-- cross points -- ")
         for e in defect_energies:
             print(e.name)
-            print(e.cross_points(ef_min=args.unitcell.vbm,
-                                 ef_max=args.unitcell.cbm,
-                                 base_ef=args.unitcell.vbm))
+            print(e.cross_points(ef_min=0, ef_max=cbm - vbm))
             print("")
         return
 
