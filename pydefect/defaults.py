@@ -16,7 +16,7 @@ class Defaults:
         self._e_above_hull = 1e-5
         self._cutoff_distance_factor = 1.3
         self._displace_distance = 0.2
-        self._same_distance_criterion = 0.1
+        self._same_distance_criterion = 0.5
         self._ele_neg_diff = 2.0
         self._kpoint_density = 5.0
         self._band_gap_criterion = 0.2  # in eV

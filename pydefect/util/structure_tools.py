@@ -32,9 +32,7 @@ class Distances:
     def atom_idx_at_center(self, specie: str) -> Optional[int]:
         distances = self.distances(remove_self=False, specie=specie)
         sorted_dists = sorted(distances)
-        if sorted_dists[1] - sorted_dists[0] < defaults.same_distance_criterion:
-            return None
-        if sorted_dists[0] == float("inf"):
+        if sorted_dists[0] > defaults.same_distance_criterion:
             return None
         return np.argmin(distances)
 
@@ -42,8 +40,10 @@ class Distances:
     def shortest_distance(self) -> float:
         return min(self.distances())
 
-    def coordination(self, include_on_site=False) -> "Coordination":
-        cutoff = self.shortest_distance * defaults.cutoff_distance_factor
+    def coordination(self, include_on_site=False, cutoff_factor=None
+                     ) -> "Coordination":
+        cutoff_factor = cutoff_factor or defaults.cutoff_distance_factor
+        cutoff = self.shortest_distance * cutoff_factor
         elements = [element.specie.name for element in self.structure]
         e_d = zip(elements, self.distances(remove_self=False))
 

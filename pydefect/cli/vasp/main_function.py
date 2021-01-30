@@ -8,7 +8,8 @@ from pydefect.analyzer.dash_components.cpd_energy_dash import \
     CpdEnergyComponent, make_energies
 from pydefect.analyzer.defect_energy import slide_energy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
-from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
+from pydefect.analyzer.defect_structure_comparator import \
+    DefectStructureComparator
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
@@ -245,11 +246,11 @@ def make_edge_characters(args):
         procar = Procar(d / defaults.procar)
         outcar = Outcar(d / defaults.outcar)
         calc_results = loadfn(d / "calc_results.json")
-        structure_analyzer = DefectStructureAnalyzer(
+        structure_comparator = DefectStructureComparator(
             calc_results.structure, args.perfect_calc_results.structure)
         edge_characters = MakeEdgeCharacters(
             procar, vasprun, outcar,
-            structure_analyzer.neighboring_atom_indices).edge_characters
+            structure_comparator.neighboring_atom_indices()).edge_characters
         edge_characters.to_json_file(d / "edge_characters.json")
 
 
