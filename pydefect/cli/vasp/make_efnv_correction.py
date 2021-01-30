@@ -6,7 +6,8 @@ from numpy import dot, cross
 from numpy.linalg import norm
 
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
+from pydefect.analyzer.defect_structure_comparator import \
+    DefectStructureComparator
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.ewald import Ewald
@@ -29,7 +30,7 @@ def make_efnv_correction(charge: int,
     """
     assert calc_results.structure.lattice == perfect_calc_results.structure.lattice
 
-    structure_analyzer = DefectStructureAnalyzer(
+    structure_analyzer = DefectStructureComparator(
         calc_results.structure, perfect_calc_results.structure)
     defect_coords = structure_analyzer.defect_center_coord
     lattice = calc_results.structure.lattice
@@ -42,7 +43,8 @@ def make_efnv_correction(charge: int,
     sites = []
     for d, p in structure_analyzer.atom_mapping.items():
         specie = str(calc_results.structure[d].specie)
-        distance = structure_analyzer.distance_from_center(d)
+        frac_coords = calc_results.structure[d].frac_coords
+        distance, _ = lattice.get_distance_and_image(defect_coords, frac_coords)
         pot = calc_results.potentials[d] - perfect_calc_results.potentials[p]
 
         coord = calc_results.structure[d].frac_coords

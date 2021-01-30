@@ -10,7 +10,8 @@ from crystal_toolkit.core.scene import Scene, Surface
 from monty.json import MSONable
 from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
+from pydefect.analyzer.defect_structure_comparator import \
+    DefectStructureComparator
 from pymatgen import Spin, Structure
 from pymatgen.analysis.graphs import StructureGraph
 from pymatgen.io.vasp import Chgcar, VolumetricData
@@ -152,8 +153,8 @@ def make_scene_dicts_json(parchg_list: List[str],
                           calc_results: CalcResults,
                           perfect_calc_results: CalcResults,
                           scene_level):
-    structure_analyzer = DefectStructureAnalyzer(calc_results.structure,
-                                                 perfect_calc_results.structure)
+    structure_analyzer = DefectStructureComparator(calc_results.structure,
+                                                   perfect_calc_results.structure)
     defect_pos = structure_analyzer.defect_center_coord
     scene_dicts = make_scene_dicts(parchg_list, defect_pos, level=scene_level)
     scene_dicts.to_json_file()

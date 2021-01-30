@@ -318,7 +318,7 @@ def test_make_edge_characters(mocker):
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
 
     mock_analyzer = mocker.patch(
-        "pydefect.cli.vasp.main_function.DefectStructureAnalyzer")
+        "pydefect.cli.vasp.main_function.DefectStructureComparator")
     mock_characters = mocker.patch(
         "pydefect.cli.vasp.main_function.MakeEdgeCharacters")
 
@@ -342,7 +342,7 @@ def test_make_edge_characters(mocker):
     mock_characters.assert_called_with(mock_procar.return_value,
                                        mock_vasprun.return_value,
                                        mock_outcar.return_value,
-                                       mock_analyzer.return_value.neighboring_atom_indices)
+                                       mock_analyzer.return_value.neighboring_atom_indices.return_value)
 
 
 def test_make_edge_state(mocker):

@@ -7,7 +7,8 @@ from typing import Tuple, Optional
 import numpy as np
 import yaml
 from monty.json import MSONable
-from pydefect.analyzer.defect_structure_analyzer import DefectStructureAnalyzer
+from pydefect.analyzer.defect_structure_comparator import \
+    DefectStructureComparator
 from pymatgen import IStructure
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.structure_symmetrizer import StructureSymmetrizer
@@ -61,7 +62,7 @@ def make_defect_entry(name: str,
                       perfect_structure: IStructure,
                       defect_structure: IStructure):
 
-    analyzer = DefectStructureAnalyzer(perfect_structure, defect_structure)
+    analyzer = DefectStructureComparator(perfect_structure, defect_structure)
 
     species = []
     frac_coords = []
