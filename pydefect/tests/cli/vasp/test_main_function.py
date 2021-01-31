@@ -15,7 +15,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_efnv_correction_from_vasp, make_defect_formation_energy, \
     make_defect_eigenvalues, make_edge_characters, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
-    plot_chem_pot_diag, make_gkfo_correction_from_vasp
+    plot_chem_pot_diag, make_gkfo_correction_from_vasp, show_defect_structure
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
@@ -424,4 +424,19 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
         mock_loadfn.assert_any_call(Path("Va_O1_2") / "correction.json")
 
 
+def test_show_defect_structure(mocker):
 
+    def side_effect(key):
+        print(key)
+        if str(key) == "Va_O1_2/defect_entry.json":
+            return "b"
+        elif str(key) == "Va_O1_2/calc_results.json":
+            return "c"
+        else:
+            raise ValueError
+
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
+    mock = mocker.patch("pydefect.cli.vasp.main_function.make_defect_structure_info")
+    args = Namespace(perfect_calc_results="a", defect_dir=Path("Va_O1_2"))
+    show_defect_structure(args)
+    mock.assert_called_with("a", "b", "c")

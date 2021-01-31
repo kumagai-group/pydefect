@@ -10,6 +10,7 @@ from pydefect.analyzer.defect_energy import slide_energy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
+from pydefect.analyzer.defect_structure_info import make_defect_structure_info
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
@@ -350,3 +351,14 @@ def make_defect_formation_energy(args):
 
     plotter.construct_plot()
     plotter.plt.savefig(f"energy_{args.label}.pdf")
+
+
+def show_defect_structure(args):
+    calc_results = loadfn(args.defect_dir / "calc_results.json")
+    defect_entry = loadfn(args.defect_dir / "defect_entry.json")
+    dsi = make_defect_structure_info(args.perfect_calc_results,
+                                     defect_entry,
+                                     calc_results,
+                                     correct_drift=True)
+    dsi.to()
+    print(dsi)

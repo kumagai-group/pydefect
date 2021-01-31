@@ -11,7 +11,9 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import Structure, Lattice
+from pymatgen import Structure, Lattice, DummySpecie
+from pymatgen.symmetry.groups import PointGroup
+from tabulate import tabulate
 from vise.util.enum import ExtendedEnum
 from vise.util.logger import get_logger
 from vise.util.structure_symmetrizer import StructureSymmetrizer
@@ -25,21 +27,27 @@ def fold_coords(structure: Structure, center: List[float]):
         site.frac_coords -= image
 
 
-def calc_drift_dist(perfect: Structure, defect: Structure, center: List[float],
-                    d_to_p: List[int]):
+def calc_drift(perfect: Structure, defect: Structure, center: List[float],
+               d_to_p: List[int]):
     distances = []
     for site in defect:
         distances.append(site.distance_and_image_from_frac_coords(center)[0])
     anchor_atom_idx = np.argmax(distances)
     p_anchor_atom_idx = d_to_p[anchor_atom_idx]
-    return defect[anchor_atom_idx].distance(perfect[p_anchor_atom_idx])
+
+    distance = defect[anchor_atom_idx].distance(perfect[p_anchor_atom_idx])
+    vector_in_frac = defect[anchor_atom_idx].frac_coords - perfect[p_anchor_atom_idx].frac_coords
+    return distance, vector_in_frac
 
 
 def calc_displacements(perfect: Structure, defect: Structure,
-                       center: List[float], d_to_p: List[int]):
+                       target_idxs: List[int], center: List[float],
+                       d_to_p: List[int]):
     result = []
     lattice: Lattice = defect.lattice
     for d, p in enumerate(d_to_p):
+        if d not in target_idxs:
+            continue
         if p is None:
             result.append(None)
         else:
@@ -61,54 +69,69 @@ def calc_displacements(perfect: Structure, defect: Structure,
             if math.isnan(angle):
                 angle = None
 
-            if disp_dist > 0.1 and 0 <= angle < 15:
-                annotation = "inward"
-            elif disp_dist > 0.1 and 75 <= angle < 90:
-                annotation = "outward"
-            else:
-                annotation = None
+            annotation = None
+            if angle:
+                if disp_dist > 0.1 and 0 <= angle < 30:
+                    annotation = "inward"
+                elif disp_dist > 0.1 and 150 <= angle < 180:
+                    annotation = "outward"
             result.append(Displacement(specie=elem,
                                        original_pos=orig_pos,
                                        final_pos=final_pos,
-                                       distance_from_defect=round(ini_dist, 3),
-                                       displace_distance=round(disp_dist, 3),
+                                       distance_from_defect=ini_dist,
+                                       displace_distance=disp_dist,
                                        angle=angle,
                                        annotation=annotation))
     return result
 
 
-def make_defect_structure_info(perfect: Structure,
+def make_defect_structure_info(perfect_calc_results: CalcResults,
                                defect_entry: DefectEntry,
-                               calc_results: CalcResults):
+                               calc_results: CalcResults,
+                               neighbor_cutoff_factor: float = 1.5,
+                               correct_drift: bool = False):
+    perfect = perfect_calc_results.structure.copy()
     initial = defect_entry.structure.copy()
     final = calc_results.structure.copy()
     assert perfect.lattice == initial.lattice == final.lattice
 
     comp_i = DefectStructureComparator(initial, perfect)
     comp_f = DefectStructureComparator(final, perfect)
+    neighbors = comp_f.neighboring_atom_indices(neighbor_cutoff_factor)
 
     center = comp_f.defect_center_coord
 
+    drift_dist, drift_vec = calc_drift(perfect, final, center, comp_f.d_to_p)
+
+    if correct_drift:
+        center -= drift_vec
+        for site in final:
+            site.frac_coords -= drift_vec
+
+    fold_coords(perfect, center)
     fold_coords(initial, center)
     fold_coords(final, center)
 
-    drift_dist = calc_drift_dist(perfect, final, center, comp_f.d_to_p)
-    assert drift_dist < 0.01
+    displacements = calc_displacements(
+        perfect, final, neighbors, center, comp_f.d_to_p)
 
-    displacements = calc_displacements(perfect, final, center, comp_f.d_to_p)
+    def remove_dot(x):
+        return "".join([s for s in x if s != "."])
 
-    return DefectStructureInfo(initial_point_group=defect_entry.site_symmetry,
+    return DefectStructureInfo(initial_point_group=remove_dot(defect_entry.site_symmetry),
                                final_point_group=calc_results.site_symmetry,
                                initial_structure=initial,
                                final_structure=final,
                                perfect_structure=perfect,
+                               fd_to_p=comp_f.d_to_p,
                                drift_dist=drift_dist,
                                initial_vacancies=comp_i.vacant_indices,
                                initial_interstitials=comp_i.inserted_indices,
                                final_vacancies=comp_f.vacant_indices,
                                final_interstitials=comp_f.inserted_indices,
                                defect_center_coord=tuple(center),
-                               displacements=displacements)
+                               displacements=displacements,
+                               neighboring_atom_indices=neighbors)
 
 
 class DefectType(MSONable, ExtendedEnum):
@@ -116,7 +139,6 @@ class DefectType(MSONable, ExtendedEnum):
     interstitial = "interstitial"
     substituted = "substituted"
     complex = "complex"
-#    split = "split"
 
 
 class SymmRelation(MSONable, ExtendedEnum):
@@ -148,6 +170,7 @@ class DefectStructureInfo(MSONable):
     initial_structure: Structure  # frac coords are shifted.
     final_structure: Structure  # frac coords are shifted.
     perfect_structure: Structure
+    fd_to_p: List[int]
 #    fd_to_id: List[int]
     drift_dist: float
 #    initial_defect_type: DefectType
@@ -158,38 +181,89 @@ class DefectStructureInfo(MSONable):
     final_interstitials: List[int]
     defect_center_coord: Tuple[float, float, float]
     displacements: List[Displacement]
-#    neighboring_atom_indices: List[int]
+    neighboring_atom_indices: List[int]
 
-    def symmetry_relation(self):
-        return
-    # def __repr__(self):
-    #     lines = [f"Site symmetry: {self.initial_sym} -> {self.final_sym}",
-    #              f"Transferred atoms:"]
-    #     for v in self.comparator.vacant_indices:
-    #         site = self.perfect_structure[v]
-    #         coords = [round(fc, 2) for fc in site.frac_coords]
-    #         lines.append(f" - {v:>3} {site.specie:>2} {coords}")
-    #     for i in self.comparator.inserted_indices:
-    #         site = self.defect_structure[i]
-    #         coords = [round(fc, 2) for fc in site.frac_coords]
-    #         lines.append(f" + {i:>3} {site.specie:>2} {coords}")
-
-        # lines.append("Displacements:")
-        # return "\n".join(lines)
-
-
-def fold_frac_coords(frac_coords, center=None):
-    center = center if center is not None else [0., 0., 0.]
-    for c in center:
-        assert 0.0 <= c < 1.0
-    result = []
-    for f, c in zip(frac_coords, center):
-        f = f % 1
-        if f < c:
-            result.append(f if c - f <= f + 1.0 - c else f + 1.0)
+    @property
+    def symm_rel_from_initial(self):
+        initial = PointGroup(self.initial_point_group)
+        final = PointGroup(self.final_point_group)
+        if initial == final:
+            return SymmRelation.same
+        elif final.is_subgroup(initial):
+            return SymmRelation.subgroup
+        elif final.is_supergroup(initial):
+            return SymmRelation.supergroup
         else:
-            result.append(f if f - c <= c - (f - 1.0) else f - 1.0)
-    return np.array(result)
+            return SymmRelation.another
+
+    @property
+    def same_config_from_initial(self):
+        return (self.initial_vacancies == self.final_vacancies
+                and self.initial_interstitials == self.final_interstitials)
+
+    def to(self):
+        fd_local = Structure.from_sites(
+            [self.final_structure[s] for s in self.neighboring_atom_indices])
+        for v in self.final_vacancies:
+            fd_local.append("H", coords=self.perfect_structure[v].frac_coords)
+        fd_local.to(filename="POSCAR_final_local")
+
+        x = [self.fd_to_p[i] for i in self.neighboring_atom_indices if self.fd_to_p[i]]
+        x.extend(self.final_vacancies)
+        p_local = Structure.from_sites([self.perfect_structure[s] for s in x])
+        p_local.to(filename="POSCAR_perfect_local")
+
+    def __repr__(self):
+        lines = [f"Site symmetry: {self.initial_point_group} "
+                 f"-> {self.final_point_group} ({self.symm_rel_from_initial})"]
+        lines.append(f"Is same configuration: {self.same_config_from_initial}")
+        lines.append(f"Drift distance: {self.drift_dist:5.3f}")
+        center_coords = [round(c, 3) for c in self.defect_center_coord]
+        lines.append(f"Defect center: {center_coords}")
+
+        lines.append("Removed atoms:")
+        x = []
+        for v in self.final_vacancies:
+            site = self.perfect_structure[v]
+            x.append([v, site.specie] + [round(fc, 2) for fc in site.frac_coords])
+        lines.append(tabulate(x))
+
+        lines.append("Added atoms:")
+        x = []
+        for i in self.final_interstitials:
+            site = self.final_structure[i]
+            x.append([i, site.specie] + [round(fc, 2) for fc in site.frac_coords])
+        lines.append(tabulate(x))
+
+        if self.same_config_from_initial is False:
+            lines.append("Initially removed atoms:")
+            x = []
+            for v in self.initial_vacancies:
+                site = self.perfect_structure[v]
+                x.append([v, site.specie] + [round(fc, 2) for fc in site.frac_coords])
+            lines.append(tabulate(x))
+
+            lines.append("Initially added atoms:")
+            x = []
+            for i in self.initial_interstitials:
+                site = self.initial_structure[i]
+                x.append([i, site.specie] + [round(fc, 2) for fc in site.frac_coords])
+            lines.append(tabulate(x))
+
+        lines.append("Displacements")
+        idxs = [[i, d] for i, d in enumerate(self.displacements) if d is not None]
+        x = []
+        for final_idx, d in sorted(idxs, key=lambda y: y[1].distance_from_defect):
+            i_pos = [round(c, 3) for c in d.original_pos]
+            f_pos = [round(c, 3) for c in d.final_pos]
+            angle = int(round(d.angle, -1)) if d.angle else ""
+            x.append([d.specie, round(d.distance_from_defect, 2),
+                      round(d.displace_distance, 2), angle, final_idx] + i_pos
+                     + ["->"] + f_pos + [d.annotation])
+
+        lines.append(tabulate(x))
+
+        return "\n".join(lines)
 
 
 def symmetrize_defect_structure(structure_symmetrizer: StructureSymmetrizer,

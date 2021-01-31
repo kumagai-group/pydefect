@@ -16,7 +16,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_calc_results, make_defect_formation_energy, make_defect_eigenvalues, \
     make_edge_characters, make_edge_states, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
-    plot_chem_pot_diag, make_gkfo_correction_from_vasp
+    plot_chem_pot_diag, make_gkfo_correction_from_vasp, show_defect_structure
 from pydefect.defaults import defaults
 from pymatgen import IStructure, Composition, Structure
 from pymatgen.io.vasp import Vasprun, Outcar
@@ -360,6 +360,20 @@ def parse_args(args):
         help="Port for web GUI.")
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
+
+    # -- defect structure ------------------------------------------------
+    parser_s = subparsers.add_parser(
+        name="show_defect_structure",
+        description="Show details of defect structure.",
+        parents=[pcr_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['sds'])
+
+    parser_s.add_argument(
+        "-d", "--defect_dir", required=True, type=Path,
+        help="Path to the defect directory.")
+    parser_s.set_defaults(func=show_defect_structure)
+
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
 

@@ -4,7 +4,7 @@ import shutil
 
 import fire
 from monty.serialization import loadfn
-from pydefect.analyzer.defect_structure_analyzer import \
+from pydefect.analyzer.defect_structure_info import \
     symmetrize_defect_structure
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry

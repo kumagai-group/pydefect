@@ -10,6 +10,7 @@ from pydefect.cli.vasp.main import parse_args
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
+from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pymatgen import Composition
 
@@ -346,5 +347,25 @@ def test_defect_formation_energy(mocker):
         add_charges=True,
         web_gui=False,
         port=8050,
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
+def test_defect_structure(mocker):
+    mock_perfect_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+
+    def side_effect(filename):
+        if filename == "perfect/calc_results.json":
+            return mock_perfect_calc_results
+        else:
+            raise ValueError
+
+    mock = mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
+    parsed_args = parse_args(["sds",
+                              "-pcr", "perfect/calc_results.json",
+                              "-d", "Va_O1_0"])
+    expected = Namespace(
+        perfect_calc_results=mock_perfect_calc_results,
+        defect_dir=Path("Va_O1_0"),
         func=parsed_args.func)
     assert parsed_args == expected
