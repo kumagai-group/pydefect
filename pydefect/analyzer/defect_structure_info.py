@@ -217,12 +217,15 @@ class DefectStructureInfo(MSONable):
         fd_local = Structure.from_sites(
             [self.final_structure[s] for s in self.neighboring_atom_indices])
         for v in self.final_vacancies:
-            fd_local.append("H", coords=self.perfect_structure[v].frac_coords)
+            fd_local.append("X", coords=self.perfect_structure[v].frac_coords)
         fd_local.to(filename="POSCAR_final_local")
 
-        x = [self.fd_to_p[i] for i in self.neighboring_atom_indices if self.fd_to_p[i]]
-        x.extend(self.final_vacancies)
-        p_local = Structure.from_sites([self.perfect_structure[s] for s in x])
+        neighbor_indices_in_p = [self.fd_to_p[i]
+                                 for i in self.neighboring_atom_indices
+                                 if self.fd_to_p[i] is not None]
+        neighbor_indices_in_p.extend(self.final_vacancies)
+        p_local = Structure.from_sites(
+            [self.perfect_structure[s] for s in neighbor_indices_in_p])
         p_local.to(filename="POSCAR_perfect_local")
 
     def __repr__(self):
