@@ -119,8 +119,8 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
     def remove_dot(x):
         return "".join([s for s in x if s != "."])
 
-    return DefectStructureInfo(initial_point_group=conv(remove_dot(defect_entry.site_symmetry)),
-                               final_point_group=conv(calc_results.site_symmetry),
+    return DefectStructureInfo(initial_point_group=conv_pg_uniquely(remove_dot(defect_entry.site_symmetry)),
+                               final_point_group=conv_pg_uniquely(calc_results.site_symmetry),
                                initial_structure=initial,
                                final_structure=final,
                                perfect_structure=perfect,
@@ -160,7 +160,7 @@ class Displacement(MSONable):
     annotation: Optional[str] = None
 
 
-def conv(pg):
+def conv_pg_uniquely(pg):
     if pg == "2mm" or pg == "m2m":
         return "mm2"
     if pg == "-4m2":

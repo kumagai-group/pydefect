@@ -6,7 +6,7 @@ import pytest
 from pydefect.analyzer.defect_structure_info import \
     Displacement, DefectStructureInfo, fold_coords, calc_drift, \
     calc_displacements, make_defect_structure_info, symmetrize_defect_structure, \
-    symmetry_relation, SymmRelation
+    symmetry_relation, SymmRelation, conv_pg_uniquely
 from pydefect.defaults import defaults
 from pydefect.tests.helpers.assertion import assert_msonable
 from pymatgen import Structure, Lattice
@@ -111,7 +111,8 @@ def test_str_info_msonable(def_str_info):
 
 def test_symmetry_relation():
     for point_group in num_sym_op:
-        assert symmetry_relation(point_group, point_group) == SymmRelation.same
+        pg = conv_pg_uniquely(point_group)
+        assert symmetry_relation(pg, pg) == SymmRelation.same
 
 
 def test_make_defect_structure_info(structures, def_str_info, mocker):
