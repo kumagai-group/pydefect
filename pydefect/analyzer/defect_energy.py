@@ -3,7 +3,7 @@
 import re
 from copy import deepcopy
 from dataclasses import dataclass
-from itertools import groupby
+from itertools import groupby, combinations
 from typing import List, Dict, Optional, Tuple
 
 import numpy as np
@@ -66,7 +66,15 @@ class DefectEnergy:
 
         return CrossPoints(inner_cross_points, boundary_points)
 
-    def pinning_level(self, ref_e: float = 0.0
+    def transition_levels(self, base_e: float = 0.0
+                          ) -> Dict[Tuple[int, int], float]:
+        result = {}
+        for (c1, e1), (c2, e2) in combinations(zip(self.charges, self.energies), 2):
+            result[(c1, c2)] = - (e1 - e2) / (c1 - c2)
+        return result
+
+    def pinning_level(self,
+                      base_e: float = 0.0
                       ) -> Tuple[Tuple[float, Optional[int]],
                                  Tuple[float, Optional[int]]]:
         """

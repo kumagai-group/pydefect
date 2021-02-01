@@ -32,6 +32,12 @@ def test_defect_energy_cross_points(defect_energy):
     assert actual == expected
 
 
+def test_defect_energy_transition_levels(defect_energy):
+    actual = defect_energy.transition_levels(base_e=0.0)
+    expected = {(0, 1): 2.0, (0, 2): 4.0, (1, 2): 6.0}
+    assert actual == expected
+
+
 def test_defect_energy_str(defect_energy):
     expected = """     Va_O1    0       4.0000       2.0000
      Va_O1    1       2.0000       1.0000
