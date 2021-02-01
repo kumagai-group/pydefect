@@ -42,7 +42,7 @@ class DefectEnergy:
             result.append(energy + correction)
         return result
 
-    def cross_points(self, ef_min, ef_max, base_ef=0.0):
+    def cross_points(self, ef_min, ef_max, base_e=0.0):
         large_minus_number = -1e4
         half_spaces = []
         for charge, corr_energy in zip(self.charges, self.corrected_energies):
@@ -60,9 +60,9 @@ class DefectEnergy:
         for intersection in hs.intersections:
             x, y = np.round(intersection, 8)
             if ef_min + 0.001 < x < ef_max - 0.001:
-                inner_cross_points.append([x - base_ef, y])
+                inner_cross_points.append([x - base_e, y])
             elif y > large_minus_number + 1:
-                boundary_points.append([x - base_ef, y])
+                boundary_points.append([x - base_e, y])
 
         return CrossPoints(inner_cross_points, boundary_points)
 
@@ -70,7 +70,7 @@ class DefectEnergy:
                       ) -> Tuple[Tuple[float, Optional[int]],
                                  Tuple[float, Optional[int]]]:
         """
-        :param ref_e: Reference to show the pinning level such as VBM.
+        :param base_e: Reference to show the pinning level such as VBM.
         :return: ((Lower pinning, its charge), (Upper pinning, its charge))
         """
         lower_pinning, upper_pinning = float("-inf"), float("inf")
@@ -83,8 +83,8 @@ class DefectEnergy:
                 lower_pinning, lower_charge = pinning, charge
             elif pinning < upper_pinning:
                 upper_pinning, upper_charge = pinning, charge
-        return ((lower_pinning - ref_e, lower_charge),
-                (upper_pinning - ref_e, upper_charge))
+        return ((lower_pinning - base_e, lower_charge),
+                (upper_pinning - base_e, upper_charge))
 
     def energy_at_ef(self, ef: float) -> Tuple[float, int]:
         """

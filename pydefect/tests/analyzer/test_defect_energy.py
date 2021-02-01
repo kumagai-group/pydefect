@@ -48,7 +48,7 @@ def test_stable_charges(defect_energy):
 
 def test_pinning(defect_energy):
     assert defect_energy.pinning_level() == ((2.0, 2), (float("inf"), None))
-    assert defect_energy.pinning_level(ref_e=1.0) == ((1.0, 2), (float("inf"), None))
+    assert defect_energy.pinning_level(base_e=1.0) == ((1.0, 2), (float("inf"), None))
 
 
 def test_energy_at_ef(defect_energy):
