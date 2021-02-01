@@ -5,11 +5,13 @@ import numpy as np
 import pytest
 from pydefect.analyzer.defect_structure_info import \
     Displacement, DefectStructureInfo, fold_coords, calc_drift, \
-    calc_displacements, make_defect_structure_info, symmetrize_defect_structure
+    calc_displacements, make_defect_structure_info, symmetrize_defect_structure, \
+    symmetry_relation, SymmRelation
 from pydefect.defaults import defaults
 from pydefect.tests.helpers.assertion import assert_msonable
 from pymatgen import Structure, Lattice
 from vise.util.structure_symmetrizer import StructureSymmetrizer
+from vise.util.structure_symmetrizer import num_sym_op
 
 
 @pytest.fixture
@@ -107,6 +109,11 @@ def test_str_info_msonable(def_str_info):
     assert_msonable(def_str_info)
 
 
+def test_symmetry_relation():
+    for point_group in num_sym_op:
+        assert symmetry_relation(point_group, point_group) == SymmRelation.same
+
+
 def test_make_defect_structure_info(structures, def_str_info, mocker):
     perfect, initial, final = structures
     p_calc_results = mocker.stub(name='perfect_calc_results')
@@ -124,26 +131,7 @@ def test_make_defect_structure_info(structures, def_str_info, mocker):
 
 
 def test_repr(def_str_info):
-    expected = """
-Site symmetry:
-  m-3m -> m-3m
-Defect center:
-  [0.4, 0.4, 0.4]
-Transferred atoms:
- - Cu [0.25, 0.25, 0.25]
- - Cu [0.25, 0.74, 0.74]
- + Cu [0.25, 0.5, 0.5]
- +  H [0.25, 0.25, 0.25]
-Defect type:
-  Complex defect
-Sum of displacement distances:
-  3.45 A
-Displacements:
-  Cu 1 [0.25, 0.75, 0.75] -> 1 [0.25, 0.75, 0.75] ([0.25, 0.75, 0.75])  0.0 A  0°
-  Cu 2 [0.25, 0.75, 0.75] -> 1 [0.25, 0.75, 0.75] ([0.25, 0.75, 0.75])  0.0 A  0° inward
-    """
     print(def_str_info)
-#    assert def_str_info.__repr__() == expected
 
 
 def test_symmetrize_defect_structure():

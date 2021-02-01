@@ -119,8 +119,8 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
     def remove_dot(x):
         return "".join([s for s in x if s != "."])
 
-    return DefectStructureInfo(initial_point_group=remove_dot(defect_entry.site_symmetry),
-                               final_point_group=calc_results.site_symmetry,
+    return DefectStructureInfo(initial_point_group=conv(remove_dot(defect_entry.site_symmetry)),
+                               final_point_group=conv(calc_results.site_symmetry),
                                initial_structure=initial,
                                final_structure=final,
                                perfect_structure=perfect,
@@ -160,6 +160,29 @@ class Displacement(MSONable):
     annotation: Optional[str] = None
 
 
+def conv(pg):
+    if pg == "2mm" or pg == "m2m":
+        return "mm2"
+    if pg == "-4m2":
+        return "-42m"
+    if pg == "m3":
+        return "m-3"
+    return pg
+
+
+def symmetry_relation(initial_point_group, final_point_group):
+    initial = PointGroup(initial_point_group)
+    final = PointGroup(final_point_group)
+    if initial == final:
+        return SymmRelation.same
+    elif final.is_subgroup(initial):
+        return SymmRelation.subgroup
+    elif final.is_supergroup(initial):
+        return SymmRelation.supergroup
+    else:
+        return SymmRelation.another
+
+
 @dataclass
 class DefectStructureInfo(MSONable):
     initial_point_group: str
@@ -181,17 +204,9 @@ class DefectStructureInfo(MSONable):
     neighboring_atom_indices: List[int]
 
     @property
-    def symm_rel_from_initial(self):
-        initial = PointGroup(self.initial_point_group)
-        final = PointGroup(self.final_point_group)
-        if initial == final:
-            return SymmRelation.same
-        elif final.is_subgroup(initial):
-            return SymmRelation.subgroup
-        elif final.is_supergroup(initial):
-            return SymmRelation.supergroup
-        else:
-            return SymmRelation.another
+    def symmetry_relation(self):
+        return symmetry_relation(
+            self.initial_point_group, self.final_point_group)
 
     @property
     def same_config_from_initial(self):
@@ -212,7 +227,7 @@ class DefectStructureInfo(MSONable):
 
     def __repr__(self):
         lines = [f"Site symmetry: {self.initial_point_group} "
-                 f"-> {self.final_point_group} ({self.symm_rel_from_initial})"]
+                 f"-> {self.final_point_group} ({self.symmetry_relation})"]
         lines.append(f"Is same configuration: {self.same_config_from_initial}")
         lines.append(f"Drift distance: {self.drift_dist:5.3f}")
         center_coords = [round(c, 3) for c in self.defect_center_coord]
