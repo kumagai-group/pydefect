@@ -40,13 +40,15 @@ def calc_drift(perfect: Structure, defect: Structure, center: List[float],
     return distance, vector_in_frac
 
 
-def calc_displacements(perfect: Structure, defect: Structure,
-                       target_idxs: List[int], center: List[float],
-                       d_to_p: List[int]):
+def calc_displacements(perfect: Structure,
+                       defect: Structure,
+                       center: List[float],
+                       d_to_p: List[int],
+                       target_idxs: List[int] = None):
     result = []
     lattice: Lattice = defect.lattice
     for d, p in enumerate(d_to_p):
-        if d not in target_idxs:
+        if target_idxs and d not in target_idxs:
             continue
         if p is None:
             result.append(None)
@@ -98,7 +100,6 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
     comp_i = DefectStructureComparator(initial, perfect)
     comp_f = DefectStructureComparator(final, perfect)
     neighbors = comp_f.neighboring_atom_indices(neighbor_cutoff_factor)
-
     center = comp_f.defect_center_coord
 
     drift_dist, drift_vec = calc_drift(perfect, final, center, comp_f.d_to_p)
@@ -113,7 +114,7 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
     fold_coords(final, center)
 
     displacements = calc_displacements(
-        perfect, final, neighbors, center, comp_f.d_to_p)
+        perfect, final, center, comp_f.d_to_p, neighbors)
 
     def remove_dot(x):
         return "".join([s for s in x if s != "."])
@@ -156,11 +157,7 @@ class Displacement(MSONable):
     distance_from_defect: float
     displace_distance: float
     angle: Optional[float]
-    annotation: str = None
-
-    # def __repr__(self):
-    #     return f" {self.specie:>2} {self.site:>3} {self.initial_distance:.2f>5} " \
-    #            f"{self.displace_distance:} {} -> {}"
+    annotation: Optional[str] = None
 
 
 @dataclass

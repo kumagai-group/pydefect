@@ -439,4 +439,4 @@ def test_show_defect_structure(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main_function.make_defect_structure_info")
     args = Namespace(perfect_calc_results="a", defect_dir=Path("Va_O1_2"))
     show_defect_structure(args)
-    mock.assert_called_with("a", "b", "c")
+    mock.assert_called_with("a", "b", "c", correct_drift=True)

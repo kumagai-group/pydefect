@@ -38,19 +38,18 @@ def displacements():
             Displacement(specie="He",
                          original_pos=(0.75, 0.75, 0.75),
                          final_pos=(0.74, 0.74, 0.74),
-                         distance_from_defect=round(x, 3),
-                         displace_distance=round(np.sqrt(3) * 10 * 0.01, 3),
+                         distance_from_defect=round(x, 14),
+                         displace_distance=0.17320508075688712,
                          angle=0.0,
-                         annotation="inward"),
+                         annotation=None),
             None,
             Displacement(specie="U",
                          original_pos=(0, 0, 0),
                          final_pos=(0.0, 0.0, 0.0001),
-                         distance_from_defect=round(np.sqrt(3) * 10 * 0.4, 3),
+                         distance_from_defect=np.sqrt(3) * 10 * 0.4,
                          displace_distance=0.001,
                          angle=54.7,
-                         annotation=None),
-            ]
+                         annotation=None)]
 
 
 @pytest.fixture
@@ -61,6 +60,7 @@ def def_str_info(structures, displacements):
                                initial_structure=initial,
                                final_structure=final,
                                perfect_structure=perfect,
+                               fd_to_p=[None, 1, None, 3],
 #                               fd_to_id=[None, 1, 2, 3],
                                drift_dist=0.001,
 #                               initial_defect_type=DefectType.substituted,
@@ -70,8 +70,8 @@ def def_str_info(structures, displacements):
                                final_vacancies=[0, 2],
                                final_interstitials=[0, 2],
                                defect_center_coord=(0.4, 0.4, 0.4),
-                               displacements=displacements)
-#                               neighboring_atom_indices=[0, 1, 2])
+                               displacements=displacements,
+                               neighboring_atom_indices=[0, 1, 2])
 
 
 def test_fold_coords():
@@ -87,10 +87,11 @@ def test_fold_coords():
 
 def test_calc_drift_dist(structures):
     perfect, _, final = structures
-    drift_dist = calc_drift(perfect, final,
-                            center=[0.4, 0.4, 0.4],
-                            d_to_p=[None, 1, 2, 3])
+    drift_dist, vector_in_frac = calc_drift(perfect, final,
+                                            center=[0.4, 0.4, 0.4],
+                                            d_to_p=[None, 1, 2, 3])
     assert drift_dist == 0.001
+    np.testing.assert_almost_equal(vector_in_frac, np.array([0.0, 0.0, 0.0001]))
 
 
 def test_calc_displacements(structures, displacements):
@@ -117,8 +118,9 @@ def test_make_defect_structure_info(structures, def_str_info, mocker):
     defect_entry.site_symmetry = "m-3m"
     d_calc_results.structure = final
     d_calc_results.site_symmetry = "m-3m"
-    actual = make_defect_structure_info(p_calc_results, defect_entry, d_calc_results)
-    assert actual == def_str_info
+    actual = make_defect_structure_info(p_calc_results, defect_entry, d_calc_results,
+                                        neighbor_cutoff_factor=3)
+    assert actual.__repr__() == def_str_info.__repr__()
 
 
 def test_repr(def_str_info):
