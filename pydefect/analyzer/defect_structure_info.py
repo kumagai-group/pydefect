@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import math
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional, List, Tuple
 
 import numpy as np
@@ -213,12 +214,12 @@ class DefectStructureInfo(MSONable):
         return (self.initial_vacancies == self.final_vacancies
                 and self.initial_interstitials == self.final_interstitials)
 
-    def to(self):
+    def to(self, dir_name: Path = Path(".")):
         fd_local = Structure.from_sites(
             [self.final_structure[s] for s in self.neighboring_atom_indices])
         for v in self.final_vacancies:
             fd_local.append("X", coords=self.perfect_structure[v].frac_coords)
-        fd_local.to(filename="POSCAR_final_local")
+        fd_local.to(filename=dir_name / "POSCAR_final_local")
 
         neighbor_indices_in_p = [self.fd_to_p[i]
                                  for i in self.neighboring_atom_indices
@@ -226,7 +227,7 @@ class DefectStructureInfo(MSONable):
         neighbor_indices_in_p.extend(self.final_vacancies)
         p_local = Structure.from_sites(
             [self.perfect_structure[s] for s in neighbor_indices_in_p])
-        p_local.to(filename="POSCAR_perfect_local")
+        p_local.to(filename=dir_name / "POSCAR_perfect_local")
 
     def __repr__(self):
         lines = [f"Site symmetry: {self.initial_point_group} "

@@ -360,5 +360,5 @@ def show_defect_structure(args):
                                      defect_entry,
                                      calc_results,
                                      correct_drift=True)
-    dsi.to()
+    dsi.to(args.defect_dir)
     print(dsi)
