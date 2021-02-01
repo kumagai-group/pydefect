@@ -88,6 +88,26 @@ def calc_displacements(perfect: Structure,
     return result
 
 
+def remove_dot(x):
+    return "".join([s for s in x if s != "."])
+
+
+def make_defect_change(perfect_calc_results: CalcResults,
+                       defect_entry: DefectEntry,
+                       calc_results: CalcResults):
+    perfect = perfect_calc_results.structure.copy()
+    initial = defect_entry.structure.copy()
+    final = calc_results.structure.copy()
+    comp_i = DefectStructureComparator(initial, perfect)
+    comp_f = DefectStructureComparator(final, perfect)
+    return DefectChange(initial_point_group=conv_pg_uniquely(remove_dot(defect_entry.site_symmetry)),
+                        final_point_group=conv_pg_uniquely(calc_results.site_symmetry),
+                        initial_vacancies=comp_i.vacant_indices,
+                        initial_interstitials=comp_i.inserted_indices,
+                        final_vacancies=comp_f.vacant_indices,
+                        final_interstitials=comp_f.inserted_indices)
+
+
 def make_defect_structure_info(perfect_calc_results: CalcResults,
                                defect_entry: DefectEntry,
                                calc_results: CalcResults,
@@ -116,9 +136,6 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
 
     displacements = calc_displacements(
         perfect, final, center, comp_f.d_to_p, neighbors)
-
-    def remove_dot(x):
-        return "".join([s for s in x if s != "."])
 
     return DefectStructureInfo(initial_point_group=conv_pg_uniquely(remove_dot(defect_entry.site_symmetry)),
                                final_point_group=conv_pg_uniquely(calc_results.site_symmetry),
@@ -182,6 +199,26 @@ def symmetry_relation(initial_point_group, final_point_group):
         return SymmRelation.supergroup
     else:
         return SymmRelation.another
+
+
+@dataclass
+class DefectChange(MSONable):
+    initial_point_group: str
+    final_point_group: str
+    initial_vacancies: List[int]
+    initial_interstitials: List[int]
+    final_vacancies: List[int]
+    final_interstitials: List[int]
+
+    @property
+    def symmetry_relation(self):
+        return symmetry_relation(
+            self.initial_point_group, self.final_point_group)
+
+    @property
+    def same_config_from_initial(self):
+        return (self.initial_vacancies == self.final_vacancies
+                and self.initial_interstitials == self.final_interstitials)
 
 
 @dataclass
