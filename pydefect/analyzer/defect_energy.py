@@ -24,6 +24,9 @@ class SingleDefectEnergy:
     energy: float
     correction: float
 
+    @property
+    def corrected_energy(self):
+        return self.energy + self.correction
 
 @dataclass
 class DefectEnergy:
