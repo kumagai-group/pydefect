@@ -12,8 +12,8 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import Structure, Lattice, DummySpecie
-from pymatgen.symmetry.groups import PointGroup
+from pymatgen import Structure, Lattice
+from pymatgen.symmetry.groups import SpaceGroup
 from tabulate import tabulate
 from vise.util.enum import ExtendedEnum
 from vise.util.logger import get_logger
@@ -189,8 +189,13 @@ def conv_pg_uniquely(pg):
 
 
 def symmetry_relation(initial_point_group, final_point_group):
-    initial = PointGroup(initial_point_group)
-    final = PointGroup(final_point_group)
+    if initial_point_group in ["3m", "-3m"]:
+        initial_point_group += "1"
+    if final_point_group in ["3m", "-3m"]:
+        final_point_group += "1"
+
+    initial = SpaceGroup(f"P{initial_point_group}")
+    final = SpaceGroup(f"P{final_point_group}")
     if initial == final:
         return SymmRelation.same
     elif final.is_subgroup(initial):

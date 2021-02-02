@@ -113,6 +113,10 @@ def test_symmetry_relation():
     for point_group in num_sym_op:
         pg = conv_pg_uniquely(point_group)
         assert symmetry_relation(pg, pg) == SymmRelation.same
+    assert symmetry_relation("3m", "m") == SymmRelation.subgroup
+    assert symmetry_relation("4", "2") == SymmRelation.subgroup
+    assert symmetry_relation("-43m", "mm2") == SymmRelation.subgroup
+    assert symmetry_relation("4/m", "2") == SymmRelation.subgroup
 
 
 def test_make_defect_structure_info(structures, def_str_info, mocker):
