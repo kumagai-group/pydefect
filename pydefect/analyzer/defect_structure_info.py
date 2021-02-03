@@ -94,12 +94,13 @@ def remove_dot(x):
 
 def make_defect_change(perfect_calc_results: CalcResults,
                        defect_entry: DefectEntry,
-                       calc_results: CalcResults):
+                       calc_results: CalcResults,
+                       same_distance_criterion: float = None):
     perfect = perfect_calc_results.structure.copy()
     initial = defect_entry.structure.copy()
     final = calc_results.structure.copy()
-    comp_i = DefectStructureComparator(initial, perfect)
-    comp_f = DefectStructureComparator(final, perfect)
+    comp_i = DefectStructureComparator(initial, perfect, same_distance_criterion)
+    comp_f = DefectStructureComparator(final, perfect, same_distance_criterion)
     return DefectChange(initial_point_group=conv_pg_uniquely(remove_dot(defect_entry.site_symmetry)),
                         final_point_group=conv_pg_uniquely(calc_results.site_symmetry),
                         initial_vacancies=comp_i.vacant_indices,
