@@ -28,6 +28,7 @@ class SingleDefectEnergy:
     def corrected_energy(self):
         return self.energy + self.correction
 
+
 @dataclass
 class DefectEnergy:
     name: str
@@ -69,11 +70,12 @@ class DefectEnergy:
 
         return CrossPoints(inner_cross_points, boundary_points)
 
-    def transition_levels(self, base_e: float = 0.0
-                          ) -> Dict[Tuple[int, int], float]:
+    def transition_levels(
+            self, base_e: float = 0.0) -> Dict[Tuple[int, int], float]:
         result = {}
-        for (c1, e1), (c2, e2) in combinations(zip(self.charges, self.energies), 2):
-            result[(c1, c2)] = - (e1 - e2) / (c1 - c2)
+        for (c1, e1), (c2, e2) in combinations(
+                zip(self.charges, self.corrected_energies), 2):
+            result[(c1, c2)] = - (e1 - e2) / (c1 - c2) - base_e
         return result
 
     def pinning_level(self,

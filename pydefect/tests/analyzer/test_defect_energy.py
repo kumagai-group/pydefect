@@ -34,7 +34,11 @@ def test_defect_energy_cross_points(defect_energy):
 
 def test_defect_energy_transition_levels(defect_energy):
     actual = defect_energy.transition_levels(base_e=0.0)
-    expected = {(0, 1): 2.0, (0, 2): 4.0, (1, 2): 6.0}
+    expected = {(0, 1): 3.0, (0, 2): 5.0, (1, 2): 7.0}
+    assert actual == expected
+
+    actual = defect_energy.transition_levels(base_e=0.1)
+    expected = {(0, 1): 2.9, (0, 2): 4.9, (1, 2): 6.9}
     assert actual == expected
 
 
