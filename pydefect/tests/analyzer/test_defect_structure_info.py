@@ -42,16 +42,14 @@ def displacements():
                          final_pos=(0.74, 0.74, 0.74),
                          distance_from_defect=round(x, 14),
                          displace_distance=0.17320508075688712,
-                         angle=0.0,
-                         annotation=None),
+                         angle=0.0),
             None,
             Displacement(specie="U",
                          original_pos=(0, 0, 0),
                          final_pos=(0.0, 0.0, 0.0001),
                          distance_from_defect=np.sqrt(3) * 10 * 0.4,
                          displace_distance=0.001,
-                         angle=54.7,
-                         annotation=None)]
+                         angle=54.7)]
 
 
 @pytest.fixture

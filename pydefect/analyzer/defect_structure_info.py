@@ -72,19 +72,12 @@ def calc_displacements(perfect: Structure,
             if math.isnan(angle):
                 angle = None
 
-            annotation = None
-            if angle:
-                if disp_dist > 0.1 and 0 <= angle < 30:
-                    annotation = "inward"
-                elif disp_dist > 0.1 and 150 <= angle < 180:
-                    annotation = "outward"
             result.append(Displacement(specie=elem,
                                        original_pos=orig_pos,
                                        final_pos=final_pos,
                                        distance_from_defect=ini_dist,
                                        displace_distance=disp_dist,
-                                       angle=angle,
-                                       annotation=annotation))
+                                       angle=angle))
     return result
 
 
@@ -176,7 +169,6 @@ class Displacement(MSONable):
     distance_from_defect: float
     displace_distance: float
     angle: Optional[float]
-    annotation: Optional[str] = None
 
 
 def conv_pg_uniquely(pg):
@@ -274,9 +266,9 @@ class DefectStructureInfo(MSONable):
 
     def __repr__(self):
         lines = [f"Site symmetry: {self.initial_point_group} "
-                 f"-> {self.final_point_group} ({self.symmetry_relation})"]
-        lines.append(f"Is same configuration: {self.same_config_from_initial}")
-        lines.append(f"Drift distance: {self.drift_dist:5.3f}")
+                 f"-> {self.final_point_group} ({self.symmetry_relation})",
+                 f"Is same configuration: {self.same_config_from_initial}",
+                 f"Drift distance: {self.drift_dist:5.3f}"]
         center_coords = [round(c, 3) for c in self.defect_center_coord]
         lines.append(f"Defect center: {center_coords}")
 
@@ -318,7 +310,7 @@ class DefectStructureInfo(MSONable):
             angle = int(round(d.angle, -1)) if d.angle else ""
             x.append([d.specie, round(d.distance_from_defect, 2),
                       round(d.displace_distance, 2), angle, final_idx] + i_pos
-                     + ["->"] + f_pos + [d.annotation])
+                     + ["->"] + f_pos)
 
         lines.append(tabulate(x))
 
