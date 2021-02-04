@@ -88,6 +88,7 @@ def remove_dot(x):
 def make_defect_structure_info(perfect_calc_results: CalcResults,
                                defect_entry: DefectEntry,
                                calc_results: CalcResults,
+                               same_dist_criterion: float = None,
                                neighbor_cutoff_factor: float = 1.5,
                                correct_drift: bool = False):
     perfect = perfect_calc_results.structure.copy()
@@ -95,8 +96,8 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
     final = calc_results.structure.copy()
     assert perfect.lattice == initial.lattice == final.lattice
 
-    comp_i = DefectStructureComparator(initial, perfect)
-    comp_f = DefectStructureComparator(final, perfect)
+    comp_i = DefectStructureComparator(initial, perfect, same_dist_criterion)
+    comp_f = DefectStructureComparator(final, perfect, same_dist_criterion)
     neighbors = comp_f.neighboring_atom_indices(neighbor_cutoff_factor)
     center = comp_f.defect_center_coord
 
@@ -114,8 +115,10 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
     displacements = calc_displacements(
         perfect, final, center, comp_f.d_to_p, neighbors)
 
-    return DefectStructureInfo(initial_point_group=unique_poing_group(remove_dot(defect_entry.site_symmetry)),
-                               final_point_group=unique_poing_group(calc_results.site_symmetry),
+    initial_pg = unique_poing_group(remove_dot(defect_entry.site_symmetry))
+    final_pg = unique_poing_group(calc_results.site_symmetry)
+    return DefectStructureInfo(initial_point_group=initial_pg,
+                               final_point_group=final_pg,
                                initial_structure=initial,
                                final_structure=final,
                                perfect_structure=perfect,

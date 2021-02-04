@@ -6,7 +6,7 @@ import pytest
 from pydefect.analyzer.defect_structure_info import \
     Displacement, DefectStructureInfo, fold_coords, calc_drift, \
     calc_displacements, make_defect_structure_info, symmetrize_defect_structure, \
-    symmetry_relation, SymmRelation, unique_poing_group
+    symmetry_relation, SymmRelation, unique_poing_group, elem_and_indices
 from pydefect.defaults import defaults
 from pydefect.tests.helpers.assertion import assert_msonable
 from pymatgen import Structure, Lattice
@@ -100,6 +100,12 @@ def test_calc_displacements(structures, displacements):
                                 center=[0.4, 0.4, 0.4],
                                 d_to_p=[None, 1, None, 3])
     expected = displacements
+    assert actual == expected
+
+
+def test_elem_and_indices(structures):
+    actual = elem_and_indices(structures[0], indices=[1, 2])
+    expected = [("He", 1), ("Li", 2)]
     assert actual == expected
 
 
