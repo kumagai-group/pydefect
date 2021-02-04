@@ -114,8 +114,8 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
     displacements = calc_displacements(
         perfect, final, center, comp_f.d_to_p, neighbors)
 
-    return DefectStructureInfo(initial_point_group=conv_pg_uniquely(remove_dot(defect_entry.site_symmetry)),
-                               final_point_group=conv_pg_uniquely(calc_results.site_symmetry),
+    return DefectStructureInfo(initial_point_group=unique_poing_group(remove_dot(defect_entry.site_symmetry)),
+                               final_point_group=unique_poing_group(calc_results.site_symmetry),
                                initial_structure=initial,
                                final_structure=final,
                                perfect_structure=perfect,
@@ -154,7 +154,7 @@ class Displacement(MSONable):
     angle: Optional[float]
 
 
-def conv_pg_uniquely(pg):
+def unique_poing_group(pg):
     if pg == "2mm" or pg == "m2m":
         return "mm2"
     if pg == "-4m2":
