@@ -85,6 +85,13 @@ def remove_dot(x):
     return "".join([s for s in x if s != "."])
 
 
+def elem_and_indices(structure: Structure, indices):
+    result = []
+    for i in indices:
+        result.append((str(structure[i].specie), i))
+    return result
+
+
 def make_defect_structure_info(perfect_calc_results: CalcResults,
                                defect_entry: DefectEntry,
                                calc_results: CalcResults,
