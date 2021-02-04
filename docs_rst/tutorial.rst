@@ -198,7 +198,8 @@ We can retrieve POSCARs of the stable or slightly unstable competing phases
 from `the Materials Project (MP) <https://materialsproject.org>`_.
 For this purpose, one needs `the API keys <https://materialsproject.org/open>`_
 of the MP as mentioned above.
-Here, we obtain the competing materials with MgSe whose energies above hull are less than 0.5 meV/atom using
+Here, we obtain the competing materials with MgSe
+whose energies above hull are less than 0.5 meV/atom using
 
 ::
 
@@ -644,7 +645,7 @@ which parses the :code:`POSCAR` files and defect name as follows.
 
 ::
 
-    python $PATH_TO_FILE/create_defect_entry.py complex_2 complex_2/POSCAR perfect/POSCAR
+    python $PATH_TO_FILE/create_defect_entry.py complex_2 perfect/POSCAR complex_2/POSCAR
 
 which creates the :code:`defect_entry.json` file. The directory name is then parsed as
 
@@ -739,7 +740,7 @@ so as to reduce careless mistakes as much as possible.
 ============================================================================
 11. Check defect eigenvalues and band-edge states in supercell calculations
 ============================================================================
-Generally, point defects are divided into three types.
+Generally, point defects are categorized into three types.
 
 (1) Defects with deep localized states inside the band gap.
 This type of defect is generally considered to be detrimental
@@ -874,3 +875,8 @@ which shows like,
 
 When changing the condition for chemical potential, namely the position of the vertex in the chemical potential diagram,
 use the :code:`-l` option.
+
+If the calculation data exists locally, the web GUI may be used with the :code:`-wg` option.
+
+
+
