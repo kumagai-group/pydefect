@@ -64,11 +64,11 @@ def def_str_info(structures, displacements):
 #                               fd_to_id=[None, 1, 2, 3],
                                drift_dist=0.001,
 #                               initial_defect_type=DefectType.substituted,
-                               initial_vacancies=[2],
-                               initial_interstitials=[2],
+                               initial_vacancies=[("Li", 2)],
+                               initial_interstitials=[("Be", 2)],
 #                               final_defect_type=DefectType.complex,
-                               final_vacancies=[0, 2],
-                               final_interstitials=[0, 2],
+                               final_vacancies=[("H", 0), ("Li", 2)],
+                               final_interstitials=[("H", 0), ("Be", 2)],
                                defect_center_coord=(0.4, 0.4, 0.4),
                                displacements=displacements,
                                neighboring_atom_indices=[0, 1, 2])
@@ -134,8 +134,8 @@ def test_make_defect_structure_info(structures, def_str_info, mocker):
     defect_entry.site_symmetry = "m-3m"
     d_calc_results.structure = final
     d_calc_results.site_symmetry = "m-3m"
-    actual = make_defect_structure_info(p_calc_results, defect_entry, d_calc_results,
-                                        neighbor_cutoff_factor=3)
+    actual = make_defect_structure_info(
+        p_calc_results, defect_entry, d_calc_results, neighbor_cutoff_factor=3)
     assert actual.__repr__() == def_str_info.__repr__()
 
 

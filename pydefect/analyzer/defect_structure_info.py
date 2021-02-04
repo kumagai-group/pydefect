@@ -122,6 +122,11 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
     displacements = calc_displacements(
         perfect, final, center, comp_f.d_to_p, neighbors)
 
+    initial_vac = elem_and_indices(initial, comp_i.vacant_indices)
+    initial_int = elem_and_indices(initial, comp_i.inserted_indices)
+    final_vac = elem_and_indices(final, comp_f.vacant_indices)
+    final_int = elem_and_indices(final, comp_f.inserted_indices)
+
     initial_pg = unique_poing_group(remove_dot(defect_entry.site_symmetry))
     final_pg = unique_poing_group(calc_results.site_symmetry)
     return DefectStructureInfo(initial_point_group=initial_pg,
@@ -131,10 +136,10 @@ def make_defect_structure_info(perfect_calc_results: CalcResults,
                                perfect_structure=perfect,
                                fd_to_p=comp_f.d_to_p,
                                drift_dist=drift_dist,
-                               initial_vacancies=comp_i.vacant_indices,
-                               initial_interstitials=comp_i.inserted_indices,
-                               final_vacancies=comp_f.vacant_indices,
-                               final_interstitials=comp_f.inserted_indices,
+                               initial_vacancies=initial_vac,
+                               initial_interstitials=initial_int,
+                               final_vacancies=final_vac,
+                               final_interstitials=final_int,
                                defect_center_coord=tuple(center),
                                displacements=displacements,
                                neighboring_atom_indices=neighbors)
@@ -203,11 +208,11 @@ class DefectStructureInfo(MSONable):
 #    fd_to_id: List[int]
     drift_dist: float
 #    initial_defect_type: DefectType
-    initial_vacancies: List[int]
-    initial_interstitials: List[int]
+    initial_vacancies: List[Tuple[str, int]]
+    initial_interstitials: List[Tuple[str, int]]
 #    final_defect_type: DefectType
-    final_vacancies: List[int]
-    final_interstitials: List[int]
+    final_vacancies: List[Tuple[str, int]]
+    final_interstitials: List[Tuple[str, int]]
     defect_center_coord: Tuple[float, float, float]
     displacements: List[Displacement]
     neighboring_atom_indices: List[int]
@@ -247,14 +252,14 @@ class DefectStructureInfo(MSONable):
 
         lines.append("Removed atoms:")
         x = []
-        for v in self.final_vacancies:
+        for _, v in self.final_vacancies:
             site = self.perfect_structure[v]
             x.append([v, site.specie] + [round(fc, 2) for fc in site.frac_coords])
         lines.append(tabulate(x))
 
         lines.append("Added atoms:")
         x = []
-        for i in self.final_interstitials:
+        for _, i in self.final_interstitials:
             site = self.final_structure[i]
             x.append([i, site.specie] + [round(fc, 2) for fc in site.frac_coords])
         lines.append(tabulate(x))
@@ -262,14 +267,14 @@ class DefectStructureInfo(MSONable):
         if self.same_config_from_initial is False:
             lines.append("Initially removed atoms:")
             x = []
-            for v in self.initial_vacancies:
+            for _, v in self.initial_vacancies:
                 site = self.perfect_structure[v]
                 x.append([v, site.specie] + [round(fc, 2) for fc in site.frac_coords])
             lines.append(tabulate(x))
 
             lines.append("Initially added atoms:")
             x = []
-            for i in self.initial_interstitials:
+            for _, i in self.initial_interstitials:
                 site = self.initial_structure[i]
                 x.append([i, site.specie] + [round(fc, 2) for fc in site.frac_coords])
             lines.append(tabulate(x))
