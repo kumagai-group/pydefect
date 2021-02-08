@@ -116,6 +116,13 @@ def test_site_diff():
     assert_msonable(site_diff)
 
 
+def test_is_no_diff():
+    site_diff = SiteDiff(removed={}, inserted={}, mapping={1: 2})
+    assert site_diff.is_no_diff is True
+    site_diff = SiteDiff(removed={1: ("H", (0.0, 0.0, 0.0))},
+                         inserted={}, mapping={1: 2})
+    assert site_diff.is_no_diff is False
+
 # def test_make_defect_type():
 #     lattice = Lattice.cubic(10)
 #     assert make_defect_type([("")], [], lattice) == DefectType.vacancy

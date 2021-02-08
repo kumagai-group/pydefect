@@ -123,6 +123,9 @@ class SiteDiff(MSONable):
     inserted: Dict[int, Tuple[str, Tuple[float, float, float]]]
     mapping: Dict[int, int]
 
+    @property
+    def is_no_diff(self):
+        return self.removed == {} and self.inserted == {}
 
 #
 # def make_defect_type(vacancies, interstitials, lattice, same_dist_criterion):
