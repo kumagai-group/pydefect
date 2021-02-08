@@ -67,7 +67,7 @@ def structure_analyzer_periodic_issue():
 
 def test_atom_mapping_to_perfect(structure_analyzer):
     assert structure_analyzer.atom_mapping == {1: 2, 2: 3, 3: 4, 4: 5}
-    assert structure_analyzer.vacant_indices == [0, 1]
+    assert structure_analyzer.removed_indices == [0, 1]
     assert structure_analyzer.inserted_indices == [0, 5]
 
 
@@ -102,7 +102,7 @@ def test_actual_files(vasp_files):
     a.pop(96)
     expected = dict(zip(range(191), a))
     assert dsa.inserted_indices == []
-    assert dsa.vacant_indices == [96]
+    assert dsa.removed_indices == [96]
     assert dsa.atom_mapping == expected
 
 

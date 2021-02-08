@@ -45,7 +45,7 @@ class DefectStructureComparator:
         return result
 
     @property
-    def vacant_indices(self):
+    def removed_indices(self):
         result = []
         for p, d in enumerate(self.p_to_d):
             try:
@@ -69,7 +69,7 @@ class DefectStructureComparator:
     @property
     def defect_center_coord(self):
         coords = []
-        for v in self.vacant_indices:
+        for v in self.removed_indices:
             coords.append(self._perfect_structure[v].frac_coords)
         for i in self.inserted_indices:
             coords.append(self._defect_structure[i].frac_coords)
@@ -84,7 +84,7 @@ class DefectStructureComparator:
 
     def neighboring_atom_indices(self, cutoff_factor=None):
         distances = []
-        for v in self.vacant_indices:
+        for v in self.removed_indices:
             distances.append(Distances(self._defect_structure,
                                        self._perfect_structure[v].frac_coords,
                                        self.same_distance_criterion))
