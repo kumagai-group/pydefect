@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 from dataclasses import dataclass
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Dict
 
 import numpy as np
 from monty.json import MSONable
@@ -101,6 +101,20 @@ class DefectStructureComparator:
             result.update(d.coordination(cutoff_factor=cutoff_factor)
                           .neighboring_atom_indices)
         return sorted(list(result))
+
+    def make_site_diff(self):
+        removed = []
+        for idx in self.removed_indices:
+            site = self._perfect_structure[idx]
+            removed.append((site.species_string, idx, tuple(site.frac_coords)))
+
+        inserted = []
+        for idx in self.inserted_indices:
+            site = self._defect_structure[idx]
+            inserted.append((site.species_string, idx, tuple(site.frac_coords)))
+
+        return SiteDiff(
+            removed=removed, inserted=inserted, mapping=self.atom_mapping)
 
 
 @dataclass

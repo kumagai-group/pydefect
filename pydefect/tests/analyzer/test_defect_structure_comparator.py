@@ -68,6 +68,16 @@ def test_defect_structure_analyzer_defect_center(structure_comparator):
     assert (actual == np.array([0.25, 0.435, 0.435])).all()
 
 
+def test_make_site_diff(structure_comparator):
+    actual = structure_comparator.make_site_diff()
+    expected = SiteDiff(removed=[("Cu", 0, (0.25, 0.25, 0.25)),
+                                 ("Cu", 1, (0.25, 0.74, 0.74))],
+                        inserted=[("Cu", 0, (0.25, 0.5, 0.5)),
+                                  ("H", 5, (0.25, 0.25, 0.25))],
+                        mapping={1: 2, 2: 3, 3: 4, 4: 5})
+    assert actual == expected
+
+
 def test_defect_center_periodicity(structure_comparator_periodic_issue):
     actual = structure_comparator_periodic_issue.defect_center_coord
     assert (actual == np.array([0.995]*3)).all()
