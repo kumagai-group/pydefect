@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+from dataclasses import dataclass
+from typing import List, Tuple, Optional
+
 import numpy as np
+from monty.json import MSONable
 from pydefect.util.structure_tools import Distances
 from pymatgen import IStructure
 
@@ -97,3 +101,25 @@ class DefectStructureComparator:
             result.update(d.coordination(cutoff_factor=cutoff_factor)
                           .neighboring_atom_indices)
         return sorted(list(result))
+
+
+@dataclass
+class SiteDiff(MSONable):
+    removed: List[Tuple[str, int, Tuple[float, float, float]]]
+    inserted: List[Tuple[str, int, Tuple[float, float, float]]]
+    mapping: List[Optional[int]]
+
+#
+# def make_defect_type(vacancies, interstitials, lattice, same_dist_criterion):
+#     if len(vacancies) == 1 and len(interstitials) == 0:
+#         return DefectType.vacancy
+#     if len(vacancies) == 0 and len(interstitials) == 1:
+#         return DefectType.interstitial
+#
+#
+# class DefectType(MSONable, ExtendedEnum):
+#     vacancy = "vacancy"
+#     interstitial = "interstitial"
+#     substituted = "substituted"
+#     complex = "complex"
+

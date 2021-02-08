@@ -6,7 +6,8 @@ import pytest
 from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_comparator import \
-    DefectStructureComparator
+    DefectStructureComparator, SiteDiff
+from pydefect.tests.helpers.assertion import assert_msonable
 from pymatgen import Structure, IStructure, Lattice
 
 
@@ -105,4 +106,17 @@ def test_actual_files(vasp_files):
     assert dsa.removed_indices == [96]
     assert dsa.atom_mapping == expected
 
+
+def test_site_diff():
+    site_diff = SiteDiff(removed=[("H", 0, (0.0, 0.0, 0.0))],
+                         inserted=[("H", 0, (0.0, 0.0, 0.0))],
+                         mapping=[None, 0, 1, 2])
+    assert_msonable(site_diff)
+
+
+# def test_make_defect_type():
+#     lattice = Lattice.cubic(10)
+#     assert make_defect_type([("")], [], lattice) == DefectType.vacancy
+#     assert make_defect_type([], [1], lattice) == DefectType.interstitial
+#     assert make_defect_type([3], [1], lattice) == DefectType.interstitial
 
