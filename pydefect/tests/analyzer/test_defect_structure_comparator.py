@@ -4,7 +4,6 @@
 import numpy as np
 import pytest
 from monty.serialization import loadfn
-from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator, SiteDiff
 from pydefect.tests.helpers.assertion import assert_msonable
@@ -12,7 +11,7 @@ from pymatgen import Structure, IStructure, Lattice
 
 
 @pytest.fixture
-def structure_analyzer():
+def structure_comparator():
     cu2o_perfect = IStructure(Lattice.cubic(5),
                               species=["Cu"] * 4 + ["O"] * 2,
                               coords=[[0.25, 0.25, 0.25],  # removed
@@ -21,28 +20,21 @@ def structure_analyzer():
                                       [0.75, 0.25, 0.75],
                                       [0, 0, 0],
                                       [0.5, 0.5, 0.5]])
-
-    # add [0.1, -0.1, 0]
-    # 3rd -- 6th
-    # [0.85, 0.65, 0.25] - [0.76, 0.73, 0.24] = [0.09, -0.08, 0.01]
-    # [0.85, 0.15, 0.75] - [0.75, 0.25, 0.73] = [0.10, -0.10, 0.02]
-    # [0.1, -0.1, 0] -[0.1, -0.1, 0] = [0, 0, 0]
-    # [0.6, 0.4, 0.5] - [0.5, 0.5, 0.5] = [0.1, -0.1, 0]
     cu2o_defect = IStructure(Lattice.cubic(5),
                              species=["Cu"] * 3 + ["O"] * 2 + ["H"],
-                             coords=[[0.25, 0.5, 0.5],   # defect
+                             coords=[[0.25, 0.5, 0.5],   # inserted
                                      [0.76, 0.73, 0.24],
                                      [0.75, 0.25, 0.73],
                                      [0.05, 0.95, 0],
                                      [0.5, 0.5, 0.5],
-                                     [0.25]*3])   # defect
+                                     [0.25]*3])   # inserted
 
     return DefectStructureComparator(defect_structure=cu2o_defect,
                                      perfect_structure=cu2o_perfect)
 
 
 @pytest.fixture
-def structure_analyzer_periodic_issue():
+def structure_comparator_periodic_issue():
     cu2o_perfect = IStructure(Lattice.cubic(5),
                               species=["Cu"] * 4 + ["O"] * 2,
                               coords=[[0.25, 0.25, 0.25],
@@ -51,7 +43,6 @@ def structure_analyzer_periodic_issue():
                                       [0.75, 0.25, 0.75],
                                       [0, 0, 0],
                                       [0.5, 0.5, 0.5]])
-
     # defect center is ([1.0, 1.0, 1.0] + [0.99, 0.99, 0.99]) / 2 = [0.995]*3
     cu2o_defect = IStructure(Lattice.cubic(5),
                              species=["Cu"] * 4 + ["O"] + ["H"],
@@ -66,20 +57,20 @@ def structure_analyzer_periodic_issue():
                                      perfect_structure=cu2o_perfect)
 
 
-def test_atom_mapping_to_perfect(structure_analyzer):
-    assert structure_analyzer.atom_mapping == {1: 2, 2: 3, 3: 4, 4: 5}
-    assert structure_analyzer.removed_indices == [0, 1]
-    assert structure_analyzer.inserted_indices == [0, 5]
+def test_atom_mapping_to_perfect(structure_comparator):
+    assert structure_comparator.atom_mapping == {1: 2, 2: 3, 3: 4, 4: 5}
+    assert structure_comparator.removed_indices == [0, 1]
+    assert structure_comparator.inserted_indices == [0, 5]
 
 
-def test_defect_structure_analyzer_defect_center(structure_analyzer):
-    expected = np.array([0.25, 0.435, 0.435])
-    assert (structure_analyzer.defect_center_coord == expected).all()
+def test_defect_structure_analyzer_defect_center(structure_comparator):
+    actual = structure_comparator.defect_center_coord
+    assert (actual == np.array([0.25, 0.435, 0.435])).all()
 
 
-def test_defect_center_periodicity(structure_analyzer_periodic_issue):
-    expected = np.array([0.995]*3)
-    assert (structure_analyzer_periodic_issue.defect_center_coord == expected).all()
+def test_defect_center_periodicity(structure_comparator_periodic_issue):
+    actual = structure_comparator_periodic_issue.defect_center_coord
+    assert (actual == np.array([0.995]*3)).all()
 
 
 def test_neighboring_atom_indices(cubic_supercell):
@@ -89,22 +80,23 @@ def test_neighboring_atom_indices(cubic_supercell):
     structure.append(species="Li", coords=[0.124, 0, 0])
     structure.to(filename="POSCAR")
     structure_analyzer = DefectStructureComparator(structure, cubic_supercell)
-    assert structure_analyzer.neighboring_atom_indices() == sorted([25, 15, 16, 23, 54, 47, 46, 56, 62])
-    # must be list to be used for indexing
+    actual = structure_analyzer.neighboring_atom_indices()
+    expected = sorted([25, 15, 16, 23, 54, 47, 46, 56, 62])
+    assert actual == expected
 
 
 def test_actual_files(vasp_files):
     d = vasp_files / "KInO2_Va_O_2"
-    calc_results: CalcResults = loadfn(d / "Va_O1_2/calc_results.json")
-    perfect_calc_results: CalcResults = loadfn(d / "perfect_calc_results.json")
-    dsa = DefectStructureComparator(calc_results.structure,
-                                    perfect_calc_results.structure)
-    a = list(range(192))
-    a.pop(96)
-    expected = dict(zip(range(191), a))
-    assert dsa.inserted_indices == []
-    assert dsa.removed_indices == [96]
-    assert dsa.atom_mapping == expected
+    calc_results = loadfn(d / "Va_O1_2/calc_results.json")
+    perfect_calc_results = loadfn(d / "perfect_calc_results.json")
+    structure_comparator = DefectStructureComparator(
+        calc_results.structure, perfect_calc_results.structure)
+    vac_atom_indices = list(range(192))
+    vac_atom_indices.pop(96)
+    expected = dict(zip(range(191), vac_atom_indices))
+    assert structure_comparator.inserted_indices == []
+    assert structure_comparator.removed_indices == [96]
+    assert structure_comparator.atom_mapping == expected
 
 
 def test_site_diff():
