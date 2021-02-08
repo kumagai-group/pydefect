@@ -119,8 +119,8 @@ class DefectStructureComparator:
 
 @dataclass
 class SiteDiff(MSONable):
-    removed: List[Tuple[str, int, Tuple[float, float, float]]]
-    inserted: List[Tuple[str, int, Tuple[float, float, float]]]
+    removed: Dict[int, Tuple[str, Tuple[float, float, float]]]
+    inserted: Dict[int, Tuple[str, Tuple[float, float, float]]]
     mapping: Dict[int, int]
 
 
