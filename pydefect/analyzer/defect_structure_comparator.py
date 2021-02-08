@@ -13,7 +13,7 @@ class DefectStructureComparator:
     def __init__(self,
                  defect_structure: IStructure,
                  perfect_structure: IStructure,
-                 same_distance_criterion: float = None):
+                 dist_tol: float = None):
         """
         Atoms in the final structure are shifted such that the farthest atom
         from the defect is placed at the same place with that in the perfect
@@ -21,7 +21,7 @@ class DefectStructureComparator:
         """
         self._defect_structure = defect_structure
         self._perfect_structure = perfect_structure
-        self.same_distance_criterion = same_distance_criterion
+        self.dist_tol = dist_tol
         self.p_to_d = self.make_p_to_d()
         self.d_to_p = self.make_d_to_p()
 
@@ -35,7 +35,7 @@ class DefectStructureComparator:
         for site in self._perfect_structure:
             distances = Distances(self._defect_structure,
                                   site.frac_coords,
-                                  self.same_distance_criterion)
+                                  self.dist_tol)
             result.append(distances.atom_idx_at_center(specie=site.specie))
         return result
 
@@ -44,7 +44,7 @@ class DefectStructureComparator:
         for site in self._defect_structure:
             distances = Distances(self._perfect_structure,
                                   site.frac_coords,
-                                  self.same_distance_criterion)
+                                  self.dist_tol)
             result.append(distances.atom_idx_at_center(specie=site.specie))
         return result
 
@@ -91,11 +91,11 @@ class DefectStructureComparator:
         for v in self.removed_indices:
             distances.append(Distances(self._defect_structure,
                                        self._perfect_structure[v].frac_coords,
-                                       self.same_distance_criterion))
+                                       self.dist_tol))
         for i in self.inserted_indices:
             distances.append(Distances(self._defect_structure,
                                        self._defect_structure[i].frac_coords,
-                                       self.same_distance_criterion))
+                                       self.dist_tol))
         result = set()
         for d in distances:
             result.update(d.coordination(cutoff_factor=cutoff_factor)

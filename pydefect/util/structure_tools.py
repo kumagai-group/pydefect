@@ -13,11 +13,10 @@ class Distances:
     def __init__(self,
                  structure: Structure,
                  center_coord: np.array,
-                 same_distance_criterion: float = None):
+                 dist_tol: float = None):
         self.structure = structure
         self.coord = center_coord
-        self.same_distance_criterion = \
-            same_distance_criterion or defaults.same_distance_criterion
+        self.dist_tol = dist_tol or defaults.dist_tol
 
     def distances(self, remove_self=True, specie=None) -> List[float]:
         result = []
@@ -37,7 +36,7 @@ class Distances:
     def atom_idx_at_center(self, specie: str) -> Optional[int]:
         distances = self.distances(remove_self=False, specie=specie)
         sorted_dists = sorted(distances)
-        if sorted_dists[0] > self.same_distance_criterion:
+        if sorted_dists[0] > self.dist_tol:
             return None
         return np.argmin(distances)
 
