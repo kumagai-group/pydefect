@@ -102,7 +102,7 @@ def test_actual_files(vasp_files):
 def test_site_diff():
     site_diff = SiteDiff(removed=[("H", 0, (0.0, 0.0, 0.0))],
                          inserted=[("H", 0, (0.0, 0.0, 0.0))],
-                         mapping=[None, 0, 1, 2])
+                         mapping={1: 2, 2: 3, 3: 4, 4: 5})
     assert_msonable(site_diff)
 
 

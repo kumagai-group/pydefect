@@ -107,7 +107,8 @@ class DefectStructureComparator:
 class SiteDiff(MSONable):
     removed: List[Tuple[str, int, Tuple[float, float, float]]]
     inserted: List[Tuple[str, int, Tuple[float, float, float]]]
-    mapping: List[Optional[int]]
+    mapping: Dict[int, int]
+
 
 #
 # def make_defect_type(vacancies, interstitials, lattice, same_dist_criterion):
