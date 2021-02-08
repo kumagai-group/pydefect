@@ -103,15 +103,15 @@ class DefectStructureComparator:
         return sorted(list(result))
 
     def make_site_diff(self):
-        removed = []
+        removed = {}
         for idx in self.removed_indices:
             site = self._perfect_structure[idx]
-            removed.append((site.species_string, idx, tuple(site.frac_coords)))
+            removed[idx] = site.species_string, tuple(site.frac_coords)
 
-        inserted = []
+        inserted = {}
         for idx in self.inserted_indices:
             site = self._defect_structure[idx]
-            inserted.append((site.species_string, idx, tuple(site.frac_coords)))
+            inserted[idx] = site.species_string, tuple(site.frac_coords)
 
         return SiteDiff(
             removed=removed, inserted=inserted, mapping=self.atom_mapping)
