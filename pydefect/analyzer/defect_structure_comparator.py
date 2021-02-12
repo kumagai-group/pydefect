@@ -121,11 +121,25 @@ class DefectStructureComparator:
 class SiteDiff(MSONable):
     removed: Dict[int, Tuple[str, Tuple[float, float, float]]]
     inserted: Dict[int, Tuple[str, Tuple[float, float, float]]]
+    removed_by_sub: Dict[int, Tuple[str, Tuple[float, float, float]]]
+    inserted_by_sub: Dict[int, Tuple[str, Tuple[float, float, float]]]
     mapping: Dict[int, int]
 
     @property
+    def substituted(self):
+        result = {}
+        for (r_idx, r_val), (i_idx, i_val) in zip(self.removed_by_sub.items(),
+                                                  self.inserted_by_sub.items()):
+            result[(r_idx, i_idx)] = r_val, i_val
+        return result
+
+    @property
     def is_no_diff(self):
-        return self.removed == {} and self.inserted == {}
+        for i in [self.removed, self.inserted,
+                  self.removed_by_sub, self.inserted_by_sub]:
+            if i != {}:
+                return False
+        return True
 
 #
 # def make_defect_type(vacancies, interstitials, lattice, same_dist_criterion):

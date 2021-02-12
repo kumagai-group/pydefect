@@ -68,16 +68,6 @@ def test_defect_structure_analyzer_defect_center(structure_comparator):
     assert (actual == np.array([0.25, 0.435, 0.435])).all()
 
 
-def test_make_site_diff(structure_comparator):
-    actual = structure_comparator.make_site_diff()
-    expected = SiteDiff(removed={0: ("Cu", (0.25, 0.25, 0.25)),
-                                 1: ("Cu", (0.25, 0.74, 0.74))},
-                        inserted={0: ("Cu", (0.25, 0.5, 0.5)),
-                                  5: ("H", (0.25, 0.25, 0.25))},
-                        mapping={1: 2, 2: 3, 3: 4, 4: 5})
-    assert actual == expected
-
-
 def test_defect_center_periodicity(structure_comparator_periodic_issue):
     actual = structure_comparator_periodic_issue.defect_center_coord
     assert (actual == np.array([0.995]*3)).all()
@@ -109,18 +99,29 @@ def test_actual_files(vasp_files):
     assert structure_comparator.atom_mapping == expected
 
 
-def test_site_diff():
-    site_diff = SiteDiff(removed={0: ("H", (0.0, 0.0, 0.0))},
-                         inserted={0: ("H", (0.0, 0.0, 0.0))},
-                         mapping={1: 2, 2: 3, 3: 4, 4: 5})
+@pytest.fixture
+def site_diff():
+    return SiteDiff(removed={1: ("Cu", (0.25, 0.74, 0.74))},
+                    inserted={0: ("Cu", (0.25, 0.5, 0.5))},
+                    inserted_by_sub={0: ("Cu", (0.25, 0.25, 0.25))},
+                    removed_by_sub={5: ("H", (0.25, 0.25, 0.25))},
+                    mapping={1: 2, 2: 3, 3: 4, 4: 5})
+
+
+def test_site_diff_msonable(site_diff):
     assert_msonable(site_diff)
 
 
-def test_is_no_diff():
-    site_diff = SiteDiff(removed={}, inserted={}, mapping={1: 2})
+def test_site_diff_substituted(site_diff):
+    assert site_diff.substituted == {(5, 0): (("H", (0.25, 0.25, 0.25)), ("Cu", (0.25, 0.25, 0.25)))}
+
+
+def test_site_diff_is_no_diff():
+    site_diff = SiteDiff(removed={}, inserted={},
+                         removed_by_sub={}, inserted_by_sub={}, mapping={1: 2})
     assert site_diff.is_no_diff is True
-    site_diff = SiteDiff(removed={1: ("H", (0.0, 0.0, 0.0))},
-                         inserted={}, mapping={1: 2})
+    site_diff = SiteDiff(removed={1: ("H", (0.0, 0.0, 0.0))}, inserted={},
+                         removed_by_sub={}, inserted_by_sub={}, mapping={1: 2})
     assert site_diff.is_no_diff is False
 
 # def test_make_defect_type():
