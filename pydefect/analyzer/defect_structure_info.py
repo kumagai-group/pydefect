@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import math
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import Optional, List, Tuple
 
@@ -9,7 +10,8 @@ from monty.json import MSONable
 from numpy.linalg import inv
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator, SiteDiff
-from pymatgen import Structure, Lattice
+from pydefect.analyzer.vesta.create_vesta_file import VestaFile
+from pymatgen import Structure, Lattice, DummySpecies
 from pymatgen.symmetry.groups import SpaceGroup
 from tabulate import tabulate
 from vise.util.enum import ExtendedEnum
@@ -63,10 +65,10 @@ def calc_displacements(perfect: Structure,
                 lattice.get_cartesian_coords(perfect.frac_coords[p] - center)
             disp_dist, t = lattice.get_distance_and_image(
                 defect.frac_coords[d], perfect.frac_coords[p])
-            displacement = lattice.get_cartesian_coords(
+            disp_vec = lattice.get_cartesian_coords(
                 defect.frac_coords[d] - perfect.frac_coords[p] + t)
 
-            inner_prod = sum(initial_pos_vec * displacement)
+            inner_prod = sum(initial_pos_vec * disp_vec)
             ini_dist = np.linalg.norm(initial_pos_vec)
             cos = round(inner_prod / (ini_dist * disp_dist), 10)
             angle = float(round(180 * (1 - np.arccos(cos) / np.pi), 1))
@@ -77,6 +79,7 @@ def calc_displacements(perfect: Structure,
                                        original_pos=orig_pos,
                                        final_pos=final_pos,
                                        distance_from_defect=ini_dist,
+                                       disp_vector=tuple(disp_vec),
                                        displace_distance=disp_dist,
                                        angle=angle))
     return result
@@ -92,10 +95,6 @@ def elem_indices_coords(structure: Structure, indices):
         site = structure[i]
         result.append((str(site.specie), i, tuple(site.frac_coords)))
     return result
-
-# fold_coords(perfect, center)
-# fold_coords(initial, center)
-# fold_coords(final, center)
 
 
 def make_defect_structure_info(perfect: Structure,
@@ -118,7 +117,7 @@ def make_defect_structure_info(perfect: Structure,
     for site in final:
         site.frac_coords -= drift_vec
 
-    displacements = calc_displacements(perfect, final, center, d_to_p)
+    displacements = calc_displacements(initial, final, center, d_to_p)
 
     return DefectStructureInfo(
         initial_site_sym=unique_point_group(initial_symmetrizer.point_group),
@@ -147,6 +146,7 @@ class Displacement(MSONable):
     original_pos: Tuple[float, float, float]
     final_pos: Tuple[float, float, float]
     distance_from_defect: float
+    disp_vector: Tuple[float, float, float]
     displace_distance: float
     angle: Optional[float]
 
