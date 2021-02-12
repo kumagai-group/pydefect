@@ -6,7 +6,7 @@ from typing import List, Tuple, Dict
 import numpy as np
 from monty.json import MSONable
 from pydefect.util.structure_tools import Distances
-from pymatgen import IStructure
+from pymatgen import IStructure, Structure
 
 
 class DefectStructureComparator:
@@ -30,23 +30,23 @@ class DefectStructureComparator:
         return {d: p for d, p in enumerate(self.d_to_p)
                 if d not in self.inserted_indices}
 
-    def make_p_to_d(self):
+    def _atom_projection(self, structure_from, structure_to, specie=True):
         result = []
-        for site in self._perfect_structure:
-            distances = Distances(self._defect_structure,
+        for site in structure_from:
+            distances = Distances(structure_to,
                                   site.frac_coords,
                                   self.dist_tol)
-            result.append(distances.atom_idx_at_center(specie=site.specie))
+            specie = site.specie if specie else None
+            result.append(distances.atom_idx_at_center(specie=specie))
         return result
 
+    def make_p_to_d(self):
+        return self._atom_projection(
+            self._perfect_structure, self._defect_structure)
+
     def make_d_to_p(self):
-        result = []
-        for site in self._defect_structure:
-            distances = Distances(self._perfect_structure,
-                                  site.frac_coords,
-                                  self.dist_tol)
-            result.append(distances.atom_idx_at_center(specie=site.specie))
-        return result
+        return self._atom_projection(
+            self._defect_structure, self._perfect_structure)
 
     @property
     def removed_indices(self):
@@ -103,18 +103,45 @@ class DefectStructureComparator:
         return sorted(list(result))
 
     def make_site_diff(self):
-        removed = {}
+        removed_sites = [self._perfect_structure[x]
+                         for x in self.removed_indices]
+        inserted_sites = [self._defect_structure[x]
+                          for x in self.inserted_indices]
+
+        removed_str = Structure.from_sites(removed_sites)
+        inserted_str = Structure.from_sites(inserted_sites)
+
+        r_to_i = self._atom_projection(removed_str, inserted_str, specie=False)
+        i_to_r = self._atom_projection(inserted_str, removed_str, specie=False)
+
+        mapping = {}
+        for x, y in enumerate(r_to_i):
+            if y and x == i_to_r[y]:
+                mapping[self.removed_indices[x]] = self.inserted_indices[y]
+
+        removed, removed_by_sub = {}, {}
         for idx in self.removed_indices:
             site = self._perfect_structure[idx]
-            removed[idx] = site.species_string, tuple(site.frac_coords)
+            val = site.species_string, tuple(site.frac_coords)
+            if idx in mapping.keys():
+                removed_by_sub[idx] = val
+            else:
+                removed[idx] = val
 
-        inserted = {}
+        inserted, inserted_by_sub = {}, {}
         for idx in self.inserted_indices:
             site = self._defect_structure[idx]
-            inserted[idx] = site.species_string, tuple(site.frac_coords)
+            val = site.species_string, tuple(site.frac_coords)
+            if idx in mapping.values():
+                inserted_by_sub[idx] = val
+            else:
+                inserted[idx] = val
 
-        return SiteDiff(
-            removed=removed, inserted=inserted, mapping=self.atom_mapping)
+        return SiteDiff(removed=removed,
+                        inserted=inserted,
+                        removed_by_sub=removed_by_sub,
+                        inserted_by_sub=inserted_by_sub,
+                        mapping=self.atom_mapping)
 
 
 @dataclass

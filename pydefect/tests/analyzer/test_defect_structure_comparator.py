@@ -103,8 +103,8 @@ def test_actual_files(vasp_files):
 def site_diff():
     return SiteDiff(removed={1: ("Cu", (0.25, 0.74, 0.74))},
                     inserted={0: ("Cu", (0.25, 0.5, 0.5))},
-                    inserted_by_sub={0: ("Cu", (0.25, 0.25, 0.25))},
-                    removed_by_sub={5: ("H", (0.25, 0.25, 0.25))},
+                    removed_by_sub={0: ("Cu", (0.25, 0.25, 0.25))},
+                    inserted_by_sub={5: ("H", (0.25, 0.25, 0.25))},
                     mapping={1: 2, 2: 3, 3: 4, 4: 5})
 
 
@@ -113,7 +113,7 @@ def test_site_diff_msonable(site_diff):
 
 
 def test_site_diff_substituted(site_diff):
-    assert site_diff.substituted == {(5, 0): (("H", (0.25, 0.25, 0.25)), ("Cu", (0.25, 0.25, 0.25)))}
+    assert site_diff.substituted == {(0, 5): (("Cu", (0.25, 0.25, 0.25)), ("H", (0.25, 0.25, 0.25)))}
 
 
 def test_site_diff_is_no_diff():
@@ -123,6 +123,11 @@ def test_site_diff_is_no_diff():
     site_diff = SiteDiff(removed={1: ("H", (0.0, 0.0, 0.0))}, inserted={},
                          removed_by_sub={}, inserted_by_sub={}, mapping={1: 2})
     assert site_diff.is_no_diff is False
+
+
+def test_make_site_diff(structure_comparator, site_diff):
+    assert structure_comparator.make_site_diff() == site_diff
+
 
 # def test_make_defect_type():
 #     lattice = Lattice.cubic(10)
