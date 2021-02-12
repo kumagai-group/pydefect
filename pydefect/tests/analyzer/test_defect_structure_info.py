@@ -7,7 +7,7 @@ from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import \
     Displacement, DefectStructureInfo, fold_coords, calc_drift, \
     make_defect_structure_info, symmetry_relation, SymmRelation, \
-    unique_point_group, elem_indices_coords
+    unique_point_group, elem_indices_coords, defect_vesta_file
 from pydefect.tests.helpers.assertion import assert_msonable
 from pymatgen import Structure, Lattice
 from vise.util.structure_symmetrizer import num_sym_op
@@ -61,14 +61,16 @@ def displacements():
 
 @pytest.fixture
 def def_str_info(displacements):
-    site_diff = SiteDiff(removed={0: ('H', (0.25, 0.25, 0.25)),
-                                  2: ('Li', (0.5, 0.5, 0.5))},
-                         inserted={0: ('H', (0.27, 0.25, 0.25)),
-                                   2: ('Be', (0.5, 0.5, 0.5009))},
+    site_diff = SiteDiff(removed={0: ('H', (0.25, 0.25, 0.25))},
+                         inserted={0: ('H', (0.27, 0.25, 0.25))},
+                         removed_by_sub={2: ('Li', (0.5, 0.5, 0.5))},
+                         inserted_by_sub={2: ('Be', (0.5, 0.5, 0.5009))},
                          mapping={1: 1, 3: 3})
     site_diff_from_init = SiteDiff(removed={0: ('H', (0.25, 0.25, 0.25))},
                                    inserted={0: ('H', (0.27, 0.25, 0.25))},
-                                   mapping={1: 1, 2: 2, 3: 3})
+                                   removed_by_sub={2: ('Li', (0.5, 0.5, 0.5))},
+                                   inserted_by_sub={2: ('Be', (0.5, 0.5, 0.5))},
+                                   mapping={1: 1, 3: 3})
     return DefectStructureInfo(initial_site_sym="3m",
                                final_site_sym="m",
                                site_diff=site_diff,
@@ -135,7 +137,7 @@ def test_make_defect_structure_info(structures, def_str_info):
     perfect, initial, final = structures
     actual = make_defect_structure_info(
          perfect, initial, final, dist_tol=0.2, symprec=0.1)
-    assert actual == def_str_info
+    assert actual.__repr__() == def_str_info.__repr__()
 
 
 def test_make_def_str_info_symm_rel(structures, def_str_info):
