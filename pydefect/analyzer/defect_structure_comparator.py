@@ -162,11 +162,8 @@ class SiteDiff(MSONable):
 
     @property
     def is_no_diff(self):
-        for i in [self.removed, self.inserted,
-                  self.removed_by_sub, self.inserted_by_sub]:
-            if i != {}:
-                return False
-        return True
+        return not (self.removed or self.inserted
+                    or self.removed_by_sub or self.inserted_by_sub)
 
 #
 # def make_defect_type(vacancies, interstitials, lattice, same_dist_criterion):
