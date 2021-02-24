@@ -135,7 +135,7 @@ def make_defect_structure_info(perfect: Structure,
     displacements = calc_displacements(initial, final, center, d_to_p)
 
     return DefectStructureInfo(
-        initial_site_sym=unique_point_group(init_site_sym),
+        initial_site_sym=unique_point_group(remove_dot(init_site_sym)),
         final_site_sym=unique_point_group(final_site_sym),
         site_diff=comp_w_perf.make_site_diff(),
         site_diff_from_initial=comp_w_init.make_site_diff(),
