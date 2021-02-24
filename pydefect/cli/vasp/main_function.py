@@ -368,6 +368,6 @@ def calc_defect_structure_info(args):
             symprec=args.symprec,
             init_site_sym=defect_entry.site_symmetry,
             final_site_sym=calc_results.site_symmetry)
-        defect_str_info.to_json()
+        defect_str_info.to_json_file(str(d / "defect_structure_info.json"))
         defect_vesta_file(calc_results.structure, defect_str_info,
                           filename=str(d / "defect.vesta"))
