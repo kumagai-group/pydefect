@@ -4,6 +4,7 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeStates
+from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.dash_components.cpd_energy_dash import \
     CpdEnergyComponent, make_energies
 from pydefect.analyzer.defect_energy import slide_energy
@@ -353,12 +354,16 @@ def make_defect_formation_energy(args):
     plotter.plt.savefig(f"energy_{args.label}.pdf")
 
 
-def show_defect_structure(args):
-    calc_results = loadfn(args.defect_dir / "calc_results.json")
-    defect_entry = loadfn(args.defect_dir / "defect_entry.json")
-    dsi = make_defect_structure_info(args.perfect_calc_results,
-                                     defect_entry,
-                                     calc_results,
-                                     correct_drift=True)
-    dsi.to(args.defect_dir)
-    print(dsi)
+def calc_defect_structure_info(args):
+    supercell_info: SupercellInfo = args.supercell_info
+    calc_results: CalcResults = loadfn(args.defect_dir / "calc_results.json")
+    defect_entry: DefectEntry = loadfn(args.defect_dir / "defect_entry.json")
+    defect_str_info = make_defect_structure_info(
+        supercell_info.structure,
+        defect_entry.structure,
+        calc_results.structure,
+        dist_tol=args.dist_tolerance,
+        symprec=args.symprec,
+        init_site_sym=defect_entry.site_symmetry,
+        final_site_sym=calc_results.site_symmetry)
+    print(defect_str_info)

@@ -352,20 +352,24 @@ def test_defect_formation_energy(mocker):
 
 
 def test_defect_structure(mocker):
-    mock_perfect_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
 
     def side_effect(filename):
-        if filename == "perfect/calc_results.json":
-            return mock_perfect_calc_results
+        if filename == "supercell_info.json":
+            return mock_supercell_info
         else:
             raise ValueError
 
     mock = mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
-    parsed_args = parse_args(["sds",
-                              "-pcr", "perfect/calc_results.json",
-                              "-d", "Va_O1_0"])
+    parsed_args = parse_args(["cds",
+                              "-s", "supercell_info.json",
+                              "-d", "Va_O1_0",
+                              "-dt", "1.0",
+                              "--symprec", "2.0"])
     expected = Namespace(
-        perfect_calc_results=mock_perfect_calc_results,
+        supercell_info=mock_supercell_info,
         defect_dir=Path("Va_O1_0"),
+        dist_tolerance=1.0,
+        symprec=2.0,
         func=parsed_args.func)
     assert parsed_args == expected

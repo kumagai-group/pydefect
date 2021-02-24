@@ -15,13 +15,14 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_efnv_correction_from_vasp, make_defect_formation_energy, \
     make_defect_eigenvalues, make_edge_characters, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
-    plot_chem_pot_diag, make_gkfo_correction_from_vasp, show_defect_structure
+    plot_chem_pot_diag, make_gkfo_correction_from_vasp, calc_defect_structure_info
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
+from pydefect.input_maker.supercell_info import SupercellInfo
 from pymatgen import IStructure, Composition, Structure, Lattice, Element
 from pymatgen.io.vasp import Vasprun, Outcar
 
@@ -424,19 +425,39 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
         mock_loadfn.assert_any_call(Path("Va_O1_2") / "correction.json")
 
 
-def test_show_defect_structure(mocker):
+def test_calc_defect_structure_info(mocker):
+
+    mock_defect_entry = mocker.Mock(spec=DefectEntry)
+    mock_defect_entry.structure = "a"
+    mock_defect_entry.site_symmetry = "x"
+    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_calc_results.structure = "b"
+    mock_calc_results.site_symmetry = "y"
 
     def side_effect(key):
-        print(key)
+
         if str(key) == "Va_O1_2/defect_entry.json":
-            return "b"
+            return mock_defect_entry
         elif str(key) == "Va_O1_2/calc_results.json":
-            return "c"
+            return mock_calc_results
         else:
             raise ValueError
 
-    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
-    mock = mocker.patch("pydefect.cli.vasp.main_function.make_defect_structure_info")
-    args = Namespace(perfect_calc_results="a", defect_dir=Path("Va_O1_2"))
-    show_defect_structure(args)
-    mock.assert_called_with("a", "b", "c", correct_drift=True)
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn",
+                               side_effect=side_effect)
+    mock_defect_str_info = mocker.patch(
+        "pydefect.cli.vasp.main_function.make_defect_structure_info")
+
+    mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
+    mock_supercell_info.structure = "c"
+    args = Namespace(supercell_info=mock_supercell_info,
+                     defect_dir=Path("Va_O1_2"),
+                     symprec=None,
+                     dist_tolerance=1.0)
+    calc_defect_structure_info(args)
+    mock_defect_str_info.assert_called_with("c", "a", "b",
+                                            dist_tol=1.0,
+                                            symprec=None,
+                                            init_site_sym="x",
+                                            final_site_sym="y")
+

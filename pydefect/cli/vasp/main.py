@@ -16,7 +16,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_calc_results, make_defect_formation_energy, make_defect_eigenvalues, \
     make_edge_characters, make_edge_states, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
-    plot_chem_pot_diag, make_gkfo_correction_from_vasp, show_defect_structure
+    plot_chem_pot_diag, make_gkfo_correction_from_vasp, calc_defect_structure_info
 from pydefect.defaults import defaults
 from pymatgen import IStructure, Composition, Structure
 from pymatgen.io.vasp import Vasprun, Outcar
@@ -41,6 +41,13 @@ def parse_args(args):
     dirs_parser.add_argument(
         "-d", "--dirs", nargs="+", type=Path,
         help="Directory paths to be parsed.")
+
+    # ++ parent parser: pcr
+    si_parser = argparse.ArgumentParser(
+        description="", add_help=False)
+    si_parser.add_argument(
+        "-s", "--supercell_info", required=True, type=loadfn,
+        help="Path to the supercell_info.json file.")
 
     # ++ parent parser: pcr
     pcr_parser = argparse.ArgumentParser(
@@ -206,12 +213,10 @@ def parse_args(args):
     parser_append_interstitial = subparsers.add_parser(
         name="append_interstitial",
         description="Append interstitial information to supercell_info.yaml",
+        parents=[si_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['ai'])
 
-    parser_append_interstitial.add_argument(
-        "-s", "--supercell_info", required=True, type=loadfn,
-        help="Path to the supercell_info.json file.")
     parser_append_interstitial.add_argument(
         "-p", "--base_structure", required=True, type=Structure.from_file,
         help="POSCAR file used for generating AECCAR files, which must be the "
@@ -228,12 +233,10 @@ def parse_args(args):
     parser_pop_interstitial = subparsers.add_parser(
         name="pop",
         description="Pop interstitial site from supercell_info.json. ",
+        parents=[si_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pi'])
 
-    parser_pop_interstitial.add_argument(
-        "-s", "--supercell_info", required=True, type=loadfn,
-        help="Path to the supercell_info.json file.")
     parser_pop_interstitial.add_argument(
         "-i", "--index", required=True, type=int,
         help="Popped interstitial index. Note that the indices begin from 1.")
@@ -361,18 +364,24 @@ def parse_args(args):
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
 
-    # -- defect structure ------------------------------------------------
-    parser_s = subparsers.add_parser(
-        name="show_defect_structure",
-        description="Show details of defect structure.",
-        parents=[pcr_parser],
+    # -- calc defect structure ------------------------------------------------
+    parser_calc_def_str = subparsers.add_parser(
+        name="calc_defect_structure_info",
+        description="Calc defect structure.",
+        parents=[si_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['sds'])
+        aliases=['cds'])
 
-    parser_s.add_argument(
+    parser_calc_def_str.add_argument(
         "-d", "--defect_dir", required=True, type=Path,
         help="Path to the defect directory.")
-    parser_s.set_defaults(func=show_defect_structure)
+    parser_calc_def_str.add_argument(
+        "-dt", "--dist_tolerance", required=True, type=float,
+        help="")
+    parser_calc_def_str.add_argument(
+        "--symprec", required=True, type=float,
+        help="")
+    parser_calc_def_str.set_defaults(func=calc_defect_structure_info)
 
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
