@@ -445,6 +445,8 @@ def test_calc_defect_structure_info(mocker):
 
     mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn",
                                side_effect=side_effect)
+    mock_defect_vesta = mocker.patch(
+        "pydefect.cli.vasp.main_function.defect_vesta_file")
     mock_defect_str_info = mocker.patch(
         "pydefect.cli.vasp.main_function.make_defect_structure_info")
 
@@ -460,4 +462,5 @@ def test_calc_defect_structure_info(mocker):
                                             symprec=None,
                                             init_site_sym="x",
                                             final_site_sym="y")
-
+    mock_defect_vesta.assert_called_with(
+        "b", mock_defect_str_info.return_value, filename="Va_O1_2/defect.vesta")
