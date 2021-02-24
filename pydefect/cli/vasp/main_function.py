@@ -11,8 +11,9 @@ from pydefect.analyzer.defect_energy import slide_energy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
-from pydefect.analyzer.defect_structure_info import make_defect_structure_info, \
-    defect_vesta_file
+from pydefect.analyzer.defect_structure_info import make_defect_structure_info
+from pydefect.cli.vasp.util_commands.create_defect_vesta_file import \
+    make_defect_vesta_file
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
@@ -358,6 +359,7 @@ def make_defect_formation_energy(args):
 def calc_defect_structure_info(args):
     supercell_info: SupercellInfo = args.supercell_info
     for d in args.dirs:
+        logger.info(f"Parsing data in {d} ...")
         calc_results: CalcResults = loadfn(d / "calc_results.json")
         defect_entry: DefectEntry = loadfn(d / "defect_entry.json")
         defect_str_info = make_defect_structure_info(
@@ -369,5 +371,3 @@ def calc_defect_structure_info(args):
             init_site_sym=defect_entry.site_symmetry,
             final_site_sym=calc_results.site_symmetry)
         defect_str_info.to_json_file(str(d / "defect_structure_info.json"))
-        defect_vesta_file(calc_results.structure, defect_str_info,
-                          filename=str(d / "defect.vesta"))

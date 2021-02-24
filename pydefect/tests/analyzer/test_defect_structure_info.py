@@ -7,7 +7,7 @@ from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import \
     Displacement, DefectStructureInfo, fold_coords, calc_drift, \
     make_defect_structure_info, symmetry_relation, SymmRelation, \
-    unique_point_group, elem_indices_coords, defect_vesta_file
+    unique_point_group, elem_indices_coords
 from pydefect.tests.helpers.assertion import assert_msonable, \
     assert_json_roundtrip
 from pymatgen import Structure, Lattice
@@ -173,9 +173,4 @@ def test_make_def_str_info_same_config_from_init(structures, def_str_info):
 def test_repr(def_str_info):
     print(def_str_info)
 
-
-def test_defect_vesta_file(structures, def_str_info, tmpdir):
-    print(tmpdir)
-    tmpdir.chdir()
-    defect_vesta_file(defect_structure=structures[2], def_str_info=def_str_info, disp_enhance_factor=100)
 
