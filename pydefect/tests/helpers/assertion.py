@@ -15,5 +15,13 @@ def assert_msonable(obj):
 def assert_json_roundtrip(obj, tmpdir):
     tmpdir.chdir()
     obj.to_json_file("a.json")
-    actual = loadfn("a.json")
-    assert actual.as_dict() == obj.as_dict()
+    actual = loadfn("a.json").as_dict()
+    expected = obj.as_dict()
+    for k, v in actual.items():
+        try:
+            assert v == expected[k]
+        except AssertionError:
+            print(k)
+            print(v)
+            print(expected[k])
+
