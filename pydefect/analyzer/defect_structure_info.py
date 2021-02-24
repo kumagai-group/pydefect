@@ -89,7 +89,8 @@ def remove_dot(x):
     return "".join([s for s in x if s != "."])
 
 
-def elem_indices_coords(structure: Structure, indices):
+def elem_indices_coords(structure: Structure, indices
+                        ) -> List[Tuple[str, int, Tuple[float, float, float]]]:
     result = []
     for i in indices:
         site = structure[i]
@@ -120,8 +121,8 @@ def make_defect_structure_info(perfect: Structure,
     displacements = calc_displacements(initial, final, center, d_to_p)
 
     return DefectStructureInfo(
-        initial_site_sym=unique_point_group(initial_symmetrizer.point_group),
-        final_site_sym=unique_point_group(final_symmetrizer.point_group),
+        initial_site_sym=unique_point_group(init_site_sym),
+        final_site_sym=unique_point_group(final_site_sym),
         site_diff=comp_w_perf.make_site_diff(),
         site_diff_from_initial=comp_w_init.make_site_diff(),
         symprec=symprec,
@@ -162,6 +163,9 @@ def unique_point_group(pg):
 
 
 def symmetry_relation(initial_point_group, final_point_group):
+    """ Check the point group symmetry relation using the space group relation
+    implemented in pymatgen.
+    """
     if initial_point_group in ["3m", "-3m"]:
         initial_point_group += "1"
     if final_point_group in ["3m", "-3m"]:
