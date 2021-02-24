@@ -145,8 +145,16 @@ def test_make_defect_structure_info(structures, def_str_info):
     perfect, initial, final = structures
     actual = make_defect_structure_info(
          perfect, initial, final, dist_tol=0.2, symprec=0.1)
-    print(actual.displacements)
-#    assert actual.__repr__() == def_str_info.__repr__()
+    print(actual)
+    assert actual.__repr__() == def_str_info.__repr__()
+
+
+def test_make_defect_structure_info_w_symms(structures, def_str_info):
+    perfect, initial, final = structures
+    actual = make_defect_structure_info(
+        perfect, initial, final, dist_tol=0.2,
+        init_site_sym="3m", final_site_sym="m")
+    assert actual.__repr__() == def_str_info.__repr__()
 
 
 def test_make_def_str_info_symm_rel(structures, def_str_info):
@@ -160,4 +168,9 @@ def test_make_def_str_info_same_config_from_init(structures, def_str_info):
 def test_repr(def_str_info):
     print(def_str_info)
 
+
+def test_defect_vesta_file(structures, def_str_info, tmpdir):
+    print(tmpdir)
+    tmpdir.chdir()
+    defect_vesta_file(defect_structure=structures[2], def_str_info=def_str_info, disp_enhance_factor=100)
 

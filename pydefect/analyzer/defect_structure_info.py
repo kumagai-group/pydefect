@@ -102,10 +102,19 @@ def make_defect_structure_info(perfect: Structure,
                                initial: Structure,
                                final: Structure,
                                dist_tol: float,
-                               symprec: float):
+                               symprec: float = None,
+                               init_site_sym: str = None,
+                               final_site_sym: str = None) -> "DefectStructureInfo":
     final = final.copy()
-    initial_symmetrizer = StructureSymmetrizer(initial, symprec)
-    final_symmetrizer = StructureSymmetrizer(final, symprec)
+    if symprec:
+        initial_symmetrizer = StructureSymmetrizer(initial, symprec)
+        final_symmetrizer = StructureSymmetrizer(final, symprec)
+        init_site_sym = initial_symmetrizer.point_group
+        final_site_sym = final_symmetrizer.point_group
+    else:
+        if not (init_site_sym and final_site_sym):
+            raise AssertionError("Need to set both initial and final site "
+                                 "symmetry, when symprec is not set.")
 
     assert perfect.lattice == initial.lattice == final.lattice
     comp_w_perf = DefectStructureComparator(final, perfect, dist_tol)
