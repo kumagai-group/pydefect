@@ -34,9 +34,9 @@ def calc_drift(perfect: Structure, defect: Structure, center: List[float],
         distances.append(site.distance_and_image_from_frac_coords(center)[0])
     anchor_atom_idx = int(np.argmax(distances))
     p_anchor_atom_idx = d_to_p[anchor_atom_idx]
-    distance = defect[anchor_atom_idx].distance(perfect[p_anchor_atom_idx])
+    distance, image = defect[anchor_atom_idx].distance_and_image_from_frac_coords(perfect[p_anchor_atom_idx].frac_coords)
     drift_vector = (defect[anchor_atom_idx].frac_coords
-                    - perfect[p_anchor_atom_idx].frac_coords)
+                    - perfect[p_anchor_atom_idx].frac_coords - image)
     return anchor_atom_idx, distance, drift_vector
 
 
