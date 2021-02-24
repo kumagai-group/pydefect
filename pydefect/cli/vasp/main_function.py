@@ -357,16 +357,17 @@ def make_defect_formation_energy(args):
 
 def calc_defect_structure_info(args):
     supercell_info: SupercellInfo = args.supercell_info
-    calc_results: CalcResults = loadfn(args.defect_dir / "calc_results.json")
-    defect_entry: DefectEntry = loadfn(args.defect_dir / "defect_entry.json")
-    defect_str_info = make_defect_structure_info(
-        supercell_info.structure,
-        defect_entry.structure,
-        calc_results.structure,
-        dist_tol=args.dist_tolerance,
-        symprec=args.symprec,
-        init_site_sym=defect_entry.site_symmetry,
-        final_site_sym=calc_results.site_symmetry)
-    print(defect_str_info)
-    defect_vesta_file(calc_results.structure, defect_str_info,
-                      filename=str(args.defect_dir / "defect.vesta"))
+    for d in args.dirs:
+        calc_results: CalcResults = loadfn(d / "calc_results.json")
+        defect_entry: DefectEntry = loadfn(d / "defect_entry.json")
+        defect_str_info = make_defect_structure_info(
+            supercell_info.structure,
+            defect_entry.structure,
+            calc_results.structure,
+            dist_tol=args.dist_tolerance,
+            symprec=args.symprec,
+            init_site_sym=defect_entry.site_symmetry,
+            final_site_sym=calc_results.site_symmetry)
+        defect_str_info.to_json()
+        defect_vesta_file(calc_results.structure, defect_str_info,
+                          filename=str(d / "defect.vesta"))

@@ -453,7 +453,7 @@ def test_calc_defect_structure_info(mocker):
     mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
     mock_supercell_info.structure = "c"
     args = Namespace(supercell_info=mock_supercell_info,
-                     defect_dir=Path("Va_O1_2"),
+                     dirs=[Path("Va_O1_2")],
                      symprec=None,
                      dist_tolerance=1.0)
     calc_defect_structure_info(args)

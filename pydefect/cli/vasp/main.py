@@ -368,13 +368,10 @@ def parse_args(args):
     parser_calc_def_str = subparsers.add_parser(
         name="calc_defect_structure_info",
         description="Calc defect structure.",
-        parents=[si_parser],
+        parents=[dirs_parser, si_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cds'])
 
-    parser_calc_def_str.add_argument(
-        "-d", "--defect_dir", required=True, type=Path,
-        help="Path to the defect directory.")
     parser_calc_def_str.add_argument(
         "-dt", "--dist_tolerance", type=float, default=defaults.dist_tol,
         help="Tolerance in Angstrom for distance to judge if the "
