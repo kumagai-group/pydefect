@@ -11,7 +11,8 @@ from pydefect.analyzer.defect_energy import slide_energy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
-from pydefect.analyzer.defect_structure_info import make_defect_structure_info
+from pydefect.analyzer.defect_structure_info import make_defect_structure_info, \
+    defect_vesta_file
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
@@ -367,3 +368,5 @@ def calc_defect_structure_info(args):
         init_site_sym=defect_entry.site_symmetry,
         final_site_sym=calc_results.site_symmetry)
     print(defect_str_info)
+    defect_vesta_file(calc_results.structure, defect_str_info,
+                      filename=str(args.defect_dir / "defect.vesta"))

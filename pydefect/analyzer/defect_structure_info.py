@@ -66,7 +66,7 @@ def calc_displacements(perfect: Structure,
             disp_dist, t = lattice.get_distance_and_image(
                 defect.frac_coords[d], perfect.frac_coords[p])
             disp_vec = lattice.get_cartesian_coords(
-                defect.frac_coords[d] - perfect.frac_coords[p] + t)
+                defect.frac_coords[d] - perfect.frac_coords[p] - t)
 
             inner_prod = sum(initial_pos_vec * disp_vec)
             ini_dist = np.linalg.norm(initial_pos_vec)
@@ -262,18 +262,25 @@ class DefectStructureInfo(MSONable):
         return "\n".join(lines)
 
 
-    # def to(self, dir_name: Path = Path(".")):
-    #     fd_local = Structure.from_sites(
-    #         [self.final_structure[s] for s in self.neighboring_atom_indices])
-    #     for v in self.final_vacancies:
-    #         fd_local.append("X", coords=self.perfect_structure[v].frac_coords)
-    #     fd_local.to(filename=dir_name / "POSCAR_final_local")
-    #
-    #     neighbor_indices_in_p = [self.fd_to_p[i]
-    #                              for i in self.neighboring_atom_indices
-    #                              if self.fd_to_p[i] is not None]
-    #     neighbor_indices_in_p.extend(self.final_vacancies)
-    #     p_local = Structure.from_sites(
-    #         [self.perfect_structure[s] for s in neighbor_indices_in_p])
-    #     p_local.to(filename=dir_name / "POSCAR_perfect_local")
-    #
+def defect_vesta_file(defect_structure: Structure,
+                      def_str_info: DefectStructureInfo,
+                      cutoff: float = 5.0,
+                      show_disp_min: float = 0.1,
+                      disp_enhance_factor: float = 3.0,
+                      filename: str = "defect.vesta"):
+    sites, vectors = [], {}
+    i = 1
+    for s, disp in zip(defect_structure, def_str_info.displacements):
+        if disp and disp.distance_from_defect < cutoff:
+            sites.append(s)
+            if disp and disp.displace_distance > show_disp_min:
+                vectors[i] = (v * disp_enhance_factor for v in disp.disp_vector)
+            i += 1
+
+    local = Structure.from_sites(sites)
+    for _, fcoord in def_str_info.site_diff.removed.values():
+        local.append(DummySpecies("X"), coords=fcoord)
+
+    vesta_file = VestaFile(local, vectors=vectors)
+    vesta_file.write_file(filename)
+

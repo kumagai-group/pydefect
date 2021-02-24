@@ -40,7 +40,7 @@ class VestaFile:
                        Struc(structure),
                        Bound(boundary),
                        SBond(structure),
-                       DummyAtomt(structure),
+#                       DummyAtomt(structure),
                        Vect(vectors),
                        Style(structure)]
 
@@ -148,13 +148,15 @@ class SBond:
 
     def __init__(self, structure: Structure, bond_factor=1.2):
         bond_list = []
+        i = 1
         for e1, e2 in itertools.permutations(structure.types_of_species, 2):
             try:
                 bond = float(e1.average_ionic_radius + e2.average_ionic_radius) * bond_factor
             except AttributeError:
                 continue
             bond_list.append(
-                f"{e1.symbol} {e2.symbol} 0.0 {bond:5.4}  0  1  1  0  1")
+                f"{i} {e1.symbol} {e2.symbol} 0.0 {bond:5.4}  0  1  1  0  1")
+            i += 1
         self.bonds = "\n".join(bond_list)
 
     def __repr__(self):
@@ -166,8 +168,15 @@ class Vect:
     """
      VECTR block in *.vesta files, showing directions of vectors
     e.g)
-    1(vct_index)   -0.16519    0.00000    0.00000  <-- e.g., arrow end point
+    1(vct_index)   -0.16519    0.00000    0.00000  <-- arrow end point
     1(atm_index)   0           0          0        <-- options
+
+            penetration add_atomic_radius
+    type 0:    no            no
+    type 1:   yes            no
+    type 2:    no           yes
+    type 3:   yes           yes
+
     """
     header_1 = "VECTR"
     separator = " 0 0 0 0 0 "
@@ -187,11 +196,11 @@ class Vect:
             vec_lines = []
             vector_types = []
             vector_option = f"{size} {color} {self.type}"
-            for i, (idx, vec) in enumerate(vectors.items()):
-                vec_lines.append(f'{idx} {val_to_str_line(vec)}')
-                vec_lines.append(f"{idx}  0 0 0 0 {self.separator}")
+            for i, (idx, vec) in enumerate(vectors.items(), 1):
+                vec_lines.append(f'{i} {val_to_str_line(vec)}')
+                vec_lines.append(f"{idx}  0 0 0 0")
                 vec_lines.append(self.separator)
-                vector_types.append(f'{i + 1} {vector_option}')
+                vector_types.append(f'{i} {vector_option}')
             self.vectors = '\n'.join(vec_lines)
             self.vector_types = '\n'.join(vector_types)
         else:

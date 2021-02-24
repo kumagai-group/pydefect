@@ -54,22 +54,22 @@ def test_bound():
 
 def test_sbond():
     s = Structure(Lattice.cubic(3.9), species=["Ba", "Ti"], coords=[[0.5]*3, [0.0]*3])
-    actual = repr(SBond(s))
+    actual = repr(SBond(s, bond_factor=1.2))
     expected = '''SBOND
-Ba Ti 0.0  2.81  0  1  1  0  1
-Ti Ba 0.0  2.81  0  1  1  0  1
+1 Ba Ti 0.0  2.81  0  1  1  0  1
+2 Ti Ba 0.0  2.81  0  1  1  0  1
  0 0 0 0 '''
     assert actual == expected
 
 
 def test_vect():
-    actual = repr(Vect({1: [0., 0., 0.], 2: [0., 0., -0.1]}))
+    actual = repr(Vect({2: [0., 0., 0.], 3: [0., 0., -0.1]}))
     expected = '''VECTR
 1 0.000000 0.000000 0.000000
-1  0 0 0 0  0 0 0 0 0 
+2  0 0 0 0
  0 0 0 0 0 
 2 0.000000 0.000000 -0.100000
-2  0 0 0 0  0 0 0 0 0 
+3  0 0 0 0
  0 0 0 0 0 
 
 VECTT
