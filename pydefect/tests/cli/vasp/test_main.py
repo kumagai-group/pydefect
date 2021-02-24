@@ -368,7 +368,7 @@ def test_defect_structure(mocker):
                               "--symprec", "2.0"])
     expected = Namespace(
         supercell_info=mock_supercell_info,
-        defect_dir=Path("Va_O1_0"),
+        dirs=[Path("Va_O1_0")],
         dist_tolerance=1.0,
         symprec=2.0,
         func=parsed_args.func)
