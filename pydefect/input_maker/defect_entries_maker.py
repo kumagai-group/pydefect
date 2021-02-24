@@ -9,6 +9,7 @@ from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pymatgen import Structure, IStructure
+from pymatgen.core.structure import PeriodicNeighbor
 
 
 class DefectEntriesMaker:
@@ -88,15 +89,15 @@ def perturb_structure(structure: Structure, center: List[float], cutoff: float
     """
     result = structure.copy()
     cartesian_coords = structure.lattice.get_cartesian_coords(center)
-    neighboring_atoms = structure.get_sites_in_sphere(
+    neighboring_atoms: List[PeriodicNeighbor] = structure.get_sites_in_sphere(
         pt=cartesian_coords, r=cutoff, include_index=True)
 
 #    assert cutoff < min(structure.lattice.lengths) / 2.0
 
     # neighboring_atom is composed of (PeriodicSite, distance, index)
-    for _, _, site_index in neighboring_atoms:
+    for p_neighbor in neighboring_atoms:
         vector = random_3d_vector(defaults.displace_distance)
-        result.translate_sites(site_index, vector, frac_coords=False)
+        result.translate_sites(p_neighbor.index, vector, frac_coords=False)
 
     return result
 
