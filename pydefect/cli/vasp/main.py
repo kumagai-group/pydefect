@@ -376,11 +376,14 @@ def parse_args(args):
         "-d", "--defect_dir", required=True, type=Path,
         help="Path to the defect directory.")
     parser_calc_def_str.add_argument(
-        "-dt", "--dist_tolerance", required=True, type=float,
-        help="")
+        "-dt", "--dist_tolerance", type=float, default=defaults.dist_tol,
+        help="Tolerance in Angstrom for distance to judge if the "
+             "atoms in initial and final structures are same ones.")
     parser_calc_def_str.add_argument(
-        "--symprec", required=True, type=float,
-        help="")
+        "--symprec", type=float,
+        help="Tolerance for determining the point groups. If it's not set, "
+             "the point groups written in defect_entry.json and "
+             "calc_results.json are used.")
     parser_calc_def_str.set_defaults(func=calc_defect_structure_info)
 
     # ------------------------------------------------------------------------
