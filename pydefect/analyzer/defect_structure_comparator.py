@@ -108,11 +108,22 @@ class DefectStructureComparator:
         inserted_sites = [self._defect_structure[x]
                           for x in self.inserted_indices]
 
-        removed_str = Structure.from_sites(removed_sites)
-        inserted_str = Structure.from_sites(inserted_sites)
+        try:
+            removed_str = Structure.from_sites(removed_sites)
+        except ValueError:
+            removed_str = None
 
-        r_to_i = self._atom_projection(removed_str, inserted_str, specie=False)
-        i_to_r = self._atom_projection(inserted_str, removed_str, specie=False)
+        try:
+            inserted_str = Structure.from_sites(inserted_sites)
+        except ValueError:
+            inserted_str = None
+
+        if inserted_str and removed_str:
+            r_to_i = self._atom_projection(removed_str, inserted_str, specie=False)
+            i_to_r = self._atom_projection(inserted_str, removed_str, specie=False)
+        else:
+            r_to_i = [None]*len(removed_sites)
+            i_to_r = [None]*len(inserted_sites)
 
         mapping = {}
         for x, y in enumerate(r_to_i):

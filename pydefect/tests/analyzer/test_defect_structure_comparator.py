@@ -129,6 +129,24 @@ def test_make_site_diff(structure_comparator, site_diff):
     assert structure_comparator.make_site_diff() == site_diff
 
 
+def test_make_site_diff_wo_diff():
+    s1 = IStructure(Lattice.cubic(10), species=["H"], coords=[[0]*3])
+    s2 = s1.copy()
+    structure_comparator = DefectStructureComparator(s1, s2)
+    site_diff = structure_comparator.make_site_diff()
+    assert site_diff == SiteDiff({}, {}, {}, {}, {0: 0})
+    assert site_diff.is_no_diff
+
+    s1 = IStructure(Lattice.cubic(10), species=["H", "He"], coords=[[0]*3, [0.5]*3])
+    s2 = IStructure(Lattice.cubic(10), species=["H"], coords=[[0]*3])
+    structure_comparator = DefectStructureComparator(defect_structure=s2,
+                                                     perfect_structure=s1)
+    site_diff = structure_comparator.make_site_diff()
+    assert site_diff == SiteDiff({1: ("He", (0.5, 0.5, 0.5))}, {}, {}, {}, {0: 0})
+    assert site_diff.is_no_diff is False
+
+
+
 # def test_make_defect_type():
 #     lattice = Lattice.cubic(10)
 #     assert make_defect_type([("")], [], lattice) == DefectType.vacancy

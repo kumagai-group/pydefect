@@ -122,7 +122,7 @@ def make_defect_structure_info(perfect: Structure,
     d_to_p = comp_w_init.d_to_p
 
     center = comp_w_perf.defect_center_coord
-    anchor_idx, drift_d, drift_vec = calc_drift(perfect, final, center, d_to_p)
+    anchor_idx, drift_d, drift_vec = calc_drift(initial, final, center, d_to_p)
     center -= drift_vec
     for site in final:
         site.frac_coords -= drift_vec
