@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List, Tuple, Dict
 
 import numpy as np
-from monty.json import MSONable
+from monty.json import MSONable, MontyDecoder
 from pydefect.util.structure_tools import Distances
 from pymatgen import IStructure, Structure
 
@@ -175,6 +175,19 @@ class SiteDiff(MSONable):
     def is_no_diff(self):
         return not (self.removed or self.inserted
                     or self.removed_by_sub or self.inserted_by_sub)
+
+    @classmethod
+    def from_dict(cls, d):
+        decoded = {}
+        for k, v in d.items():
+            if k.startswith("@"):
+                continue
+            try:
+                k = int(k)
+            except ValueError:
+                pass
+            decoded[k] = MontyDecoder().process_decoded(v)
+        return cls(**decoded)
 
 #
 # def make_defect_type(vacancies, interstitials, lattice, same_dist_criterion):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import math
+import warnings
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import Optional, List, Tuple
@@ -16,6 +17,7 @@ from pymatgen.symmetry.groups import SpaceGroup
 from tabulate import tabulate
 from vise.util.enum import ExtendedEnum
 from vise.util.logger import get_logger
+from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 logger = get_logger(__name__)
@@ -70,7 +72,10 @@ def calc_displacements(perfect: Structure,
 
             inner_prod = sum(initial_pos_vec * disp_vec)
             ini_dist = np.linalg.norm(initial_pos_vec)
-            cos = round(inner_prod / (ini_dist * disp_dist), 10)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                # ignore "RuntimeWarning: invalid value encountered in double_scalars"
+                cos = round(inner_prod / (ini_dist * disp_dist), 10)
             angle = float(round(180 * (1 - np.arccos(cos) / np.pi), 1))
             if math.isnan(angle):
                 angle = None
@@ -193,7 +198,7 @@ def symmetry_relation(initial_point_group, final_point_group):
 
 
 @dataclass
-class DefectStructureInfo(MSONable):
+class DefectStructureInfo(MSONable, ToJsonFileMixIn):
     initial_site_sym: str
     final_site_sym: str
     site_diff: SiteDiff

@@ -8,7 +8,8 @@ from pydefect.analyzer.defect_structure_info import \
     Displacement, DefectStructureInfo, fold_coords, calc_drift, \
     make_defect_structure_info, symmetry_relation, SymmRelation, \
     unique_point_group, elem_indices_coords, defect_vesta_file
-from pydefect.tests.helpers.assertion import assert_msonable
+from pydefect.tests.helpers.assertion import assert_msonable, \
+    assert_json_roundtrip
 from pymatgen import Structure, Lattice
 from vise.util.structure_symmetrizer import num_sym_op
 
@@ -129,6 +130,10 @@ def test_elem_indices_coords(structures):
 
 def test_str_info_msonable(def_str_info):
     assert_msonable(def_str_info)
+
+
+def test_calc_results_json_roundtrip(def_str_info, tmpdir):
+    assert_json_roundtrip(def_str_info, tmpdir)
 
 
 def test_symmetry_relation():
