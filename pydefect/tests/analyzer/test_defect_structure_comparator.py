@@ -125,6 +125,30 @@ def test_site_diff_is_no_diff():
     assert site_diff.is_no_diff is False
 
 
+def test_site_diff():
+    site_diff_vac = SiteDiff(removed={1: ("H", (0.0, 0.0, 0.0))}, inserted={},
+                             removed_by_sub={}, inserted_by_sub={},
+                             mapping={1: 2})
+    site_diff_int = SiteDiff(removed={}, inserted={1: ("H", (0.0, 0.0, 0.0))},
+                             removed_by_sub={}, inserted_by_sub={},
+                             mapping={1: 2})
+    site_diff_sub = SiteDiff(removed={}, inserted={},
+                             removed_by_sub={1: ("H", (0.0, 0.0, 0.0))},
+                             inserted_by_sub={1: ("He", (0.0, 0.0, 0.0))},
+                             mapping={1: 2})
+    assert site_diff_vac.is_vacancy
+    assert site_diff_int.is_vacancy is False
+    assert site_diff_sub.is_vacancy is False
+
+    assert site_diff_vac.is_interstitial is False
+    assert site_diff_int.is_interstitial
+    assert site_diff_sub.is_interstitial is False
+
+    assert site_diff_vac.is_substituted is False
+    assert site_diff_int.is_substituted is False
+    assert site_diff_sub.is_substituted
+
+
 def test_make_site_diff(structure_comparator, site_diff):
     assert structure_comparator.make_site_diff() == site_diff
 

@@ -7,10 +7,11 @@ from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import \
     Displacement, DefectStructureInfo, fold_coords, calc_drift, \
     make_defect_structure_info, symmetry_relation, SymmRelation, \
-    unique_point_group, elem_indices_coords
+    unique_point_group, elem_indices_coords, DefectType, judge_defect_type
 from pydefect.tests.helpers.assertion import assert_msonable, \
     assert_json_roundtrip
 from pymatgen import Structure, Lattice
+from vise.util.enum import ExtendedEnum
 from vise.util.structure_symmetrizer import num_sym_op
 
 
@@ -112,20 +113,56 @@ def test_calc_drift_dist(structures):
     assert drift_dist == 0.001
     np.testing.assert_almost_equal(vector_in_frac, np.array([0.0, 0.0, 0.0001]))
 
-#
-# def test_calc_displacements(structures, displacements):
-#     perfect, _, final = structures
-#     actual = calc_displacements(perfect, final,
-#                                 center=[0.4, 0.4, 0.4],
-#                                 d_to_p=[None, 1, None, 3])
-#     expected = displacements
-#     assert actual == expected
-
 
 def test_elem_indices_coords(structures):
     actual = elem_indices_coords(structures[0], indices=[1, 2])
     expected = [("He", 1, (0.75, 0.75, 0.75)), ("Li", 2, (0.5, 0.5, 0.5))]
     assert actual == expected
+
+
+def test_defect_type():
+    assert_msonable(DefectType.vacancy)
+    assert issubclass(DefectType, ExtendedEnum)
+
+
+def test_judge_defect_type():
+    """The structures remain as they could be used in the future"""
+    perfect = Structure(Lattice.cubic(10), species=["H"]*4,
+                        coords=[[0.0, 0.0, 0.0], [0.0, 0.5, 0.5],
+                                [0.5, 0.0, 0.5], [0.5, 0.5, 0.0]])
+    defect = Structure(Lattice.cubic(10), species=["H"]*3,
+                       coords=[[0.0, 0.0, 0.0], [0.25, 0.25, 0.5],
+                               [0.5, 0.5, 0.0]])
+    site_diff = SiteDiff(removed={1: ("H", (0.0, 0.5, 0.5)),
+                                  2: ("H", (0.5, 0.0, 0.5))},
+                         inserted={1: ("H", (0.25, 0.25, 0.5))},
+                         removed_by_sub={}, inserted_by_sub={},
+                         mapping={0: 0, 2: 3})
+    assert judge_defect_type(site_diff) == DefectType.vacancy_split
+
+    defect_2 = Structure(Lattice.cubic(10), species=["H"]*5,
+                         coords=[[0.0, 0.0, 0.0], [0.25, 0.25, 0.5],
+                                 [0.75, 0.25, 0.5], [0.25, 0.75, 0.5],
+                                 [0.5, 0.5, 0.0]])
+    site_diff_2 = SiteDiff(removed={1: ("H", (0.0, 0.5, 0.5)),
+                                    2: ("H", (0.5, 0.0, 0.5))},
+                           inserted={1: ("H", (0.25, 0.25, 0.5)),
+                                     2: ("H", (0.75, 0.25, 0.5)),
+                                     3: ("H", (0.25, 0.75, 0.5))},
+                           removed_by_sub={}, inserted_by_sub={},
+                           mapping={0: 0, 4: 3})
+    assert judge_defect_type(site_diff_2) == DefectType.interstitial_split
+
+    defect_3 = Structure(Lattice.cubic(10), species=["H", "He", "H"],
+                         coords=[[0.0, 0.0, 0.0], [0.25, 0.25, 0.5],
+                                 [0.5, 0.5, 0.0]])
+    site_diff_3 = SiteDiff(removed={1: ("H", (0.0, 0.5, 0.5)),
+                                    2: ("H", (0.5, 0.0, 0.5))},
+                           inserted={1: ("He", (0.25, 0.25, 0.5))},
+                           removed_by_sub={}, inserted_by_sub={},
+                           mapping={0: 0, 2: 3})
+
+    assert judge_defect_type(site_diff_3) == DefectType.unknown
 
 
 def test_str_info_msonable(def_str_info):
@@ -168,6 +205,10 @@ def test_make_def_str_info_symm_rel(structures, def_str_info):
 
 def test_make_def_str_info_same_config_from_init(structures, def_str_info):
     assert def_str_info.same_config_from_init is False
+
+
+def test_def_str_info_defect_type(def_str_info):
+    assert def_str_info.defect_type == DefectType.unknown
 
 
 def test_repr(def_str_info):

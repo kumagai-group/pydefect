@@ -101,6 +101,37 @@ def elem_indices_coords(structure: Structure, indices
     return result
 
 
+class DefectType(MSONable, ExtendedEnum):
+    vacancy = "vacancy"
+    interstitial = "interstitial"
+    substituted = "substituted"
+    vacancy_split = "vacancy_split"
+    interstitial_split = "interstitial_split"
+    unknown = "unknown"
+
+
+def judge_defect_type(site_diff: SiteDiff):
+    if site_diff.is_vacancy:
+        return DefectType.vacancy
+    elif site_diff.is_interstitial:
+        return DefectType.interstitial
+    elif site_diff.is_substituted:
+        return DefectType.substituted
+
+    elements_involved = set()
+    for elem, _ in (list(site_diff.removed.values())
+                    + list(site_diff.inserted.values())):
+        elements_involved.add(elem)
+
+    if len(elements_involved) == 1 and not site_diff.substituted:
+        if len(site_diff.removed) - len(site_diff.inserted) == 1:
+            return DefectType.vacancy_split
+        elif len(site_diff.removed) - len(site_diff.inserted) == -1:
+            return DefectType.interstitial_split
+
+    return DefectType.unknown
+
+
 def make_defect_structure_info(perfect: Structure,
                                initial: Structure,
                                final: Structure,
@@ -217,8 +248,13 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
     def same_config_from_init(self):
         return self.site_diff_from_initial.is_no_diff
 
+    @property
+    def defect_type(self):
+        return judge_defect_type(self.site_diff)
+
     def __repr__(self):
-        lines = [f"Site symmetry: {self.initial_site_sym} "
+        lines = [f"Defect type: {self.defect_type}",
+                 f"Site symmetry: {self.initial_site_sym} "
                  f"-> {self.final_site_sym} ({self.symm_relation})",
                  f"Is same configuration: {self.same_config_from_init}",
                  f"Drift distance: {self.drift_dist:5.3f}"]

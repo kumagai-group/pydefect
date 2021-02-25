@@ -164,6 +164,21 @@ class SiteDiff(MSONable):
     mapping: Dict[int, int]
 
     @property
+    def is_vacancy(self):
+        return (len(self.removed) == 1 and len(self.inserted) == 0 and
+                len(self.removed_by_sub) == 0 and len(self.inserted_by_sub) == 0)
+
+    @property
+    def is_interstitial(self):
+        return (len(self.removed) == 0 and len(self.inserted) == 1 and
+                len(self.removed_by_sub) == 0 and len(self.inserted_by_sub) == 0)
+
+    @property
+    def is_substituted(self):
+        return (len(self.removed) == 0 and len(self.inserted) == 0 and
+                len(self.removed_by_sub) == 1 and len(self.inserted_by_sub) == 1)
+
+    @property
     def substituted(self):
         result = {}
         for (r_idx, r_val), (i_idx, i_val) in zip(self.removed_by_sub.items(),
@@ -188,18 +203,4 @@ class SiteDiff(MSONable):
                 pass
             decoded[k] = MontyDecoder().process_decoded(v)
         return cls(**decoded)
-
-#
-# def make_defect_type(vacancies, interstitials, lattice, same_dist_criterion):
-#     if len(vacancies) == 1 and len(interstitials) == 0:
-#         return DefectType.vacancy
-#     if len(vacancies) == 0 and len(interstitials) == 1:
-#         return DefectType.interstitial
-#
-#
-# class DefectType(MSONable, ExtendedEnum):
-#     vacancy = "vacancy"
-#     interstitial = "interstitial"
-#     substituted = "substituted"
-#     complex = "complex"
 
