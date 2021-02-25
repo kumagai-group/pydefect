@@ -92,7 +92,8 @@ def remove_dot(x):
     return "".join([s for s in x if s != "."])
 
 
-def elem_indices_coords(structure: Structure, indices
+def elem_indices_coords(structure: Structure,
+                        indices: List[int]
                         ) -> List[Tuple[str, int, Tuple[float, float, float]]]:
     result = []
     for i in indices:
@@ -119,11 +120,10 @@ def judge_defect_type(site_diff: SiteDiff):
         return DefectType.substituted
 
     elements_involved = set()
-    for elem, _ in (list(site_diff.removed.values())
-                    + list(site_diff.inserted.values())):
+    for _, elem, _ in site_diff.removed + site_diff.inserted:
         elements_involved.add(elem)
 
-    if len(elements_involved) == 1 and not site_diff.substituted:
+    if len(elements_involved) == 1 and not site_diff.removed_by_sub:
         if len(site_diff.removed) - len(site_diff.inserted) == 1:
             return DefectType.vacancy_split
         elif len(site_diff.removed) - len(site_diff.inserted) == -1:
@@ -138,7 +138,8 @@ def make_defect_structure_info(perfect: Structure,
                                dist_tol: float,
                                symprec: float = None,
                                init_site_sym: str = None,
-                               final_site_sym: str = None) -> "DefectStructureInfo":
+                               final_site_sym: str = None
+                               ) -> "DefectStructureInfo":
     final = final.copy()
     if symprec:
         initial_symmetrizer = StructureSymmetrizer(initial, symprec)
@@ -253,7 +254,8 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
         return judge_defect_type(self.site_diff)
 
     def __repr__(self):
-        lines = [f"Defect type: {self.defect_type}",
+        lines = ["",
+                 f"Defect type: {self.defect_type}",
                  f"Site symmetry: {self.initial_site_sym} "
                  f"-> {self.final_site_sym} ({self.symm_relation})",
                  f"Is same configuration: {self.same_config_from_init}",
@@ -263,26 +265,26 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
 
         lines.append("Removed atoms:")
         x = []
-        for i, (elem, coords) in self.site_diff.removed.items():
+        for i, elem, coords in self.site_diff.removed:
             x.append([i, elem] + [round(fc, 2) for fc in coords])
         lines.append(tabulate(x))
 
         lines.append("Added atoms:")
         x = []
-        for i, (elem, coords) in self.site_diff.inserted.items():
+        for i, elem, coords in self.site_diff.inserted:
             x.append([i, elem] + [round(fc, 2) for fc in coords])
         lines.append(tabulate(x))
 
         if self.same_config_from_init is False:
             lines.append("Initially removed atoms:")
             x = []
-            for i, (elem, coords) in self.site_diff_from_initial.removed.items():
+            for i, elem, coords in self.site_diff_from_initial.removed:
                 x.append([i, elem] + [round(fc, 2) for fc in coords])
             lines.append(tabulate(x))
 
             lines.append("Initially added atoms:")
             x = []
-            for i, (elem, coords) in self.site_diff_from_initial.inserted.items():
+            for i, elem, coords in self.site_diff_from_initial.inserted:
                 x.append([i, elem] + [round(fc, 2) for fc in coords])
             lines.append(tabulate(x))
 

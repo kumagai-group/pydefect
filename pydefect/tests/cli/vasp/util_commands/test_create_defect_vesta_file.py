@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 
-import pytest
-from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo, \
     Displacement
@@ -13,17 +11,14 @@ from pymatgen import Structure, Lattice
 
 def test_defect_vesta_file(tmpdir):
     print(tmpdir)
-    site_diff = SiteDiff(removed={0: ('H', (0.25, 0.25, 0.25))},
-                         inserted={0: ('H', (0.27, 0.25, 0.25))},
-                         removed_by_sub={2: ('Li', (0.5, 0.5, 0.5))},
-                         inserted_by_sub={2: ('Be', (0.5, 0.5, 0.5009))},
-                         mapping={1: 1, 3: 3})
-    site_diff_from_init = SiteDiff(removed={0: ('H', (0.25, 0.25, 0.25))},
-                                   inserted={0: ('H', (0.27, 0.25, 0.25))},
-                                   removed_by_sub={2: ('Li', (0.5, 0.5, 0.5))},
-                                   inserted_by_sub={2: ('Be', (0.5, 0.5, 0.5))},
-                                   mapping={1: 1, 3: 3})
-
+    site_diff = SiteDiff(removed=[(0, 'H', (0.25, 0.25, 0.25))],
+                         inserted=[(0, 'H', (0.27, 0.25, 0.25))],
+                         removed_by_sub=[(2, 'Li', (0.5, 0.5, 0.5))],
+                         inserted_by_sub=[(2, 'Be', (0.5, 0.5, 0.5009))])
+    site_diff_from_init = SiteDiff(removed=[(0, 'H', (0.25, 0.25, 0.25))],
+                                   inserted=[(0, 'H', (0.27, 0.25, 0.25))],
+                                   removed_by_sub=[(2, 'Li', (0.5, 0.5, 0.5))],
+                                   inserted_by_sub=[(2, 'Be', (0.5, 0.5, 0.5))])
     displacements = [None,
             Displacement(specie="He",
                          original_pos=(0.75, 0.75, 0.75),

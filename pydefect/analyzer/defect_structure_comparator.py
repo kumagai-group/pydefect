@@ -125,43 +125,43 @@ class DefectStructureComparator:
             r_to_i = [None]*len(removed_sites)
             i_to_r = [None]*len(inserted_sites)
 
-        mapping = {}
+        mapping, removed_mapping, inserted_mapping = [], [], []
         for x, y in enumerate(r_to_i):
             if y and x == i_to_r[y]:
-                mapping[self.removed_indices[x]] = self.inserted_indices[y]
+                mapping.append((self.removed_indices[x], self.inserted_indices[y]))
+                removed_mapping.append(self.removed_indices[x])
+                inserted_mapping.append(self.inserted_indices[y])
 
-        removed, removed_by_sub = {}, {}
+        removed, removed_by_sub = [], []
         for idx in self.removed_indices:
             site = self._perfect_structure[idx]
-            val = site.species_string, tuple(site.frac_coords)
-            if idx in mapping.keys():
-                removed_by_sub[idx] = val
+            val = idx, site.species_string, tuple(site.frac_coords)
+            if idx in removed_mapping:
+                removed_by_sub.append(val)
             else:
-                removed[idx] = val
+                removed.append(val)
 
-        inserted, inserted_by_sub = {}, {}
+        inserted, inserted_by_sub = [], []
         for idx in self.inserted_indices:
             site = self._defect_structure[idx]
-            val = site.species_string, tuple(site.frac_coords)
-            if idx in mapping.values():
-                inserted_by_sub[idx] = val
+            val = idx, site.species_string, tuple(site.frac_coords)
+            if idx in inserted_mapping:
+                inserted_by_sub.append(val)
             else:
-                inserted[idx] = val
+                inserted.append(val)
 
         return SiteDiff(removed=removed,
                         inserted=inserted,
                         removed_by_sub=removed_by_sub,
-                        inserted_by_sub=inserted_by_sub,
-                        mapping=self.atom_mapping)
+                        inserted_by_sub=inserted_by_sub)
 
 
 @dataclass
 class SiteDiff(MSONable):
-    removed: Dict[int, Tuple[str, Tuple[float, float, float]]]
-    inserted: Dict[int, Tuple[str, Tuple[float, float, float]]]
-    removed_by_sub: Dict[int, Tuple[str, Tuple[float, float, float]]]
-    inserted_by_sub: Dict[int, Tuple[str, Tuple[float, float, float]]]
-    mapping: Dict[int, int]
+    removed: List[Tuple[int, str, Tuple[float, float, float]]]
+    inserted: List[Tuple[int, str, Tuple[float, float, float]]]
+    removed_by_sub: List[Tuple[int, str, Tuple[float, float, float]]]
+    inserted_by_sub: List[Tuple[int, str, Tuple[float, float, float]]]
 
     @property
     def is_vacancy(self):
@@ -179,28 +179,7 @@ class SiteDiff(MSONable):
                 len(self.removed_by_sub) == 1 and len(self.inserted_by_sub) == 1)
 
     @property
-    def substituted(self):
-        result = {}
-        for (r_idx, r_val), (i_idx, i_val) in zip(self.removed_by_sub.items(),
-                                                  self.inserted_by_sub.items()):
-            result[(r_idx, i_idx)] = r_val, i_val
-        return result
-
-    @property
     def is_no_diff(self):
         return not (self.removed or self.inserted
                     or self.removed_by_sub or self.inserted_by_sub)
-
-    @classmethod
-    def from_dict(cls, d):
-        decoded = {}
-        for k, v in d.items():
-            if k.startswith("@"):
-                continue
-            try:
-                k = int(k)
-            except ValueError:
-                pass
-            decoded[k] = MontyDecoder().process_decoded(v)
-        return cls(**decoded)
 

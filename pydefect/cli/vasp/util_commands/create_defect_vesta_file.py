@@ -22,7 +22,7 @@ def make_defect_vesta_file(defect_structure: Structure,
             i += 1
 
     local = Structure.from_sites(sites)
-    for _, fcoord in def_str_info.site_diff.removed.values():
+    for _, _, fcoord in def_str_info.site_diff.removed:
         local.append(DummySpecies("X"), coords=fcoord)
 
     boundary = sum([[x - 0.5, x + 0.5] for x in def_str_info.center], [])

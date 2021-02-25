@@ -101,41 +101,33 @@ def test_actual_files(vasp_files):
 
 @pytest.fixture
 def site_diff():
-    return SiteDiff(removed={1: ("Cu", (0.25, 0.74, 0.74))},
-                    inserted={0: ("Cu", (0.25, 0.5, 0.5))},
-                    removed_by_sub={0: ("Cu", (0.25, 0.25, 0.25))},
-                    inserted_by_sub={5: ("H", (0.25, 0.25, 0.25))},
-                    mapping={1: 2, 2: 3, 3: 4, 4: 5})
+    return SiteDiff(removed=[(1, "Cu", (0.25, 0.74, 0.74))],
+                    inserted=[(0,  "Cu", (0.25, 0.5, 0.5))],
+                    removed_by_sub=[(0,  "Cu", (0.25, 0.25, 0.25))],
+                    inserted_by_sub=[(5, "H", (0.25, 0.25, 0.25))])
 
 
 def test_site_diff_msonable(site_diff):
     assert_msonable(site_diff)
 
 
-def test_site_diff_substituted(site_diff):
-    assert site_diff.substituted == {(0, 5): (("Cu", (0.25, 0.25, 0.25)), ("H", (0.25, 0.25, 0.25)))}
-
-
 def test_site_diff_is_no_diff():
-    site_diff = SiteDiff(removed={}, inserted={},
-                         removed_by_sub={}, inserted_by_sub={}, mapping={1: 2})
+    site_diff = SiteDiff(removed=[], inserted=[],
+                         removed_by_sub=[], inserted_by_sub=[])
     assert site_diff.is_no_diff is True
-    site_diff = SiteDiff(removed={1: ("H", (0.0, 0.0, 0.0))}, inserted={},
-                         removed_by_sub={}, inserted_by_sub={}, mapping={1: 2})
+    site_diff = SiteDiff(removed=[(1, "H", (0.0, 0.0, 0.0))], inserted=[],
+                         removed_by_sub=[], inserted_by_sub=[])
     assert site_diff.is_no_diff is False
 
 
 def test_site_diff():
-    site_diff_vac = SiteDiff(removed={1: ("H", (0.0, 0.0, 0.0))}, inserted={},
-                             removed_by_sub={}, inserted_by_sub={},
-                             mapping={1: 2})
-    site_diff_int = SiteDiff(removed={}, inserted={1: ("H", (0.0, 0.0, 0.0))},
-                             removed_by_sub={}, inserted_by_sub={},
-                             mapping={1: 2})
-    site_diff_sub = SiteDiff(removed={}, inserted={},
-                             removed_by_sub={1: ("H", (0.0, 0.0, 0.0))},
-                             inserted_by_sub={1: ("He", (0.0, 0.0, 0.0))},
-                             mapping={1: 2})
+    site_diff_vac = SiteDiff(removed=[(1, "H", (0.0, 0.0, 0.0))], inserted=[],
+                             removed_by_sub=[], inserted_by_sub=[])
+    site_diff_int = SiteDiff(removed=[], inserted=[(1, "H", (0.0, 0.0, 0.0))],
+                             removed_by_sub=[], inserted_by_sub=[])
+    site_diff_sub = SiteDiff(removed=[], inserted=[],
+                             removed_by_sub=[(1, "H", (0.0, 0.0, 0.0))],
+                             inserted_by_sub=[(1, "He", (0.0, 0.0, 0.0))])
     assert site_diff_vac.is_vacancy
     assert site_diff_int.is_vacancy is False
     assert site_diff_sub.is_vacancy is False
@@ -158,7 +150,7 @@ def test_make_site_diff_wo_diff():
     s2 = s1.copy()
     structure_comparator = DefectStructureComparator(s1, s2)
     site_diff = structure_comparator.make_site_diff()
-    assert site_diff == SiteDiff({}, {}, {}, {}, {0: 0})
+    assert site_diff == SiteDiff([], [], [], [])
     assert site_diff.is_no_diff
 
     s1 = IStructure(Lattice.cubic(10), species=["H", "He"], coords=[[0]*3, [0.5]*3])
@@ -166,7 +158,7 @@ def test_make_site_diff_wo_diff():
     structure_comparator = DefectStructureComparator(defect_structure=s2,
                                                      perfect_structure=s1)
     site_diff = structure_comparator.make_site_diff()
-    assert site_diff == SiteDiff({1: ("He", (0.5, 0.5, 0.5))}, {}, {}, {}, {0: 0})
+    assert site_diff == SiteDiff([(1, "He", (0.5, 0.5, 0.5))], [], [], [])
     assert site_diff.is_no_diff is False
 
 

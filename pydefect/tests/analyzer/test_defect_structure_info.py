@@ -71,16 +71,14 @@ def displacements():
 
 @pytest.fixture
 def def_str_info(displacements):
-    site_diff = SiteDiff(removed={0: ('H', (0.25, 0.25, 0.25))},
-                         inserted={0: ('H', (0.27, 0.25, 0.25))},
-                         removed_by_sub={2: ('Li', (0.5, 0.5, 0.5))},
-                         inserted_by_sub={2: ('Be', (0.5, 0.5, 0.5009))},
-                         mapping={1: 1, 3: 3})
-    site_diff_from_init = SiteDiff(removed={0: ('H', (0.25, 0.25, 0.25))},
-                                   inserted={0: ('H', (0.27, 0.25, 0.25))},
-                                   removed_by_sub={2: ('Li', (0.5, 0.5, 0.5))},
-                                   inserted_by_sub={2: ('Be', (0.5, 0.5, 0.5))},
-                                   mapping={1: 1, 3: 3})
+    site_diff = SiteDiff(removed=[(0, 'H', (0.25, 0.25, 0.25))],
+                         inserted=[(0, 'H', (0.27, 0.25, 0.25))],
+                         removed_by_sub=[(2, 'Li', (0.5, 0.5, 0.5))],
+                         inserted_by_sub=[(2, 'Be', (0.5, 0.5, 0.5009))])
+    site_diff_from_init = SiteDiff(removed=[(0, 'H', (0.25, 0.25, 0.25))],
+                                   inserted=[(0, 'H', (0.27, 0.25, 0.25))],
+                                   removed_by_sub=[(2, 'Li', (0.5, 0.5, 0.5))],
+                                   inserted_by_sub=[(2, 'Be', (0.5, 0.5, 0.5))])
     return DefectStructureInfo(initial_site_sym="3m",
                                final_site_sym="m",
                                site_diff=site_diff,
@@ -133,34 +131,31 @@ def test_judge_defect_type():
     defect = Structure(Lattice.cubic(10), species=["H"]*3,
                        coords=[[0.0, 0.0, 0.0], [0.25, 0.25, 0.5],
                                [0.5, 0.5, 0.0]])
-    site_diff = SiteDiff(removed={1: ("H", (0.0, 0.5, 0.5)),
-                                  2: ("H", (0.5, 0.0, 0.5))},
-                         inserted={1: ("H", (0.25, 0.25, 0.5))},
-                         removed_by_sub={}, inserted_by_sub={},
-                         mapping={0: 0, 2: 3})
+    site_diff = SiteDiff(removed=[(1, "H", (0.0, 0.5, 0.5)),
+                                  (2, "H", (0.5, 0.0, 0.5))],
+                         inserted=[(1, "H", (0.25, 0.25, 0.5))],
+                         removed_by_sub=[], inserted_by_sub=[])
     assert judge_defect_type(site_diff) == DefectType.vacancy_split
 
     defect_2 = Structure(Lattice.cubic(10), species=["H"]*5,
                          coords=[[0.0, 0.0, 0.0], [0.25, 0.25, 0.5],
                                  [0.75, 0.25, 0.5], [0.25, 0.75, 0.5],
                                  [0.5, 0.5, 0.0]])
-    site_diff_2 = SiteDiff(removed={1: ("H", (0.0, 0.5, 0.5)),
-                                    2: ("H", (0.5, 0.0, 0.5))},
-                           inserted={1: ("H", (0.25, 0.25, 0.5)),
-                                     2: ("H", (0.75, 0.25, 0.5)),
-                                     3: ("H", (0.25, 0.75, 0.5))},
-                           removed_by_sub={}, inserted_by_sub={},
-                           mapping={0: 0, 4: 3})
+    site_diff_2 = SiteDiff(removed=[(1, "H", (0.0, 0.5, 0.5)),
+                                    (2, "H", (0.5, 0.0, 0.5))],
+                           inserted=[(1, "H", (0.25, 0.25, 0.5)),
+                                     (2, "H", (0.75, 0.25, 0.5)),
+                                     (3, "H", (0.25, 0.75, 0.5))],
+                           removed_by_sub=[], inserted_by_sub=[])
     assert judge_defect_type(site_diff_2) == DefectType.interstitial_split
 
     defect_3 = Structure(Lattice.cubic(10), species=["H", "He", "H"],
                          coords=[[0.0, 0.0, 0.0], [0.25, 0.25, 0.5],
                                  [0.5, 0.5, 0.0]])
-    site_diff_3 = SiteDiff(removed={1: ("H", (0.0, 0.5, 0.5)),
-                                    2: ("H", (0.5, 0.0, 0.5))},
-                           inserted={1: ("He", (0.25, 0.25, 0.5))},
-                           removed_by_sub={}, inserted_by_sub={},
-                           mapping={0: 0, 2: 3})
+    site_diff_3 = SiteDiff(removed=[(1, "H", (0.0, 0.5, 0.5)),
+                                    (2, "H", (0.5, 0.0, 0.5))],
+                           inserted=[(1, "He", (0.25, 0.25, 0.5))],
+                           removed_by_sub=[], inserted_by_sub=[])
 
     assert judge_defect_type(site_diff_3) == DefectType.unknown
 
