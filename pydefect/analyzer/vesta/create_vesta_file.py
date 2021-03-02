@@ -3,8 +3,10 @@
 # This file is originally developed by Naoki Tsunoda.
 
 import itertools
-from typing import Union, Optional, Dict, Iterable
+from typing import Union, Optional, Dict, Iterable, List, Tuple
 
+from pydefect.analyzer.vesta.element_colors import atom_color
+from pymatgen import DummySpecies
 from pymatgen.core.structure import Structure
 from vise.util.logger import get_logger
 
@@ -25,8 +27,12 @@ class VestaFile:
                  structure: Structure,
                  title: str = None,
                  vectors: Dict[int, Iterable] = None,
+                 vector_colors: List[Tuple[int, int, int]] = None,
+                 bond_radius: float = 0.12,
                  boundary: Optional[Iterable] = None):
         """
+        If name is set to the Site in structure, they are used for labels.
+
         Args:
             vectors (dict):
                 e.g., {1: [1.0, 0.0, 0.0], ..}
@@ -39,10 +45,11 @@ class VestaFile:
                        Cellp(structure),
                        Struc(structure),
                        Bound(boundary),
-                       SBond(structure),
+                       SBond(structure, bond_radius=bond_radius),
+                       SiteT(structure),
 #                       DummyAtomt(structure),
-                       Vect(vectors),
-                       Style(structure)]
+                       Vect(vectors, size=0.2, colors=vector_colors),
+                       Style(bond_radius=bond_radius)]
 
     def __repr__(self):
         outs = []
@@ -99,10 +106,11 @@ class Struc:
 
     def __init__(self, structure: Structure):
         coords = []
-        for site, c in enumerate(structure, 1):
-            specifies = f'{site} {c.species_string} ' \
-                        f'{c.species_string}{site} {1.0} '
-            coord = val_to_str_line(c.frac_coords)
+        for site_idx, site in enumerate(structure, 1):
+            name = site.properties.get("name", None) \
+                   or f'{site.species_string}{site_idx}'
+            specifies = f'{site_idx} {site.species_string} {name} {1.0} '
+            coord = val_to_str_line(site.frac_coords)
             coords.append(specifies + coord)
             coords.append(self.zero_coord)
         # replace "X0+" (pmg dummy species) -> "XX" (vesta dummy species)
@@ -142,25 +150,52 @@ class Bound:
 class SBond:
     """
     SBOND block in *.vesta files, control show/hide bonding between elements.
+
+    boundary_mode = 0 : "Do not search the atoms beyond the boundary"
     """
     header = "SBOND"
     separator = " 0 0 0 0 "
 
-    def __init__(self, structure: Structure, bond_factor=1.2):
+    def __init__(self, structure: Structure, bond_factor=1.2,
+                 boundary_mode=0, bond_radius: float = None):
         bond_list = []
-        i = 1
-        for e1, e2 in itertools.permutations(structure.types_of_species, 2):
+        for i, (e1, e2) in enumerate(itertools.permutations(structure.types_of_species, 2), 1):
             try:
                 bond = float(e1.average_ionic_radius + e2.average_ionic_radius) * bond_factor
             except AttributeError:
                 continue
-            bond_list.append(
-                f"{i} {e1.symbol} {e2.symbol} 0.0 {bond:5.4}  0  1  1  0  1")
-            i += 1
+            x = f"{i} {e1.symbol} {e2.symbol} 0.0 {bond:5.4}  0  {boundary_mode}  1  0  1"
+            if bond_radius:
+                x += f" {bond_radius}   2.000 161  33 246"
+            bond_list.append(x)
         self.bonds = "\n".join(bond_list)
 
     def __repr__(self):
         outs = [self.header, self.bonds, self.separator]
+        return "\n".join(outs)
+
+
+class SiteT:
+    """
+    SITET block in *.vesta files, control show/hide bonding between elements.
+
+    boundary_mode = 0 : "Do not search the atoms beyond the boundary"
+    """
+    header = "SITET"
+    separator = " 0 0 0 0 "
+
+    def __init__(self, structure: Structure):
+        self.sites = []
+        for i, site in enumerate(structure, 1):
+            name = site.properties.get("name", None) or f'{site.species_string}{i}'
+            if isinstance(site.specie, DummySpecies):
+                rgb = "30 30 30"
+            else:
+                rgb = atom_color(site.species_string)
+            self.sites.append(f"  {i}     {name}  0.5 {rgb} {rgb} 204  1")
+
+    def __repr__(self):
+        outs = [self.header] + self.sites + [self.separator]
         return "\n".join(outs)
 
 
@@ -186,21 +221,28 @@ class Vect:
     def __init__(self,
                  vectors: Dict[int, Iterable],
                  size: float = 0.5,
-                 color: str = "1 1 1"):
+                 colors: List[Tuple[int, int, int]] = None):
         """
         Args:
             vectors (dict): dict of site index and vector.
                             e.g., {1: [1.0, 0.0, 0.0], ..}
+
+        RGB colors are in between 0 and 255
+        (0, 0, 0) -> black
         """
         if vectors:
             vec_lines = []
             vector_types = []
-            vector_option = f"{size} {color} {self.type}"
+            colors = colors or [(0, 0, 0)] * len(vectors)
             for i, (idx, vec) in enumerate(vectors.items(), 1):
                 vec_lines.append(f'{i} {val_to_str_line(vec)}')
                 vec_lines.append(f"{idx}  0 0 0 0")
                 vec_lines.append(self.separator)
+                c = f"{colors[i - 1][0]} {colors[i - 1][1]} {colors[i - 1][2]}"
+                vector_option = f"{size} {c} {self.type}"
                 vector_types.append(f'{i} {vector_option}')
+            vec_lines.append(self.separator)
+            vector_types.append(self.separator)
             self.vectors = '\n'.join(vec_lines)
             self.vector_types = '\n'.join(vector_types)
         else:
@@ -239,6 +281,7 @@ class Style:
     header = "STYLE"
     amp_prefix = "VECTS "
     atoms_prefix = "ATOMS "
+    bondp_prefix = "BONDP"
     sects_prefix = "SECTS"
     sectp_prefix = "SECTP"
     ucolp_prefix = "UCOLP"
@@ -248,14 +291,18 @@ class Style:
     sects = " 160  1"
     sectp = "  1 0 0  0.00000E+00  0.00000E+00  0.00000E+00  0.00100E+00"
 
-    def __init__(self, structure: Structure, is_ionic: bool = True):
-        self.amplitude = (structure.volume / structure.num_sites) ** 1 / 3
+    def __init__(self,
+                 bond_radius: float,
+                 is_ionic: bool = True):
+        self.amplitude = 1.0
         self.atoms = "1  0  1" if is_ionic else "0  0  1"
+        self.bond_radius = bond_radius
 
     def __repr__(self):
         vct = f'{self.amp_prefix} {self.amplitude}'
-        atom = f'{self.atoms_prefix} {self.atoms}'
         sects = f'{self.sects_prefix} {self.sects}'
         sectp = f'{self.sectp_prefix} \n {self.sectp}'
         ucol = f'{self.ucolp_prefix} \n {self.all_bold_cell}'
-        return "\n".join([self.header, vct, sects, sectp, ucol, atom])
+        atoms = f'{self.atoms_prefix} {self.atoms}'
+        bondp = f'{self.bondp_prefix} \n   1  16  {self.bond_radius}  1.000 127 127 127'
+        return "\n".join([self.header, vct, sects, sectp, ucol, atoms, bondp])

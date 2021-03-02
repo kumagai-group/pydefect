@@ -8,7 +8,8 @@ from pathlib import Path
 from pymatgen import Lattice, DummySpecies
 from pymatgen.core.structure import Structure
 
-from pydefect.analyzer.vesta.create_vesta_file import VestaFile, Title, Cellp, Struc, Bound, SBond, Vect, Style
+from pydefect.analyzer.vesta.create_vesta_file import VestaFile, Title, Cellp, \
+    Struc, Bound, SBond, Vect, Style
 
 parent_dir = Path(__file__).parent
 
