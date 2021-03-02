@@ -10,7 +10,7 @@ from monty.json import MSONable
 from numpy.linalg import inv
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator, SiteDiff
-from pymatgen import Structure, Lattice
+from pymatgen import Structure, Lattice, PeriodicSite
 from pymatgen.symmetry.groups import SpaceGroup
 from tabulate import tabulate
 from vise.util.enum import ExtendedEnum
@@ -21,13 +21,20 @@ from vise.util.structure_symmetrizer import StructureSymmetrizer
 logger = get_logger(__name__)
 
 
-def fold_coords(structure: Structure, center: List[float]):
+def folded_coords(site: PeriodicSite, center: List[float]):
+    _, image = site.distance_and_image_from_frac_coords(center)
+    return tuple(site.frac_coords - image)
+
+
+def fold_coords_in_structure(structure: Structure, center: List[float]):
     for site in structure:
         _, image = site.distance_and_image_from_frac_coords(center)
         site.frac_coords -= image
 
 
-def calc_drift(perfect: Structure, defect: Structure, center: List[float],
+def calc_drift(perfect: Structure,
+               defect: Structure,
+               center: List[float],
                d_to_p: List[int]):
     distances = []
     for site in defect:
@@ -43,13 +50,10 @@ def calc_drift(perfect: Structure, defect: Structure, center: List[float],
 def calc_displacements(perfect: Structure,
                        defect: Structure,
                        center: List[float],
-                       d_to_p: List[int],
-                       target_idxs: List[int] = None):
+                       d_to_p: List[int]):
     result = []
     lattice: Lattice = defect.lattice
     for d, p in enumerate(d_to_p):
-        if target_idxs and d not in target_idxs:
-            continue
         if p is None:
             result.append(None)
         else:
@@ -58,11 +62,10 @@ def calc_displacements(perfect: Structure,
             if p_elem != d_elem:
                 result.append(None)
                 continue
-            orig_pos = tuple(perfect[p].frac_coords)
-            final_pos = tuple(defect[d].frac_coords)
+            initial_pos = folded_coords(perfect[p], center)
+            final_pos = folded_coords(defect[d], initial_pos)
 
-            initial_pos_vec = \
-                lattice.get_cartesian_coords(perfect.frac_coords[p] - center)
+            initial_pos_vec = lattice.get_cartesian_coords(np.array(initial_pos) - center)
             disp_dist, t = lattice.get_distance_and_image(
                 defect.frac_coords[d], perfect.frac_coords[p])
             disp_vec = lattice.get_cartesian_coords(
@@ -79,7 +82,7 @@ def calc_displacements(perfect: Structure,
                 angle = None
 
             result.append(Displacement(specie=p_elem,
-                                       original_pos=orig_pos,
+                                       original_pos=initial_pos,
                                        final_pos=final_pos,
                                        distance_from_defect=ini_dist,
                                        disp_vector=tuple(disp_vec),

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from copy import deepcopy
 
 import numpy as np
 import pytest
 from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import \
-    Displacement, DefectStructureInfo, fold_coords, calc_drift, \
+    Displacement, DefectStructureInfo, fold_coords_in_structure, calc_drift, \
     make_defect_structure_info, symmetry_relation, SymmRelation, \
-    unique_point_group, elem_indices_coords, DefectType, judge_defect_type
-from pydefect.tests.helpers.assertion import assert_msonable, \
-    assert_json_roundtrip
+    unique_point_group, elem_indices_coords, DefectType, judge_defect_type, \
+    calc_displacements
 from pymatgen import Structure, Lattice
 from vise.tests.helpers.assertion import assert_dataclass_almost_equal, \
     assert_msonable, assert_json_roundtrip
@@ -53,14 +53,14 @@ def displacements():
                          final_pos=(0.76, 0.75, 0.75),
                          distance_from_defect=6.465437190360757,
                          disp_vector=(0.1, 0.0, 0.0),
-                         displace_distance=0.09999999999999964,
+                         displace_distance=0.1,
                          angle=124.9),
             Displacement(specie="Be",
                          original_pos=(0.5, 0.5, 0.5),
                          final_pos=(0.5, 0.5, 0.5009),
                          distance_from_defect=2.1355627039494767,
                          disp_vector=(0.0, 0.0, 0.009),
-                         displace_distance=0.009000000000000341,
+                         displace_distance=0.009,
                          angle=125.8),
             Displacement(specie="U",
                          original_pos=(0, 0, 0),
@@ -90,7 +90,7 @@ def def_str_info(displacements):
                                anchor_atom_idx=3,
                                drift_vector=(0.0, 0.0, 0.0001),
                                drift_dist=0.001,
-                               center=(0.38, 0.375, 0.37517500000000004),
+                               center=(0.38, 0.375, 0.375175),
                                displacements=displacements)
 
 
@@ -98,7 +98,7 @@ def test_fold_coords():
     actual = Structure(Lattice.monoclinic(a=1, b=1, c=1, beta=20),
                        species=["H"],
                        coords=[[0.5, 0, 0.49]])
-    fold_coords(actual, [0, 0, 0])
+    fold_coords_in_structure(actual, [0, 0, 0])
     expected = Structure(Lattice.monoclinic(a=1, b=1, c=1, beta=20),
                          species=["H"],
                          coords=[[-0.5, 0, 0.49]])
@@ -112,6 +112,20 @@ def test_calc_drift_dist(structures):
     assert anchor_atom_idx == 3
     assert drift_dist == 0.001
     np.testing.assert_almost_equal(vector_in_frac, np.array([0.0, 0.0, 0.0001]))
+
+
+def test_calc_displacements():
+    perf = Structure(Lattice.cubic(10), species=["H"], coords=[[0, 0, -0.01]])
+    defect = Structure(Lattice.cubic(10), species=["H"], coords=[[0, 0, 10.98]])
+    actual = calc_displacements(perf, defect, [0, 0, 0.98], d_to_p=[0])
+    expected = [Displacement(specie="H",
+                             original_pos=(0.0, 0.0, 0.99),
+                             final_pos=(0.0, 0.0, 0.98),
+                             distance_from_defect=0.1,
+                             disp_vector=(0.0, 0.0, -0.1),
+                             displace_distance=0.1,
+                             angle=0.0)]
+    assert_dataclass_almost_equal(actual[0], expected[0])
 
 
 def test_elem_indices_coords(structures):
@@ -184,8 +198,7 @@ def test_make_defect_structure_info(structures, def_str_info):
     perfect, initial, final = structures
     actual = make_defect_structure_info(
          perfect, initial, final, dist_tol=0.2, symprec=0.1)
-    print(actual)
-    assert actual.__repr__() == def_str_info.__repr__()
+    assert_dataclass_almost_equal(actual, def_str_info)
 
 
 def test_make_defect_structure_info_w_symms(structures, def_str_info):
@@ -193,7 +206,9 @@ def test_make_defect_structure_info_w_symms(structures, def_str_info):
     actual = make_defect_structure_info(
         perfect, initial, final, dist_tol=0.2,
         init_site_sym="3m", final_site_sym="m")
-    assert actual.__repr__() == def_str_info.__repr__()
+    expected = deepcopy(def_str_info)
+    expected.symprec = None
+    assert_dataclass_almost_equal(actual, expected)
 
 
 def test_make_def_str_info_symm_rel(structures, def_str_info):
