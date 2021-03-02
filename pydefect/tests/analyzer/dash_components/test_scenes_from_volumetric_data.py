@@ -9,7 +9,7 @@ from pydefect.analyzer.dash_components.scenes_from_volumetric_data \
     import SceneDicts, get_vertices_and_faces, make_scene_dicts, SingleScene
 from pymatgen import Structure
 from pymatgen.analysis.local_env import MinimumDistanceNN
-from vise.tests.conftest import assert_msonable
+from vise.tests.helpers.assertion import assert_msonable
 
 
 @pytest.fixture
