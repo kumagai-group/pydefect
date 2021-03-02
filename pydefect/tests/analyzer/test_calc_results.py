@@ -4,8 +4,7 @@ import pytest
 from pymatgen.io.vasp import Vasprun, Outcar
 
 from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
-from pydefect.tests.helpers.assertion import assert_msonable, \
-    assert_json_roundtrip
+from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 
 
 @pytest.fixture

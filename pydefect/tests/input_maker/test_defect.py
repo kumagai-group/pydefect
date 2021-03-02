@@ -3,7 +3,7 @@
 
 from pydefect.input_maker.defect import (
     Defect, SimpleDefect, screen_simple_defect)
-from pydefect.tests.helpers.assertion import assert_msonable
+from vise.tests.helpers.assertion import assert_msonable
 
 
 def test_defect_msonable():

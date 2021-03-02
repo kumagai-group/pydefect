@@ -11,6 +11,8 @@ from pydefect.analyzer.defect_structure_info import \
 from pydefect.tests.helpers.assertion import assert_msonable, \
     assert_json_roundtrip
 from pymatgen import Structure, Lattice
+from vise.tests.helpers.assertion import assert_dataclass_almost_equal, \
+    assert_msonable, assert_json_roundtrip
 from vise.util.enum import ExtendedEnum
 from vise.util.structure_symmetrizer import num_sym_op
 

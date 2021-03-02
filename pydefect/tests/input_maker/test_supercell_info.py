@@ -4,9 +4,8 @@
 import pytest
 
 from pydefect.input_maker.supercell_info import Interstitial, SupercellInfo
-from pydefect.tests.helpers.assertion import assert_msonable, \
-    assert_json_roundtrip
 from pydefect.util.structure_tools import Coordination
+from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 
 
 @pytest.fixture

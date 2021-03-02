@@ -5,8 +5,7 @@ from pathlib import Path
 import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues, \
     BandEdgeStates, EdgeState, EdgeCharacter, EdgeCharacters
-from pydefect.tests.helpers.assertion import assert_msonable, \
-    assert_json_roundtrip
+from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 
 
 @pytest.fixture

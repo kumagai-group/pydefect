@@ -4,8 +4,7 @@ import numpy as np
 import pytest
 
 from pydefect.analyzer.unitcell import Unitcell
-from pydefect.tests.helpers.assertion import assert_msonable, \
-    assert_json_roundtrip
+from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 
 
 @pytest.fixture

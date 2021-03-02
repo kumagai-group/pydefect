@@ -5,7 +5,7 @@ from pydefect.corrections.abstract_correction import Correction
 
 from pydefect.corrections.efnv_correction import \
     PotentialSite
-from pydefect.tests.helpers.assertion import assert_msonable
+from vise.tests.helpers.assertion import assert_msonable
 
 
 def test_extended_fnv_correction_msonable(efnv_correction):

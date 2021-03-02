@@ -9,8 +9,8 @@ import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
     NoElementEnergyError, CompositionEnergy, replace_comp_energy
 # When same keys are inserted, only the latter one is accepted.
-from pydefect.tests.helpers.assertion import assert_msonable
 from pymatgen import Composition, Element
+from vise.tests.helpers.assertion import assert_msonable
 
 energies = [CompositionEnergy(Composition("H"), 0.0, "a"),
             CompositionEnergy(Composition("H4O2"), -4.0, "c"),

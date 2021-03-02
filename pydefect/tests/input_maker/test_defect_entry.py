@@ -6,11 +6,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 from pydefect.input_maker.defect_entry import DefectEntry, make_defect_entry
-from pydefect.tests.helpers.assertion import assert_json_roundtrip, \
-    assert_msonable
 from pymatgen import Lattice, IStructure
 
 # "H" at [0.0, 0.0, 0.0] is removed here.
+from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
+
 perf_coords = [[0.0, 0.0, 0.0], [0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.0, 0.5, 0.5],
                [0.0, 0.0, 0.5], [0.0, 0.5, 0.0], [0.5, 0.0, 0.0], [0.5, 0.5, 0.5]]
 

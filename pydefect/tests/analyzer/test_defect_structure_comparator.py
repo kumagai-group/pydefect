@@ -6,8 +6,8 @@ import pytest
 from monty.serialization import loadfn
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator, SiteDiff
-from pydefect.tests.helpers.assertion import assert_msonable
 from pymatgen import Structure, IStructure, Lattice
+from vise.tests.helpers.assertion import assert_msonable
 
 
 @pytest.fixture

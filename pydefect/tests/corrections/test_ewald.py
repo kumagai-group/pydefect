@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 from numpy import pi, sqrt, exp, cos
 from pydefect.corrections.ewald import Ewald
-from pydefect.tests.helpers.assertion import assert_msonable
 from scipy.special import erfc
+from vise.tests.helpers.assertion import assert_msonable
 
 
 @pytest.fixture
