@@ -128,6 +128,9 @@ def test_site_diff():
     site_diff_sub = SiteDiff(removed=[], inserted=[],
                              removed_by_sub=[(1, "H", (0.0, 0.0, 0.0))],
                              inserted_by_sub=[(1, "He", (0.0, 0.0, 0.0))])
+    assert site_diff_vac.is_complex_defect is False
+    assert site_diff_sub.is_complex_defect is False
+
     assert site_diff_vac.is_vacancy
     assert site_diff_int.is_vacancy is False
     assert site_diff_sub.is_vacancy is False

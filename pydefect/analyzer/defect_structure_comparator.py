@@ -164,6 +164,11 @@ class SiteDiff(MSONable):
     inserted_by_sub: List[Tuple[int, str, Tuple[float, float, float]]]
 
     @property
+    def is_complex_defect(self):
+        return (len(self.removed) + len(self.inserted)
+                + len(self.removed_by_sub)) != 1
+
+    @property
     def is_vacancy(self):
         return (len(self.removed) == 1 and len(self.inserted) == 0 and
                 len(self.removed_by_sub) == 0 and len(self.inserted_by_sub) == 0)
