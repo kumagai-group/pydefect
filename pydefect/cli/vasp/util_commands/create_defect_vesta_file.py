@@ -26,13 +26,15 @@ def make_defect_vesta_file(defect_structure: Structure,
             species.append(disp.specie)
             initial_coords.append(disp.original_pos)
             final_coords.append(s.frac_coords)
-            site_info.append(round(disp.distance_from_defect, 2))
+            info = f"{round(disp.distance_from_defect, 1)}"
 
             if disp and disp.displace_distance > show_disp_min:
                 vectors[i] = (v * disp_enhance_factor for v in disp.disp_vector)
                 rgb = int(200 * disp.angle / 180)
                 vector_colors.append((rgb, rgb, 100))
+                info += f"_{round(disp.displace_distance, 2)}"
 
+            site_info.append(info)
             i += 1
 
     initial_local = Structure(defect_structure.lattice, species, initial_coords)
