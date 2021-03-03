@@ -102,7 +102,7 @@ until we have a publication!
 Contact info
 --------------
 Yu Kumagai<br>
-yuuukuma@gmail.com
+yuuukuma@gmail.com<br>
 kumagai@msl.titech.ac.jp
 
 Tokyo Institute of Technology (Japan)
