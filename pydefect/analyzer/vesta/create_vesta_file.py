@@ -192,7 +192,9 @@ class SiteT:
                 rgb = "30 30 30"
             else:
                 rgb = atom_color(site.species_string)
-            self.sites.append(f"  {i}     {name}  0.5 {rgb} {rgb} 204  1")
+            radius = 0.3 if name == "center" else 0.5
+            label = 0 if name == "center" else 1
+            self.sites.append(f" {i}  {name}  {radius} {rgb} {rgb} 204 {label}")
 
     def __repr__(self):
         outs = [self.header] + self.sites + [self.separator]

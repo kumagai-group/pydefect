@@ -53,6 +53,10 @@ def make_defect_vesta_file(defect_structure: Structure,
         final_local.append(DummySpecies(), coords=fcoord)
         final_local[-1].properties["name"] = f"Va_{specie}"
 
+    if def_str_info.site_diff.is_complex_defect:
+        final_local.append(DummySpecies(), coords=def_str_info.center)
+        final_local[-1].properties["name"] = f"center"
+
     fold_coords_in_structure(initial_local, def_str_info.center)
     fold_coords_in_structure(final_local, def_str_info.center)
 
