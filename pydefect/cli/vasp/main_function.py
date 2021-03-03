@@ -12,8 +12,6 @@ from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
 from pydefect.analyzer.defect_structure_info import make_defect_structure_info
-from pydefect.cli.vasp.util_commands.create_defect_vesta_file import \
-    make_defect_vesta_file
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.analyzer.make_band_edge_state import make_band_edge_state
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
