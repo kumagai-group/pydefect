@@ -90,7 +90,8 @@ def test_make_chem_pot_diag(mocker, tmpdir):
     mock = mocker.patch("pydefect.cli.vasp.main_function.Vasprun", side_effect=side_effect)
     args_1 = Namespace(elements=None, functional=None, yaml="cpd.yaml", update=False,
                        dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
-                       target=Composition("MgO"))
+                       target=Composition("MgO"),
+                       vertices=None)
     make_chem_pot_diag(args_1)
 
     args = Namespace(yaml="cpd.yaml")
@@ -98,11 +99,21 @@ def test_make_chem_pot_diag(mocker, tmpdir):
 
     args_2 = Namespace(elements=None, functional=None, yaml="cpd.yaml", update=False,
                        dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
-                       target=Composition("MgAl2O4"))
+                       target=Composition("MgO"),
+                       vertices=["Mg", "Al", "O"])
     make_chem_pot_diag(args_2)
 
     args = Namespace(yaml="cpd.yaml")
+    plot_chem_pot_diag(args)  # show Al phases
+
+    args_3 = Namespace(elements=None, functional=None, yaml="cpd.yaml", update=False,
+                       dirs=[Path("Mg"), Path("MgO"), Path("O"), Path("Al"), Path("MgAl2O4")],
+                       target=Composition("MgAl2O4"), vertices=None)
+    make_chem_pot_diag(args_3)
+
+    args = Namespace(yaml="cpd.yaml")
     plot_chem_pot_diag(args)
+
 
 
 def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):

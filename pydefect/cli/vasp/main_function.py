@@ -67,8 +67,9 @@ def make_competing_phase_dirs(args):
 
 def make_chem_pot_diag(args) -> None:
     if args.elements:
-        cpd = make_chem_pot_diag_from_mp(additional_elements=args.elements,
-                                         target=args.target,
+        cpd = make_chem_pot_diag_from_mp(target=args.target,
+                                         additional_elements=args.elements,
+                                         vertex_elements=args.vertices,
                                          atom_energy_yaml=args.atom_energy_yaml)
     else:
         comp_es = []
@@ -81,7 +82,8 @@ def make_chem_pot_diag(args) -> None:
             cpd = ChemPotDiag.from_yaml(args.yaml)
             replace_comp_energy(cpd, comp_es)
         else:
-            cpd = ChemPotDiag(comp_es, args.target)
+            cpd = ChemPotDiag(comp_es, args.target,
+                              vertex_elements=args.vertices)
     cpd.to_yaml(args.yaml)
 
 

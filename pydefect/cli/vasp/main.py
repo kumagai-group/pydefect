@@ -140,6 +140,10 @@ def parse_args(args):
         "-u", "--update", action="store_true",
         help="Used when one wants to update the cpd.yaml with calculation "
              "results.")
+    parser_mcpd.add_argument(
+        "-v", "--vertices", nargs="+",
+        help="Set vertex element names for chemical potential diagram, e.g., "
+             "Mg Al O.")
 
     parser_mcpd.set_defaults(func=make_chem_pot_diag)
 

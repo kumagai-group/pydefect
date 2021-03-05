@@ -78,6 +78,7 @@ def test_make_cpd_options():
         atom_energy_yaml=None,
         yaml="cpd.yaml",
         update=False,
+        vertices=None,
         func=parsed_args.func)
     assert parsed_args == expected
 
