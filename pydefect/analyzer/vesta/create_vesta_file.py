@@ -6,7 +6,7 @@ import itertools
 from typing import Union, Optional, Dict, Iterable, List, Tuple
 
 from pydefect.analyzer.vesta.element_colors import atom_color
-from pymatgen import DummySpecies
+from pymatgen.core import DummySpecies
 from pymatgen.core.structure import Structure
 from vise.util.logger import get_logger
 

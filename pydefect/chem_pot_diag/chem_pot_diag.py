@@ -14,7 +14,7 @@ from monty.json import MSONable
 from monty.serialization import loadfn
 from pydefect.error import PydefectError
 from pydefect.util.error_classes import CpdNotSupportedError
-from pymatgen import Composition, Element
+from pymatgen.core import Composition, Element
 from scipy.spatial.qhull import HalfspaceIntersection, QhullError
 from tabulate import tabulate
 

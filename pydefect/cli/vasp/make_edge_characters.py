@@ -4,7 +4,8 @@ from typing import Dict
 
 import numpy as np
 from pydefect.analyzer.band_edge_states import EdgeCharacters, EdgeCharacter
-from pymatgen import Spin, Structure
+from pymatgen.core import Structure
+from pymatgen.electronic_structure.core import Spin
 from pymatgen.io.vasp import Procar, Vasprun, Outcar
 from vise.analyzer.vasp.band_edge_properties import eigenvalues_from_vasprun
 

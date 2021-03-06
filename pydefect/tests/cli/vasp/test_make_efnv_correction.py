@@ -6,7 +6,7 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.cli.vasp.make_efnv_correction import \
     calc_max_sphere_radius, make_efnv_correction
 from pydefect.corrections.efnv_correction import PotentialSite
-from pymatgen import IStructure, Lattice
+from pymatgen.core import IStructure, Lattice
 
 
 def test_make_efnv_correction(mocker):

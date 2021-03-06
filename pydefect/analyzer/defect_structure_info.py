@@ -10,7 +10,7 @@ from monty.json import MSONable
 from numpy.linalg import inv
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator, SiteDiff
-from pymatgen import Structure, Lattice, PeriodicSite
+from pymatgen.core import Structure, Lattice, PeriodicSite
 from pymatgen.symmetry.groups import SpaceGroup
 from tabulate import tabulate
 from vise.util.enum import ExtendedEnum

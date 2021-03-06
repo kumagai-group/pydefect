@@ -6,7 +6,7 @@ from pydefect.cli.vasp.util_commands.make_refined_poscar import \
     make_refined_structure
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import Structure
+from pymatgen.core import Structure
 
 
 def test_make_refined_structure(tmpdir, mocker, simple_cubic):

@@ -2,7 +2,8 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import numpy as np
 import pytest
-from pymatgen import Spin, Structure, Lattice
+from pymatgen.core import Structure, Lattice
+from pymatgen.electronic_structure.core import Spin
 from pymatgen.io.vasp import Vasprun, Outcar, Procar
 
 from pydefect.cli.vasp.make_edge_characters import MakeEdgeCharacters, \

@@ -8,7 +8,7 @@ from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.supercell_info import SupercellInfo
-from pymatgen import Structure, IStructure
+from pymatgen.core import Structure, IStructure
 from pymatgen.core.structure import PeriodicNeighbor
 
 

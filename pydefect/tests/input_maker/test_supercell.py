@@ -5,7 +5,7 @@ import pytest
 from pydefect.input_maker.supercell import (
     Supercell, Supercells, TetragonalSupercells, RhombohedralSupercells)
 from pydefect.util.error_classes import SupercellError
-from pymatgen import Element
+from pymatgen.core import Element
 
 
 def test_supercell(simple_cubic, simple_cubic_2x1x1):

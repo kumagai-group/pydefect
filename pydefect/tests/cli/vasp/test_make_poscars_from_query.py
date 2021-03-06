@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from monty.serialization import loadfn
-from pymatgen import Structure, Lattice
+from pymatgen.core import Structure, Lattice
 
 from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
 

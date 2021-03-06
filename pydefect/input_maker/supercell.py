@@ -9,7 +9,7 @@ from typing import List, Tuple
 import numpy as np
 from numpy.linalg import det
 from pydefect.util.error_classes import SupercellError
-from pymatgen import IStructure
+from pymatgen.core import IStructure
 
 
 class Supercell:

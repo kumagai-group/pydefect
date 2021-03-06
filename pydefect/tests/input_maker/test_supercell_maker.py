@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pydefect.util.error_classes import NotPrimitiveError
-from pymatgen import Lattice, Structure
+from pymatgen.core import Lattice, Structure
 
 
 def test_create_supercell_tetragonal(tetra_close_to_cubic):

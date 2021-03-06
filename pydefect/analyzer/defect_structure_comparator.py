@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from typing import List, Tuple, Dict
 
 import numpy as np
-from monty.json import MSONable, MontyDecoder
+from monty.json import MSONable
 from pydefect.util.structure_tools import Distances
-from pymatgen import IStructure, Structure
+from pymatgen.core import IStructure, Structure
 
 
 class DefectStructureComparator:

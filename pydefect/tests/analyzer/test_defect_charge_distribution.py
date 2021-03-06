@@ -3,7 +3,8 @@
 
 import numpy as np
 from pydefect.analyzer.defect_charge_distribution import RadialDist
-from pymatgen import Structure, Lattice, Spin
+from pymatgen.electronic_structure.core import Spin
+from pymatgen.core import Structure, Lattice
 from pymatgen.io.vasp import Chgcar
 
 

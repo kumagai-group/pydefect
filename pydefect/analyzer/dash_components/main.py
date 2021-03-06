@@ -22,7 +22,7 @@ from pydefect.corrections.site_potential_plotter import \
     SitePotentialPlotlyPlotter
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import Structure
+from pymatgen.core import Structure
 from vise.analyzer.dash_components.band_dos_dash import BandDosComponent
 from vise.analyzer.dash_components.main import symmetry_layout, site_layout, \
     mpid_and_link

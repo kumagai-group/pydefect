@@ -6,7 +6,7 @@ from typing import List, Dict, Optional, Set
 
 import numpy as np
 from pydefect.defaults import defaults
-from pymatgen import Structure, Element
+from pymatgen.core import Structure, Element
 
 
 class Distances:

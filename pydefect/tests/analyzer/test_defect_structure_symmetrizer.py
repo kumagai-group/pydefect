@@ -4,7 +4,7 @@ import numpy as np
 from pydefect.analyzer.defect_structure_symmetrizer import \
     symmetrize_defect_structure
 from pydefect.defaults import defaults
-from pymatgen import Structure
+from pymatgen.core import Structure
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 

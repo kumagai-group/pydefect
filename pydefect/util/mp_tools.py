@@ -2,7 +2,8 @@
 
 from typing import List
 
-from pymatgen import Element, MPRester
+from pymatgen.ext.matproj import MPRester
+from pymatgen.core import Element
 
 from pydefect.defaults import defaults
 

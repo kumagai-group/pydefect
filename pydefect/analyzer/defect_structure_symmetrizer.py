@@ -5,7 +5,7 @@ from typing import Optional
 import numpy as np
 from numpy.linalg import inv
 from pydefect.analyzer.defect_structure_info import logger
-from pymatgen import Structure
+from pymatgen.core import Structure
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 

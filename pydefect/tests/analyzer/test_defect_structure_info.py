@@ -10,7 +10,7 @@ from pydefect.analyzer.defect_structure_info import \
     make_defect_structure_info, symmetry_relation, SymmRelation, \
     unique_point_group, elem_indices_coords, DefectType, judge_defect_type, \
     calc_displacements
-from pymatgen import Structure, Lattice
+from pymatgen.core import Structure, Lattice
 from vise.tests.helpers.assertion import assert_dataclass_almost_equal, \
     assert_msonable, assert_json_roundtrip
 from vise.util.enum import ExtendedEnum

@@ -12,7 +12,7 @@ from pydefect.analyzer.dash_components.cpd_energy_dash import CpdEnergyComponent
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo,     CompositionEnergy
 from pydefect.corrections.manual_correction import ManualCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import Composition, Structure, Lattice, Element
+from pymatgen.core import Composition, Structure, Lattice, Element
 import dash_html_components as html
 import crystal_toolkit.components as ctc
 from dash.dependencies import Input, Output, State

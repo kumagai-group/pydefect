@@ -5,7 +5,7 @@ import pytest
 
 from pathlib import Path
 
-from pymatgen import Lattice, DummySpecies
+from pymatgen.core import Lattice, DummySpecies
 from pymatgen.core.structure import Structure
 
 from pydefect.analyzer.vesta.create_vesta_file import VestaFile, Title, Cellp, \

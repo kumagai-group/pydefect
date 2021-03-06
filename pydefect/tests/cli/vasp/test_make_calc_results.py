@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
-from pymatgen import Structure
+from pymatgen.core import Structure
 from pymatgen.io.vasp import Vasprun, Outcar
 
 

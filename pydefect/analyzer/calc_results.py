@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from monty.json import MSONable
-from pymatgen import IStructure
+from pymatgen.core import IStructure
 from vise.analyzer.band_edge_properties import BandEdge
 from vise.util.mix_in import ToJsonFileMixIn
 

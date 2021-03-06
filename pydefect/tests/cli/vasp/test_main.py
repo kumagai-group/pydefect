@@ -10,9 +10,8 @@ from pydefect.cli.vasp.main import parse_args
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
-from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.supercell_info import SupercellInfo
-from pymatgen import Composition
+from pymatgen.core import Composition
 
 
 def test_print(mocker):

@@ -2,7 +2,7 @@
 #  Copyright (c) 2020 Kumagai group.
 import fire
 from pydefect.input_maker.defect_entry import make_defect_entry
-from pymatgen import IStructure
+from pymatgen.core import IStructure
 from vise.util.logger import get_logger
 
 logger = get_logger(__name__)

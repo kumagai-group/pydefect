@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from pydefect.cli.vasp.make_band_edge_eigenvalues import \
     make_band_edge_eigenvalues
-from pymatgen import Spin
+from pymatgen.electronic_structure.core import Spin
 from pymatgen.io.vasp import Vasprun
 
 

@@ -12,7 +12,7 @@ from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CompositionEnergy,
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagPlotly3DMplPlotter, \
     ChemPotDiagPlotly2DMplPlotter
 from pydefect.util.mp_tools import MpQuery
-from pymatgen import Composition, Element
+from pymatgen.core import Composition, Element
 from vise.atom_energies.atom_energy import mp_energies
 from vise.util.logger import get_logger
 

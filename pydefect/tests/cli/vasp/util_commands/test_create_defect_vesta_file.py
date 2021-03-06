@@ -6,7 +6,7 @@ from pydefect.analyzer.defect_structure_info import DefectStructureInfo, \
     Displacement
 from pydefect.cli.vasp.util_commands.create_defect_vesta_file import \
     make_defect_vesta_file
-from pymatgen import Structure, Lattice
+from pymatgen.core import Structure, Lattice
 
 
 def test_defect_vesta_file(tmpdir):

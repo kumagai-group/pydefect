@@ -5,7 +5,7 @@ import pytest
 from pydefect.input_maker.add_interstitial import append_interstitial
 from pydefect.input_maker.supercell_info import Interstitial
 from pydefect.util.error_classes import NotPrimitiveError
-from pymatgen import Structure, Lattice
+from pymatgen.core import Structure, Lattice
 
 
 def test_add_interstitial(cubic_supercell_info_wo_int):

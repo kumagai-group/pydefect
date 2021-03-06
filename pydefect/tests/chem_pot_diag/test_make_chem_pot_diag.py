@@ -5,7 +5,7 @@ import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CompositionEnergy
 from pydefect.chem_pot_diag.make_chem_pot_diag import \
     make_chem_pot_diag_from_mp, remove_higher_energy_comp
-from pymatgen import Composition, Element
+from pymatgen.core import Composition, Element
 
 
 @pytest.fixture

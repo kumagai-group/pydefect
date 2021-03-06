@@ -12,7 +12,8 @@ from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
-from pymatgen import Spin, Structure
+from pymatgen.core import Structure
+from pymatgen.electronic_structure.core import Spin
 from pymatgen.analysis.graphs import StructureGraph
 from pymatgen.io.vasp import Chgcar, VolumetricData
 from skimage.measure import marching_cubes

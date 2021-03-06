@@ -7,7 +7,7 @@ from monty.json import MSONable
 from numpy.linalg import det
 from pydefect.database.database import electronegativity, oxidation_state
 from pydefect.util.structure_tools import Distances
-from pymatgen import IStructure
+from pymatgen.core import IStructure
 from vise.util.logger import get_logger
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.structure_symmetrizer import Site

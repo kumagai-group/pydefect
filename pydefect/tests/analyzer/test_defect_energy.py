@@ -11,7 +11,7 @@ from pydefect.analyzer.defect_energy import (
     defect_plotly_name)
 from pydefect.corrections.manual_correction import ManualCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import IStructure, Lattice, Element
+from pymatgen.core import IStructure, Lattice, Element
 
 
 @pytest.fixture

@@ -12,7 +12,7 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.corrections.manual_correction import NoCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import Element, IStructure
+from pymatgen.core import Element, IStructure
 from scipy.spatial import HalfspaceIntersection
 import dash_html_components as html
 

@@ -18,7 +18,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
     plot_chem_pot_diag, make_gkfo_correction_from_vasp, calc_defect_structure_info
 from pydefect.defaults import defaults
-from pymatgen import IStructure, Composition, Structure
+from pymatgen.core import IStructure, Composition, Structure
 from pymatgen.io.vasp import Vasprun, Outcar
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
