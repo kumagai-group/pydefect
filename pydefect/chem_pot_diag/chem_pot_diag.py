@@ -242,7 +242,6 @@ class ChemPotDiag(MSONable):
                 f"Element {element} not in impurities. List of impurities are "
                 f"{self.impurity_elements}.")
         comp_set = set(self.vertex_elements) | {element}
-        print(comp_set)
         competing_comp_e = None
         y = float("inf")
         for ce in self.comp_energies:
