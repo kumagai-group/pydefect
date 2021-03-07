@@ -173,6 +173,27 @@ def test_impurity_abs_energy2(cpd2):
     assert cpd2.impurity_abs_energy(Element.Cl, "A") == expected
 
 
+@pytest.fixture
+def cpd_all_vertices():
+    energies_here = [CompositionEnergy(Composition("H"), 0.0, "a"),
+                     CompositionEnergy(Composition("H4O2"), -4.0, "c"),
+                     CompositionEnergy(Composition("O"), 1.0, "b"),
+                     CompositionEnergy(Composition("Cl2"), 3.0, "e"),
+                     ]
+    return ChemPotDiag(energies_here, target=Composition("H2O"),
+                       vertex_elements=[Element.H, Element.O, Element.Cl])
+
+
+def test_impurity_abs_energy3(cpd_all_vertices):
+    assert cpd_all_vertices.impurity_elements == []
+    with pytest.raises(ValueError):
+        cpd_all_vertices.impurity_abs_energy(Element.Cl, "A")
+    expected = {Element.H: -1.4551915228366852e-11,
+                Element.O: -2.0,
+                Element.Cl: 1.499999999985448}
+    assert cpd_all_vertices.abs_chem_pot_dict("A") == expected
+
+
 @pytest.fixture()
 def cpd_plot_info():
     cpd = ChemPotDiag(energies, target=Composition("H2O"))

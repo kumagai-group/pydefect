@@ -87,7 +87,7 @@ class ChemPotDiag(MSONable):
         result = set()
         for c in self.all_compounds:
             result.update(set(c.elements))
-        result.difference_update(set(self.target.elements))
+        result.difference_update(set(self.vertex_elements))
         return list(result)
 
     @property
@@ -237,7 +237,12 @@ class ChemPotDiag(MSONable):
         return result
 
     def impurity_abs_energy(self, element: Element, label: str):
+        if element not in self.impurity_elements:
+            raise ValueError(
+                f"Element {element} not in impurities. List of impurities are "
+                f"{self.impurity_elements}.")
         comp_set = set(self.vertex_elements) | {element}
+        print(comp_set)
         competing_comp_e = None
         y = float("inf")
         for ce in self.comp_energies:
