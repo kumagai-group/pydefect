@@ -1,6 +1,6 @@
 numpy
 monty
-pymatgen == 2021.3.5
+pymatgen == 2021.3.9
 fire
 vise
 crystal-toolkit
