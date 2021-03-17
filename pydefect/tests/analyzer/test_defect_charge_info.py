@@ -12,7 +12,7 @@ from vise.tests.helpers.assertion import assert_json_roundtrip
 
 @pytest.fixture
 def charge_dist():
-    return ChargeDist(charge_center=(0.1, 0.1, 0.1), radial_dist=[0.5, 0.25, 0.25])
+    return ChargeDist(charge_center=(0.1, 0.1, 0.1), radial_dist=[0.4, 0.4, 0.2])
 
 
 @pytest.fixture
@@ -37,11 +37,10 @@ def test_defect_charge_info_json_roundtrip(defect_charge_info, tmpdir):
 #     assert actual is True
 #     actual = defect_charge_info.is_charge_localized(10, Spin.up, threshold=(3 / 4 + 0.1))
 #     assert actual is False
-#
-#
-# def test_make_defect_charge_info_defect_radius(defect_charge_info):
-#     assert defect_charge_info.defect_radius(10, Spin.up) == 0.5 * 0.5 + .25 * 1.5 + .25 * 2.5
 
+
+def test_defect_charge_info_half_charge_radius(defect_charge_info):
+    assert defect_charge_info.half_charge_radius(10, Spin.up) == 1.25
 
 
 """

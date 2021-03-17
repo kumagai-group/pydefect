@@ -7,7 +7,7 @@ from pydefect.analyzer.defect_charge_info import DefectChargeInfo, ChargeDist
 from pydefect.analyzer.grids import Grids
 from pydefect.cli.vasp.make_efnv_correction import calc_max_sphere_radius
 from pymatgen import Spin
-from pymatgen.io.vasp import Chgcar, VolumetricData
+from pymatgen.io.vasp import Chgcar
 
 
 def center_1d_periodic_quantity(grid_points: List[float]):

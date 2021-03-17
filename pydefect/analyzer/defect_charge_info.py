@@ -36,18 +36,16 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
     #         if e < self.defect_region_radius:
     #             _sum += r
     #     return _sum > threshold
-    #
-    # def defect_radius(self, band_idx, spin):
-    #     return sum([r * e for r, e in
-    #                 zip(self.dist(band_idx, spin), self.distance_bins)])
 
-        # half_point = None
-        # for i in range(hist_data[:, 1].size):
-        #     if sum(hist_data[:i + 1, 1]) > 0.5:
-        #         # Obtain from the calculation of the area of a trapezoid
-        #         x0 = hist_data[i - 1, 0]
-        #         y0 = hist_data[i, 1]
-        #         y1 = hist_data[i + 1, 1]
-        #         half_point = (0.5 - sum(hist_data[:i, 1]) * mesh_distance) \
-        #                      * 2 / (y0 + y1) + x0
-        #         break
+    def half_charge_radius(self, band_idx, spin):
+        charge_sum = 0.0
+        spin = 0 if spin == Spin.up else 1
+        idx = self.band_idxs.index(band_idx)
+        dist = self.charge_dists[idx][spin].radial_dist
+        for c, start, end in zip(
+                dist, self.distance_bins[:-1], self.distance_bins[1:]):
+            charge_sum += c
+            if charge_sum > 0.5:
+                return start + (end - start) * (c + 0.5 - charge_sum) / c
+
+        raise ValueError("Radius containing 0.5 e- could not be found.")
