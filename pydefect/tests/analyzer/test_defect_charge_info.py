@@ -19,7 +19,7 @@ def charge_dist():
 def defect_charge_info(charge_dist):
     return DefectChargeInfo(distance_bins=[0.0, 1.0, 2.0, 2.5],
                             band_idxs=[10],
-                            charge_dists=[[charge_dist]],
+                            charge_dists=[[charge_dist, charge_dist]],
                             ave_charge_density=0.5)
 
 
@@ -30,17 +30,18 @@ def test_charge_dist_json_roundtrip(charge_dist, tmpdir):
 def test_defect_charge_info_json_roundtrip(defect_charge_info, tmpdir):
     assert_json_roundtrip(defect_charge_info, tmpdir)
 
-#def test_bin_me(defect_charge_info, tmpdir):
-#
-# def test_make_defect_charge_info_is_charge_localized(defect_charge_info):
-#     actual = defect_charge_info.is_charge_localized(10, Spin.up, threshold=(3 / 4 - 0.1))
-#     assert actual is True
-#     actual = defect_charge_info.is_charge_localized(10, Spin.up, threshold=(3 / 4 + 0.1))
-#     assert actual is False
-
 
 def test_defect_charge_info_half_charge_radius(defect_charge_info):
     assert defect_charge_info.half_charge_radius(10, Spin.up) == 1.25
+
+
+def test_defect_charge_info_repr(defect_charge_info):
+    expected = """--------  ----  ------
+band_idx  spin  radius
+10        up    1.25
+10        down  1.25
+--------  ----  ------"""
+    assert defect_charge_info.__repr__() == expected
 
 
 """
