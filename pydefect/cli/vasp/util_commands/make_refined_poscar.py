@@ -10,6 +10,10 @@ from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen.core import Structure
 from vise.util.structure_symmetrizer import StructureSymmetrizer
+from vise.util.logger import get_logger
+
+
+logger = get_logger(__name__)
 
 
 def make_refined_structure():
@@ -19,6 +23,7 @@ def make_refined_structure():
                                        defaults.symmetry_length_tolerance,
                                        defaults.symmetry_angle_tolerance)
     if symmetrizer.point_group == "1":
+        logger.info("The point group is 1, so the symmetry is not refined.")
         return
 
     shutil.move(defaults.contcar, str(defaults.contcar) + ".sym_1")
@@ -30,6 +35,8 @@ def make_refined_structure():
         defect_entry.anchor_atom_index,
         defect_entry.anchor_atom_coords)
 
+    logger.info(f"The point group is {symmetrizer.point_group}, "
+                f"so the symmetry is refined and POSCAR is being created.")
     refined_structure.to(fmt="POSCAR", filename="POSCAR")
 
 
