@@ -102,7 +102,7 @@ class IsShallow:
         Path(filename).write_text(str(self.is_shallow))
 
     @classmethod
-    def from_yaml(cls, filename="band_edge_states.yaml"):
+    def from_yaml(cls, filename="is_shallow.yaml"):
         first_letter = Path(filename).read_text()[0].upper()
         is_shallow = True if first_letter == "T" else False
         return cls(is_shallow=is_shallow)

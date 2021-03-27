@@ -80,3 +80,12 @@ def test_band_edge_states_json_roundtrip(band_edge_states, tmpdir):
 def is_shallow():
     return IsShallow(is_shallow=True)
 
+
+def test_is_shallow_yaml(tmpdir):
+    tmpdir.chdir()
+    IsShallow(True).to_yaml()
+    assert IsShallow.from_yaml() == IsShallow(True)
+    Path("a.yaml").write_text("t")
+    assert IsShallow.from_yaml("a.yaml") == IsShallow(True)
+    Path("a.yaml").write_text("f")
+    assert IsShallow.from_yaml("a.yaml") == IsShallow(False)
