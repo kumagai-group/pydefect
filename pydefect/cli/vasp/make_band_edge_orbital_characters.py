@@ -1,59 +1,50 @@
 # -*- coding: utf-8 -*-
-#  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from typing import Dict
-
+#  Copyright (c) 2020 Kumagai group.
+from typing import List, Dict
 import numpy as np
-from pydefect.analyzer.band_edge_states import EdgeCharacters, EdgeCharacter
-from pymatgen.core import Structure
-from pymatgen.electronic_structure.core import Spin
+from pydefect.analyzer.band_edge_states import OrbitalInfo, \
+    BandEdgeOrbitalInfos
+from pydefect.defaults import defaults
+
+from pymatgen import Spin, Structure
 from pymatgen.io.vasp import Procar, Vasprun, Outcar
 from vise.analyzer.vasp.band_edge_properties import eigenvalues_from_vasprun
 
 
-class MakeEdgeCharacters:
-    def __init__(self,
-                 procar: Procar,
-                 vasprun: Vasprun,
-                 outcar: Outcar,
-                 neighboring_atom_indices):
-        self.orbs = procar.data
-        self.structure = vasprun.final_structure
-        self.eigenvalues = eigenvalues_from_vasprun(vasprun)
-        self.nelect = outcar.nelect
-        self.mag = outcar.total_mag if outcar.total_mag else 0.0
-        self.neighboring_atom_indices = neighboring_atom_indices
+def make_band_edge_orbital_characters(procar: Procar,
+                                      vasprun: Vasprun,
+                                      vbm: float, cbm: float):
+    eigval_range = defaults.eigval_range
+    kpt_coords = [tuple(coord) for coord in vasprun.actual_kpoints]
+    max_energy_by_spin, min_energy_by_spin = [], []
 
-    @property
-    def edge_characters(self):
-        chars = []
-        for spin, eigenvalues in self.eigenvalues.items():
-            if spin == Spin.up:
-                vbm_band_idx = int(round((self.nelect + self.mag) / 2)) - 1
-            else:
-                vbm_band_idx = int(round((self.nelect - self.mag) / 2)) - 1
-            cbm_band_idx = vbm_band_idx + 1
+    for e in vasprun.eigenvalues.values():
+        max_energy_by_spin.append(np.amax(e[:, :, 0], axis=0))
+        min_energy_by_spin.append(np.amin(e[:, :, 0], axis=0))
 
-            vbm = np.amax(eigenvalues[:, vbm_band_idx], axis=0)
-            vbm_kpt_idx = np.argwhere(eigenvalues[:, vbm_band_idx] == vbm)[0][0]
-            hob_bottom_e = np.amin(eigenvalues[:, vbm_band_idx], axis=0)
+    max_energy_by_band = np.amax(np.vstack(max_energy_by_spin), axis=0)
+    min_energy_by_band = np.amin(np.vstack(min_energy_by_spin), axis=0)
 
-            cbm = np.amin(eigenvalues[:, cbm_band_idx], axis=0)
-            cbm_kpt_idx = np.argwhere(eigenvalues[:, cbm_band_idx] == cbm)[0][0]
-            lub_top_e = np.amax(eigenvalues[:, cbm_band_idx], axis=0)
+    lower_idx = np.argwhere(max_energy_by_band > vbm - eigval_range)[0][0]
+    upper_idx = np.argwhere(min_energy_by_band < cbm + eigval_range)[-1][-1]
 
-            vbm_character = calc_orbital_character(self.orbs, self.structure, spin, vbm_kpt_idx, vbm_band_idx)
-            cbm_character = calc_orbital_character(self.orbs, self.structure, spin, cbm_kpt_idx, cbm_band_idx)
+    orbs, s = procar.data, vasprun.final_structure
+    orb_infos = []
+    for spin, eigvals in vasprun.eigenvalues.items():
+        orb_infos.append([])
+        for k_idx in range(len(kpt_coords)):
+            orb_infos[-1].append([])
+            for b_idx in range(lower_idx, upper_idx + 1):
+                e, occ = eigvals[k_idx, b_idx, :]
+                orbitals = calc_orbital_character(orbs, s, spin, k_idx, b_idx)
+                orb_infos[-1][-1].append(OrbitalInfo(e, orbitals, occ))
 
-            if self.neighboring_atom_indices:
-                vbm_participation_ratio = calc_participation_ratio(self.orbs, spin, vbm_kpt_idx, vbm_band_idx, self.neighboring_atom_indices)
-                cbm_participation_ratio = calc_participation_ratio(self.orbs, spin, cbm_kpt_idx, cbm_band_idx, self.neighboring_atom_indices)
-            else:
-                vbm_participation_ratio = None
-                cbm_participation_ratio = None
-
-            chars.append(EdgeCharacter(hob_bottom_e, lub_top_e, vbm, cbm, vbm_character, cbm_character, vbm_participation_ratio, cbm_participation_ratio))
-
-        return EdgeCharacters(chars)
+    return BandEdgeOrbitalInfos(
+        orbital_infos=orb_infos,
+        kpt_coords=kpt_coords,
+        kpt_weights=vasprun.actual_kpoints_weights,
+        # need to convert numpy.int64 to int for mongoDB.
+        lowest_band_index=int(lower_idx))
 
 
 def calc_participation_ratio(orbitals: Dict[Spin, np.ndarray],
@@ -117,7 +108,3 @@ def calc_orbital_character(orbitals,
                  round(projection_sum(indices, 1, 1), 3),
                  round(projection_sum(indices, 2, 2), 3)]
     return orbital_components
-
-
-
-
