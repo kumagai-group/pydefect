@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from typing import List, Dict
+from typing import Dict
+
 import numpy as np
 from pydefect.analyzer.band_edge_states import OrbitalInfo, \
     BandEdgeOrbitalInfos
 from pydefect.defaults import defaults
-
 from pymatgen import Spin, Structure
-from pymatgen.io.vasp import Procar, Vasprun, Outcar
-from vise.analyzer.vasp.band_edge_properties import eigenvalues_from_vasprun
+from pymatgen.io.vasp import Procar, Vasprun
 
 
-def make_band_edge_orbital_characters(procar: Procar,
-                                      vasprun: Vasprun,
-                                      vbm: float, cbm: float):
+def make_band_edge_orbital_infos(procar: Procar,
+                                 vasprun: Vasprun,
+                                 vbm: float, cbm: float):
     eigval_range = defaults.eigval_range
     kpt_coords = [tuple(coord) for coord in vasprun.actual_kpoints]
     max_energy_by_spin, min_energy_by_spin = [], []

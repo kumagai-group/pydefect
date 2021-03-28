@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+import numpy as np
 from pydefect.analyzer.band_edge_states import OrbitalInfo, \
     BandEdgeOrbitalInfos
-from pydefect.cli.vasp.make_band_edge_orbital_characters import \
-    make_band_edge_orbital_characters
+from pydefect.cli.vasp.make_band_edge_orbital_infos import \
+    make_band_edge_orbital_infos
 from pymatgen import Spin, Structure, Lattice
-from pymatgen.io.vasp import Procar, Vasprun, Outcar
-from pytest_mock import mocker
-import numpy as np
+from pymatgen.io.vasp import Procar, Vasprun
 from vise.tests.helpers.assertion import assert_dataclass_almost_equal
 
 
-def test_make_band_edge_orbital_characters(mocker):
+def test_make_band_edge_orbital_infos(mocker):
     mock_procar = mocker.Mock(spec=Procar, autospec=True)
     mock_vasprun = mocker.Mock(spec=Vasprun, autospec=True)
-    mock_defaults = mocker.patch("pydefect.cli.vasp.make_band_edge_eigenvalues.defaults")
-    mock_defaults.eigval_range = 3.0
-
     mock_vasprun.actual_kpoints = [[0.0, 0.0, 0.0]]
     mock_vasprun.actual_kpoints_weights = [1.0]
     mock_vasprun.final_structure = Structure(
@@ -75,7 +71,7 @@ def test_make_band_edge_orbital_characters(mocker):
           [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]]]),
     }
 
-    actual = make_band_edge_orbital_characters(
+    actual = make_band_edge_orbital_infos(
         mock_procar, mock_vasprun, vbm=0.0, cbm=5.0)
 
     expected = BandEdgeOrbitalInfos(
