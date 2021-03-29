@@ -388,7 +388,7 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
             raise ValueError
 
     mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn", side_effect=side_effect)
-    mock_band_edge_states = mocker.patch("pydefect.cli.vasp.main_function.BandEdgeStates")
+    mock_is_shallow = mocker.patch("pydefect.cli.vasp.main_function.IsShallow")
 
     mock_unitcell = mocker.Mock(spec=Unitcell)
     mock_unitcell.vbm = 11
@@ -411,7 +411,7 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
     make_defect_formation_energy(args)
 
     if skip_shallow is True:
-        mock_band_edge_states.from_yaml.assert_any_call(Path("Va_O1_2") / "band_edge_states.yaml")
+        mock_is_shallow.from_yaml.assert_any_call(Path("Va_O1_2") / "is_shallow.yaml")
     else:
         mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
         mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")
