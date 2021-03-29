@@ -45,6 +45,12 @@ def test_band_edge_orbital_info_json_roundtrip(band_edge_orbital_infos, tmpdir):
     assert_json_roundtrip(band_edge_orbital_infos, tmpdir)
 
 
+def test_band_edge_orbital_info_energies_occupations(band_edge_orbital_infos):
+    actual = band_edge_orbital_infos.energies_and_occupations
+    expected = [[[[1.0, 1.0]]]]
+    assert actual == expected
+
+
 @pytest.fixture
 def perfect_band_edge_state(orbital_info):
     vbm_info = EdgeInfo(band_idx=10, kpt_coord=(0.0, 0.0, 0.0),

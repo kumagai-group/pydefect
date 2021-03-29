@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from collections.abc import Sequence
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
@@ -33,6 +34,15 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     kpt_coords: List[Tuple[float, float, float]]
     kpt_weights: List[float]
     lowest_band_index: int
+
+    @property
+    def energies_and_occupations(self):
+        result = deepcopy(self.orbital_infos)
+        for i, x in enumerate(self.orbital_infos):
+            for j, y in enumerate(x):
+                for k, z in enumerate(y):
+                    result[i][j][k] = [z.energy, z.occupation]
+        return result
 
 
 @dataclass
