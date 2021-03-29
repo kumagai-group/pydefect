@@ -26,7 +26,7 @@ def test_band_edge_eigenvalues_to_json_file(band_edge_eigenvalues, tmpdir):
 
 @pytest.fixture
 def orbital_info():
-    return OrbitalInfo(energy=1.0, orbitals={"Mn": [0.5, 0.6]}, occupation=1.0)
+    return OrbitalInfo(energy=1.0, orbitals={"Mn": [0.5, 0.4]}, occupation=1.0)
 
 
 def test_orbital_info_msonable(orbital_info):
@@ -48,6 +48,21 @@ def test_band_edge_orbital_info_json_roundtrip(band_edge_orbital_infos, tmpdir):
 def test_band_edge_orbital_info_energies_occupations(band_edge_orbital_infos):
     actual = band_edge_orbital_infos.energies_and_occupations
     expected = [[[[1.0, 1.0]]]]
+    assert actual == expected
+
+
+def test_band_edge_orbital_info_repr(band_edge_orbital_infos):
+    actual = band_edge_orbital_infos.__repr__()
+    expected = """k-points
+---  ---------------  ------
+idx  coords           weight
+1    (0.0, 0.0, 0.0)  1.0
+---  ---------------  ------
+--------  -----  ------  ----------  ------------------
+band_idx  k_idx  energy  occupation  orbital
+11        1      1.0     1.0         {'Mn': [0.5, 0.4]}
+
+--------  -----  ------  ----------  ------------------"""
     assert actual == expected
 
 

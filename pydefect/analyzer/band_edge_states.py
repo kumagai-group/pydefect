@@ -5,8 +5,10 @@ from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
+import numpy as np
 
 from monty.json import MSONable
+from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn
 
 
@@ -43,6 +45,23 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
                 for k, z in enumerate(y):
                     result[i][j][k] = [z.energy, z.occupation]
         return result
+
+    def __repr__(self):
+        lines = ["k-points"]
+        x = [["idx", "coords", "weight"]]
+        for i, (c, w) in enumerate(zip(self.kpt_coords, self.kpt_weights), 1):
+            x.append([i, c, w])
+        lines.append(tabulate(x))
+        x = [["band_idx", "k_idx", "energy", "occupation", "orbital"]]
+        for oi in self.orbital_infos:
+            a = np.array(oi).T
+            for i, b in enumerate(a, 1):
+                for j, c in enumerate(b, 1):
+                    x.append([i+self.lowest_band_index, j, c.energy, c.occupation, c.orbitals])
+            x.append("")
+        lines.append(tabulate(x))
+
+        return "\n".join(lines)
 
 
 @dataclass
