@@ -3,30 +3,30 @@
 from pathlib import Path
 
 from monty.serialization import loadfn
-from pydefect.analyzer.band_edge_states import BandEdgeStates
+from pydefect.analyzer.band_edge_states import IsShallow
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.dash_components.cpd_energy_dash import \
     CpdEnergyComponent, make_energies
 from pydefect.analyzer.defect_energy import slide_energy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
-from pydefect.analyzer.defect_structure_comparator import \
-    DefectStructureComparator
 from pydefect.analyzer.defect_structure_info import make_defect_structure_info
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
-from pydefect.analyzer.make_band_edge_state import make_band_edge_state
+from pydefect.analyzer.make_band_edge_states import make_band_edge_states
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
     CompositionEnergy, replace_comp_energy
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagMpl2DMplPlotter, \
     ChemPotDiagMpl3DMplPlotter
 from pydefect.chem_pot_diag.make_chem_pot_diag import make_chem_pot_diag_from_mp
 from pydefect.cli.main_tools import sanitize_matrix
-from pydefect.cli.vasp.make_band_edge_eigenvalues import \
-    make_band_edge_eigenvalues
+from pydefect.cli.vasp.make_band_edge_orbital_infos import \
+    make_band_edge_orbital_infos
 from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
-from pydefect.cli.vasp.make_edge_characters import MakeEdgeCharacters
+from pydefect.cli.vasp.make_defect_charge_info import make_defect_charge_info
 from pydefect.cli.vasp.make_efnv_correction import \
     make_efnv_correction
 from pydefect.cli.vasp.make_gkfo_correction import make_gkfo_correction
+from pydefect.cli.vasp.make_perfect_band_edge_state import \
+    make_perfect_band_edge_state_from_vasp
 from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
 from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
 from pydefect.corrections.site_potential_plotter import \
@@ -40,7 +40,7 @@ from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pydefect.util.mp_tools import MpQuery
-from pymatgen.io.vasp import Vasprun, Outcar, Procar
+from pymatgen.io.vasp import Vasprun, Outcar, Procar, Chgcar
 from pymatgen.util.string import latexify
 from vise.util.logger import get_logger
 
@@ -221,7 +221,7 @@ def make_gkfo_correction_from_vasp(args):
     plotter.plt.clf()
 
 
-def make_defect_eigenvalues(args):
+def make_band_edge_orb_infos_and_eigval_plot(args):
     supercell_vbm = args.perfect_calc_results.vbm
     supercell_cbm = args.perfect_calc_results.cbm
     for d in args.dirs:
@@ -231,46 +231,36 @@ def make_defect_eigenvalues(args):
             title = defect_entry.name
         except FileNotFoundError:
             title = "No name"
+        procar = Procar(d / defaults.procar)
         vasprun = Vasprun(d / defaults.vasprun)
-        band_edge_eigenvalues = make_band_edge_eigenvalues(
-            vasprun, supercell_vbm, supercell_cbm)
-        band_edge_eigenvalues.to_json_file(d / "band_edge_eigenvalues.json")
+        band_edge_orb_chars = make_band_edge_orbital_infos(
+            procar, vasprun, supercell_vbm, supercell_cbm)
+        band_edge_orb_chars.to_json_file(d / "band_edge_orbital_infos.json")
         plotter = EigenvalueMplPlotter(
-            title=title, band_edge_eigenvalues=band_edge_eigenvalues,
+            title=title, band_edge_orb_infos=band_edge_orb_chars,
             supercell_vbm=supercell_vbm, supercell_cbm=supercell_cbm)
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "eigenvalues.pdf")
         plotter.plt.clf()
 
 
-def make_edge_characters(args):
-    for d in args.dirs:
-        logger.info(f"Parsing data in {d} ...")
-        vasprun = Vasprun(d / defaults.vasprun)
-        procar = Procar(d / defaults.procar)
-        outcar = Outcar(d / defaults.outcar)
-        calc_results = loadfn(d / "calc_results.json")
-        structure_comparator = DefectStructureComparator(
-            calc_results.structure, args.perfect_calc_results.structure)
-        edge_characters = MakeEdgeCharacters(
-            procar, vasprun, outcar,
-            structure_comparator.neighboring_atom_indices()).edge_characters
-        edge_characters.to_json_file(d / "edge_characters.json")
+def make_perfect_band_edge_state(args):
+    procar = Procar(args.dir / defaults.procar)
+    vasprun = Vasprun(args.dir / defaults.vasprun)
+    outcar = Outcar(args.dir / defaults.outcar)
+    perfect_band_edge_state = \
+        make_perfect_band_edge_state_from_vasp(procar, vasprun, outcar)
+    perfect_band_edge_state.to_json_file(
+        args.dir / "perfect_band_edge_state.json")
 
 
-def make_edge_states(args):
+def make_band_edge_states_main_func(args):
     for d in args.dirs:
         print(f"-- {d}")
-        edge_states = []
-        edge_characters = loadfn(d / "edge_characters.json")
-        for spin, edge_character, ref in zip(["spin up  ", "spin down"],
-                                             edge_characters,
-                                             args.perfect_edge_characters):
-            edge_state = make_band_edge_state(edge_character, ref)
-            edge_states.append(edge_state)
-            print(spin, edge_state)
-
-        BandEdgeStates(edge_states).to_yaml(d / "band_edge_states.yaml")
+        orb_infos = loadfn(d / "band_edge_orbital_infos.json")
+        band_edge_states = make_band_edge_states(orb_infos, args.p_state)
+        band_edge_states.to_json_file(d / "band_edge_states.json")
+        band_edge_states.is_shallow.to_yaml(d / "is_shallow.yaml")
 
 
 def make_defect_formation_energy(args):
@@ -281,8 +271,8 @@ def make_defect_formation_energy(args):
     defects, defect_entries, corrections, edge_states = [], [], [], []
     for d in args.dirs:
         if args.skip_shallow:
-            edge_states = BandEdgeStates.from_yaml(d / "band_edge_states.yaml")
-            if edge_states.is_shallow:
+            is_shallow = IsShallow.from_yaml(d / "is_shallow.yaml")
+            if is_shallow.is_shallow:
                 continue
         defects.append(loadfn(d / "calc_results.json"))
         defect_entries.append(loadfn(d / "defect_entry.json"))
@@ -295,9 +285,9 @@ def make_defect_formation_energy(args):
         import crystal_toolkit.components as ctc
         import dash
 
-        edge_states = []
+        is_shallows = []
         for d in args.dirs:
-            edge_states.append(BandEdgeStates.from_yaml(d / "band_edge_states.yaml"))
+            is_shallows.append(IsShallow.from_yaml(d / "is_shallow.yaml"))
 
         app = dash.Dash(__name__,
                         suppress_callback_exceptions=True,
@@ -371,3 +361,18 @@ def calc_defect_structure_info(args):
             init_site_sym=defect_entry.site_symmetry,
             final_site_sym=calc_results.site_symmetry)
         defect_str_info.to_json_file(str(d / "defect_structure_info.json"))
+
+
+def calc_defect_charge_info(args):
+    band_idxs = []
+    parchgs = []
+    for fname in args.parchgs:
+        band_idx = int(fname.split(".")[-2])
+        logger.info(f"band index {band_idx} is parsed from filename {fname}")
+        band_idxs.append(band_idx)
+        parchgs.append(Chgcar.from_file(fname))
+    defect_charge_info = make_defect_charge_info(
+        parchgs, band_idxs, args.bin_interval)
+    defect_charge_info.to_json_file()
+    plt = defect_charge_info.show_dist()
+    plt.savefig("dist.pdf")

@@ -13,10 +13,12 @@ from pydefect.cli.main_tools import str_int_to_int
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
     make_chem_pot_diag, make_efnv_correction_from_vasp, print_file, \
-    make_calc_results, make_defect_formation_energy, make_defect_eigenvalues, \
-    make_edge_characters, make_edge_states, \
+    make_calc_results, make_defect_formation_energy, \
     append_interstitial_to_supercell_info, pop_interstitial_from_supercell_info, \
-    plot_chem_pot_diag, make_gkfo_correction_from_vasp, calc_defect_structure_info
+    plot_chem_pot_diag, make_gkfo_correction_from_vasp, \
+    calc_defect_structure_info, calc_defect_charge_info, \
+    make_band_edge_orb_infos_and_eigval_plot, make_perfect_band_edge_state, \
+    make_band_edge_states_main_func
 from pydefect.defaults import defaults
 from pymatgen.core import IStructure, Composition, Structure
 from pymatgen.io.vasp import Vasprun, Outcar
@@ -42,7 +44,7 @@ def parse_args(args):
         "-d", "--dirs", nargs="+", type=Path,
         help="Directory paths to be parsed.")
 
-    # ++ parent parser: pcr
+    # ++ parent parser: supercell_info
     si_parser = argparse.ArgumentParser(
         description="", add_help=False)
     si_parser.add_argument(
@@ -292,40 +294,43 @@ def parse_args(args):
 
     parser_gkfo.set_defaults(func=make_gkfo_correction_from_vasp)
 
-    # -- defect eigenvalues ------------------------------------------------
+    # -- band edge orbital infos  ----------------------------------------------
     parser_eig = subparsers.add_parser(
-        name="eig",
-        description="Generate plot of eigenvalues and occupations.",
+        name="make_band_edge_orbital_infos",
+        description="Generate band_edge_orbital_infos.json and "
+                    "eigenvalues.pdf.",
         parents=[dirs_parser, pcr_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['eig'])
+        aliases=['mbeoi'])
 
-    parser_eig.set_defaults(func=make_defect_eigenvalues)
+    parser_eig.set_defaults(func=make_band_edge_orb_infos_and_eigval_plot)
 
-    # -- band edge characters ------------------------------------------------
-    parser_ec = subparsers.add_parser(
-        name="make_edge_characters",
-        description="Make edge_characters.json files that are used for "
-                    "analyzing the eigenvalues.",
-        parents=[dirs_parser, pcr_parser],
+    # -- perfect band edge state  ----------------------------------------------
+    parser_mpb = subparsers.add_parser(
+        name="make_perfect_band_edge_state",
+        description="Generate band_edge_orbital_infos.json and "
+                    "eigenvalues.pdf.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['mec'])
+        aliases=['mpbes'])
+    parser_mpb.add_argument(
+        "-d", "--dir", type=Path,
+        help="Directory path to the perfect supercell calculation.")
 
-    parser_ec.set_defaults(func=make_edge_characters)
+    parser_mpb.set_defaults(func=make_perfect_band_edge_state)
 
     # -- band edge states ------------------------------------------------
     parser_es = subparsers.add_parser(
-        name="edge_states",
+        name="make_band_edge_states",
         description="Show edge state for each spin channel.",
         parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['es'])
+        aliases=['mbes'])
 
     parser_es.add_argument(
-        "-p", "--perfect_edge_characters", required=True, type=loadfn,
-        help="Path to the edge_characters.json for the perfect supercell.")
+        "-p", "--p_state", required=True, type=loadfn,
+        help="Path to the perfect_band_edge_state.json.")
 
-    parser_es.set_defaults(func=make_edge_states)
+    parser_es.set_defaults(func=make_band_edge_states_main_func)
 
     # -- defect formation energy ----------------------------------------------
     parser_energy = subparsers.add_parser(
@@ -386,6 +391,22 @@ def parse_args(args):
              "the point groups written in defect_entry.json and "
              "calc_results.json are used.")
     parser_calc_def_str.set_defaults(func=calc_defect_structure_info)
+
+    # -- calc defect charge info -----------------------------------------------
+    parser_calc_def_charge_info = subparsers.add_parser(
+        name="calc_defect_charge_info",
+        description="Calc defect charge info.",
+#        parents=[dirs_parser, si_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['cdc'])
+
+    parser_calc_def_charge_info.add_argument(
+        "-p", "--parchgs", type=str, nargs="+")
+    parser_calc_def_charge_info.add_argument(
+        "--bin_interval", type=float, default=0.2)
+    # parser_calc_def_charge_info.add_argument(
+    #     "--filename", type=float)
+    parser_calc_def_charge_info.set_defaults(func=calc_defect_charge_info)
 
     # ------------------------------------------------------------------------
     return parser.parse_args(args)

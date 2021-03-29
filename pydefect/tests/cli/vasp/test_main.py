@@ -262,7 +262,7 @@ def test_gkfo_correction(mocker):
     assert parsed_args == expected
 
 
-def test_defect_eigenvalues(mocker):
+def test_make_band_edge_orbital_infos(mocker):
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
 
     def side_effect(filename):
@@ -272,7 +272,7 @@ def test_defect_eigenvalues(mocker):
             raise ValueError
 
     mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
-    parsed_args = parse_args(["eig",
+    parsed_args = parse_args(["mbeoi",
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-pcr", "perfect/calc_results.json"])
     expected = Namespace(
@@ -282,30 +282,26 @@ def test_defect_eigenvalues(mocker):
     assert parsed_args == expected
 
 
-def test_band_edge_characters(mocker):
-    mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
-    parsed_args = parse_args(["mec",
-                              "-d", "Va_O1_0", "Va_O1_1",
-                              "-pcr", "perfect/calc_results.json"])
+def test_make_perfect_band_edge_state():
+    parsed_args = parse_args(["mpbes",
+                              "-d", "Va_O1_0"])
     expected = Namespace(
-        dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
-        perfect_calc_results=mock.return_value,
+        dir=Path("Va_O1_0"),
         func=parsed_args.func)
     assert parsed_args == expected
-    mock.assert_any_call("perfect/calc_results.json")
 
 
-def test_band_edge_states(mocker):
+def test_make_band_edge_states(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
-    parsed_args = parse_args(["es",
+    parsed_args = parse_args(["mbes",
                               "-d", "Va_O1_0", "Va_O1_1",
-                              "-p", "perfect/edge_characters.json"])
+                              "-p", "perfect/perfect_band_edge_state.json"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
-        perfect_edge_characters=mock.return_value,
+        p_state=mock.return_value,
         func=parsed_args.func)
     assert parsed_args == expected
-    mock.assert_any_call("perfect/edge_characters.json")
+    mock.assert_any_call("perfect/perfect_band_edge_state.json")
 
 
 def test_defect_formation_energy(mocker):
