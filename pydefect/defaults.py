@@ -20,8 +20,8 @@ class Defaults:
         self._ele_neg_diff = 2.0
         self._kpoint_density = 5.0
         self._band_gap_criterion = 0.2  # in eV
-        self._similar_orb_criterion = 0.12
-        self._similar_energy_criterion = 0.2  # in eV
+        self._similar_orb_criterion = 0.2
+        self._similar_energy_criterion = 0.5  # in eV
         self._eigval_range = 1.0
         self._integer_criterion = 0.1
         self._defect_energy_colors = \
