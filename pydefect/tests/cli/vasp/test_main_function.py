@@ -9,6 +9,7 @@ from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeOrbitalInfos, \
     PerfectBandEdgeState
 from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.defect_structure_info import DefectStructureInfo
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
@@ -289,6 +290,8 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
 
     mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
 
+    mock_structure_info = mocker.Mock(spec=DefectStructureInfo, autospec=True)
+
     mock_make_orbital_infos = mocker.patch(
         "pydefect.cli.vasp.main_function.make_band_edge_orbital_infos")
     mock_eigval_plotter = mocker.patch(
@@ -299,6 +302,8 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
             mock_defect_entry.name = "Va_O1"
             mock_defect_entry.charge = 2
             return mock_defect_entry
+        elif str(key) == "Va_O1_2/defect_structure_info.json":
+            return mock_structure_info
         else:
             raise ValueError
 
@@ -312,7 +317,7 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
     mock_procar.assert_called_with(Path("Va_O1_2") / defaults.procar)
     mock_vasprun.assert_called_with(Path("Va_O1_2") / defaults.vasprun)
 
-    mock_make_orbital_infos.assert_called_with(mock_procar.return_value, mock_vasprun.return_value, 10, 20)
+    mock_make_orbital_infos.assert_called_with(mock_procar.return_value, mock_vasprun.return_value, 10, 20, mock_structure_info)
 
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
 

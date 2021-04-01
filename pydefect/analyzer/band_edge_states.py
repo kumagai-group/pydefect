@@ -28,6 +28,7 @@ class OrbitalInfo(MSONable):
     # where lists contain s, p, d, (f) orbital components.
     orbitals: Dict[str, List[float]]
     occupation: float
+    participation_ratio: float = None
 
 
 @dataclass
@@ -52,12 +53,12 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
         for i, (c, w) in enumerate(zip(self.kpt_coords, self.kpt_weights), 1):
             x.append([i, c, w])
         lines.append(tabulate(x))
-        x = [["band_idx", "k_idx", "energy", "occupation", "orbital"]]
+        x = [["band_idx", "k_idx", "energy", "occupation", "p_ratio", "orbital"]]
         for oi in self.orbital_infos:
             a = np.array(oi).T
             for i, b in enumerate(a, 1):
                 for j, c in enumerate(b, 1):
-                    x.append([i+self.lowest_band_index, j, c.energy, c.occupation, c.orbitals])
+                    x.append([i+self.lowest_band_index, j, c.energy, round(c.occupation, 3), round(c.participation_ratio, 2), c.orbitals])
             x.append("")
         lines.append(tabulate(x))
 

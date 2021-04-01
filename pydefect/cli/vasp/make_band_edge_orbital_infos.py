@@ -5,6 +5,7 @@ from typing import Dict
 import numpy as np
 from pydefect.analyzer.band_edge_states import OrbitalInfo, \
     BandEdgeOrbitalInfos
+from pydefect.analyzer.defect_structure_info import DefectStructureInfo
 from pydefect.defaults import defaults
 from pymatgen import Spin, Structure
 from pymatgen.io.vasp import Procar, Vasprun
@@ -12,10 +13,12 @@ from pymatgen.io.vasp import Procar, Vasprun
 
 def make_band_edge_orbital_infos(procar: Procar,
                                  vasprun: Vasprun,
-                                 vbm: float, cbm: float):
+                                 vbm: float, cbm: float,
+                                 str_info: DefectStructureInfo):
     eigval_range = defaults.eigval_range
     kpt_coords = [tuple(coord) for coord in vasprun.actual_kpoints]
     max_energy_by_spin, min_energy_by_spin = [], []
+    neighbors = str_info.neighbor_atom_indices
 
     for e in vasprun.eigenvalues.values():
         max_energy_by_spin.append(np.amax(e[:, :, 0], axis=0))
@@ -36,7 +39,8 @@ def make_band_edge_orbital_infos(procar: Procar,
             for b_idx in range(lower_idx, upper_idx + 1):
                 e, occ = eigvals[k_idx, b_idx, :]
                 orbitals = calc_orbital_character(orbs, s, spin, k_idx, b_idx)
-                orb_infos[-1][-1].append(OrbitalInfo(e, orbitals, occ))
+                p_ratio = calc_participation_ratio(orbs, spin, k_idx, b_idx, neighbors)
+                orb_infos[-1][-1].append(OrbitalInfo(e, orbitals, occ, p_ratio))
 
     return BandEdgeOrbitalInfos(
         orbital_infos=orb_infos,

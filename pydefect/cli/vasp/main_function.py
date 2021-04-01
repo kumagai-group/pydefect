@@ -233,8 +233,9 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
             title = "No name"
         procar = Procar(d / defaults.procar)
         vasprun = Vasprun(d / defaults.vasprun)
+        str_info = loadfn(d / "defect_structure_info.json")
         band_edge_orb_chars = make_band_edge_orbital_infos(
-            procar, vasprun, supercell_vbm, supercell_cbm)
+            procar, vasprun, supercell_vbm, supercell_cbm, str_info)
         band_edge_orb_chars.to_json_file(d / "band_edge_orbital_infos.json")
         plotter = EigenvalueMplPlotter(
             title=title, band_edge_orb_infos=band_edge_orb_chars,

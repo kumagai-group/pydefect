@@ -7,7 +7,7 @@ from typing import Optional, List
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from plotly.subplots import make_subplots
-from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues
+from pydefect.analyzer.band_edge_states import BandEdgeOrbitalInfos
 from pydefect.defaults import defaults
 from vise.util.matplotlib import float_to_int_formatter
 
@@ -45,7 +45,7 @@ class EigenvalueMplSettings:
 class EigenvaluePlotter:
     def __init__(self,
                  title: str,
-                 band_edge_eigenvalues: BandEdgeEigenvalues,
+                 band_edge_orb_infos: BandEdgeOrbitalInfos,
                  supercell_vbm: float,
                  supercell_cbm: float,
                  y_range: Optional[List[float]] = None,
@@ -53,9 +53,9 @@ class EigenvaluePlotter:
                  ):
 
         self._title = title
-        self._energies_and_occupations = band_edge_eigenvalues.energies_and_occupations
-        self._kpt_coords = band_edge_eigenvalues.kpt_coords
-        self._lowest_band_idx = band_edge_eigenvalues.lowest_band_index
+        self._energies_and_occupations = band_edge_orb_infos.energies_and_occupations
+        self._kpt_coords = band_edge_orb_infos.kpt_coords
+        self._lowest_band_idx = band_edge_orb_infos.lowest_band_index
         self._supercell_vbm = supercell_vbm
         self._supercell_cbm = supercell_cbm
         self._middle = (self._supercell_vbm + self._supercell_cbm) / 2

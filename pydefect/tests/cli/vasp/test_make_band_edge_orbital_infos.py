@@ -3,6 +3,7 @@
 import numpy as np
 from pydefect.analyzer.band_edge_states import OrbitalInfo, \
     BandEdgeOrbitalInfos
+from pydefect.analyzer.defect_structure_info import DefectStructureInfo
 from pydefect.cli.vasp.make_band_edge_orbital_infos import \
     make_band_edge_orbital_infos
 from pymatgen import Spin, Structure, Lattice
@@ -13,6 +14,8 @@ from vise.tests.helpers.assertion import assert_dataclass_almost_equal
 def test_make_band_edge_orbital_infos(mocker):
     mock_procar = mocker.Mock(spec=Procar, autospec=True)
     mock_vasprun = mocker.Mock(spec=Vasprun, autospec=True)
+    mock_str_info = mocker.Mock(spec=DefectStructureInfo, autospec=True)
+
     mock_vasprun.actual_kpoints = [[0.0, 0.0, 0.0]]
     mock_vasprun.actual_kpoints_weights = [1.0]
     mock_vasprun.final_structure = Structure(
@@ -71,19 +74,20 @@ def test_make_band_edge_orbital_infos(mocker):
           [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]]]),
     }
 
+    mock_str_info.neighbor_atom_indices = [0]
     actual = make_band_edge_orbital_infos(
-        mock_procar, mock_vasprun, vbm=0.0, cbm=5.0)
+        mock_procar, mock_vasprun, vbm=0.0, cbm=5.0, str_info=mock_str_info)
 
     expected = BandEdgeOrbitalInfos(
         orbital_infos=[[
-            [OrbitalInfo(energy=-2.9, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=1.0),
-             OrbitalInfo(energy=8.01, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0)],
-            [OrbitalInfo(energy=-2.99, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=1.0),
-             OrbitalInfo(energy=7.90, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0)]],
-           [[OrbitalInfo(energy=7.99, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0),
-             OrbitalInfo(energy=10.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0)],
-            [OrbitalInfo(energy=8.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0),
-             OrbitalInfo(energy=10.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0)]]],
+            [OrbitalInfo(energy=-2.9, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=1.0, participation_ratio=1.0),
+             OrbitalInfo(energy=8.01, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0)],
+            [OrbitalInfo(energy=-2.99, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=1.0, participation_ratio=1.0),
+             OrbitalInfo(energy=7.90, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0)]],
+           [[OrbitalInfo(energy=7.99, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0),
+             OrbitalInfo(energy=10.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0)],
+            [OrbitalInfo(energy=8.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0),
+             OrbitalInfo(energy=10.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0)]]],
         kpt_coords=[(0.0, 0.0, 0.0)], kpt_weights=[1.0], lowest_band_index=1)
     assert_dataclass_almost_equal(actual, expected)
 
