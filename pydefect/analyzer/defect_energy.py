@@ -7,7 +7,7 @@ from itertools import groupby, combinations
 from typing import List, Dict, Optional, Tuple
 
 import numpy as np
-from pydefect.analyzer.band_edge_states import BandEdgeStates
+from pydefect.analyzer.band_edge_states import BandEdgeStates, IsShallow
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.corrections.manual_correction import NoCorrection
@@ -192,12 +192,12 @@ def make_energies(perfect: CalcResults,
                   corrections: List[Correction],
                   abs_chem_pot: Dict[Element, float],
                   allow_shallow: bool = True,
-                  band_edges: List[BandEdgeStates] = None):
+                  is_shallows: List[IsShallow] = None):
 
     single_energies = []
     for i, (d, e, c) in enumerate(zip(defects, defect_entries, corrections)):
         if allow_shallow is False:
-            if band_edges and band_edges[i].is_shallow:
+            if is_shallows and is_shallows[i].is_shallow:
                 continue
         single_energies.append(
             make_single_defect_energy(perfect, d, e, abs_chem_pot, c))

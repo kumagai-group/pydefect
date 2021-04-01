@@ -7,7 +7,7 @@ import dash_table
 from crystal_toolkit.core.mpcomponent import MPComponent
 from crystal_toolkit.helpers.layouts import Column, dcc, html, Columns
 from dash.dependencies import Input, Output
-from pydefect.analyzer.band_edge_states import BandEdgeStates
+from pydefect.analyzer.band_edge_states import IsShallow
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import make_energies
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotlyPlotter
@@ -27,8 +27,8 @@ class CpdEnergyComponent(MPComponent):
                  corrections: List[Correction],
                  unitcell_vbm: float,
                  unitcell_cbm: float,
-                 band_edge_states: List[BandEdgeStates] = None,
-                 show_competing_phases = False,
+                 is_shallows: List[IsShallow] = None,
+                 show_competing_phases: bool = False,
                  *args, **kwargs):
         self.cpd_plot_info = cpd_plot_info
         self.perfect = perfect
@@ -37,7 +37,7 @@ class CpdEnergyComponent(MPComponent):
         self.corrections = corrections
         self.unitcell_vbm = unitcell_vbm
         self.unitcell_cbm = unitcell_cbm
-        self.band_edge_states = band_edge_states
+        self.is_shallows = is_shallows
         self.dim = cpd_plot_info.dim
         super().__init__(*args, **kwargs)
 
@@ -72,7 +72,7 @@ class CpdEnergyComponent(MPComponent):
                                         self.corrections,
                                         abs_chem_pot,
                                         allow_shallow,
-                                        self.band_edge_states)
+                                        self.is_shallows)
         plotter = DefectEnergyPlotlyPlotter(title=f"Label {label[0]}",
                                             defect_energies=defect_energies,
                                             vbm=self.unitcell_vbm,
