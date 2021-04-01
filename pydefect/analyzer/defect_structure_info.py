@@ -10,6 +10,7 @@ from monty.json import MSONable
 from numpy.linalg import inv
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator, SiteDiff
+from pydefect.defaults import defaults
 from pymatgen.core import Structure, Lattice, PeriodicSite
 from pymatgen.symmetry.groups import SpaceGroup
 from tabulate import tabulate
@@ -141,8 +142,11 @@ def make_defect_structure_info(perfect: Structure,
                                dist_tol: float,
                                symprec: float = None,
                                init_site_sym: str = None,
-                               final_site_sym: str = None
+                               final_site_sym: str = None,
+                               neighbor_cutoff_factor: float = None
                                ) -> "DefectStructureInfo":
+    cutoff = neighbor_cutoff_factor or defaults.cutoff_distance_factor
+
     final = final.copy()
     if symprec:
         initial_symmetrizer = StructureSymmetrizer(initial, symprec)
@@ -175,6 +179,8 @@ def make_defect_structure_info(perfect: Structure,
         symprec=symprec,
         dist_tol=dist_tol,
         anchor_atom_idx=anchor_idx,
+        neighbor_atom_indices=comp_w_perf.neighboring_atom_indices(cutoff),
+        neighbor_cutoff_factor=cutoff,
         drift_vector=tuple(drift_vec),
         drift_dist=drift_d,
         center=tuple(center),
@@ -239,6 +245,8 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
     symprec: float
     dist_tol: float
     anchor_atom_idx: int
+    neighbor_atom_indices: List[int]
+    neighbor_cutoff_factor: float
     drift_vector: Tuple[float, float, float]
     drift_dist: float
     center: Tuple[float, float, float]

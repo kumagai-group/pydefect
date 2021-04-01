@@ -88,6 +88,8 @@ def def_str_info(displacements):
                                symprec=0.1,
                                dist_tol=0.2,
                                anchor_atom_idx=3,
+                               neighbor_atom_indices=[0],
+                               neighbor_cutoff_factor=1.2,
                                drift_vector=(0.0, 0.0, 0.0001),
                                drift_dist=0.001,
                                center=(0.38, 0.375, 0.375175),
@@ -197,7 +199,8 @@ def test_symmetry_relation():
 def test_make_defect_structure_info(structures, def_str_info):
     perfect, initial, final = structures
     actual = make_defect_structure_info(
-         perfect, initial, final, dist_tol=0.2, symprec=0.1)
+         perfect, initial, final, dist_tol=0.2, symprec=0.1,
+         neighbor_cutoff_factor=1.2)
     assert_dataclass_almost_equal(actual, def_str_info)
 
 
@@ -205,7 +208,7 @@ def test_make_defect_structure_info_w_symms(structures, def_str_info):
     perfect, initial, final = structures
     actual = make_defect_structure_info(
         perfect, initial, final, dist_tol=0.2,
-        init_site_sym="3m", final_site_sym="m")
+        init_site_sym="3m", final_site_sym="m", neighbor_cutoff_factor=1.2)
     expected = deepcopy(def_str_info)
     expected.symprec = None
     assert_dataclass_almost_equal(actual, expected)
