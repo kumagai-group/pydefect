@@ -338,7 +338,7 @@ The atomic energies are collected to yaml file using the following python script
     # -*- coding: utf-8 -*-
     #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
-    from pymatgen import Element
+    from pymatgen.core import Element
     from pymatgen.io.vasp import Outcar
 
     for e in Element:
