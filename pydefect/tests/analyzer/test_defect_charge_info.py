@@ -35,13 +35,24 @@ def test_defect_charge_info_half_charge_radius(defect_charge_info):
     assert defect_charge_info.half_charge_radius(10, Spin.up) == 1.25
 
 
+def test_defect_charge_info_uniform_half_charge_radius(defect_charge_info):
+    expected = (3 * 0.5 / (4 * np.pi * 0.5)) ** (1.0 / 3.0)
+    assert defect_charge_info.uniform_half_charge_radius == expected
+
+
 def test_defect_charge_info_repr(defect_charge_info):
-    expected = """--------  ----  ------
+    expected = """Uniform charge radius is 0.620
+--------  ----  ------
 band_idx  spin  radius
 10        up    1.25
 10        down  1.25
 --------  ----  ------"""
     assert defect_charge_info.__repr__() == expected
+
+
+def test_defect_charge_info_show_dist(defect_charge_info):
+    plt = defect_charge_info.show_dist()
+    plt.show()
 
 
 """

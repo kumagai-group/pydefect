@@ -34,14 +34,19 @@ def center_1d_periodic_quantity(grid_points: List[float]):
     return np.nanargmin(moments)
 
 
+def make_spin_charges(parchg: Chgcar) -> List[Chgcar]:
+    result = [Chgcar(parchg.structure, {"total": parchg.spin_data[Spin.up]})]
+    if "diff" in parchg.data:
+        result.append(
+            Chgcar(parchg.structure, {"total": parchg.spin_data[Spin.down]}))
+    return result
+
+
 def make_charge_dist(parchg: Chgcar, grids: Grids, distance_bins: np.ndarray):
     assert parchg.structure.lattice == grids.lattice
     assert parchg.dim == grids.dim
 
-    spin_charges = [Chgcar(parchg.structure, {"total": parchg.spin_data[Spin.up]})]
-    if "diff" in parchg.data:
-        spin_charges.append(
-            Chgcar(parchg.structure, {"total": parchg.spin_data[Spin.down]}))
+    spin_charges = make_spin_charges(parchg)
 
     dists = []
     defect_center_idxs = []
