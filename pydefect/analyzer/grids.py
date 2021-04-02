@@ -17,6 +17,17 @@ class Grids:
     dim: Tuple[int, int, int]
     distance_data: np.ndarray
 
+    def dump(self):
+        np.savez("grids", matrix=self.lattice.matrix,
+                 distance_data=self.distance_data)
+
+    @classmethod
+    def from_file(cls, filename="grids.npz"):
+        loaded_dict = np.load(filename)
+        lattice = Lattice(loaded_dict["matrix"])
+        return cls(dim=loaded_dict["distance_data"].shape, lattice=lattice,
+                   distance_data=loaded_dict["distance_data"])
+
     @classmethod
     def from_chgcar(cls, chgcar: Chgcar):
         lattice, dim = chgcar.structure.lattice, chgcar.dim

@@ -11,7 +11,6 @@ from vise.tests.helpers.assertion import assert_dataclass_almost_equal
 def grids():
     return Grids(lattice=Lattice.cubic(10),
                  dim=(1, 1, 5),
-#                 distance_bins=[0.0, 2.5, 5.0], #  radius is the last one, 5.0.
                  distance_data=np.array([[[0.0, 2.0, 4.0, 4.0, 2.0]]]))
 
 @pytest.fixture
@@ -29,6 +28,14 @@ def test_grids_joblib_roundtrip(tmpdir, grids):
         joblib.dump(grids, f, compress=3)
     with open("tmp.joblib", mode="rb") as f:
         actual = joblib.load(f)
+    assert_dataclass_almost_equal(actual, grids)
+
+
+def test_grids_np_save_load_roundtrip(tmpdir, grids):
+    tmpdir.chdir()
+    print(tmpdir)
+    grids.dump()
+    actual = grids.from_file()
     assert_dataclass_almost_equal(actual, grids)
 
 
@@ -50,6 +57,7 @@ def test_spherical_dist(grids):
     #  Divide by 2 since there are 2 points at 4.0 distance.
     expected = [0.0, 4 * np.pi / 3 * (5.0**3 - 2.5**3) / 2]
     assert actual == expected
+
 
 """
 TODO
