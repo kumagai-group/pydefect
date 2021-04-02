@@ -30,6 +30,14 @@ class OrbitalInfo(MSONable):
     occupation: float
     participation_ratio: float = None
 
+    def pretty_orbital(self):
+        x = []
+        for elem, orbs in self.orbitals.items():
+            for orb_name, weight in zip(["s", "p", "d", "f"], orbs):
+                if weight > 0.1:
+                    x.append(f"{elem}-{orb_name}: {weight:.2f}")
+        return ", ".join(x)
+
 
 @dataclass
 class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
@@ -37,6 +45,7 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     kpt_coords: List[Tuple[float, float, float]]
     kpt_weights: List[float]
     lowest_band_index: int
+    fermi_level: float
 
     @property
     def energies_and_occupations(self):
@@ -49,20 +58,46 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
 
     def __repr__(self):
         lines = ["k-points"]
-        x = [["idx", "coords", "weight"]]
+        kpt_block = [["idx", "coords", "weight"]]
         for i, (c, w) in enumerate(zip(self.kpt_coords, self.kpt_weights), 1):
-            x.append([i, c, w])
-        lines.append(tabulate(x))
-        x = [["band_idx", "k_idx", "energy", "occupation", "p_ratio", "orbital"]]
+            kpt_block.append([i, c, w])
+
+        lines.append(tabulate(kpt_block))
+        band_block = [["band_idx", "k_idx", "energy", "occup", "p_ratio",
+                       "orbital"]]
         for oi in self.orbital_infos:
-            a = np.array(oi).T
-            for i, b in enumerate(a, 1):
-                for j, c in enumerate(b, 1):
-                    x.append([i+self.lowest_band_index, j, c.energy, round(c.occupation, 3), round(c.participation_ratio, 2), c.orbitals])
-            x.append("")
-        lines.append(tabulate(x))
+            orb_infos = np.array(oi).T
+
+            # determine the band_idx where the occupation changes
+            middle_idx = int(len(orb_infos) / 2)
+            for band_idx in range(0, len(orb_infos) - 1):
+                occu_diff = (orb_infos[band_idx][0].occupation
+                             - orb_infos[band_idx + 1][0].occupation)
+                if occu_diff > 0.1:
+                    middle_idx = band_idx
+                    break
+            min_idx = max(middle_idx - 3, 0)
+            max_idx = min(middle_idx + 3, len(orb_infos))
+
+            for band_idx in range(min_idx, max_idx):
+                for kpt_idx, orb_info in enumerate(orb_infos[band_idx], 1):
+                    actual_band_idx = band_idx + self.lowest_band_index + 1
+                    energy = round(orb_info.energy, 2)
+                    occupation = round(orb_info.occupation, 2)
+                    p_ratio = round(orb_info.participation_ratio, 2)
+                    orbs = orb_info.pretty_orbital()
+                    band_block.append([actual_band_idx, kpt_idx, energy,
+                                       occupation, p_ratio, orbs])
+                band_block.append(["--"])
+            band_block.append("")
+        lines.append(tabulate(band_block))
 
         return "\n".join(lines)
+
+
+def is_any_part_occ(x: OrbitalInfo, y: OrbitalInfo):
+    return (min(x.occupation, (1.0 - x.occupation)) > 0.01
+            or min(y.occupation, (1.0 - y.occupation)) > 0.01)
 
 
 @dataclass
@@ -110,7 +145,7 @@ class BandEdgeState(MSONable):
 
     @property
     def is_shallow(self):
-        return self.vbm_info.occupation < 0.5 or self.cbm_info.occupation > 0.5
+        return self.vbm_info.occupation < 0.7 or self.cbm_info.occupation > 0.3
 
 
 @dataclass

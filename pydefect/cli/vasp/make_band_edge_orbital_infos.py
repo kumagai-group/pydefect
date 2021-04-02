@@ -47,7 +47,8 @@ def make_band_edge_orbital_infos(procar: Procar,
         kpt_coords=kpt_coords,
         kpt_weights=vasprun.actual_kpoints_weights,
         # need to convert numpy.int64 to int for mongoDB.
-        lowest_band_index=int(lower_idx))
+        lowest_band_index=int(lower_idx),
+        fermi_level=vasprun.efermi)
 
 
 def calc_participation_ratio(orbitals: Dict[Spin, np.ndarray],

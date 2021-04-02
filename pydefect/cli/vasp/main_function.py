@@ -257,11 +257,14 @@ def make_perfect_band_edge_state(args):
 
 def make_band_edge_states_main_func(args):
     for d in args.dirs:
-        print(f"-- {d}")
-        orb_infos = loadfn(d / "band_edge_orbital_infos.json")
-        band_edge_states = make_band_edge_states(orb_infos, args.p_state)
-        band_edge_states.to_json_file(d / "band_edge_states.json")
-        band_edge_states.is_shallow.to_yaml(d / "is_shallow.yaml")
+        try:
+            print(f"-- {d}")
+            orb_infos = loadfn(d / "band_edge_orbital_infos.json")
+            band_edge_states = make_band_edge_states(orb_infos, args.p_state)
+            band_edge_states.to_json_file(d / "band_edge_states.json")
+            band_edge_states.is_shallow.to_yaml(d / "is_shallow.yaml")
+        except ValueError as e:
+            print(e)
 
 
 def make_defect_formation_energy(args):

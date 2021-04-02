@@ -33,6 +33,7 @@ def test_make_band_edge_orbital_infos(mocker):
                                                      [[-3.01, 1.],
                                                       [ 8.00, 0.],
                                                       [10.00, 0.]]])}
+    mock_vasprun.efermi = 20.0
     # s: 1, p: 3, d: 5, f: 7 = 16 orbitals
     mock_procar.data = {Spin.up: np.array(
        [[[[1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],  # 1st kpt, 0th band, 1st atom
@@ -88,6 +89,7 @@ def test_make_band_edge_orbital_infos(mocker):
              OrbitalInfo(energy=10.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0)],
             [OrbitalInfo(energy=8.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0),
              OrbitalInfo(energy=10.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0)]]],
-        kpt_coords=[(0.0, 0.0, 0.0)], kpt_weights=[1.0], lowest_band_index=1)
+        kpt_coords=[(0.0, 0.0, 0.0)], kpt_weights=[1.0], lowest_band_index=1,
+    fermi_level=20.0)
     assert_dataclass_almost_equal(actual, expected)
 

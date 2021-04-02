@@ -26,7 +26,9 @@ def test_band_edge_eigenvalues_to_json_file(band_edge_eigenvalues, tmpdir):
 
 @pytest.fixture
 def orbital_info():
-    return OrbitalInfo(energy=1.0, orbitals={"Mn": [0.5, 0.4]}, occupation=1.0,
+    return OrbitalInfo(energy=1.0,
+                       orbitals={"Mn": [0.5, 0.4, 0.0, 0.0]},
+                       occupation=1.0,
                        participation_ratio=0.1)
 
 
@@ -34,12 +36,17 @@ def test_orbital_info_msonable(orbital_info):
     assert_msonable(orbital_info)
 
 
+def test_pretty_orbitals(orbital_info):
+    assert orbital_info.pretty_orbital() == "Mn-s: 0.50, Mn-p: 0.40"
+
+
 @pytest.fixture
 def band_edge_orbital_infos(orbital_info):
     return BandEdgeOrbitalInfos(orbital_infos=[[[orbital_info]]],
                                 kpt_coords=[(0.0, 0.0, 0.0)],
                                 kpt_weights=[1.0],
-                                lowest_band_index=10)
+                                lowest_band_index=10,
+                                fermi_level=0.5)
 
 
 def test_band_edge_orbital_info_json_roundtrip(band_edge_orbital_infos, tmpdir):
@@ -60,11 +67,11 @@ def test_band_edge_orbital_info_repr(band_edge_orbital_infos):
 idx  coords           weight
 1    (0.0, 0.0, 0.0)  1.0
 ---  ---------------  ------
---------  -----  ------  ----------  -------  ------------------
-band_idx  k_idx  energy  occupation  p_ratio  orbital
-11        1      1.0     1.0         0.1      {'Mn': [0.5, 0.4]}
+--------  -----  ------  -----  -------  ----------------------
+band_idx  k_idx  energy  occup  p_ratio  orbital
+11        1      1.0     1.0    0.1      Mn-s: 0.50, Mn-p: 0.40
 
---------  -----  ------  ----------  -------  ------------------"""
+--------  -----  ------  -----  -------  ----------------------"""
     assert actual == expected
 
 
