@@ -30,7 +30,8 @@ def orb_infos():
     return BandEdgeOrbitalInfos(kpt_coords=[(0.0, 0.0, 0.0)],
                                 kpt_weights=[1.0],
                                 orbital_infos=orbital_infos,
-                                lowest_band_index=8)
+                                lowest_band_index=8,
+                                fermi_level=0.5)
 
 
 def test_make_band_edge_state_no_in_gap(p_edge_state, orb_infos):

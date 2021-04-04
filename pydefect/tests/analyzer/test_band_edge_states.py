@@ -70,6 +70,7 @@ idx  coords           weight
 --------  -----  ------  -----  -------  ----------------------
 band_idx  k_idx  energy  occup  p_ratio  orbital
 11        1      1.0     1.0    0.1      Mn-s: 0.50, Mn-p: 0.40
+--
 
 --------  -----  ------  -----  -------  ----------------------"""
     assert actual == expected

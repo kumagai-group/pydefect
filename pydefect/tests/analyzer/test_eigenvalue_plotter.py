@@ -33,7 +33,8 @@ orbital_infos = BandEdgeOrbitalInfos(
         OrbitalInfo(energy=1.0, orbitals={}, occupation=0.0, participation_ratio=0.3)]]],
     kpt_coords=[(0.0, 0.0, 0.0), (0.25, 0.0, 0.0)],
     kpt_weights=[0.5, 0.5],
-    lowest_band_index=10)
+    lowest_band_index=10,
+    fermi_level=0.5)
 
 
 @pytest.fixture
