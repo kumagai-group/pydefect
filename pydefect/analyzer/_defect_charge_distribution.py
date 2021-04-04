@@ -16,7 +16,7 @@ class RadialDist:
         self.lattice = parchg.structure.lattice
         self.center = center_coords
         self.radius = calc_max_sphere_radius(self.lattice.matrix)
-        self._distances_data = None
+        self._distances_data = None  # lazy evaluation
 
     @property
     def distances_data(self):
