@@ -5,7 +5,6 @@ from itertools import zip_longest
 from typing import List
 
 import numpy as np
-
 from pydefect.analyzer.band_edge_states import BandEdgeOrbitalInfos, \
     PerfectBandEdgeState, BandEdgeStates, EdgeInfo, OrbitalInfo, \
     LocalizedOrbital, BandEdgeState

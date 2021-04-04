@@ -2,8 +2,8 @@
 #  Copyright (c) 2020 Kumagai group.
 
 import fire
-from pymatgen.core import Element, Structure
 from pymatgen.analysis.defects.utils import ChargeDensityAnalyzer
+from pymatgen.core import Element, Structure
 from pymatgen.io.vasp import Chgcar, VolumetricData
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 

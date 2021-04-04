@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from itertools import product
 from typing import List
+
 import numpy as np
 from pydefect.analyzer.defect_charge_info import DefectChargeInfo, ChargeDist
 from pydefect.analyzer.grids import Grids

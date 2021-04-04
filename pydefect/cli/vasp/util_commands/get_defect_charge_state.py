@@ -6,7 +6,6 @@ import argparse
 from pymatgen.io.vasp.inputs import Poscar, Incar, Potcar
 from vise.util.logger import get_logger
 
-
 logger = get_logger(__name__)
 
 

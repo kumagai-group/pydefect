@@ -2,9 +2,9 @@
 #  Copyright (c) 2020 Kumagai group.
 from dataclasses import dataclass
 from typing import List, Sequence
+
 import numpy as np
 from matplotlib import pyplot as plt
-
 from monty.json import MSONable
 from pymatgen import Spin
 from tabulate import tabulate

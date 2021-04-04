@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 from dataclasses import dataclass
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 
 import numpy as np
 from monty.json import MSONable

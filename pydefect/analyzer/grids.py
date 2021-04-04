@@ -3,10 +3,9 @@
 from dataclasses import dataclass
 from itertools import product
 from typing import Tuple, List
-import numpy as np
-from numpy.testing import assert_almost_equal
-from pydefect.cli.vasp.make_efnv_correction import calc_max_sphere_radius
 
+import numpy as np
+from pydefect.cli.vasp.make_efnv_correction import calc_max_sphere_radius
 from pymatgen import Lattice
 from pymatgen.io.vasp import Chgcar
 

@@ -9,9 +9,8 @@ from pydefect.analyzer.defect_structure_symmetrizer import \
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen.core import Structure
-from vise.util.structure_symmetrizer import StructureSymmetrizer
 from vise.util.logger import get_logger
-
+from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 logger = get_logger(__name__)
 

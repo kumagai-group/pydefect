@@ -40,7 +40,7 @@ from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pydefect.util.mp_tools import MpQuery
-from pymatgen.io.vasp import Vasprun, Outcar, Procar, Chgcar
+from pymatgen.io.vasp import Vasprun, Outcar, Procar
 from pymatgen.util.string import latexify
 from vise.util.logger import get_logger
 

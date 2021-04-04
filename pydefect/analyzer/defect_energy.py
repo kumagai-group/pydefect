@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-import re
 from copy import deepcopy
 from dataclasses import dataclass
 from itertools import groupby, combinations
 from typing import List, Dict, Optional, Tuple
 
+import dash_html_components as html
 import numpy as np
-from pydefect.analyzer.band_edge_states import BandEdgeStates, IsShallow
+from pydefect.analyzer.band_edge_states import IsShallow
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.corrections.manual_correction import NoCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen.core import Element, IStructure
 from scipy.spatial import HalfspaceIntersection
-import dash_html_components as html
 
 
 @dataclass

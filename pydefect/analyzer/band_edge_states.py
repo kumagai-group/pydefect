@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from collections.abc import Sequence
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Dict, Tuple, Optional
-import numpy as np
+from typing import List, Dict, Tuple
 
+import numpy as np
 from monty.json import MSONable
 from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn

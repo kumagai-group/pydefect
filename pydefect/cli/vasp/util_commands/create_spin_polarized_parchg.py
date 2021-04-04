@@ -6,7 +6,6 @@ from typing import List
 
 import fire
 import numpy as np
-
 from pydefect.cli.vasp.make_defect_charge_info import make_spin_charges
 from pymatgen.io.vasp import Chgcar, Poscar
 from vise.util.logger import get_logger
