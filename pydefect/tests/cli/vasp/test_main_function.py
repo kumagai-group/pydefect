@@ -280,6 +280,43 @@ def test_make_gkfo_correction_from_vasp(tmpdir, mocker):
         ion_clamped_diele_tensor=mock_unitcell.ele_dielectric_const)
 
 
+def test_calc_defect_structure_info(mocker):
+
+    mock_defect_entry = mocker.Mock(spec=DefectEntry)
+    mock_defect_entry.structure = "a"
+    mock_defect_entry.site_symmetry = "x"
+    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_calc_results.structure = "b"
+    mock_calc_results.site_symmetry = "y"
+
+    def side_effect(key):
+
+        if str(key) == "Va_O1_2/defect_entry.json":
+            return mock_defect_entry
+        elif str(key) == "Va_O1_2/calc_results.json":
+            return mock_calc_results
+        else:
+            raise ValueError
+
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn",
+                               side_effect=side_effect)
+    mock_defect_str_info = mocker.patch(
+        "pydefect.cli.vasp.main_function.make_defect_structure_info")
+
+    mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
+    mock_supercell_info.structure = "c"
+    args = Namespace(supercell_info=mock_supercell_info,
+                     dirs=[Path("Va_O1_2")],
+                     symprec=None,
+                     dist_tolerance=1.0)
+    calc_defect_structure_info(args)
+    mock_defect_str_info.assert_called_with("c", "a", "b",
+                                            dist_tol=1.0,
+                                            symprec=None,
+                                            init_site_sym="x",
+                                            final_site_sym="y")
+
+
 def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
     mock_procar = mocker.patch("pydefect.cli.vasp.main_function.Procar")
     mock_vasprun = mocker.patch("pydefect.cli.vasp.main_function.Vasprun")
@@ -422,39 +459,3 @@ def test_make_defect_formation_energy(skip_shallow, tmpdir, mocker):
         mock_loadfn.assert_any_call(Path("Va_O1_2") / "calc_results.json")
         mock_loadfn.assert_any_call(Path("Va_O1_2") / "correction.json")
 
-
-def test_calc_defect_structure_info(mocker):
-
-    mock_defect_entry = mocker.Mock(spec=DefectEntry)
-    mock_defect_entry.structure = "a"
-    mock_defect_entry.site_symmetry = "x"
-    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
-    mock_calc_results.structure = "b"
-    mock_calc_results.site_symmetry = "y"
-
-    def side_effect(key):
-
-        if str(key) == "Va_O1_2/defect_entry.json":
-            return mock_defect_entry
-        elif str(key) == "Va_O1_2/calc_results.json":
-            return mock_calc_results
-        else:
-            raise ValueError
-
-    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_function.loadfn",
-                               side_effect=side_effect)
-    mock_defect_str_info = mocker.patch(
-        "pydefect.cli.vasp.main_function.make_defect_structure_info")
-
-    mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
-    mock_supercell_info.structure = "c"
-    args = Namespace(supercell_info=mock_supercell_info,
-                     dirs=[Path("Va_O1_2")],
-                     symprec=None,
-                     dist_tolerance=1.0)
-    calc_defect_structure_info(args)
-    mock_defect_str_info.assert_called_with("c", "a", "b",
-                                            dist_tol=1.0,
-                                            symprec=None,
-                                            init_site_sym="x",
-                                            final_site_sym="y")

@@ -221,6 +221,23 @@ def make_gkfo_correction_from_vasp(args):
     plotter.plt.clf()
 
 
+def calc_defect_structure_info(args):
+    supercell_info: SupercellInfo = args.supercell_info
+    for d in args.dirs:
+        logger.info(f"Parsing data in {d} ...")
+        calc_results: CalcResults = loadfn(d / "calc_results.json")
+        defect_entry: DefectEntry = loadfn(d / "defect_entry.json")
+        defect_str_info = make_defect_structure_info(
+            supercell_info.structure,
+            defect_entry.structure,
+            calc_results.structure,
+            dist_tol=args.dist_tolerance,
+            symprec=args.symprec,
+            init_site_sym=defect_entry.site_symmetry,
+            final_site_sym=calc_results.site_symmetry)
+        defect_str_info.to_json_file(str(d / "defect_structure_info.json"))
+
+
 def make_band_edge_orb_infos_and_eigval_plot(args):
     supercell_vbm = args.perfect_calc_results.vbm
     supercell_cbm = args.perfect_calc_results.cbm
@@ -350,31 +367,14 @@ def make_defect_formation_energy(args):
     plotter.plt.savefig(f"energy_{args.label}.pdf")
 
 
-def calc_defect_structure_info(args):
-    supercell_info: SupercellInfo = args.supercell_info
-    for d in args.dirs:
-        logger.info(f"Parsing data in {d} ...")
-        calc_results: CalcResults = loadfn(d / "calc_results.json")
-        defect_entry: DefectEntry = loadfn(d / "defect_entry.json")
-        defect_str_info = make_defect_structure_info(
-            supercell_info.structure,
-            defect_entry.structure,
-            calc_results.structure,
-            dist_tol=args.dist_tolerance,
-            symprec=args.symprec,
-            init_site_sym=defect_entry.site_symmetry,
-            final_site_sym=calc_results.site_symmetry)
-        defect_str_info.to_json_file(str(d / "defect_structure_info.json"))
-
-
 def calc_defect_charge_info(args):
     band_idxs = []
     parchgs = []
-    for fname in args.parchgs:
-        band_idx = int(fname.split(".")[-2])
-        logger.info(f"band index {band_idx} is parsed from filename {fname}")
+    for parchg in args.parchgs:
+        band_idx = int(parchg.split(".")[-2])
+        logger.info(f"band index {band_idx} is being parsed.")
         band_idxs.append(band_idx)
-        parchgs.append(Chgcar.from_file(fname))
+        parchgs.append(parchg)
     defect_charge_info = make_defect_charge_info(
         parchgs, band_idxs, args.bin_interval)
     defect_charge_info.to_json_file()

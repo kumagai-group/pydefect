@@ -9,6 +9,7 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect import __version__
+from pydefect.analyzer.grids import Grids
 from pydefect.cli.main_tools import str_int_to_int
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
@@ -21,7 +22,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_band_edge_states_main_func
 from pydefect.defaults import defaults
 from pymatgen.core import IStructure, Composition, Structure
-from pymatgen.io.vasp import Vasprun, Outcar
+from pymatgen.io.vasp import Vasprun, Outcar, Chgcar
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
@@ -294,6 +295,25 @@ def parse_args(args):
 
     parser_gkfo.set_defaults(func=make_gkfo_correction_from_vasp)
 
+    # -- calc defect structure ------------------------------------------------
+    parser_calc_def_str = subparsers.add_parser(
+        name="calc_defect_structure_info",
+        description="Calc defect structure.",
+        parents=[dirs_parser, si_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['cds'])
+
+    parser_calc_def_str.add_argument(
+        "-dt", "--dist_tolerance", type=float, default=defaults.dist_tol,
+        help="Tolerance in Angstrom for distance to judge if the "
+             "atoms in initial and final structures are same ones.")
+    parser_calc_def_str.add_argument(
+        "--symprec", type=float,
+        help="Tolerance for determining the point groups. If it's not set, "
+             "the point groups written in defect_entry.json and "
+             "calc_results.json are used.")
+    parser_calc_def_str.set_defaults(func=calc_defect_structure_info)
+
     # -- band edge orbital infos  ----------------------------------------------
     parser_eig = subparsers.add_parser(
         name="make_band_edge_orbital_infos",
@@ -373,41 +393,21 @@ def parse_args(args):
 
     parser_energy.set_defaults(func=make_defect_formation_energy)
 
-    # -- calc defect structure ------------------------------------------------
-    parser_calc_def_str = subparsers.add_parser(
-        name="calc_defect_structure_info",
-        description="Calc defect structure.",
-        parents=[dirs_parser, si_parser],
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['cds'])
-
-    parser_calc_def_str.add_argument(
-        "-dt", "--dist_tolerance", type=float, default=defaults.dist_tol,
-        help="Tolerance in Angstrom for distance to judge if the "
-             "atoms in initial and final structures are same ones.")
-    parser_calc_def_str.add_argument(
-        "--symprec", type=float,
-        help="Tolerance for determining the point groups. If it's not set, "
-             "the point groups written in defect_entry.json and "
-             "calc_results.json are used.")
-    parser_calc_def_str.set_defaults(func=calc_defect_structure_info)
-
     # -- calc defect charge info -----------------------------------------------
     parser_calc_def_charge_info = subparsers.add_parser(
         name="calc_defect_charge_info",
         description="Calc defect charge info.",
-#        parents=[dirs_parser, si_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cdc'])
 
     parser_calc_def_charge_info.add_argument(
-        "-p", "--parchgs", type=str, nargs="+")
+        "-p", "--parchgs", type=Chgcar.from_file, nargs="+")
     parser_calc_def_charge_info.add_argument(
-        "--bin_interval", type=float, default=0.2)
-    # parser_calc_def_charge_info.add_argument(
-    #     "--filename", type=float)
-    parser_calc_def_charge_info.set_defaults(func=calc_defect_charge_info)
+        "-b", "--bin_interval", type=float, default=0.2)
+    parser_calc_def_charge_info.add_argument(
+        "-g", "--grids_filename", type=Grids.from_file)
 
+    parser_calc_def_charge_info.set_defaults(func=calc_defect_charge_info)
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
 

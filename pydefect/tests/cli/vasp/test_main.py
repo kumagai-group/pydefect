@@ -262,6 +262,30 @@ def test_gkfo_correction(mocker):
     assert parsed_args == expected
 
 
+def test_defect_structure(mocker):
+    mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
+
+    def side_effect(filename):
+        if filename == "supercell_info.json":
+            return mock_supercell_info
+        else:
+            raise ValueError
+
+    mock = mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
+    parsed_args = parse_args(["cds",
+                              "-s", "supercell_info.json",
+                              "-d", "Va_O1_0",
+                              "-dt", "1.0",
+                              "--symprec", "2.0"])
+    expected = Namespace(
+        supercell_info=mock_supercell_info,
+        dirs=[Path("Va_O1_0")],
+        dist_tolerance=1.0,
+        symprec=2.0,
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
 def test_make_band_edge_orbital_infos(mocker):
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
 
@@ -347,25 +371,17 @@ def test_defect_formation_energy(mocker):
     assert parsed_args == expected
 
 
-def test_defect_structure(mocker):
-    mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
+def test_calc_defect_charge_info(mocker):
+    patch_chgcar = mocker.patch("pydefect.cli.vasp.main.Chgcar")
+    patch_grids = mocker.patch("pydefect.cli.vasp.main.Grids")
 
-    def side_effect(filename):
-        if filename == "supercell_info.json":
-            return mock_supercell_info
-        else:
-            raise ValueError
-
-    mock = mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
-    parsed_args = parse_args(["cds",
-                              "-s", "supercell_info.json",
-                              "-d", "Va_O1_0",
-                              "-dt", "1.0",
-                              "--symprec", "2.0"])
+    parsed_args = parse_args(["cdc",
+                              "-p", "a/PARCHG.0001.ALLK",
+                              "-b", "0.3",
+                              "-g", "grids.npz"])
     expected = Namespace(
-        supercell_info=mock_supercell_info,
-        dirs=[Path("Va_O1_0")],
-        dist_tolerance=1.0,
-        symprec=2.0,
+        parchgs=[patch_chgcar.from_file.return_value],
+        bin_interval=0.3,
+        grids_filename=patch_grids.from_file.return_value,
         func=parsed_args.func)
     assert parsed_args == expected
