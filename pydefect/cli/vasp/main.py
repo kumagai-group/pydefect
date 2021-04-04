@@ -134,7 +134,7 @@ def parse_args(args):
         help="Target composition, e.g., MgO.")
     parser_mcpd.add_argument(
         "-e", "--elements", type=str, nargs="+",
-        help="Element names considered in chemical potential diagram. Used for"
+        help="Element names considered in chemical potential diagram. Used for "
              "creating the diagram from mp data with atom energy alignment.")
     parser_mcpd.add_argument(
         "-a", "--atom_energy_yaml", type=str,
@@ -295,62 +295,63 @@ def parse_args(args):
 
     parser_gkfo.set_defaults(func=make_gkfo_correction_from_vasp)
 
-    # -- calc defect structure ------------------------------------------------
-    parser_calc_def_str = subparsers.add_parser(
-        name="calc_defect_structure_info",
-        description="Calc defect structure.",
+    # -- defect structure info ------------------------------------------------
+    parser_defect_structure_info = subparsers.add_parser(
+        name="defect_structure_info",
+        description="Defect structure info.",
         parents=[dirs_parser, si_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['cds'])
+        aliases=['dsi'])
 
-    parser_calc_def_str.add_argument(
+    parser_defect_structure_info.add_argument(
         "-dt", "--dist_tolerance", type=float, default=defaults.dist_tol,
         help="Tolerance in Angstrom for distance to judge if the "
              "atoms in initial and final structures are same ones.")
-    parser_calc_def_str.add_argument(
+    parser_defect_structure_info.add_argument(
         "--symprec", type=float,
         help="Tolerance for determining the point groups. If it's not set, "
              "the point groups written in defect_entry.json and "
              "calc_results.json are used.")
-    parser_calc_def_str.set_defaults(func=calc_defect_structure_info)
+    parser_defect_structure_info.set_defaults(func=calc_defect_structure_info)
 
     # -- band edge orbital infos  ----------------------------------------------
-    parser_eig = subparsers.add_parser(
-        name="make_band_edge_orbital_infos",
+    parser_band_edge_orb_infos = subparsers.add_parser(
+        name="band_edge_orbital_infos",
         description="Generate band_edge_orbital_infos.json and "
                     "eigenvalues.pdf.",
         parents=[dirs_parser, pcr_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['mbeoi'])
+        aliases=['beoi'])
 
-    parser_eig.set_defaults(func=make_band_edge_orb_infos_and_eigval_plot)
+    parser_band_edge_orb_infos.set_defaults(
+        func=make_band_edge_orb_infos_and_eigval_plot)
 
     # -- perfect band edge state  ----------------------------------------------
-    parser_mpb = subparsers.add_parser(
-        name="make_perfect_band_edge_state",
+    parser_perf_band_edge_state = subparsers.add_parser(
+        name="perfect_band_edge_state",
         description="Generate band_edge_orbital_infos.json and "
                     "eigenvalues.pdf.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['mpbes'])
-    parser_mpb.add_argument(
+        aliases=['pbes'])
+    parser_perf_band_edge_state.add_argument(
         "-d", "--dir", type=Path,
         help="Directory path to the perfect supercell calculation.")
 
-    parser_mpb.set_defaults(func=make_perfect_band_edge_state)
+    parser_perf_band_edge_state.set_defaults(func=make_perfect_band_edge_state)
 
     # -- band edge states ------------------------------------------------
-    parser_es = subparsers.add_parser(
-        name="make_band_edge_states",
+    parser_band_edge_states = subparsers.add_parser(
+        name="band_edge_states",
         description="Show edge state for each spin channel.",
         parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['mbes'])
+        aliases=['bes'])
 
-    parser_es.add_argument(
+    parser_band_edge_states.add_argument(
         "-p", "--p_state", required=True, type=loadfn,
         help="Path to the perfect_band_edge_state.json.")
 
-    parser_es.set_defaults(func=make_band_edge_states_main_func)
+    parser_band_edge_states.set_defaults(func=make_band_edge_states_main_func)
 
     # -- defect formation energy ----------------------------------------------
     parser_energy = subparsers.add_parser(

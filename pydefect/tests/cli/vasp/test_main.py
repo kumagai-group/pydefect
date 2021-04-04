@@ -262,7 +262,7 @@ def test_gkfo_correction(mocker):
     assert parsed_args == expected
 
 
-def test_defect_structure(mocker):
+def test_defect_structure_info(mocker):
     mock_supercell_info = mocker.Mock(spec=SupercellInfo, autospec=True)
 
     def side_effect(filename):
@@ -272,7 +272,7 @@ def test_defect_structure(mocker):
             raise ValueError
 
     mock = mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
-    parsed_args = parse_args(["cds",
+    parsed_args = parse_args(["dsi",
                               "-s", "supercell_info.json",
                               "-d", "Va_O1_0",
                               "-dt", "1.0",
@@ -286,7 +286,7 @@ def test_defect_structure(mocker):
     assert parsed_args == expected
 
 
-def test_make_band_edge_orbital_infos(mocker):
+def test_band_edge_orbital_infos(mocker):
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
 
     def side_effect(filename):
@@ -296,7 +296,7 @@ def test_make_band_edge_orbital_infos(mocker):
             raise ValueError
 
     mocker.patch("pydefect.cli.vasp.main.loadfn", side_effect=side_effect)
-    parsed_args = parse_args(["mbeoi",
+    parsed_args = parse_args(["beoi",
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-pcr", "perfect/calc_results.json"])
     expected = Namespace(
@@ -306,8 +306,8 @@ def test_make_band_edge_orbital_infos(mocker):
     assert parsed_args == expected
 
 
-def test_make_perfect_band_edge_state():
-    parsed_args = parse_args(["mpbes",
+def test_perfect_band_edge_state():
+    parsed_args = parse_args(["pbes",
                               "-d", "Va_O1_0"])
     expected = Namespace(
         dir=Path("Va_O1_0"),
@@ -315,9 +315,9 @@ def test_make_perfect_band_edge_state():
     assert parsed_args == expected
 
 
-def test_make_band_edge_states(mocker):
+def test_band_edge_states(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
-    parsed_args = parse_args(["mbes",
+    parsed_args = parse_args(["bes",
                               "-d", "Va_O1_0", "Va_O1_1",
                               "-p", "perfect/perfect_band_edge_state.json"])
     expected = Namespace(
