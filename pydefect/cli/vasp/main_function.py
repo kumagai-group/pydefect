@@ -41,8 +41,8 @@ from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pydefect.util.mp_tools import MpQuery
 from pymatgen.io.vasp import Vasprun, Outcar, Procar
-from pymatgen.util.string import latexify
 from vise.util.logger import get_logger
+from vise.util.string import latexify
 
 logger = get_logger(__name__)
 

@@ -6,9 +6,8 @@ from pydefect.analyzer.defect_energy import DefectEnergy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter, \
     DefectEnergiesMplSettings, DefectEnergyPlotlyPlotter
 from pydefect.defaults import defaults
-from pymatgen.util.string import latexify
 from vise.util.dash_helper import show_png
-
+from vise.util.string import latexify
 
 try:
     import psutil

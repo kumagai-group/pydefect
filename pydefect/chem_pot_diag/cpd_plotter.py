@@ -10,8 +10,8 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo
 from pymatgen.core import Composition
-from pymatgen.util.string import latexify
 from vise.util.plotly_util import sort_coords, make_triangles
+from vise.util.string import latexify
 
 
 class CpdMplSettings:
