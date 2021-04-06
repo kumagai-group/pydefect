@@ -9,6 +9,7 @@ import yaml
 from monty.json import MSONable
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
+from pydefect.util.coords import pretty_coords
 from pymatgen.core import IStructure
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.structure_symmetrizer import StructureSymmetrizer
@@ -26,10 +27,10 @@ class PerturbedSite(MSONable):
     def __str__(self):
         elem = f"{self.element:>4}"
         dist = f"{self.distance:4.2f}"
-        ini_coords = ", ".join([f"{c:6.3f}" for c in self.initial_coords])
-        p_coords = ", ".join([f"{c:6.3f}" for c in self.perturbed_coords])
+        ini_coords = pretty_coords(self.initial_coords)
+        p_coords = pretty_coords(self.perturbed_coords)
         disp = f"{self.displacement:7.2f}"
-        return f"{elem} {dist} ({ini_coords}) -> ({p_coords}) {disp}"
+        return f"{elem} {dist} {ini_coords} -> {p_coords} {disp}"
 
 
 @dataclass(frozen=True)
