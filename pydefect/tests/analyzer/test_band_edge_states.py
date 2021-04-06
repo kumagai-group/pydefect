@@ -60,19 +60,18 @@ def test_band_edge_orbital_info_energies_occupations(band_edge_orbital_infos):
 
 
 def test_band_edge_orbital_info_repr(band_edge_orbital_infos):
-    actual = band_edge_orbital_infos.__repr__()
+    actual = band_edge_orbital_infos.__str__()
     print(actual)
-    expected = """k-points
----  ---------------  ------
-idx  coords           weight
-1    (0.0, 0.0, 0.0)  1.0
----  ---------------  ------
---------  -----  ------  -----  -------  ----------------------
-band_idx  k_idx  energy  occup  p_ratio  orbital
-11        1      1.0     1.0    0.1      Mn-s: 0.50, Mn-p: 0.40
---
+    expected = """ -- band-edge state info
+K-points info
+Index  Coords                    Weight
+1      ( 0.000,  0.000,  0.000)  1.000
 
---------  -----  ------  -----  -------  ----------------------"""
+Band info near band edges
+Index  Kpoint index  Energy  Occupation  P-ratio  Orbital
+11     1             1.00    1.0         0.1      Mn-s: 0.50, Mn-p: 0.40
+--
+"""
     assert actual == expected
 
 

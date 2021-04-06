@@ -7,6 +7,7 @@ from typing import List, Dict, Tuple
 
 import numpy as np
 from monty.json import MSONable
+from pydefect.util.coords import pretty_coords
 from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn
 
@@ -55,15 +56,18 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
                     result[i][j][k] = [z.energy, z.occupation]
         return result
 
-    def __repr__(self):
-        lines = ["k-points"]
-        kpt_block = [["idx", "coords", "weight"]]
+    def __str__(self):
+        lines = [" -- band-edge state info", "K-points info"]
+        kpt_block = [["Index", "Coords", "Weight"]]
         for i, (c, w) in enumerate(zip(self.kpt_coords, self.kpt_weights), 1):
-            kpt_block.append([i, c, w])
+            kpt_block.append([i, pretty_coords(c), f"{w:4.3f}"])
 
-        lines.append(tabulate(kpt_block))
-        band_block = [["band_idx", "k_idx", "energy", "occup", "p_ratio",
-                       "orbital"]]
+        lines.append(tabulate(kpt_block, tablefmt="plain"))
+        lines.append("")
+        lines.append("Band info near band edges")
+
+        band_block = [["Index", "Kpoint index", "Energy", "Occupation",
+                       "P-ratio", "Orbital"]]
         for oi in self.orbital_infos:
             orb_infos = np.array(oi).T
 
@@ -81,15 +85,15 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
             for band_idx in range(min_idx, max_idx):
                 for kpt_idx, orb_info in enumerate(orb_infos[band_idx], 1):
                     actual_band_idx = band_idx + self.lowest_band_index + 1
-                    energy = round(orb_info.energy, 2)
-                    occupation = round(orb_info.occupation, 2)
-                    p_ratio = round(orb_info.participation_ratio, 2)
+                    energy = f"{orb_info.energy:5.2f}"
+                    occupation = f"{orb_info.occupation:4.1f}"
+                    p_ratio = f"{orb_info.participation_ratio:4.1f}"
                     orbs = orb_info.pretty_orbital()
                     band_block.append([actual_band_idx, kpt_idx, energy,
                                        occupation, p_ratio, orbs])
                 band_block.append(["--"])
             band_block.append("")
-        lines.append(tabulate(band_block))
+        lines.append(tabulate(band_block, tablefmt="plain"))
 
         return "\n".join(lines)
 
