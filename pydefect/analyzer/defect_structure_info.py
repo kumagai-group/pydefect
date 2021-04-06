@@ -9,8 +9,9 @@ import numpy as np
 from monty.json import MSONable
 from numpy.linalg import inv
 from pydefect.analyzer.defect_structure_comparator import \
-    DefectStructureComparator, SiteDiff
+    DefectStructureComparator, SiteDiff, SiteInfo
 from pydefect.defaults import defaults
+from pydefect.util.coords import pretty_coords
 from pymatgen.core import Structure, Lattice, PeriodicSite
 from pymatgen.symmetry.groups import SpaceGroup
 from tabulate import tabulate
@@ -264,53 +265,51 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
     def defect_type(self):
         return judge_defect_type(self.site_diff)
 
-    def __repr__(self):
-        lines = ["",
-                 f"Defect type: {self.defect_type}",
-                 f"Site symmetry: {self.initial_site_sym} "
-                 f"-> {self.final_site_sym} ({self.symm_relation})",
-                 f"Is same configuration: {self.same_config_from_init}",
-                 f"Drift distance: {self.drift_dist:5.3f}"]
-        center_coords = [round(c, 3) for c in self.center]
+    def __str__(self):
+        lines = [
+            " -- defect structure info",
+            f"Defect type: {self.defect_type}",
+            f"Site symmetry: {self.initial_site_sym} -> {self.final_site_sym} ({self.symm_relation})",
+            f"Is same configuration: {self.same_config_from_init}",
+            f"Drift distance: {self.drift_dist:5.3f}"]
+        center_coords = pretty_coords(self.center)
         lines.append(f"Defect center: {center_coords}")
 
-        lines.append("Removed atoms:")
-        x = []
-        for i, elem, coords in self.site_diff.removed:
-            x.append([i, elem] + [round(fc, 2) for fc in coords])
-        lines.append(tabulate(x))
-
-        lines.append("Added atoms:")
-        x = []
-        for i, elem, coords in self.site_diff.inserted:
-            x.append([i, elem] + [round(fc, 2) for fc in coords])
-        lines.append(tabulate(x))
+        _add_site_info(lines, "Removed atoms:", self.site_diff.removed)
+        _add_site_info(lines, "Added atoms:", self.site_diff.inserted)
 
         if self.same_config_from_init is False:
-            lines.append("Initially removed atoms:")
-            x = []
-            for i, elem, coords in self.site_diff_from_initial.removed:
-                x.append([i, elem] + [round(fc, 2) for fc in coords])
-            lines.append(tabulate(x))
-
-            lines.append("Initially added atoms:")
-            x = []
-            for i, elem, coords in self.site_diff_from_initial.inserted:
-                x.append([i, elem] + [round(fc, 2) for fc in coords])
-            lines.append(tabulate(x))
+            _add_site_info(lines, "Initially removed atoms:",
+                           self.site_diff_from_initial.removed)
+            _add_site_info(lines, "Initially added atoms:",
+                           self.site_diff_from_initial.inserted)
 
         lines.append("Displacements")
         idxs = [[i, d] for i, d in enumerate(self.displacements) if d is not None]
-        x = []
-        for final_idx, d in sorted(idxs, key=lambda y: y[1].distance_from_defect):
-            i_pos = [round(c, 3) for c in d.original_pos]
-            f_pos = [round(c, 3) for c in d.final_pos]
+        table = [["Elem", "Dist", "Displace", "Angle", "Index",
+                  "Initial site", "", "Final site"]]
+        for final_idx, d in sorted(idxs,
+                                   key=lambda y: y[1].distance_from_defect):
+            if d.distance_from_defect > defaults.show_structure_cutoff:
+                break
+            i_pos = pretty_coords(d.original_pos)
+            f_pos = pretty_coords(d.final_pos)
             angle = int(round(d.angle, -1)) if d.angle else ""
-            x.append([d.specie, round(d.distance_from_defect, 2),
-                      round(d.displace_distance, 2), angle, final_idx] + i_pos
-                     + ["->"] + f_pos)
-        lines.append(tabulate(x))
+            table.append([d.specie, round(d.distance_from_defect, 2),
+                          round(d.displace_distance, 2), angle, final_idx,
+                          i_pos, "->", f_pos])
+        lines.append(tabulate(table, tablefmt="plain"))
 
         return "\n".join(lines)
+
+
+def _add_site_info(
+        lines: List[str], header: str, site_info: List[SiteInfo]) -> None:
+    lines.append(header)
+    table = []
+    for i, elem, coords in site_info:
+        table.append([i, elem, pretty_coords(coords)])
+    lines.append(tabulate(table, tablefmt="plain"))
+    lines.append("")
 
 
