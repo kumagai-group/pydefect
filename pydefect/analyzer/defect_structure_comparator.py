@@ -7,6 +7,7 @@ import numpy as np
 from monty.json import MSONable
 from pydefect.util.structure_tools import Distances
 from pymatgen.core import IStructure, Structure
+from vise.util.typing import Coords
 
 
 class DefectStructureComparator:
@@ -156,12 +157,15 @@ class DefectStructureComparator:
                         inserted_by_sub=inserted_by_sub)
 
 
+SiteInfo = Tuple[int, str, Coords]
+
+
 @dataclass
 class SiteDiff(MSONable):
-    removed: List[Tuple[int, str, Tuple[float, float, float]]]
-    inserted: List[Tuple[int, str, Tuple[float, float, float]]]
-    removed_by_sub: List[Tuple[int, str, Tuple[float, float, float]]]
-    inserted_by_sub: List[Tuple[int, str, Tuple[float, float, float]]]
+    removed: List[SiteInfo]
+    inserted: List[SiteInfo]
+    removed_by_sub: List[SiteInfo]
+    inserted_by_sub: List[SiteInfo]
 
     @property
     def is_complex_defect(self):
