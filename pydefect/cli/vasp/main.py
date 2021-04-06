@@ -50,6 +50,7 @@ def parse_args(args):
         description="", add_help=False)
     si_parser.add_argument(
         "-s", "--supercell_info", required=True, type=loadfn,
+        default="supercell_info.json",
         help="Path to the supercell_info.json file.")
 
     # ++ parent parser: pcr
