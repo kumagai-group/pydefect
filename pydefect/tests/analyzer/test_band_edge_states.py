@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues, \
     BandEdgeStates, OrbitalInfo, BandEdgeOrbitalInfos, PerfectBandEdgeState, \
-    EdgeInfo, BandEdgeState, LocalizedOrbital, IsShallow
+    EdgeInfo, BandEdgeState, LocalizedOrbital, IsShallow, pretty_orbital
 from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 
 
@@ -36,8 +36,8 @@ def test_orbital_info_msonable(orbital_info):
     assert_msonable(orbital_info)
 
 
-def test_pretty_orbitals(orbital_info):
-    assert orbital_info.pretty_orbital() == "Mn-s: 0.50, Mn-p: 0.40"
+def test_pretty_orbital(orbital_info):
+    assert pretty_orbital(orbital_info.orbitals) == "Mn-s: 0.50, Mn-p: 0.40"
 
 
 @pytest.fixture
@@ -62,7 +62,7 @@ def test_band_edge_orbital_info_energies_occupations(band_edge_orbital_infos):
 def test_band_edge_orbital_info_repr(band_edge_orbital_infos):
     actual = band_edge_orbital_infos.__str__()
     print(actual)
-    expected = """ -- band-edge state info
+    expected = """ -- band-edge orbitals info
 K-points info
 Index  Coords                    Weight
 1      ( 0.000,  0.000,  0.000)  1.000
@@ -104,6 +104,20 @@ def band_edge_states(orbital_info):
 
 def test_band_edge_states_json_roundtrip(band_edge_states, tmpdir):
     assert_json_roundtrip(band_edge_states, tmpdir)
+
+
+def test_band_edge_states(band_edge_states):
+    expected = """ -- band-edge states info
+Spin-up
+     Index  Energy  Occupation  K-point coords            Orbitals
+VBM  10     1.0     1.0         ( 0.000,  0.000,  0.000)  Mn-s: 0.50, Mn-p: 0.40
+CBM  12     1.0     1.0         ( 0.000,  0.000,  0.000)  Mn-s: 0.50, Mn-p: 0.40
+---
+Localized Orbital(s)
+Index  Energy  Occupation  Orbitals
+11     1.9     1.0         H-s: 1.00
+"""
+    assert band_edge_states.__str__() == expected
 
 
 @pytest.fixture

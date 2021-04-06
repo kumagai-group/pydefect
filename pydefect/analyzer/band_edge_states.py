@@ -3,13 +3,14 @@
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 import numpy as np
 from monty.json import MSONable
 from pydefect.util.coords import pretty_coords
 from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn
+from vise.util.typing import Coords
 
 
 @dataclass
@@ -18,6 +19,15 @@ class BandEdgeEigenvalues(MSONable, ToJsonFileMixIn):
     energies_and_occupations: List[List[List[List[float]]]]
     kpt_coords: List[Tuple[float, float, float]]
     lowest_band_index: int
+
+
+def pretty_orbital(orbitals):
+    x = []
+    for elem, orbs in orbitals.items():
+        for orb_name, weight in zip(["s", "p", "d", "f"], orbs):
+            if weight > 0.1:
+                x.append(f"{elem}-{orb_name}: {weight:.2f}")
+    return ", ".join(x)
 
 
 @dataclass
@@ -30,19 +40,11 @@ class OrbitalInfo(MSONable):
     occupation: float
     participation_ratio: float = None
 
-    def pretty_orbital(self):
-        x = []
-        for elem, orbs in self.orbitals.items():
-            for orb_name, weight in zip(["s", "p", "d", "f"], orbs):
-                if weight > 0.1:
-                    x.append(f"{elem}-{orb_name}: {weight:.2f}")
-        return ", ".join(x)
-
 
 @dataclass
 class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     orbital_infos: List[List[List["OrbitalInfo"]]]  # [spin, k-idx, band-idx]
-    kpt_coords: List[Tuple[float, float, float]]
+    kpt_coords: List[Coords]
     kpt_weights: List[float]
     lowest_band_index: int
     fermi_level: float
@@ -57,7 +59,7 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
         return result
 
     def __str__(self):
-        lines = [" -- band-edge state info", "K-points info"]
+        lines = [" -- band-edge orbitals info", "K-points info"]
         kpt_block = [["Index", "Coords", "Weight"]]
         for i, (c, w) in enumerate(zip(self.kpt_coords, self.kpt_weights), 1):
             kpt_block.append([i, pretty_coords(c), f"{w:4.3f}"])
@@ -88,7 +90,7 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
                     energy = f"{orb_info.energy:5.2f}"
                     occupation = f"{orb_info.occupation:4.1f}"
                     p_ratio = f"{orb_info.participation_ratio:4.1f}"
-                    orbs = orb_info.pretty_orbital()
+                    orbs = pretty_orbital(orb_info.orbitals)
                     band_block.append([actual_band_idx, kpt_idx, energy,
                                        occupation, p_ratio, orbs])
                 band_block.append(["--"])
@@ -116,7 +118,7 @@ class LocalizedOrbital(MSONable):
 @dataclass
 class EdgeInfo(MSONable):
     band_idx: int
-    kpt_coord: Tuple[float, float, float]
+    kpt_coord: Coords
     orbital_info: "OrbitalInfo"
 
     @property
@@ -150,6 +152,28 @@ class BandEdgeState(MSONable):
     def is_shallow(self):
         return self.vbm_info.occupation < 0.7 or self.cbm_info.occupation > 0.3
 
+    def __str__(self):
+        lines = []
+        inner_table = [["", "Index", "Energy", "Occupation", "K-point coords", "Orbitals"]]
+        inner_table.append(["VBM", self.vbm_info.band_idx, self.vbm_info.energy,
+                            self.vbm_info.occupation,
+                            pretty_coords(self.vbm_info.kpt_coord),
+                            pretty_orbital(self.vbm_info.orbital_info.orbitals)])
+        inner_table.append(["CBM", self.cbm_info.band_idx, self.cbm_info.energy,
+                            self.cbm_info.occupation,
+                            pretty_coords(self.cbm_info.kpt_coord),
+                            pretty_orbital(self.cbm_info.orbital_info.orbitals)])
+        lines.append(tabulate(inner_table, tablefmt="plain"))
+
+        lines.append("---")
+        lines.append("Localized Orbital(s)")
+        inner_table = [["Index", "Energy", "Occupation", "Orbitals"]]
+        for lo in self.localized_orbitals:
+            inner_table.append([lo.band_idx, lo.ave_energy, lo.occupation,
+                                pretty_orbital(lo.orbitals)])
+        lines.append(tabulate(inner_table, tablefmt="plain"))
+        return "\n".join(lines)
+
 
 @dataclass
 class BandEdgeStates(MSONable, ToJsonFileMixIn):
@@ -160,6 +184,15 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
         if any([i.is_shallow for i in self.states]):
             return IsShallow(True)
         return IsShallow(False)
+
+    def __str__(self):
+        lines = [" -- band-edge states info"]
+        for spin, state in zip(["up", "down"], self.states):
+            lines.append(f"Spin-{spin}")
+            lines.append(state.__str__())
+            lines.append("")
+
+        return "\n".join(lines)
 
 
 @dataclass
