@@ -8,10 +8,12 @@ from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entries_maker import (
     DefectEntriesMaker, copy_to_structure, to_istructure, add_atom_to_structure,
     perturb_structure, random_3d_vector)
-from pydefect.input_maker.defect_entry import DefectEntry
+from pydefect.input_maker.defect_entry import DefectEntry, PerturbedSite
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.supercell_info import SupercellInfo, Site, \
     Interstitial
+from pymatgen import PeriodicSite
+from vise.tests.helpers.assertion import assert_dataclass_almost_equal
 
 
 @pytest.fixture
@@ -48,16 +50,12 @@ def test_defect_entries_maker(cubic_supercell_info, cubic_supercell, mocker):
                                   charge=0,
                                   structure=ne_he1_str,
                                   site_symmetry="m-3m",
-                                  defect_center=(0.25, 0.0, 0.0),
-                                  perturbed_structure=ne_he1_str.copy(),
-                                  ),
+                                  defect_center=(0.25, 0.0, 0.0)),
                       DefectEntry(name="Va_H1",
                                   charge=1,
                                   structure=va_h1_str,
                                   site_symmetry="m-3m",
-                                  defect_center=(0.0, 0.0, 0.0),
-                                  perturbed_structure=va_h1_str.copy(),
-                                  )}
+                                  defect_center=(0.0, 0.0, 0.0))}
 
     assert maker.defect_entries == defect_entries
 
@@ -111,25 +109,32 @@ def test_add_atom_to_structure(ortho_conventional):
 
 
 def test_perturbed_structure(ortho_conventional, mocker):
-    mock = mocker.patch("pydefect.input_maker.defect_entries_maker.random_3d_vector")
-    mock.return_value = [0.0, 0.0, 0.35]
+    mock = mocker.patch(
+        "pydefect.input_maker.defect_entries_maker.random_3d_vector")
+    mock.return_value = ([0.0, 0.0, 0.35], 1.0)
     structure = copy_to_structure(ortho_conventional)
     actual = perturb_structure(structure,
                                center=[0.0, 0.0, 0.0], cutoff=2.5-1e-5)
-    expected = structure
-    expected[0].frac_coords = [0.0, 0.0, 0.05]
+    expected_structure = structure
+    expected_structure[0].frac_coords = [0.0, 0.0, 0.05]
+    expected_site = PerturbedSite(element='H',
+                                  distance=0.0,
+                                  initial_coords=(0.0, 0.0, 0.0),
+                                  perturbed_coords=(0.0, 0.0, 0.05),
+                                  displacement=1.0)
 
     mock.assert_called_with(defaults.displace_distance)
-    assert actual == expected
+    assert actual[0] == expected_structure
+    assert_dataclass_almost_equal(actual[1][0], expected_site)
 
 
 def test_random_3d_vector():
-    actual = random_3d_vector(1.0)
-    assert np.linalg.norm(actual) <= 1.0
-    assert len(actual) == 3
+    actual_vec, actual_dist = random_3d_vector(1.0)
+    assert actual_dist <= 1.0
+    assert len(actual_vec) == 3
 
-    actual = random_3d_vector(0.0)
-    assert np.linalg.norm(actual) == 0.0
+    actual_vec, actual_dist = random_3d_vector(0.0)
+    assert actual_dist == 0.0
 
 """
 TODO
