@@ -82,19 +82,19 @@ def test_defect_entry(defect_entry, tmpdir):
 """
     assert Path("a.yaml").read_text() == expected
 
-#
-# def test_defect_entry_str(defect_entry, tmpdir):
-#     actual = defect_entry.__str__()
-#     expected = """ -- defect entry info
-# name: Va_O1_1
-# site symmetry: m-3m
-# defect center: ( 0.000,  0.000,  0.000)
-# perturbed sites:
-# elem dist   initial_coords             perturbed_coords
-#   He 5.00 ( 0.000,  0.000,  0.500) -> ( 0.000,  0.000,  0.501)
-#   He 5.00 ( 0.000,  0.500,  0.000) -> ( 0.000,  0.501,  0.000)
-#   He 5.00 ( 0.500,  0.000,  0.000) -> ( 0.501,  0.000,  0.000)"""
-#     assert actual == expected
+
+def test_defect_entry_str(defect_entry, tmpdir):
+    actual = defect_entry.__str__()
+    expected = """ -- defect entry info
+name: Va_O1_1
+site symmetry: m-3m
+defect center: ( 0.000,  0.000,  0.000)
+perturbed sites:
+elem dist   initial_coords             perturbed_coords         displacement
+  He 5.00 ( 0.000,  0.000,  0.500) -> ( 0.000,  0.000,  0.501)    0.10
+  He 5.00 ( 0.000,  0.500,  0.000) -> ( 0.000,  0.501,  0.000)    0.10
+  He 5.00 ( 0.500,  0.000,  0.000) -> ( 0.501,  0.000,  0.000)    0.10"""
+    assert actual == expected
 
 
 def test_make_defect_entry(defect_entry):

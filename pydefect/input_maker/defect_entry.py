@@ -9,7 +9,6 @@ import yaml
 from monty.json import MSONable
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
-from pymatgen import Site
 from pymatgen.core import IStructure
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.structure_symmetrizer import StructureSymmetrizer
@@ -25,7 +24,12 @@ class PerturbedSite(MSONable):
     displacement: float
 
     def __str__(self):
-        return
+        elem = f"{self.element:>4}"
+        dist = f"{self.distance:4.2f}"
+        ini_coords = ", ".join([f"{c:6.3f}" for c in self.initial_coords])
+        p_coords = ", ".join([f"{c:6.3f}" for c in self.perturbed_coords])
+        disp = f"{self.displacement:7.2f}"
+        return f"{elem} {dist} ({ini_coords}) -> ({p_coords}) {disp}"
 
 
 @dataclass(frozen=True)
@@ -73,22 +77,17 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
         Path(filename).write_text(yaml.dump(d))
 
     def __str__(self):
-        center = ", ".join([f"{c:6.3f}" for c in self.defect_center])
-        perturbed = []
-        for i in self.perturbed_site_indices:
-            i_site: Site = self.structure[i]
-            p_site = self.perturbed_structure[i]
-            perturbed.append([i_site.specie, ])
-
-        return f""" -- defect entry info
+        result = f""" -- defect entry info
 name: {self.full_name}
 site symmetry: {self.site_symmetry}
-defect center: ({center})    
+defect center: ({", ".join([f"{c:6.3f}" for c in self.defect_center])})
 perturbed sites:
-elem dist   initial_coords             perturbed_coords
-  He 5.00 ( 0.000,  0.000,  0.500) -> ( 0.000,  0.000,  0.501) 
-  He 5.00 ( 0.000,  0.500,  0.000) -> ( 0.000,  0.501,  0.000) 
-  He 5.00 ( 0.500,  0.000,  0.000) -> ( 0.501,  0.000,  0.000)"""
+elem dist   initial_coords             perturbed_coords         displacement
+"""
+        if self.perturbed_sites:
+            result += "\n".join([i.__str__() for i in self.perturbed_sites])
+
+        return result
 
 
 def make_defect_entry(name: str,
