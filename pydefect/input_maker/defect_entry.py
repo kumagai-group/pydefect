@@ -9,9 +9,23 @@ import yaml
 from monty.json import MSONable
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
+from pymatgen import Site
 from pymatgen.core import IStructure
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.structure_symmetrizer import StructureSymmetrizer
+from vise.util.typing import Coords
+
+
+@dataclass(frozen=True)
+class PerturbedSite(MSONable):
+    element: str
+    distance: float
+    initial_coords: Coords
+    perturbed_coords: Coords
+    displacement: float
+
+    def __str__(self):
+        return
 
 
 @dataclass(frozen=True)
@@ -19,9 +33,11 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
     name: str
     charge: int
     structure: IStructure
-    perturbed_structure: Optional[IStructure]
     site_symmetry: str
-    defect_center: Tuple[float, float, float]
+    defect_center: Coords
+    perturbed_structure: Optional[IStructure] = None
+    perturbed_sites: Optional[Tuple[PerturbedSite, ...]] = None
+    perturbed_site_symmetry: Optional[str] = None
 
     @property
     def anchor_atom_index(self) -> int:
@@ -56,6 +72,24 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
         d = {"charge": self.charge}
         Path(filename).write_text(yaml.dump(d))
 
+    def __str__(self):
+        center = ", ".join([f"{c:6.3f}" for c in self.defect_center])
+        perturbed = []
+        for i in self.perturbed_site_indices:
+            i_site: Site = self.structure[i]
+            p_site = self.perturbed_structure[i]
+            perturbed.append([i_site.specie, ])
+
+        return f""" -- defect entry info
+name: {self.full_name}
+site symmetry: {self.site_symmetry}
+defect center: ({center})    
+perturbed sites:
+elem dist   initial_coords             perturbed_coords
+  He 5.00 ( 0.000,  0.000,  0.500) -> ( 0.000,  0.000,  0.501) 
+  He 5.00 ( 0.000,  0.500,  0.000) -> ( 0.000,  0.501,  0.000) 
+  He 5.00 ( 0.500,  0.000,  0.000) -> ( 0.501,  0.000,  0.000)"""
+
 
 def make_defect_entry(name: str,
                       charge: int,
@@ -78,6 +112,8 @@ def make_defect_entry(name: str,
                                    species, frac_coords)
     symmetrizer = StructureSymmetrizer(initial_structure)
 
-    return DefectEntry(name, charge, initial_structure, None,
+    return DefectEntry(name=name,
+                       charge=charge,
+                       structure=initial_structure,
                        site_symmetry=symmetrizer.point_group,
                        defect_center=tuple(analyzer.defect_center_coord))

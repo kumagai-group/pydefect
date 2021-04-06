@@ -5,7 +5,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from pydefect.input_maker.defect_entry import DefectEntry, make_defect_entry
+from pydefect.input_maker.defect_entry import DefectEntry, make_defect_entry, \
+    PerturbedSite
 from pymatgen.core import Lattice, IStructure
 
 # "H" at [0.0, 0.0, 0.0] is removed here.
@@ -31,12 +32,18 @@ perturbed_defect = IStructure(
 
 @pytest.fixture
 def defect_entry():
+    perturbed_sites = (
+        PerturbedSite("He", 5.0, (0.0, 0.0, 0.5), (0.0, 0.0, 0.501), 0.1),
+        PerturbedSite("He", 5.0, (0.0, 0.5, 0.0), (0.0, 0.501, 0.0), 0.1),
+        PerturbedSite("He", 5.0, (0.5, 0.0, 0.0), (0.501, 0.0, 0.0), 0.1))
     return DefectEntry(name="Va_O1",
                        charge=1,
                        structure=defect_structure,
-                       perturbed_structure=perturbed_defect,
                        site_symmetry="m-3m",
-                       defect_center=(0, 0, 0))
+                       defect_center=(0.0, 0.0, 0.0),
+                       perturbed_structure=perturbed_defect,
+                       perturbed_sites=perturbed_sites,
+                       perturbed_site_symmetry="1")
 
 
 def test_hashable(defect_entry):
@@ -74,6 +81,20 @@ def test_defect_entry(defect_entry, tmpdir):
     expected = """charge: 1
 """
     assert Path("a.yaml").read_text() == expected
+
+#
+# def test_defect_entry_str(defect_entry, tmpdir):
+#     actual = defect_entry.__str__()
+#     expected = """ -- defect entry info
+# name: Va_O1_1
+# site symmetry: m-3m
+# defect center: ( 0.000,  0.000,  0.000)
+# perturbed sites:
+# elem dist   initial_coords             perturbed_coords
+#   He 5.00 ( 0.000,  0.000,  0.500) -> ( 0.000,  0.000,  0.501)
+#   He 5.00 ( 0.000,  0.500,  0.000) -> ( 0.000,  0.501,  0.000)
+#   He 5.00 ( 0.500,  0.000,  0.000) -> ( 0.501,  0.000,  0.000)"""
+#     assert actual == expected
 
 
 def test_make_defect_entry(defect_entry):

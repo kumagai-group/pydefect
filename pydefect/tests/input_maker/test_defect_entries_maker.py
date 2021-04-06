@@ -44,10 +44,20 @@ def test_defect_entries_maker(cubic_supercell_info, cubic_supercell, mocker):
     ne_he1_str.append("Ne", coords)
     ne_he1_str = to_istructure(ne_he1_str)
 
-    defect_entries = {
-        DefectEntry("Ne_He1", 0, ne_he1_str, ne_he1_str.copy(), "m-3m", (0.25, 0.0, 0.0)),
-        DefectEntry("Va_H1", 1, va_h1_str, va_h1_str.copy(), "m-3m", (0.0, 0.0, 0.0)),
-    }
+    defect_entries = {DefectEntry(name="Ne_He1",
+                                  charge=0,
+                                  structure=ne_he1_str,
+                                  site_symmetry="m-3m",
+                                  defect_center=(0.25, 0.0, 0.0),
+                                  perturbed_structure=ne_he1_str.copy(),
+                                  ),
+                      DefectEntry(name="Va_H1",
+                                  charge=1,
+                                  structure=va_h1_str,
+                                  site_symmetry="m-3m",
+                                  defect_center=(0.0, 0.0, 0.0),
+                                  perturbed_structure=va_h1_str.copy(),
+                                  )}
 
     assert maker.defect_entries == defect_entries
 
