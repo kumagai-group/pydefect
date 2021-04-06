@@ -6,6 +6,7 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo, \
     fold_coords_in_structure
 from pydefect.analyzer.vesta.create_vesta_file import VestaFile
+from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pymatgen.core import Structure, DummySpecies, Element
@@ -23,7 +24,7 @@ def make_defect_vesta_file(defect_structure: Structure,
     vectors, vector_colors = {}, []
     i = 1
     for f_idx, (s, disp) in enumerate(zip(defect_structure, def_str_info.displacements)):
-        if disp and disp.distance_from_defect < cutoff:
+        if disp and disp.distance_from_defect < defaults.show_structure_cutoff:
             species.append(disp.specie)
             initial_coords.append(disp.original_pos)
             final_coords.append(s.frac_coords)

@@ -15,6 +15,7 @@ class Defaults:
         self._ewald_accuracy = 15.0
         self._e_above_hull = 1e-5
         self._cutoff_distance_factor = 1.3
+        self._show_structure_cutoff = 5.0
         self._displace_distance = 0.2
         self._dist_tol = 1.0
         self._ele_neg_diff = 2.0
@@ -60,6 +61,10 @@ class Defaults:
     @property
     def cutoff_distance_factor(self):
         return self._cutoff_distance_factor
+
+    @property
+    def show_structure_cutoff(self):
+        return self._show_structure_cutoff
 
     @property
     def displace_distance(self):
