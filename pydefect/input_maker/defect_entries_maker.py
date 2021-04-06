@@ -42,7 +42,7 @@ class DefectEntriesMaker:
 
         structure = copy_to_structure(self.supercell_info.structure)
 
-        if defect.out_atom[0] is "i":
+        if defect.out_atom[0] == "i":
             index = int(defect.out_atom[1:]) - 1
             site = self.supercell_info.interstitials[index]
             cutoff = self.supercell_info.interstitial_coords(index).cutoff
