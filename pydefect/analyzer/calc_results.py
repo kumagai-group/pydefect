@@ -34,4 +34,9 @@ class CalcResults(MSONable, ToJsonFileMixIn):
     def cbm(self):
         return self.cbm_info.energy
 
-
+    def __str__(self):
+        return f""" -- calc results info
+energy: {self.energy:10.3f}
+magnetization: {self.magnetization:6.2f}
+electronic convergence: {self.electronic_conv}
+ionic convergence: {self.ionic_conv}"""

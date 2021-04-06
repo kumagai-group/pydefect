@@ -26,3 +26,10 @@ def test_calc_results_vbm_cbm(calc_results):
     assert calc_results.vbm == 2.4163
     assert calc_results.cbm == 10.2574
 
+
+def test_calc_results_str(calc_results):
+    assert calc_results.__str__() == """ -- calc results info
+energy:    -34.911
+magnetization:   0.00
+electronic convergence: True
+ionic convergence: True"""
