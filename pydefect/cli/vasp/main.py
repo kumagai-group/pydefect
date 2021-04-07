@@ -22,7 +22,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_band_edge_states_main_func
 from pydefect.defaults import defaults
 from pymatgen.core import IStructure, Composition, Structure
-from pymatgen.io.vasp import Vasprun, Outcar, Chgcar
+from pymatgen.io.vasp import Vasprun, Outcar
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
@@ -403,7 +403,7 @@ def parse_args(args):
         aliases=['cdc'])
 
     parser_calc_def_charge_info.add_argument(
-        "-p", "--parchgs", type=Chgcar.from_file, nargs="+")
+        "-p", "--parchgs", type=str, nargs="+")
     parser_calc_def_charge_info.add_argument(
         "-b", "--bin_interval", type=float, default=0.2)
     parser_calc_def_charge_info.add_argument(

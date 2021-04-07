@@ -40,7 +40,7 @@ from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pydefect.util.mp_tools import MpQuery
-from pymatgen.io.vasp import Vasprun, Outcar, Procar
+from pymatgen.io.vasp import Vasprun, Outcar, Procar, Chgcar
 from vise.util.logger import get_logger
 from vise.util.string import latexify
 
@@ -374,7 +374,7 @@ def calc_defect_charge_info(args):
         band_idx = int(parchg.split(".")[-2])
         logger.info(f"band index {band_idx} is being parsed.")
         band_idxs.append(band_idx)
-        parchgs.append(parchg)
+        parchgs.append(Chgcar.from_file(parchg))
     defect_charge_info = make_defect_charge_info(
         parchgs, band_idxs, args.bin_interval)
     defect_charge_info.to_json_file()
