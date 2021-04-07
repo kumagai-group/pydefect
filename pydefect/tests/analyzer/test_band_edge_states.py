@@ -106,7 +106,11 @@ def test_band_edge_states_json_roundtrip(band_edge_states, tmpdir):
     assert_json_roundtrip(band_edge_states, tmpdir)
 
 
-def test_band_edge_states(band_edge_states):
+def test_band_edge_states_band_indices(band_edge_states):
+    assert band_edge_states.band_indices == [10, 11, 12]
+
+
+def test_band_edge_states_str(band_edge_states):
     expected = """ -- band-edge states info
 Spin-up
      Index  Energy  Occupation  K-point coords            Orbitals
