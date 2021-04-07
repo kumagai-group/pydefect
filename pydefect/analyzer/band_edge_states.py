@@ -214,6 +214,16 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
             return IsShallow(True)
         return IsShallow(False)
 
+    @property
+    def band_indices(self):
+        result = set()
+        for state in self.states:
+            result.add(state.vbm_info.band_idx)
+            for lo in state.localized_orbitals:
+                result.add(lo.band_idx)
+            result.add(state.cbm_info.band_idx)
+        return sorted(result)
+
     def __str__(self):
         lines = [" -- band-edge states info"]
         for spin, state in zip(["up", "down"], self.states):
