@@ -42,9 +42,11 @@ def test_make_band_edge_state_no_in_gap(p_edge_state, orb_infos):
     cbm_info = EdgeInfo(band_idx=12, kpt_coord=(0.0, 0.0, 0.0),
                         orbital_info=OrbitalInfo(energy=1.2, orbitals={"Mn": [0.0, 0.0, 0.0, 0.0], "O": [0.1, 0.3, 0.0, 0.0]}, occupation=0.0, participation_ratio=0.1))
     localized_orb_1 = LocalizedOrbital(band_idx=10, ave_energy=0.0, occupation=1.0,
-                                       orbitals={"Mn": [0.1, 0.2, 0.0, 0.0], "O": [0.3, 0.4, 0.0, 0.0]})
+                                       orbitals={"Mn": [0.1, 0.2, 0.0, 0.0], "O": [0.3, 0.4, 0.0, 0.0]},
+                                       participation_ratio=0.1)
     localized_orb_2 = LocalizedOrbital(band_idx=11, ave_energy=1.0, occupation=0.0,
-                                       orbitals={"Mn": [0.5, 0.8, 0.0, 0.0], "O": [0.0, 0.0, 0.0, 0.0]})
+                                       orbitals={"Mn": [0.5, 0.8, 0.0, 0.0], "O": [0.0, 0.0, 0.0, 0.0]},
+                                       participation_ratio=0.1)
     expected = BandEdgeStates(
         states=[BandEdgeState(vbm_info=vbm_info,
                               cbm_info=cbm_info,

@@ -31,8 +31,9 @@ def get_localized_orbs(orb_info_by_spin: List[List[OrbitalInfo]],
 
     result = []
     for i, orbs_by_kpt in enumerate(orbs_by_band_by_kpt, loc_band_index_range[0]):
-        ave_e = sum([orb.energy * w for orb, w in zip(orbs_by_kpt, weights)])
-        occupation = sum([orb.occupation * w for orb, w in zip(orbs_by_kpt, weights)])
+        def get_ave(key):
+            return sum([getattr(orb, key) * w for orb, w in zip(orbs_by_kpt, weights)])
+
         orbs = defaultdict(list)
         for orb, w in zip(orbs_by_kpt, weights):
             for elem, contrb in orb.orbitals.items():
@@ -43,9 +44,12 @@ def get_localized_orbs(orb_info_by_spin: List[List[OrbitalInfo]],
                         orbs[elem].append(0.0)
                         orbs[elem][y] += c
 
-        result.append(LocalizedOrbital(band_idx=i, ave_energy=ave_e,
-                                       occupation=occupation,
-                                       orbitals=dict(orbs)))
+        result.append(LocalizedOrbital(
+            band_idx=i,
+            ave_energy=get_ave("energy"),
+            occupation=get_ave("occupation"),
+            orbitals=dict(orbs),
+            participation_ratio=get_ave("participation_ratio")))
     return result
 
 
