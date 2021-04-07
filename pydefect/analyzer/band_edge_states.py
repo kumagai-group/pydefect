@@ -111,8 +111,9 @@ class LocalizedOrbital(MSONable):
     ave_energy: float
     occupation: float
     orbitals: Dict[str, List[float]]
-#    radius: Optional[float] = None
-#    center: Optional[Tuple[float, float, float]] = None
+    participation_ratio: Optional[float] = None
+    radius: Optional[float] = None
+    center: Optional[Coords] = None
 
 
 @dataclass
@@ -133,11 +134,29 @@ class EdgeInfo(MSONable):
     def occupation(self):
         return self.orbital_info.occupation
 
+    @property
+    def p_ratio(self):
+        return self.orbital_info.participation_ratio
+
 
 @dataclass
 class PerfectBandEdgeState(MSONable, ToJsonFileMixIn):
     vbm_info: EdgeInfo  # None for metals
     cbm_info: EdgeInfo
+
+    def __str__(self):
+        inner_table = [["", "Index", "Energy", "Occupation", "Orbitals", "K-point coords"]]
+        inner_table.append(["VBM", self.vbm_info.band_idx, self.vbm_info.energy,
+                            f"{self.vbm_info.occupation:5.2f}",
+                            pretty_orbital(self.vbm_info.orbital_info.orbitals),
+                            pretty_coords(self.vbm_info.kpt_coord),
+                            ])
+        inner_table.append(["CBM", self.cbm_info.band_idx, self.cbm_info.energy,
+                            f"{self.cbm_info.occupation:5.2f}",
+                            pretty_orbital(self.cbm_info.orbital_info.orbitals),
+                            pretty_coords(self.cbm_info.kpt_coord),
+                            ])
+        return tabulate(inner_table, tablefmt="plain")
 
 
 @dataclass
@@ -154,22 +173,32 @@ class BandEdgeState(MSONable):
 
     def __str__(self):
         lines = []
-        inner_table = [["", "Index", "Energy", "Occupation", "K-point coords", "Orbitals"]]
-        inner_table.append(["VBM", self.vbm_info.band_idx, self.vbm_info.energy,
-                            self.vbm_info.occupation,
+        inner_table = [["", "Index", "Energy", "P-ratio", "Occupation",
+                        "Orbitals", "K-point coords"]]
+        inner_table.append(["VBM", self.vbm_info.band_idx,
+                            f"{self.vbm_info.energy:7.3f}",
+                            f"{self.vbm_info.p_ratio:5.2f}",
+                            f"{self.vbm_info.occupation:5.2f}",
+                            pretty_orbital(self.vbm_info.orbital_info.orbitals),
                             pretty_coords(self.vbm_info.kpt_coord),
-                            pretty_orbital(self.vbm_info.orbital_info.orbitals)])
-        inner_table.append(["CBM", self.cbm_info.band_idx, self.cbm_info.energy,
-                            self.cbm_info.occupation,
+                            ])
+        inner_table.append(["CBM", self.cbm_info.band_idx,
+                            f"{self.cbm_info.energy:7.3f}",
+                            f"{self.cbm_info.p_ratio:5.2f}",
+                            f"{self.cbm_info.occupation:5.2f}",
+                            pretty_orbital(self.cbm_info.orbital_info.orbitals),
                             pretty_coords(self.cbm_info.kpt_coord),
-                            pretty_orbital(self.cbm_info.orbital_info.orbitals)])
+                            ])
         lines.append(tabulate(inner_table, tablefmt="plain"))
 
         lines.append("---")
         lines.append("Localized Orbital(s)")
-        inner_table = [["Index", "Energy", "Occupation", "Orbitals"]]
+        inner_table = [["Index", "Energy", "P-ratio", "Occupation", "Orbitals"]]
         for lo in self.localized_orbitals:
-            inner_table.append([lo.band_idx, lo.ave_energy, lo.occupation,
+            inner_table.append([lo.band_idx,
+                                f"{lo.ave_energy:7.3f}",
+                                f"{lo.participation_ratio:5.2f}",
+                                f"{lo.occupation:5.2f}",
                                 pretty_orbital(lo.orbitals)])
         lines.append(tabulate(inner_table, tablefmt="plain"))
         return "\n".join(lines)
