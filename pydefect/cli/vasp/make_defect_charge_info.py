@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 from pydefect.analyzer.defect_charge_info import DefectChargeInfo, ChargeDist
@@ -55,19 +55,21 @@ def make_charge_dist(parchg: Chgcar, grids: Grids, distance_bins: np.ndarray):
             chg.get_average_along_axis(i)) for i in [0, 1, 2]]
         defect_center_idxs.append(np.array(center))
         data = chg.data["total"] / grids.lattice.volume
+        print(f"center {center}")
         dists.append(grids.spherical_dist(data, center, distance_bins))
 
     result = []
     for c, d in zip(defect_center_idxs, dists):
-        result.append(ChargeDist((c / grids.dim).tolist(), d))
+        result.append(ChargeDist(tuple(c / grids.dim), d))
 
     return result
 
 
 def make_defect_charge_info(parchgs: List[Chgcar],
                             band_idxs: List[int],
-                            bin_interval: float):
-    grids = Grids.from_chgcar(parchgs[0])
+                            bin_interval: float,
+                            grids: Optional[Grids] = None):
+    grids = grids or Grids.from_chgcar(parchgs[0])
     radius = calc_max_sphere_radius(parchgs[0].structure.lattice.matrix)
     num_bins = int(np.ceil(radius / bin_interval))
     distance_bins = np.array([bin_interval * i for i in range(num_bins)] + [radius])
@@ -75,5 +77,6 @@ def make_defect_charge_info(parchgs: List[Chgcar],
     charge_dists = []
     for parchg in parchgs:
         charge_dists.append(make_charge_dist(parchg, grids, distance_bins))
-    return DefectChargeInfo(distance_bins.tolist(), band_idxs, charge_dists, ave_charge_density)
+    return DefectChargeInfo(distance_bins.tolist(), band_idxs, charge_dists,
+                            ave_charge_density)
 

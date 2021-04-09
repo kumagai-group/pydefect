@@ -11,6 +11,7 @@ from pydefect.analyzer.defect_energy import slide_energy
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_info import make_defect_structure_info
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
+from pydefect.analyzer.grids import Grids
 from pydefect.analyzer.make_band_edge_states import make_band_edge_states
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
     CompositionEnergy, replace_comp_energy
@@ -386,7 +387,16 @@ def calc_defect_charge_info(args):
                               vesta_file=args.vesta_file,
                               to_vesta_file=to_vesta_file)
 
-    defect_charge_info = make_defect_charge_info(parchgs, band_idxs, args.bin_interval)
+    grids = None
+    if args.grids_dirname:
+        if (args.grids_dirname / "grids.npz").is_file():
+            grids = Grids.from_file(args.grids_dirname / "grids.npz")
+        else:
+            grids = Grids.from_chgcar(parchgs[0])
+            grids.dump(args.grids_dirname / "grids.npz")
+
+    defect_charge_info = make_defect_charge_info(
+        parchgs, band_idxs, args.bin_interval, grids)
     defect_charge_info.to_json_file()
     plt = defect_charge_info.show_dist()
     plt.savefig("dist.pdf")

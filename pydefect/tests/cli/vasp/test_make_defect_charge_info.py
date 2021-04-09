@@ -29,8 +29,8 @@ def parchg():
 
 @pytest.fixture
 def charge_dist_list():
-    return [ChargeDist([0.0, 0.5, 0.5], [0.0, 1.5 / 3 * 4 * np.pi / 3 * (5.0**3 - 2.5**3)]),
-            ChargeDist([0.0, 0.5, 0.5], [0.0, 0.5 / 3 * 4 * np.pi / 3 * (5.0**3 - 2.5**3)])]
+    return [ChargeDist((0.0, 0.5, 0.5), [1.5 / 3 * 4 * np.pi * 2.5**3, 0.0]),
+            ChargeDist((0.0, 0.5, 0.5), [0.5 / 3 * 4 * np.pi * 2.5**3, 0.0])]
 
 
 def test_make_charge_dist(parchg, charge_dist_list):

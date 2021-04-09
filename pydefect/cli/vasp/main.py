@@ -9,7 +9,6 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect import __version__
-from pydefect.analyzer.grids import Grids
 from pydefect.cli.main_tools import str_int_to_int
 from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_defect_entries, make_unitcell, make_competing_phase_dirs, \
@@ -403,13 +402,14 @@ def parse_args(args):
         aliases=['cdc'])
 
     parser_calc_def_charge_info.add_argument(
-        "-p", "--parchgs", type=str, nargs="+")
+        "-p", "--parchgs", type=str, nargs="+", required=True,
+        help="PARCHG files.")
     parser_calc_def_charge_info.add_argument(
-        "-v", "--vesta_file", type=Path)
+        "-v", "--vesta_file", type=Path, help="defect.vesta file")
     parser_calc_def_charge_info.add_argument(
         "-b", "--bin_interval", type=float, default=0.2)
     parser_calc_def_charge_info.add_argument(
-        "-g", "--grids_filename", type=Grids.from_file)
+        "-g", "--grids_dirname", type=Path)
 
     parser_calc_def_charge_info.set_defaults(func=calc_defect_charge_info)
     # ------------------------------------------------------------------------

@@ -371,17 +371,16 @@ def test_defect_formation_energy(mocker):
     assert parsed_args == expected
 
 
-def test_calc_defect_charge_info(mocker):
-    patch_chgcar = mocker.patch("pydefect.cli.vasp.main.Chgcar")
-    patch_grids = mocker.patch("pydefect.cli.vasp.main.Grids")
-
+def test_calc_defect_charge_info():
     parsed_args = parse_args(["cdc",
                               "-p", "a/PARCHG.0001.ALLK",
+                              "-v", "x",
                               "-b", "0.3",
-                              "-g", "grids.npz"])
+                              "-g", "y"])
     expected = Namespace(
-        parchgs=[patch_chgcar.from_file.return_value],
+        parchgs=["a/PARCHG.0001.ALLK"],
+        vesta_file=Path("x"),
         bin_interval=0.3,
-        grids_filename=patch_grids.from_file.return_value,
+        grids_dirname=Path("y"),
         func=parsed_args.func)
     assert parsed_args == expected
