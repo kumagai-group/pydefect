@@ -195,9 +195,10 @@ class BandEdgeState(MSONable):
         lines.append("Localized Orbital(s)")
         inner_table = [["Index", "Energy", "P-ratio", "Occupation", "Orbitals"]]
         for lo in self.localized_orbitals:
+            pr = f"{lo.participation_ratio:5.2f}" if lo.participation_ratio else "None"
             inner_table.append([lo.band_idx,
                                 f"{lo.ave_energy:7.3f}",
-                                f"{lo.participation_ratio:5.2f}",
+                                pr,
                                 f"{lo.occupation:5.2f}",
                                 pretty_orbital(lo.orbitals)])
         lines.append(tabulate(inner_table, tablefmt="plain"))

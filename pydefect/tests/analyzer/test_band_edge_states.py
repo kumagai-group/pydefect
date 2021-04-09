@@ -113,14 +113,15 @@ def test_band_edge_states_band_indices(band_edge_states):
 def test_band_edge_states_str(band_edge_states):
     expected = """ -- band-edge states info
 Spin-up
-     Index  Energy  Occupation  K-point coords            Orbitals
-VBM  10     1.0     1.0         ( 0.000,  0.000,  0.000)  Mn-s: 0.50, Mn-p: 0.40
-CBM  12     1.0     1.0         ( 0.000,  0.000,  0.000)  Mn-s: 0.50, Mn-p: 0.40
+     Index  Energy  P-ratio  Occupation  Orbitals                K-point coords
+VBM  10     1.000   0.10     1.00        Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
+CBM  12     1.000   0.10     1.00        Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
 ---
 Localized Orbital(s)
-Index  Energy  Occupation  Orbitals
-11     1.9     1.0         H-s: 1.00
+Index  Energy  P-ratio  Occupation  Orbitals
+11     1.900   None     1.00        H-s: 1.00
 """
+    print(band_edge_states)
     assert band_edge_states.__str__() == expected
 
 
