@@ -9,7 +9,7 @@ from pymatgen.core import Lattice, DummySpecies
 from pymatgen.core.structure import Structure
 
 from pydefect.analyzer.vesta.create_vesta_file import VestaFile, Title, Cellp, \
-    Struc, Bound, SBond, Vect, Style
+    Struc, Bound, SBond, Vect, Style, ImportDensity, add_density
 
 parent_dir = Path(__file__).parent
 
@@ -42,6 +42,13 @@ def test_struc(structure):
 2 XX XX2 1.0 0.000000 0.000000 0.000000
  0.0 0.0 0.0 
  0 0 0 0 0 '''
+    assert actual == expected
+
+
+def test_import_density():
+    actual = repr(ImportDensity(volumetric_filename="CHG"))
+    expected = """IMPORT_DENSITY 0.1
++1.000000 CHG"""
     assert actual == expected
 
 
@@ -85,9 +92,9 @@ def test_style(structure):
     actual = repr(Style(0.1, is_ionic=True))
     expected = '''STYLE
 VECTS  1.0
-SECTS  160  1
+SECTS  64  1
 SECTP 
-   1 0 0  0.00000E+00  0.00000E+00  0.00000E+00  0.00100E+00
+   1 0 0  0.00000E+00  0.00000E+00  -1.00000E+01  1.00000E+01
 UCOLP 
  0  2  1.000   0   0   0
 ATOMS  1  0  1
@@ -99,3 +106,46 @@ BONDP
 def test_vesta_file(structure):
     print(VestaFile(structure))
 
+
+def test_add_density(tmpdir):
+    tmpdir.chdir()
+    Path("test.vesta").write_text("""#VESTA_FORMAT_VERSION 3.5.0
+TITLE
+X1 Ba1
+
+CELLP
+3.900000 3.900000 3.900000 90.000000 90.000000 90.000000
+
+STRUC
+1 Ba Ba1 1.0 0.500000 0.500000 0.500000
+0.0 0.0 0.0
+2 XX XX2 1.0 0.000000 0.000000 0.000000
+0.0 0.0 0.0
+0 0 0 0 0""")
+
+    add_density(vesta_file=Path("test.vesta"), to_vesta_file=Path("to.vesta"),
+                isurfs=[0.1, 0.2], volmetric_file=Path("PARCHG"))
+
+    actual = Path("to.vesta").read_text()
+    expected = """#VESTA_FORMAT_VERSION 3.5.0
+TITLE
+X1 Ba1
+
+IMPORT_DENSITY 0.1
++1.000000 PARCHG
+
+CELLP
+3.900000 3.900000 3.900000 90.000000 90.000000 90.000000
+
+STRUC
+1 Ba Ba1 1.0 0.500000 0.500000 0.500000
+0.0 0.0 0.0
+2 XX XX2 1.0 0.000000 0.000000 0.000000
+0.0 0.0 0.0
+0 0 0 0 0
+
+ISURF
+  1   1  0.1  0  0  255  50  50
+  1   1  0.2  0  0  255  50  50
+  0   0   0   0"""
+    assert actual == expected

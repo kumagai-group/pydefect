@@ -6,14 +6,16 @@ from typing import List, Sequence
 import numpy as np
 from matplotlib import pyplot as plt
 from monty.json import MSONable
+from pydefect.util.coords import pretty_coords
 from pymatgen import Spin
 from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn
+from vise.util.typing import Coords
 
 
 @dataclass
 class ChargeDist(MSONable, ToJsonFileMixIn):
-    charge_center: Sequence[float]
+    charge_center: Coords
     radial_dist: List[float]
 
 
@@ -34,6 +36,10 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
         return (3 * 0.5 / (4 * np.pi * self.ave_charge_density)) ** (1.0 / 3.0)
 
     @property
+    def pretty_uniform_radius(self):
+        return f"{self.uniform_half_charge_radius:6.3f}"
+
+    @property
     def is_spin_polarized(self):
         return len(self.charge_dists[0]) == 2
 
@@ -50,19 +56,27 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
 
         raise ValueError("Radius containing 0.5 e- could not be found.")
 
-    def __repr__(self):
-        all_lines = [
-            f"Uniform charge radius is {self.uniform_half_charge_radius:.3f}"]
-        lines = [["band_idx", "spin", "radius"]]
-        for band_idx in self.band_idxs:
-            radius = self.half_charge_radius(band_idx, Spin.up)
-            lines.append([band_idx, "up", round(radius, 2)])
+    def __str__(self):
+        all_lines = [" -- defect charge info",
+                     f"Uniform charge radius is {self.pretty_uniform_radius}"]
+        lines = [["Band index", "Spin", "Radius", "Center"]]
+        for band_idx, c_dist in zip(self.band_idxs, self.charge_dists):
+            self._add_band_info(band_idx, c_dist, lines, Spin.up)
             if self.is_spin_polarized:
-                radius = self.half_charge_radius(band_idx, Spin.down)
-                lines.append([band_idx, "down", round(radius, 2)])
+                self._add_band_info(band_idx, c_dist, lines, Spin.down)
 
-        all_lines.append(tabulate(lines))
+        all_lines.append(tabulate(lines, tablefmt="plain"))
         return "\n".join(all_lines)
+
+    def _add_band_info(self, band_idx, c_dist, lines, spin):
+        try:
+            radius = f"{self.half_charge_radius(band_idx, spin):6.3f}"
+        except ValueError:
+            radius = "None"
+        spin_idx = 0 if spin == Spin.up else 1
+        spin_str = "up" if spin == Spin.up else "down"
+        center = pretty_coords(c_dist[spin_idx].charge_center)
+        lines.append([band_idx, spin_str, radius, center])
 
     @property
     def bins_middle_points(self):

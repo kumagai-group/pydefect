@@ -21,10 +21,12 @@ from pydefect.cli.main_tools import sanitize_matrix
 from pydefect.cli.vasp.make_band_edge_orbital_infos import \
     make_band_edge_orbital_infos
 from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
-from pydefect.cli.vasp.make_defect_charge_info import make_defect_charge_info
+from pydefect.cli.vasp.make_defect_charge_info import make_defect_charge_info, \
+    make_spin_charges
 from pydefect.cli.vasp.make_efnv_correction import \
     make_efnv_correction
 from pydefect.cli.vasp.make_gkfo_correction import make_gkfo_correction
+from pydefect.cli.vasp.make_light_chgcar import make_light_chgcar
 from pydefect.cli.vasp.make_perfect_band_edge_state import \
     make_perfect_band_edge_state_from_vasp
 from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
@@ -374,9 +376,17 @@ def calc_defect_charge_info(args):
         band_idx = int(parchg.split(".")[-2])
         logger.info(f"band index {band_idx} is being parsed.")
         band_idxs.append(band_idx)
-        parchgs.append(Chgcar.from_file(parchg))
-    defect_charge_info = make_defect_charge_info(
-        parchgs, band_idxs, args.bin_interval)
+        p = Chgcar.from_file(parchg)
+        parchgs.append(p)
+        parent = Path(parchg).parent
+        for spin, charge in zip(["up", "down"], make_spin_charges(p)):
+            to_vesta_file = Path(f"defect_{band_idx}_{spin}.vesta")
+            make_light_chgcar(charge,
+                              parent / f"PARCHG_{band_idx}_{spin}",
+                              vesta_file=args.vesta_file,
+                              to_vesta_file=to_vesta_file)
+
+    defect_charge_info = make_defect_charge_info(parchgs, band_idxs, args.bin_interval)
     defect_charge_info.to_json_file()
     plt = defect_charge_info.show_dist()
     plt.savefig("dist.pdf")

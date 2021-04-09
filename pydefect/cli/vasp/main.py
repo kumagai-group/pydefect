@@ -405,6 +405,8 @@ def parse_args(args):
     parser_calc_def_charge_info.add_argument(
         "-p", "--parchgs", type=str, nargs="+")
     parser_calc_def_charge_info.add_argument(
+        "-v", "--vesta_file", type=Path)
+    parser_calc_def_charge_info.add_argument(
         "-b", "--bin_interval", type=float, default=0.2)
     parser_calc_def_charge_info.add_argument(
         "-g", "--grids_filename", type=Grids.from_file)

@@ -3,6 +3,7 @@
 # This file is originally developed by Naoki Tsunoda.
 
 import itertools
+from pathlib import Path
 from typing import Union, Optional, Dict, Iterable, List, Tuple
 
 from pydefect.analyzer.vesta.element_colors import atom_color
@@ -55,7 +56,7 @@ class VestaFile:
         outs = []
         for block in self.blocks:
             outs.append(repr(block))
-        return "\n".join(outs)
+        return "\n\n".join(outs)
 
     def write_file(self, filename: str):
         filename = filename if ".vesta" in filename else f"{filename}.vesta"
@@ -119,6 +120,26 @@ class Struc:
     def __repr__(self):
         outs = [self.header, self.str_coords, self.separator]
         return '\n'.join(outs)
+
+
+class ImportDensity:
+    """
+     IMPORT_DENSITY block in *.vesta files.
+     """
+    smooth_param = 0.1
+    header = f"IMPORT_DENSITY {smooth_param}"
+    prefix = "+1.000000"
+
+    def __init__(self, volumetric_filename: str):
+        """
+        Args:
+            volumetric_filename: e.g., 'CHGCAR'
+        """
+        self.string = f"{self.prefix} {volumetric_filename}"
+
+    def __repr__(self):
+        outs = [self.header, self.string]
+        return "\n".join(outs)
 
 
 class Bound:
@@ -290,8 +311,9 @@ class Style:
 
     all_bold_cell = "0  2  1.000   0   0   0"
     isurf = "1   1    12.0991 255 255   0 127 255"
-    sects = " 160  1"
-    sectp = "  1 0 0  0.00000E+00  0.00000E+00  0.00000E+00  0.00100E+00"
+    sect_param = 64
+    sects = f" {sect_param}  1"
+    sectp = "  1 0 0  0.00000E+00  0.00000E+00  -1.00000E+01  1.00000E+01"
 
     def __init__(self,
                  bond_radius: float,
@@ -308,3 +330,17 @@ class Style:
         atoms = f'{self.atoms_prefix} {self.atoms}'
         bondp = f'{self.bondp_prefix} \n   1  16  {self.bond_radius}  1.000 127 127 127'
         return "\n".join([self.header, vct, sects, sectp, ucol, atoms, bondp])
+
+
+def add_density(vesta_file: Path, to_vesta_file: Path, isurfs: List[float],
+                volmetric_file: Path):
+    lines = vesta_file.read_text().split("\n")
+    title_idx = lines.index("TITLE")
+    lines.insert(title_idx + 3, ImportDensity(str(volmetric_file)).__repr__() + "\n")
+
+    lines.append("\nISURF")
+    for isurf in isurfs:
+        lines.append(f"  1   1  {isurf}  0  0  255  50  50")
+    lines.append("  0   0   0   0""")
+    to_vesta_file.write_text("\n".join(lines))
+
