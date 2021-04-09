@@ -16,8 +16,8 @@ class Grids:
     dim: Tuple[int, int, int]
     distance_data: np.ndarray
 
-    def dump(self):
-        np.savez("grids", matrix=self.lattice.matrix,
+    def dump(self, filename="grids.npz"):
+        np.savez(filename, matrix=self.lattice.matrix,
                  distance_data=self.distance_data)
 
     @classmethod
@@ -42,7 +42,7 @@ class Grids:
         return cls(lattice, dim, distances_data[:, 0].reshape(dim))
 
     def shifted_distance_data(self, center: List[int]):
-        return np.roll(self.distance_data, center)
+        return np.roll(np.roll(np.roll(self.distance_data, center[0], axis=0), center[1], axis=1), center[2], axis=2)
 
     def spherical_dist(self,
                        data: np.ndarray,
@@ -54,6 +54,7 @@ class Grids:
         counts, _ = np.histogram(shifted_dist, distance_bins)
         volumes = distance_bins[1:] ** 3 - distance_bins[:-1] ** 3
         histogram = _sum / counts * 4 * np.pi * volumes / 3
+#        histogram = _sum / counts
         return histogram.tolist()
 
 #        num_bins = int(np.ceil(radius / bin_interval))

@@ -13,6 +13,7 @@ def grids():
                  dim=(1, 1, 5),
                  distance_data=np.array([[[0.0, 2.0, 4.0, 4.0, 2.0]]]))
 
+
 @pytest.fixture
 def chgcar():
     struc = Structure(lattice=Lattice.cubic(10), species=["H"], coords=[[0]*3])
@@ -47,6 +48,17 @@ def test_grids_from_chgcar(grids, chgcar):
 def test_shift_distance_data(grids):
     actual = grids.shifted_distance_data(center=[0, 0, 1])
     expected = np.array([[[2.0, 0.0, 2.0, 4.0, 4.0]]])
+    np.testing.assert_array_almost_equal(actual, expected)
+
+
+def test_shift_distance_data2():
+    grids = Grids(lattice=Lattice.cubic(10),
+                  dim=(2, 2, 2),
+                  distance_data=np.array([[[0.0, 5.0], [5.0, 7.07]],
+                                          [[5.0, 7.07], [7.07, 8.66]]]))
+    actual = grids.shifted_distance_data(center=[1, 1, 1])
+    expected = np.array([[[8.66, 7.07], [7.07, 5.0]],
+                         [[7.07, 5.0], [5.0, 0.0]]])
     np.testing.assert_array_almost_equal(actual, expected)
 
 
