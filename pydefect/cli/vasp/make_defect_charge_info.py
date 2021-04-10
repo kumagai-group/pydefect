@@ -3,7 +3,7 @@
 from typing import List, Optional
 
 import numpy as np
-from pydefect.analyzer.defect_charge_info import DefectChargeInfo, ChargeDist
+from pydefect.analyzer.defect_charge_info import DefectChargeInfo, AveChargeDensityDist
 from pydefect.analyzer.grids import Grids
 from pydefect.cli.vasp.make_efnv_correction import calc_max_sphere_radius
 from pymatgen import Spin
@@ -55,12 +55,11 @@ def make_charge_dist(parchg: Chgcar, grids: Grids, distance_bins: np.ndarray):
             chg.get_average_along_axis(i)) for i in [0, 1, 2]]
         defect_center_idxs.append(np.array(center))
         data = chg.data["total"] / grids.lattice.volume
-        print(f"center {center}")
         dists.append(grids.spherical_dist(data, center, distance_bins))
 
     result = []
     for c, d in zip(defect_center_idxs, dists):
-        result.append(ChargeDist(tuple(c / grids.dim), d))
+        result.append(AveChargeDensityDist(tuple(c / grids.dim), d))
 
     return result
 

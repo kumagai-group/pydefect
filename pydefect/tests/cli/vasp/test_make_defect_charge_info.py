@@ -3,7 +3,8 @@
 
 import numpy as np
 import pytest
-from pydefect.analyzer.defect_charge_info import ChargeDist, DefectChargeInfo
+from pydefect.analyzer.defect_charge_info import AveChargeDensityDist, \
+    DefectChargeInfo
 from pydefect.analyzer.grids import Grids
 from pydefect.cli.vasp.make_defect_charge_info import \
     center_1d_periodic_quantity, make_charge_dist, make_defect_charge_info
@@ -29,8 +30,8 @@ def parchg():
 
 @pytest.fixture
 def charge_dist_list():
-    return [ChargeDist((0.0, 0.5, 0.5), [1.5 / 3 * 4 * np.pi * 2.5**3, 0.0]),
-            ChargeDist((0.0, 0.5, 0.5), [0.5 / 3 * 4 * np.pi * 2.5**3, 0.0])]
+    return [AveChargeDensityDist((0.0, 0.5, 0.5), [1.5 / 1000, 0.0]),
+            AveChargeDensityDist((0.0, 0.5, 0.5), [0.5 / 1000, 0.0])]
 
 
 def test_make_charge_dist(parchg, charge_dist_list):

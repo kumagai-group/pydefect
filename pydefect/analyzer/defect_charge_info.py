@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 from dataclasses import dataclass
-from typing import List, Sequence
+from typing import List
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -14,7 +14,7 @@ from vise.util.typing import Coords
 
 
 @dataclass
-class ChargeDist(MSONable, ToJsonFileMixIn):
+class AveChargeDensityDist(MSONable, ToJsonFileMixIn):
     charge_center: Coords
     radial_dist: List[float]
 
@@ -23,13 +23,19 @@ class ChargeDist(MSONable, ToJsonFileMixIn):
 class DefectChargeInfo(MSONable, ToJsonFileMixIn):
     distance_bins: List[float]  # the last value is the radius
     band_idxs: List[int]
-    charge_dists: List[List[ChargeDist]]  # [band-idx, spin]
+    charge_dists: List[List[AveChargeDensityDist]]  # [band-idx, spin]
     ave_charge_density: float
 
-    def charge_distribution(self, band_idx, spin):
+    def ave_chg_dens_distribution(self, band_idx, spin):
         spin_idx = 0 if spin == Spin.up else 1
         band_pos = np.argwhere(np.array(self.band_idxs) == band_idx)[0][0]
         return self.charge_dists[spin_idx][band_pos].radial_dist
+
+    def sum_chg_dens_distribution(self, band_idx, spin):
+        ave = self.ave_chg_dens_distribution(band_idx, spin)
+        volumes = (np.array(self.distance_bins[1:]) ** 3
+                   - np.array(self.distance_bins[:-1]) ** 3) * 4 / 3 * np.pi
+        return list(ave * volumes)
 
     @property
     def uniform_half_charge_radius(self):

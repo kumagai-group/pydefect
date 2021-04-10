@@ -63,11 +63,12 @@ def test_shift_distance_data2():
 
 
 def test_spherical_dist(grids):
+    # distance_data=np.array([[[0.0, 2.0, 4.0, 4.0, 2.0]]]))
     actual = grids.spherical_dist(data=np.array([[[0.0, 0.0, 0.0, 0.0, 1.0]]]),
                                   center=[0, 0, 1],
                                   distance_bins=np.array([0.0, 2.5, 5.0]))
-    #  Divide by 2 since there are 2 points at 4.0 distance.
-    expected = [0.0, 4 * np.pi / 3 * (5.0**3 - 2.5**3) / 2]
+    #  Divide by 2 since there are 2 points at 4.0 distance. volume=1000.
+    expected = [0.0, 1.0 / 2 / 1000]
     assert actual == expected
 
 

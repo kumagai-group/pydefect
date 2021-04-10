@@ -3,7 +3,7 @@
 
 import numpy as np
 import pytest
-from pydefect.analyzer.defect_charge_info import DefectChargeInfo, ChargeDist
+from pydefect.analyzer.defect_charge_info import DefectChargeInfo, AveChargeDensityDist
 from pymatgen.electronic_structure.core import Spin
 from pymatgen.core import Structure, Lattice
 from pymatgen.io.vasp import Chgcar
@@ -11,24 +11,34 @@ from vise.tests.helpers.assertion import assert_json_roundtrip
 
 
 @pytest.fixture
-def charge_dist():
-    return ChargeDist(charge_center=(0.1, 0.1, 0.1), radial_dist=[0.4, 0.4, 0.2])
+def ave_charge_density_dist():
+    return AveChargeDensityDist(charge_center=(0.1, 0.1, 0.1),
+                                radial_dist=[0.4, 0.4, 0.2])
 
 
 @pytest.fixture
-def defect_charge_info(charge_dist):
+def defect_charge_info(ave_charge_density_dist):
     return DefectChargeInfo(distance_bins=[0.0, 1.0, 2.0, 2.5],
                             band_idxs=[10],
-                            charge_dists=[[charge_dist, charge_dist]],
+                            charge_dists=[[ave_charge_density_dist,
+                                           ave_charge_density_dist]],
                             ave_charge_density=0.5)
 
 
-def test_charge_dist_json_roundtrip(charge_dist, tmpdir):
-    assert_json_roundtrip(charge_dist, tmpdir)
+def test_charge_dist_json_roundtrip(ave_charge_density_dist, tmpdir):
+    assert_json_roundtrip(ave_charge_density_dist, tmpdir)
 
 
 def test_defect_charge_info_json_roundtrip(defect_charge_info, tmpdir):
     assert_json_roundtrip(defect_charge_info, tmpdir)
+
+
+def test_defect_charge_info_sum_chg_dens_distribution(defect_charge_info):
+    actual = defect_charge_info.sum_chg_dens_distribution(10, Spin.up)
+    expected = np.array([0.4 * 1.0 ** 3,
+                         0.4 * (2.0 ** 3 - 1.0 ** 3),
+                         0.2 * (2.5 ** 3 - 2.0 ** 3)]) * 4 / 3 * np.pi
+    np.testing.assert_array_almost_equal(actual, expected)
 
 
 def test_defect_charge_info_half_charge_radius(defect_charge_info):

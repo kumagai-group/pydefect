@@ -42,7 +42,8 @@ class Grids:
         return cls(lattice, dim, distances_data[:, 0].reshape(dim))
 
     def shifted_distance_data(self, center: List[int]):
-        return np.roll(np.roll(np.roll(self.distance_data, center[0], axis=0), center[1], axis=1), center[2], axis=2)
+        return np.roll(np.roll(np.roll(self.distance_data, center[0], axis=0),
+                               center[1], axis=1), center[2], axis=2)
 
     def spherical_dist(self,
                        data: np.ndarray,
@@ -52,9 +53,7 @@ class Grids:
         shifted_dist = self.shifted_distance_data(center)
         _sum, _ = np.histogram(shifted_dist, distance_bins, weights=data)
         counts, _ = np.histogram(shifted_dist, distance_bins)
-        volumes = distance_bins[1:] ** 3 - distance_bins[:-1] ** 3
-        histogram = _sum / counts * 4 * np.pi * volumes / 3
-#        histogram = _sum / counts
+        histogram = _sum / counts / self.lattice.volume
         return histogram.tolist()
 
 #        num_bins = int(np.ceil(radius / bin_interval))
