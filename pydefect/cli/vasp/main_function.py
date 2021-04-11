@@ -51,7 +51,8 @@ logger = get_logger(__name__)
 
 
 def print_file(args):
-    print(args.obj)
+    lines = [obj.__str__() for obj in args.objs]
+    print("\n\n".join(lines))
 
 
 def make_unitcell(args):

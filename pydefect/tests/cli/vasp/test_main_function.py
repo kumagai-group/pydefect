@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from argparse import Namespace
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 
 import numpy as np
@@ -31,8 +33,20 @@ from pymatgen.io.vasp import Vasprun, Outcar
 
 
 def test_print():
-    args = Namespace(obj="a")
-    print_file(args)
+    class A:
+        def __str__(self):
+            return "a"
+
+    class B:
+        def __str__(self):
+            return "b"
+
+    f = StringIO()
+    with redirect_stdout(f):
+        print_file(args=Namespace(objs=[A(), B()]))
+
+    actual = f.getvalue()
+    assert actual == "a\n\nb\n"
 
 
 def test_make_unitcell(mocker):

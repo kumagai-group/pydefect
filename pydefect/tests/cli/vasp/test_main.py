@@ -17,7 +17,7 @@ from pymatgen.core import Composition
 def test_print(mocker):
     mock = mocker.patch("pydefect.cli.vasp.main.loadfn")
     parsed_args = parse_args(["p", "-f", "a.json"])
-    expected = Namespace(obj=mock.return_value, func=parsed_args.func)
+    expected = Namespace(objs=[mock.return_value], func=parsed_args.func)
     assert parsed_args == expected
 
 

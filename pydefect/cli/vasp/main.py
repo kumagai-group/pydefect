@@ -74,8 +74,8 @@ def parse_args(args):
         aliases=['p'])
 
     parser_print.add_argument(
-        "-f", "--filename", dest="obj", required=True, type=loadfn,
-        help="Path to the json file to be printed.")
+        "-f", "--filename", dest="objs", required=True, type=loadfn, nargs="+",
+        help="Path to the json files to be printed.")
 
     parser_print.set_defaults(func=print_file)
 
