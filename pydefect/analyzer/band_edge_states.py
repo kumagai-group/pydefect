@@ -212,14 +212,16 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
         return IsShallow(False)
 
     @property
-    def band_indices(self):
+    def band_indices_for_parchgs(self):
         result = set()
         for state in self.states:
             result.add(state.vbm_info.band_idx)
             for lo in state.localized_orbitals:
                 result.add(lo.band_idx)
             result.add(state.cbm_info.band_idx)
-        return sorted(result)
+
+        # Increment index by 1 as VASP band index begins from 1.
+        return sorted([i + 1 for i in result])
 
     def __str__(self):
         lines = [" -- band-edge states info"]
