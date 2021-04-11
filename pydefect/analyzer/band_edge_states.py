@@ -175,14 +175,14 @@ class BandEdgeState(MSONable):
         lines = []
         inner_table = [["", "Index", "Energy", "P-ratio", "Occupation",
                         "Orbitals", "K-point coords"]]
-        inner_table.append(["VBM", self.vbm_info.band_idx,
+        inner_table.append(["VBM", self.vbm_info.band_idx + 1,
                             f"{self.vbm_info.energy:7.3f}",
                             f"{self.vbm_info.p_ratio:5.2f}",
                             f"{self.vbm_info.occupation:5.2f}",
                             pretty_orbital(self.vbm_info.orbital_info.orbitals),
                             pretty_coords(self.vbm_info.kpt_coord),
                             ])
-        inner_table.append(["CBM", self.cbm_info.band_idx,
+        inner_table.append(["CBM", self.cbm_info.band_idx + 1,
                             f"{self.cbm_info.energy:7.3f}",
                             f"{self.cbm_info.p_ratio:5.2f}",
                             f"{self.cbm_info.occupation:5.2f}",
@@ -196,7 +196,7 @@ class BandEdgeState(MSONable):
         inner_table = [["Index", "Energy", "P-ratio", "Occupation", "Orbitals"]]
         for lo in self.localized_orbitals:
             pr = f"{lo.participation_ratio:5.2f}" if lo.participation_ratio else "None"
-            inner_table.append([lo.band_idx,
+            inner_table.append([lo.band_idx + 1,
                                 f"{lo.ave_energy:7.3f}",
                                 pr,
                                 f"{lo.occupation:5.2f}",
