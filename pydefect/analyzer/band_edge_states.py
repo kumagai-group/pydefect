@@ -141,22 +141,21 @@ class EdgeInfo(MSONable):
 
 @dataclass
 class PerfectBandEdgeState(MSONable, ToJsonFileMixIn):
-    vbm_info: EdgeInfo  # None for metals
+    vbm_info: EdgeInfo
     cbm_info: EdgeInfo
 
     def __str__(self):
-        inner_table = [["", "Index", "Energy", "Occupation", "Orbitals", "K-point coords"]]
-        inner_table.append(["VBM", self.vbm_info.band_idx, self.vbm_info.energy,
-                            f"{self.vbm_info.occupation:5.2f}",
-                            pretty_orbital(self.vbm_info.orbital_info.orbitals),
-                            pretty_coords(self.vbm_info.kpt_coord),
-                            ])
-        inner_table.append(["CBM", self.cbm_info.band_idx, self.cbm_info.energy,
-                            f"{self.cbm_info.occupation:5.2f}",
-                            pretty_orbital(self.cbm_info.orbital_info.orbitals),
-                            pretty_coords(self.cbm_info.kpt_coord),
-                            ])
-        return tabulate(inner_table, tablefmt="plain")
+        def show_edge_info(edge_info: EdgeInfo):
+            return [edge_info.band_idx,
+                    edge_info.energy,
+                    f"{edge_info.occupation:5.2f}",
+                    pretty_orbital(edge_info.orbital_info.orbitals),
+                    pretty_coords(edge_info.kpt_coord)]
+
+        return tabulate([
+            ["", "Index", "Energy", "Occupation", "Orbitals", "K-point coords"],
+            ["VBM"] + show_edge_info(self.vbm_info),
+            ["CBM"] + show_edge_info(self.cbm_info)], tablefmt="plain")
 
 
 @dataclass
@@ -172,30 +171,27 @@ class BandEdgeState(MSONable):
         return self.vbm_info.occupation < 0.7 or self.cbm_info.occupation > 0.3
 
     def __str__(self):
+        def show_edge_info(edge_info: EdgeInfo):
+            return [edge_info.band_idx + 1,
+                    f"{edge_info.energy:7.3f}",
+                    f"{edge_info.p_ratio:5.2f}",
+                    f"{edge_info.occupation:5.2f}",
+                    pretty_orbital(edge_info.orbital_info.orbitals),
+                    pretty_coords(edge_info.kpt_coord)]
+
         lines = []
         inner_table = [["", "Index", "Energy", "P-ratio", "Occupation",
-                        "Orbitals", "K-point coords"]]
-        inner_table.append(["VBM", self.vbm_info.band_idx + 1,
-                            f"{self.vbm_info.energy:7.3f}",
-                            f"{self.vbm_info.p_ratio:5.2f}",
-                            f"{self.vbm_info.occupation:5.2f}",
-                            pretty_orbital(self.vbm_info.orbital_info.orbitals),
-                            pretty_coords(self.vbm_info.kpt_coord),
-                            ])
-        inner_table.append(["CBM", self.cbm_info.band_idx + 1,
-                            f"{self.cbm_info.energy:7.3f}",
-                            f"{self.cbm_info.p_ratio:5.2f}",
-                            f"{self.cbm_info.occupation:5.2f}",
-                            pretty_orbital(self.cbm_info.orbital_info.orbitals),
-                            pretty_coords(self.cbm_info.kpt_coord),
-                            ])
+                        "Orbitals", "K-point coords"],
+                       ["VBM"] + show_edge_info(self.vbm_info),
+                       ["CBM"] + show_edge_info(self.cbm_info)]
         lines.append(tabulate(inner_table, tablefmt="plain"))
 
         lines.append("---")
         lines.append("Localized Orbital(s)")
         inner_table = [["Index", "Energy", "P-ratio", "Occupation", "Orbitals"]]
         for lo in self.localized_orbitals:
-            pr = f"{lo.participation_ratio:5.2f}" if lo.participation_ratio else "None"
+            pr = f"{lo.participation_ratio:5.2f}" \
+                if lo.participation_ratio else "None"
             inner_table.append([lo.band_idx + 1,
                                 f"{lo.ave_energy:7.3f}",
                                 pr,
