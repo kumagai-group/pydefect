@@ -29,7 +29,7 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
     def ave_chg_dens_distribution(self, band_idx, spin):
         spin_idx = 0 if spin == Spin.up else 1
         band_pos = np.argwhere(np.array(self.band_idxs) == band_idx)[0][0]
-        return self.charge_dists[spin_idx][band_pos].radial_dist
+        return self.charge_dists[band_pos][spin_idx].radial_dist
 
     def sum_chg_dens_distribution(self, band_idx, spin):
         ave = self.ave_chg_dens_distribution(band_idx, spin)
@@ -52,8 +52,7 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
     def half_charge_radius(self, band_idx, spin):
         charge_sum = 0.0
         spin = 0 if spin == Spin.up else 1
-        idx = self.band_idxs.index(band_idx)
-        dist = self.charge_dists[idx][spin].radial_dist
+        dist = self.sum_chg_dens_distribution(band_idx, spin)
         for c, start, end in zip(
                 dist, self.distance_bins[:-1], self.distance_bins[1:]):
             charge_sum += c
@@ -98,5 +97,5 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
                 plt.plot(self.bins_middle_points[:-1],
                          dist.radial_dist[:-1], label=f"{_idx} {spin}")
         ax = plt.gca()
-        ax.legend(bbox_to_anchor=(0, 1.0), loc='upper left')
+        ax.legend(loc='upper right')
         return plt

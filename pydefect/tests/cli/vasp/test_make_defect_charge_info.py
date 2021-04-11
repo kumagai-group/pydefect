@@ -30,8 +30,8 @@ def parchg():
 
 @pytest.fixture
 def charge_dist_list():
-    return [AveChargeDensityDist((0.0, 0.5, 0.5), [1.5 / 1000, 0.0]),
-            AveChargeDensityDist((0.0, 0.5, 0.5), [0.5 / 1000, 0.0])]
+    return [AveChargeDensityDist((0.0, 0.5, 0.5), [1.5, 0.0]),
+            AveChargeDensityDist((0.0, 0.5, 0.5), [0.5, 0.0])]
 
 
 def test_make_charge_dist(parchg, charge_dist_list):

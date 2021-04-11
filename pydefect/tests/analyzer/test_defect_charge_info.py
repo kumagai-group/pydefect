@@ -42,12 +42,11 @@ def test_defect_charge_info_sum_chg_dens_distribution(defect_charge_info):
 
 
 def test_defect_charge_info_half_charge_radius(defect_charge_info):
-    assert defect_charge_info.half_charge_radius(10, Spin.up) == 1.25
+    assert defect_charge_info.half_charge_radius(10, Spin.up) == 0.2984155182973037
 
 
 def test_defect_charge_info_uniform_half_charge_radius(defect_charge_info):
-    expected = (3 * 0.5 / (4 * np.pi * 0.5)) ** (1.0 / 3.0)
-    assert defect_charge_info.uniform_half_charge_radius == expected
+    assert defect_charge_info.uniform_half_charge_radius == 0.6203504908994001
 
 
 def test_defect_charge_info_repr(defect_charge_info):
@@ -55,8 +54,8 @@ def test_defect_charge_info_repr(defect_charge_info):
     expected = """ -- defect charge info
 Uniform charge radius is  0.620
 Band index  Spin  Radius  Center
-10          up    1.250   ( 0.100,  0.100,  0.100)
-10          down  1.250   ( 0.100,  0.100,  0.100)"""
+10          up    0.298   ( 0.100,  0.100,  0.100)
+10          down  0.298   ( 0.100,  0.100,  0.100)"""
     assert defect_charge_info.__str__() == expected
 
 

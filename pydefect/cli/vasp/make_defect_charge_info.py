@@ -54,7 +54,7 @@ def make_charge_dist(parchg: Chgcar, grids: Grids, distance_bins: np.ndarray):
         center = [center_1d_periodic_quantity(
             chg.get_average_along_axis(i)) for i in [0, 1, 2]]
         defect_center_idxs.append(np.array(center))
-        data = chg.data["total"] / grids.lattice.volume
+        data = chg.data["total"]
         dists.append(grids.spherical_dist(data, center, distance_bins))
 
     result = []
