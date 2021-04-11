@@ -377,6 +377,7 @@ def calc_defect_charge_info(args):
     for parchg in args.parchgs:
         band_idx = int(parchg.split(".")[-2])
         logger.info(f"band index {band_idx} is being parsed.")
+        # Use the band indices used in VASP, where it begins from 1.
         band_idxs.append(band_idx)
         p = Chgcar.from_file(parchg)
         parchgs.append(p)
