@@ -275,14 +275,24 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
         center_coords = pretty_coords(self.center)
         lines.append(f"Defect center: {center_coords}")
 
-        _add_site_info(lines, "Removed atoms:", self.site_diff.removed)
-        _add_site_info(lines, "Added atoms:", self.site_diff.inserted)
+        def _site_info(header: str, site_info: List[SiteInfo]):
+            if not site_info:
+                return []
+            result = [header]
+            result.append(tabulate(
+                [[i, elem, pretty_coords(coords)]
+                 for i, elem, coords in site_info], tablefmt="plain"))
+            result.append("")
+            return result
+
+        lines.extend(_site_info("Removed atoms:", self.site_diff.removed))
+        lines.extend(_site_info("Added atoms:", self.site_diff.inserted))
 
         if self.same_config_from_init is False:
-            _add_site_info(lines, "Initially removed atoms:",
-                           self.site_diff_from_initial.removed)
-            _add_site_info(lines, "Initially added atoms:",
-                           self.site_diff_from_initial.inserted)
+            lines.extend(_site_info("Initially removed atoms:",
+                                    self.site_diff_from_initial.removed))
+            lines.extend(_site_info("Initially added atoms:",
+                                    self.site_diff_from_initial.inserted))
 
         lines.append("Displacements")
         idxs = [[i, d] for i, d in enumerate(self.displacements) if d is not None]
@@ -301,15 +311,5 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
         lines.append(tabulate(table, tablefmt="plain"))
 
         return "\n".join(lines)
-
-
-def _add_site_info(
-        lines: List[str], header: str, site_info: List[SiteInfo]) -> None:
-    lines.append(header)
-    table = []
-    for i, elem, coords in site_info:
-        table.append([i, elem, pretty_coords(coords)])
-    lines.append(tabulate(table, tablefmt="plain"))
-    lines.append("")
 
 

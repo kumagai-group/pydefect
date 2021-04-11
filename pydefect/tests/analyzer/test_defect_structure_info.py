@@ -227,6 +227,27 @@ def test_def_str_info_defect_type(def_str_info):
 
 
 def test_repr(def_str_info):
-    print(def_str_info)
+    x = deepcopy(def_str_info)
+    x.site_diff_from_initial.inserted = []
+    actual = x.__str__()
+    expected = """ -- defect structure info
+Defect type: unknown
+Site symmetry: 3m -> m (subgroup)
+Is same configuration: False
+Drift distance: 0.001
+Defect center: ( 0.380,  0.375,  0.375)
+Removed atoms:
+0  H  ( 0.250,  0.250,  0.250)
+
+Added atoms:
+0  H  ( 0.270,  0.250,  0.250)
+
+Initially removed atoms:
+0  H  ( 0.250,  0.250,  0.250)
+
+Displacements
+Elem  Dist  Displace  Angle  Index  Initial site                  Final site
+Be    2.14  0.01      130    2      ( 0.500,  0.500,  0.500)  ->  ( 0.500,  0.500,  0.501)"""
+    assert actual == expected
 
 
