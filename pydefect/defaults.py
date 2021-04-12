@@ -29,10 +29,6 @@ class Defaults(DefaultsBase):
             ["xkcd:blue", "xkcd:brown", "xkcd:crimson", "xkcd:darkgreen",
              "xkcd:gold", "xkcd:magenta", "xkcd:orange", "xkcd:darkblue",
              "xkcd:navy", "xkcd:red", "xkcd:olive", "xkcd:black", "xkcd:indigo"]
-        self._outcar = "OUTCAR"
-        self._contcar = "CONTCAR"
-        self._vasprun = "vasprun.xml"
-        self._procar = "PROCAR"
 
         self.set_user_settings(yaml_filename="pydefect.yaml")
 
@@ -99,22 +95,6 @@ class Defaults(DefaultsBase):
     @property
     def defect_energy_colors(self):
         return cycle(self._defect_energy_colors)
-
-    @property
-    def outcar(self):
-        return Path(self._outcar)
-
-    @property
-    def contcar(self):
-        return Path(self._contcar)
-
-    @property
-    def vasprun(self):
-        return Path(self._vasprun)
-
-    @property
-    def procar(self):
-        return Path(self._procar)
 
 
 defaults = Defaults()

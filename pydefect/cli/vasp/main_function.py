@@ -34,7 +34,7 @@ from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
 from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
 from pydefect.corrections.site_potential_plotter import \
     SitePotentialMplPlotter
-from pydefect.defaults import defaults
+from vise.defaults import defaults
 from pydefect.input_maker.add_interstitial import append_interstitial
 from pydefect.input_maker.defect_entries_maker import DefectEntriesMaker
 from pydefect.input_maker.defect_entry import DefectEntry

@@ -6,7 +6,8 @@ import fire
 from monty.serialization import loadfn
 from pydefect.analyzer.defect_structure_symmetrizer import \
     symmetrize_defect_structure
-from pydefect.defaults import defaults
+from pydefect.defaults import defaults as p_defaults
+from vise.defaults import defaults as v_defaults
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen.core import Structure
 from vise.util.logger import get_logger
@@ -17,17 +18,17 @@ logger = get_logger(__name__)
 
 def make_refined_structure():
     defect_entry: DefectEntry = loadfn("defect_entry.json")
-    structure = Structure.from_file(defaults.contcar)
+    structure = Structure.from_file(v_defaults.contcar)
     symmetrizer = StructureSymmetrizer(structure,
-                                       defaults.symmetry_length_tolerance,
-                                       defaults.symmetry_angle_tolerance)
+                                       p_defaults.symmetry_length_tolerance,
+                                       p_defaults.symmetry_angle_tolerance)
     if symmetrizer.point_group == "1":
         logger.info("The point group is 1, so the symmetry is not refined.")
         return
 
-    shutil.move(defaults.contcar, str(defaults.contcar) + ".sym_1")
-    shutil.move(defaults.outcar, str(defaults.outcar) + ".sym_1")
-    shutil.move(defaults.vasprun, str(defaults.vasprun) + ".sym_1")
+    shutil.move(v_defaults.contcar, str(v_defaults.contcar) + ".sym_1")
+    shutil.move(v_defaults.outcar, str(v_defaults.outcar) + ".sym_1")
+    shutil.move(v_defaults.vasprun, str(v_defaults.vasprun) + ".sym_1")
 
     refined_structure = symmetrize_defect_structure(
         symmetrizer,

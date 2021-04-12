@@ -4,9 +4,9 @@ from pathlib import Path
 
 from pydefect.cli.vasp.util_commands.make_refined_poscar import \
     make_refined_structure
-from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen.core import Structure
+from vise.defaults import defaults
 
 
 def test_make_refined_structure(tmpdir, mocker, simple_cubic):

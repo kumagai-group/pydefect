@@ -23,7 +23,7 @@ from pydefect.cli.vasp.main_function import make_supercell, make_defect_set, \
     make_perfect_band_edge_state, make_band_edge_states_main_func
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
-from pydefect.defaults import defaults
+from vise.defaults import defaults
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
