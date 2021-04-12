@@ -54,8 +54,3 @@ def test_make_defect_charge_info(parchg, charge_dist_list):
                                 0.001)
     assert actual == expected
 
-"""
-TODO
-DONE
-- Add defect_center_coords property
-"""

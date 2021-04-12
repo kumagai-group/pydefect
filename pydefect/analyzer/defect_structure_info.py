@@ -266,24 +266,23 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
         return judge_defect_type(self.site_diff)
 
     def __str__(self):
-        lines = [
-            " -- defect structure info",
-            f"Defect type: {self.defect_type}",
-            f"Site symmetry: {self.initial_site_sym} -> {self.final_site_sym} ({self.symm_relation})",
-            f"Is same configuration: {self.same_config_from_init}",
-            f"Drift distance: {self.drift_dist:5.3f}"]
+        sym_transition = f"{self.initial_site_sym} " \
+                         f"-> {self.final_site_sym} ({self.symm_relation})"
         center_coords = pretty_coords(self.center)
-        lines.append(f"Defect center: {center_coords}")
+        lines = [" -- defect structure info",
+                 f"Defect type: {self.defect_type}",
+                 f"Site symmetry: {sym_transition}",
+                 f"Is same configuration: {self.same_config_from_init}",
+                 f"Drift distance: {self.drift_dist:5.3f}",
+                 f"Defect center: {center_coords}"]
 
         def _site_info(header: str, site_info: List[SiteInfo]):
             if not site_info:
                 return []
-            result = [header]
-            result.append(tabulate(
-                [[i, elem, pretty_coords(coords)]
-                 for i, elem, coords in site_info], tablefmt="plain"))
-            result.append("")
-            return result
+            _table = tabulate([[idx, elem, pretty_coords(coords)]
+                              for idx, elem, coords in site_info],
+                              tablefmt="plain")
+            return [header, _table, ""]
 
         lines.extend(_site_info("Removed atoms:", self.site_diff.removed))
         lines.extend(_site_info("Added atoms:", self.site_diff.inserted))
@@ -295,7 +294,8 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
                                     self.site_diff_from_initial.inserted))
 
         lines.append("Displacements")
-        idxs = [[i, d] for i, d in enumerate(self.displacements) if d is not None]
+        idxs = [[i, d] for i, d in enumerate(self.displacements)
+                if d is not None]
         table = [["Elem", "Dist", "Displace", "Angle", "Index",
                   "Initial site", "", "Final site"]]
         for final_idx, d in sorted(idxs,

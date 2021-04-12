@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from itertools import cycle
-from pathlib import Path
 
 from monty.design_patterns import singleton
 from vise.defaults import DefaultsBase
