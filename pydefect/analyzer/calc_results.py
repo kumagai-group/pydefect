@@ -11,6 +11,7 @@ from vise.util.mix_in import ToJsonFileMixIn
 
 @dataclass
 class CalcResults(MSONable, ToJsonFileMixIn):
+    # keep structure and site_symmetry in CalcResults
     structure: IStructure
     site_symmetry: str
     energy: float

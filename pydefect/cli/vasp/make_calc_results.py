@@ -2,32 +2,26 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.defaults import defaults
-from vise.defaults import defaults as v_defaults
 from pymatgen.io.vasp import Vasprun, Outcar
-from vise.analyzer.vasp.band_edge_properties import VaspBandEdgeProperties
+
 from vise.util.structure_symmetrizer import StructureSymmetrizer
+from vise.defaults import defaults as v_defaults
 
 
 def make_calc_results_from_vasp(vasprun: Vasprun,
                                 outcar: Outcar) -> CalcResults:
-    structure = vasprun.final_structure
     magnetization = outcar.total_mag or 0.0
-
     symmetrizer = StructureSymmetrizer(
-        structure,
+        vasprun.final_structure,
         symprec=defaults.symmetry_length_tolerance,
         angle_tolerance=defaults.symmetry_angle_tolerance,
         time_reversal=abs(magnetization) > v_defaults.integer_criterion)
-    band_edge_prop = VaspBandEdgeProperties(
-        vasprun, outcar, v_defaults.integer_criterion)
 
-    return CalcResults(structure=structure,
+    return CalcResults(structure=vasprun.final_structure,
                        site_symmetry=symmetrizer.point_group,
                        energy=outcar.final_energy,
                        magnetization=magnetization,
                        potentials=[-p for p in outcar.electrostatic_potential],
-                       vbm_info=band_edge_prop.vbm_info,
-                       cbm_info=band_edge_prop.cbm_info,
                        fermi_level=vasprun.efermi,
                        electronic_conv=vasprun.converged_electronic,
                        ionic_conv=vasprun.converged_ionic)
