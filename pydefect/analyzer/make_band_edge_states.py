@@ -17,7 +17,7 @@ def get_similar_orb_idx(orbs: List[OrbitalInfo], edge_info: EdgeInfo):
             orb_diff = orbital_diff(orb.orbitals, edge_info.orbitals)
             if orb_diff < defaults.similar_orb_criterion:
                 return i, orb_diff
-    raise ValueError(f"Similar orbital to the edge cannot be found. "
+    raise ValueError(f"Similar orbital to the edge are not found. "
                      f"Try to increase the similar criterion.")
 
 
@@ -94,7 +94,7 @@ def orbital_diff(orbital_1: dict, orbital_2: dict) -> float:
     result = 0
     for e in element_set:
         result += sum([abs(i - j) for i, j
-                           in zip_longest(orb_1[e], orb_2[e], fillvalue=0)])
+                       in zip_longest(orb_1[e], orb_2[e], fillvalue=0)])
 
     return result
 

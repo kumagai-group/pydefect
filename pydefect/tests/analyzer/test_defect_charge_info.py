@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from copy import deepcopy
-
 import numpy as np
 import pytest
 from pydefect.analyzer.defect_charge_info import DefectChargeInfo, AveChargeDensityDist
@@ -46,7 +44,8 @@ def test_defect_charge_info_sum_chg_dens_distribution(defect_charge_info):
 
 
 def test_defect_charge_info_half_charge_radius(defect_charge_info):
-    assert defect_charge_info.half_charge_radius(10, Spin.up) == 0.2984155182973037
+    actual = defect_charge_info.half_charge_radius(10, Spin.up)
+    assert actual == 0.2984155182973037
 
 
 def test_defect_charge_info_uniform_half_charge_radius(defect_charge_info):
@@ -66,15 +65,3 @@ Band index  Spin  Radius  Center
 def test_defect_charge_info_show_dist(defect_charge_info):
     plt = defect_charge_info.show_dist()
     plt.show()
-
-
-"""
-TODO
-* DefectChargeInfo dataclass
-- center
-- radial_dist (-> charge radius)
-- defect_region_radius
-
-* make DefectChargeInfo
-
-"""
