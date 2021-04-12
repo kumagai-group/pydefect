@@ -19,8 +19,6 @@ class CalcResults(MSONable, ToJsonFileMixIn):
     # vasp convention of atomic site potential.
     potentials: List[float]
     fermi_level: float
-    vbm_info: BandEdge = None
-    cbm_info: BandEdge = None
     electronic_conv: Optional[bool] = None
     ionic_conv: Optional[bool] = None
 

@@ -17,7 +17,7 @@ def test_make_gkfo_correction(vasp_files):
     initial_calc_results = loadfn(d / "initial_+" / "calc_results.json")
     final_calc_results = loadfn(d / "final_2+" / "calc_results.json")
 
-    gkfo: GkfoCorrection = make_gkfo_correction(
+    gkfo = make_gkfo_correction(
         efnv_correction=efnv_corr,
         additional_charge=1,
         final_calc_results=final_calc_results,
