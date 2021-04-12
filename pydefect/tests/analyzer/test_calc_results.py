@@ -22,11 +22,6 @@ def test_calc_results_json_roundtrip(calc_results, tmpdir):
     assert_json_roundtrip(calc_results, tmpdir)
 
 
-def test_calc_results_vbm_cbm(calc_results):
-    assert calc_results.vbm == 2.4163
-    assert calc_results.cbm == 10.2574
-
-
 def test_calc_results_str(calc_results):
     assert calc_results.__str__() == """ -- calc results info
 energy:    -34.911

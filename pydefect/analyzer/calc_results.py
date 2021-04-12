@@ -18,19 +18,11 @@ class CalcResults(MSONable, ToJsonFileMixIn):
     # potential acting on the positive unit charge, whose sign is reserved from
     # vasp convention of atomic site potential.
     potentials: List[float]
-    vbm_info: BandEdge
-    cbm_info: BandEdge
     fermi_level: float
+    vbm_info: BandEdge = None
+    cbm_info: BandEdge = None
     electronic_conv: Optional[bool] = None
     ionic_conv: Optional[bool] = None
-
-    @property
-    def vbm(self):
-        return self.vbm_info.energy
-
-    @property
-    def cbm(self):
-        return self.cbm_info.energy
 
     def __str__(self):
         return f""" -- calc results info
