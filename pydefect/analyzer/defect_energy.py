@@ -3,7 +3,7 @@
 from copy import deepcopy
 from dataclasses import dataclass
 from itertools import groupby, combinations
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Union
 
 import dash_html_components as html
 import numpy as np
@@ -222,14 +222,16 @@ def reservoir_energy(diffs: Dict[Element, int],
 
 
 def num_atom_differences(structure: IStructure,
-                         ref_structure: IStructure) -> Dict[Element, int]:
+                         ref_structure: IStructure,
+                         str_key: bool = False
+                         ) -> Dict[Union[Element, str], int]:
     target_composition = structure.composition.as_dict()
     reference_composition = ref_structure.composition.as_dict()
     result = {}
     for k in set(target_composition.keys()) | set(reference_composition.keys()):
         n_atom_diff = int(target_composition[k] - reference_composition[k])
         if n_atom_diff:
-            result[Element(k)] = n_atom_diff
+            result[k if str_key else Element(k)] = n_atom_diff
     return result
 
 
