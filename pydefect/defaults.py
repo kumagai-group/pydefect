@@ -4,11 +4,11 @@ from itertools import cycle
 from pathlib import Path
 
 from monty.design_patterns import singleton
-from vise.user_settings import UserSettings
+from vise.defaults import DefaultsBase
 
 
 @singleton
-class Defaults:
+class Defaults(DefaultsBase):
     def __init__(self):
         self._symmetry_length_tolerance = 0.1
         self._symmetry_angle_tolerance = 5.0
@@ -34,13 +34,7 @@ class Defaults:
         self._vasprun = "vasprun.xml"
         self._procar = "PROCAR"
 
-        user_settings = UserSettings(yaml_filename="pydefect.yaml")
-        self.yaml_files = user_settings.yaml_files_from_root_dir
-        self.user_settings = user_settings.user_settings
-
-        for k, v in self.user_settings.items():
-            if hasattr(self, k):
-                self.__setattr__("_" + k, v)
+        self.set_user_settings(yaml_filename="pydefect.yaml")
 
     @property
     def symmetry_length_tolerance(self):
