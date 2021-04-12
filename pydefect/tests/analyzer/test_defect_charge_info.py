@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+from copy import deepcopy
 
 import numpy as np
 import pytest
@@ -18,10 +19,13 @@ def ave_charge_density_dist():
 
 @pytest.fixture
 def defect_charge_info(ave_charge_density_dist):
+    ave_charge_density_dist_down = AveChargeDensityDist(
+        charge_center=(0.1, 0.1, 0.1), radial_dist=[0.3, 0.5, 0.2])
+
     return DefectChargeInfo(distance_bins=[0.0, 1.0, 2.0, 2.5],
                             band_idxs=[10],
                             charge_dists=[[ave_charge_density_dist,
-                                           ave_charge_density_dist]],
+                                           ave_charge_density_dist_down]],
                             ave_charge_density=0.5)
 
 
@@ -55,7 +59,7 @@ def test_defect_charge_info_repr(defect_charge_info):
 Uniform charge radius is  0.620
 Band index  Spin  Radius  Center
 10          up    0.298   ( 0.100,  0.100,  0.100)
-10          down  0.298   ( 0.100,  0.100,  0.100)"""
+10          down  0.398   ( 0.100,  0.100,  0.100)"""
     assert defect_charge_info.__str__() == expected
 
 
