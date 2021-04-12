@@ -19,12 +19,9 @@ class Defaults(DefaultsBase):
         self._displace_distance = 0.2
         self._dist_tol = 1.0
         self._ele_neg_diff = 2.0
-        self._kpoint_density = 5.0
-        self._band_gap_criterion = 0.2  # in eV
         self._similar_orb_criterion = 0.2
         self._similar_energy_criterion = 0.5  # in eV
         self._eigval_range = 1.0
-        self._integer_criterion = 0.1
         self._defect_energy_colors = \
             ["xkcd:blue", "xkcd:brown", "xkcd:crimson", "xkcd:darkgreen",
              "xkcd:gold", "xkcd:magenta", "xkcd:orange", "xkcd:darkblue",
@@ -69,10 +66,6 @@ class Defaults(DefaultsBase):
         return self._ele_neg_diff
 
     @property
-    def kpoint_density(self):
-        return self._kpoint_density
-
-    @property
     def similar_orb_criterion(self):
         return self._similar_orb_criterion
 
@@ -83,14 +76,6 @@ class Defaults(DefaultsBase):
     @property
     def eigval_range(self):
         return self._eigval_range
-
-    @property
-    def band_gap_criterion(self):
-        return self._band_gap_criterion
-
-    @property
-    def integer_criterion(self):
-        return self._integer_criterion
 
     @property
     def defect_energy_colors(self):
