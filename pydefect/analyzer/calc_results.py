@@ -15,8 +15,6 @@ class CalcResults(MSONable, ToJsonFileMixIn):
     site_symmetry: str
     energy: float
     magnetization: float
-    kpoint_coords: List[List[float]]
-    kpoint_weights: List[float]
     # potential acting on the positive unit charge, whose sign is reserved from
     # vasp convention of atomic site potential.
     potentials: List[float]
