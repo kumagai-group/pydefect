@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List
 
 import numpy as np
@@ -23,7 +24,7 @@ class Unitcell(MSONable, ToJsonFileMixIn):
         return total.tolist()
 
     def to_yaml(self, filename: str = "unitcell.yaml") -> None:
-        text = f"""vbm: {self.vbm}
+        Path(filename).write_text(f"""vbm: {self.vbm}
 cbm: {self.cbm}
 ele_dielectric_const:
 - {self.ele_dielectric_const[0]}
@@ -33,9 +34,7 @@ ion_dielectric_const:
 - {self.ion_dielectric_const[0]}
 - {self.ion_dielectric_const[1]}
 - {self.ion_dielectric_const[2]}
-"""
-        with open(filename, 'w') as file:
-            file.write(text)
+""")
 
     @classmethod
     def from_yaml(cls, filename: str = "unitcell.yaml"):
