@@ -8,18 +8,20 @@ from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
 @pytest.fixture
 def energy():
-    return Energy(rel_energy=1.0, atom_io={"O": -1},
+    return Energy(name="Va_O1", charge=1, rel_energy=1.0, atom_io={"O": -1},
                   correction_energy={"1st order": 1.0, "alignment-like": 2.0},
                   is_shallow=False)
 
 
 @pytest.fixture
 def energy2():
-    return Energy(rel_energy=0.0, atom_io={})
+    return Energy(name="Va_O1", charge=1, rel_energy=0.0, atom_io={})
 
 
 def test_energy_yaml(energy, tmpdir):
-    expected_text = """rel_energy: 1.0
+    expected_text = """name: Va_O1
+charge: 1
+rel_energy: 1.0
 atom_io:
   O: -1
 correction_energy: 
@@ -30,7 +32,9 @@ is_shallow: False"""
 
 
 def test_energy_yaml2(energy2, tmpdir):
-    expected_text = """rel_energy: 1.0
+    expected_text = """"name: Va_O1
+charge: 1
+rel_energy: 1.0
 atom_io:
 """
     assert_yaml_roundtrip(energy2, tmpdir, expected_text)
