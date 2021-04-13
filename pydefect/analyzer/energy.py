@@ -12,7 +12,7 @@ from monty.serialization import loadfn
 class Energy(MSONable):
     rel_energy: float
     atom_io: Dict[str, int]
-    correction_energy: Optional[float] = None
+    correction_energy: Optional[Dict[str, float]] = None
     is_shallow: Optional[bool] = None
 
     def to_yaml(self, filename: str = "energy.yaml") -> None:
@@ -21,7 +21,9 @@ class Energy(MSONable):
         for k, v in self.atom_io.items():
             lines.append(f"  {k}: {v}")
         if self.correction_energy is not None:
-            lines.append(f"correction_energy: {self.correction_energy}")
+            lines.append(f"correction_energy:")
+            for k, v in self.correction_energy.items():
+                lines.append(f"  {k}: {v}")
         if self.is_shallow is not None:
             lines.append(f"is_shallow: {self.is_shallow}")
         Path(filename).write_text("\n".join(lines))

@@ -8,7 +8,8 @@ from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
 @pytest.fixture
 def energy():
-    return Energy(rel_energy=1.0, atom_io={"O": -1}, correction_energy=1.0,
+    return Energy(rel_energy=1.0, atom_io={"O": -1},
+                  correction_energy={"1st order": 1.0, "alignment-like": 2.0},
                   is_shallow=False)
 
 
@@ -16,7 +17,9 @@ def test_energy_yaml(energy, tmpdir):
     expected_text = """rel_energy: 1.0
 atom_io:
   O: -1
-correction_energy: 1.0
+correction_energy: 
+  1st order: 1.0
+  alignment-like: 2.0
 is_shallow: False"""
     assert_yaml_roundtrip(energy, tmpdir, expected_text)
 

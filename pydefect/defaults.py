@@ -25,6 +25,7 @@ class Defaults(DefaultsBase):
             ["xkcd:blue", "xkcd:brown", "xkcd:crimson", "xkcd:darkgreen",
              "xkcd:gold", "xkcd:magenta", "xkcd:orange", "xkcd:darkblue",
              "xkcd:navy", "xkcd:red", "xkcd:olive", "xkcd:black", "xkcd:indigo"]
+        self._abs_strange_energy = 100.0
 
         self.set_user_settings(yaml_filename="pydefect.yaml")
 
@@ -79,6 +80,10 @@ class Defaults(DefaultsBase):
     @property
     def defect_energy_colors(self):
         return cycle(self._defect_energy_colors)
+
+    @property
+    def abs_strange_energy(self):
+        return self._abs_strange_energy
 
 
 defaults = Defaults()
