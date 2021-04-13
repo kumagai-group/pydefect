@@ -13,6 +13,11 @@ def energy():
                   is_shallow=False)
 
 
+@pytest.fixture
+def energy2():
+    return Energy(rel_energy=0.0, atom_io={})
+
+
 def test_energy_yaml(energy, tmpdir):
     expected_text = """rel_energy: 1.0
 atom_io:
@@ -24,11 +29,13 @@ is_shallow: False"""
     assert_yaml_roundtrip(energy, tmpdir, expected_text)
 
 
-def test_energy_yaml2(tmpdir):
-    energy = Energy(rel_energy=0.0, atom_io={})
+def test_energy_yaml2(energy2, tmpdir):
     expected_text = """rel_energy: 1.0
 atom_io:
 """
-    assert_yaml_roundtrip(energy, tmpdir, expected_text)
+    assert_yaml_roundtrip(energy2, tmpdir, expected_text)
 
 
+def test_energy_total_correction(energy, energy2, tmpdir):
+    assert energy.total_correction == 3.0
+    assert energy2.total_correction is None

@@ -34,3 +34,9 @@ class Energy(MSONable):
         if d["atom_io"] is None:
             d["atom_io"] = {}
         return cls(**d)
+
+    @property
+    def total_correction(self):
+        if self.correction_energy is not None:
+            return sum([v for v in self.correction_energy.values()])
+        return None
