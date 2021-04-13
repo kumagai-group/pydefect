@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 
 from pydefect.analyzer.unitcell import Unitcell
-from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
+from vise.tests.helpers.assertion import assert_json_roundtrip, \
+    assert_yaml_roundtrip
 
 
 @pytest.fixture
@@ -27,9 +28,7 @@ def test_json_round_trip(unitcell, tmpdir):
 
 
 def test_yaml_roundtrip(unitcell, tmpdir):
-    tmpdir.chdir()
-    unitcell.to_yaml("a.yaml")
-    expected = """vbm: 0.1
+    expected_text = """vbm: 0.1
 cbm: 5.1
 ele_dielectric_const:
 - [1.0, 2.0, 3.0]
@@ -40,9 +39,4 @@ ion_dielectric_const:
 - [40.0, 50.0, 60.0]
 - [70.0, 80.0, 90.0]
 """
-    assert Path("a.yaml").read_text() == expected
-
-    actual = Unitcell.from_yaml("a.yaml").as_dict()
-    expected = unitcell.as_dict()
-    for k, v in actual.items():
-        assert v == expected[k]
+    assert_yaml_roundtrip(unitcell, tmpdir, expected_text)
