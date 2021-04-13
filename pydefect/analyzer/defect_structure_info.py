@@ -141,23 +141,15 @@ def make_defect_structure_info(perfect: Structure,
                                initial: Structure,
                                final: Structure,
                                dist_tol: float,
-                               symprec: float = None,
-                               init_site_sym: str = None,
-                               final_site_sym: str = None,
+                               symprec: float,
+                               init_site_sym: str,
                                neighbor_cutoff_factor: float = None
                                ) -> "DefectStructureInfo":
     cutoff = neighbor_cutoff_factor or defaults.cutoff_distance_factor
 
     final = final.copy()
-    if symprec:
-        initial_symmetrizer = StructureSymmetrizer(initial, symprec)
-        final_symmetrizer = StructureSymmetrizer(final, symprec)
-        init_site_sym = initial_symmetrizer.point_group
-        final_site_sym = final_symmetrizer.point_group
-    else:
-        if not (init_site_sym and final_site_sym):
-            raise AssertionError("Need to set both initial and final site "
-                                 "symmetry, when symprec is not set.")
+    symmetrizer = StructureSymmetrizer(final, symprec)
+    final_site_sym = symmetrizer.point_group
 
     assert perfect.lattice == initial.lattice == final.lattice
     comp_w_perf = DefectStructureComparator(final, perfect, dist_tol)

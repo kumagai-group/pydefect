@@ -199,19 +199,9 @@ def test_symmetry_relation():
 def test_make_defect_structure_info(structures, def_str_info):
     perfect, initial, final = structures
     actual = make_defect_structure_info(
-         perfect, initial, final, dist_tol=0.2, symprec=0.1,
-         neighbor_cutoff_factor=1.2)
+         perfect, initial, final, dist_tol=0.2, symprec=0.1, init_site_sym="3m",
+        neighbor_cutoff_factor=1.2)
     assert_dataclass_almost_equal(actual, def_str_info)
-
-
-def test_make_defect_structure_info_w_symms(structures, def_str_info):
-    perfect, initial, final = structures
-    actual = make_defect_structure_info(
-        perfect, initial, final, dist_tol=0.2,
-        init_site_sym="3m", final_site_sym="m", neighbor_cutoff_factor=1.2)
-    expected = deepcopy(def_str_info)
-    expected.symprec = None
-    assert_dataclass_almost_equal(actual, expected)
 
 
 def test_make_def_str_info_symm_rel(structures, def_str_info):

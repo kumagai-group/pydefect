@@ -301,7 +301,6 @@ def test_calc_defect_structure_info(mocker):
     mock_defect_entry.site_symmetry = "x"
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
     mock_calc_results.structure = "b"
-    mock_calc_results.site_symmetry = "y"
 
     def side_effect(key):
 
@@ -321,14 +320,13 @@ def test_calc_defect_structure_info(mocker):
     mock_supercell_info.structure = "c"
     args = Namespace(supercell_info=mock_supercell_info,
                      dirs=[Path("Va_O1_2")],
-                     symprec=None,
+                     symprec=defaults.symmetry_length_tolerance,
                      dist_tolerance=1.0)
     calc_defect_structure_info(args)
     mock_defect_str_info.assert_called_with("c", "a", "b",
                                             dist_tol=1.0,
-                                            symprec=None,
-                                            init_site_sym="x",
-                                            final_site_sym="y")
+                                            symprec=defaults.symmetry_length_tolerance,
+                                            init_site_sym="x")
 
 
 def test_make_band_edge_orb_infos_and_eigval_plot(mocker):

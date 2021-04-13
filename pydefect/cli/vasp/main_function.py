@@ -237,8 +237,7 @@ def calc_defect_structure_info(args):
             calc_results.structure,
             dist_tol=args.dist_tolerance,
             symprec=args.symprec,
-            init_site_sym=defect_entry.site_symmetry,
-            final_site_sym=calc_results.site_symmetry)
+            init_site_sym=defect_entry.site_symmetry)
         defect_str_info.to_json_file(str(d / "defect_structure_info.json"))
 
 

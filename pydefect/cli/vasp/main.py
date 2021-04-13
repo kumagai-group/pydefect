@@ -308,10 +308,10 @@ def parse_args(args):
         help="Tolerance in Angstrom for distance to judge if the "
              "atoms in initial and final structures are same ones.")
     parser_defect_structure_info.add_argument(
-        "--symprec", type=float,
-        help="Tolerance for determining the point groups. If it's not set, "
-             "the point groups written in defect_entry.json and "
-             "calc_results.json are used.")
+        "--symprec", type=float, default=defaults.symmetry_length_tolerance,
+        help="Tolerance for determining point groups in the final "
+             "structures. Note that point groups in the initial structures are "
+             "set via defect_entry.json files.")
     parser_defect_structure_info.set_defaults(func=calc_defect_structure_info)
 
     # -- band edge orbital infos  ----------------------------------------------
