@@ -29,7 +29,7 @@ alphabets = list(string.ascii_uppercase) + \
 class CompositionEnergy(MSONable):
     composition: InitVar[Union[Composition, dict]]
     energy: float
-    source: str
+    source: str = None
 
     def __post_init__(self, composition):
         if isinstance(composition, Composition):
@@ -58,7 +58,7 @@ class ChemPotDiag(MSONable):
              "vertex_elements": [str(e) for e in self.vertex_elements]}
         for ce in self.comp_energies:
             key = str(ce.composition.iupac_formula).replace(" ", "")
-            val = {"energy": ce.energy, "source": ce.source}
+            val = {"energy": ce.energy, "source": str(ce.source)}
             d[key] = val
         Path(filename).write_text(yaml.dump(d))
 

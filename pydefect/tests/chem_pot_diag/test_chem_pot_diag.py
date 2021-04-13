@@ -249,15 +249,16 @@ Mg2F4:
 Mg3:
   energy: -4.50835875
   source: local
-Na1F1:
+# Omit 1 
+NaF:
   energy: -8.67062716
   source: local
 Na20:
   energy: -25.85889772
   source: local
+# Omit source
 Na4Mg4F12:
   energy: -98.24594267
-  source: local
 target: MgF2
 vertex_elements:
 - Na
