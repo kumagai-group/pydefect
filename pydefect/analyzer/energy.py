@@ -6,6 +6,7 @@ from typing import Dict, Optional
 
 from monty.json import MSONable
 from monty.serialization import loadfn
+from pymatgen import Element
 
 
 @dataclass
@@ -13,7 +14,7 @@ class Energy(MSONable):
     name: str
     charge: int
     rel_energy: float
-    atom_io: Dict[str, int]
+    atom_io: Dict[Element, int]
     correction_energy: Optional[Dict[str, float]] = None
     is_shallow: Optional[bool] = None
 
@@ -37,6 +38,8 @@ class Energy(MSONable):
         d = loadfn(filename)
         if d["atom_io"] is None:
             d["atom_io"] = {}
+        else:
+            d["atom_io"] = {Element(k): v for k, v in d["atom_io"].items()}
         return cls(**d)
 
     @property
