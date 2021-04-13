@@ -42,16 +42,20 @@ class CompositionEnergy(MSONable):
         return self.energy / self.composition.num_atoms
 
 
-@dataclass(repr=False)
 class ChemPotDiag(MSONable):
-    comp_energies: List[CompositionEnergy]
-    target: InitVar[Union[Composition, dict]]
-    vertex_elements: InitVar[Optional[List[Element]]] = None
-
-    def __post_init__(self, target, vertex_elements):
-        self.target: Composition = target if isinstance(target, Composition) \
+    def __init__(self,
+                 comp_energies: List[CompositionEnergy],
+                 target: Union[Composition, dict],
+                 vertex_elements: Optional[List[Element]] = None):
+        self.comp_energies = comp_energies
+        self.target = target if isinstance(target, Composition) \
             else Composition.from_dict(target)
         self.vertex_elements = vertex_elements or sorted(self.target.elements)
+
+    def __eq__(self, other: "ChemPotDiag"):
+        return (self.comp_energies == other.comp_energies
+                and self.target == other.target
+                and self.vertex_elements == other.vertex_elements)
 
     def to_yaml(self, filename: str = "cpd.yaml") -> None:
         d = {"target": str(self.target).replace(" ", ""),
@@ -70,7 +74,7 @@ class ChemPotDiag(MSONable):
         composition_energies = []
         for k, v in d.items():
             composition_energies.append(
-                CompositionEnergy(Composition(k), v["energy"], v["source"]))
+                CompositionEnergy(Composition(k), v["energy"], getattr(v, 'source', None)))
         return cls(composition_energies, target, vertex_elements)
 
     @property
@@ -95,7 +99,7 @@ class ChemPotDiag(MSONable):
         return len(self.vertex_elements)
 
     @property
-    def vertex_elements_abs_energies_per_atom(self):
+    def vertex_elements_abs_energies_per_atom(self) -> Dict[Composition, float]:
         result = {}
         for k, v in self.abs_energies_per_atom.items():
             if set(k.elements).issubset(set(self.vertex_elements)):
@@ -109,7 +113,7 @@ class ChemPotDiag(MSONable):
         raise ValueError(f"{elem} is not included.")
 
     @property
-    def offset_to_abs(self):
+    def offset_to_abs(self) -> List[float]:
         result = []
         for vertex_element in self.vertex_elements:
             target = Composition({vertex_element: 1.0}).reduced_composition
@@ -123,7 +127,7 @@ class ChemPotDiag(MSONable):
         return result
 
     @property
-    def rel_energies(self):
+    def rel_energies(self) -> Dict[Composition, float]:
         result = {}
         for c, e in self.vertex_elements_abs_energies_per_atom.items():
             sub = sum(f * offset for f, offset
@@ -174,7 +178,7 @@ class ChemPotDiag(MSONable):
     def target_vertices(self) -> Dict[str, List[float]]:
         label = iter(alphabets)
         fractions = self.atomic_fractions(self.target)
-        energy = self.rel_energies[self.target]
+        energy = self.rel_energies[self.target.reduced_composition]
         return {next(label): c for c in self.vertex_coords
                 if on_composition(fractions, c, energy)}
 
