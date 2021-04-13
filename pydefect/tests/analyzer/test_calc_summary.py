@@ -11,7 +11,7 @@ from vise.tests.helpers.assertion import assert_msonable
 @pytest.fixture
 def single_summary():
     return SingleCalcSummary(charge=0,
-                             ion_io={"O": -1},
+                             atom_io={"O": -1},
                              electronic_conv=True,
                              ionic_conv=True,
                              is_energy_strange=False,
@@ -42,7 +42,7 @@ def test_single_calc_summary_properties(single_summary):
 @pytest.fixture
 def calc_summary(single_summary):
     second = SingleCalcSummary(charge=1,
-                               ion_io={"Mg": -1},
+                               atom_io={"Mg": -1},
                                electronic_conv=True,
                                ionic_conv=False,
                                is_energy_strange=False,
