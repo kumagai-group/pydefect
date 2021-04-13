@@ -12,13 +12,11 @@ from vise.util.mix_in import ToJsonFileMixIn
 class CalcResults(MSONable, ToJsonFileMixIn):
     # keep structure and site_symmetry in CalcResults
     structure: IStructure
-    site_symmetry: str
     energy: float
     magnetization: float
     # potential acting on the positive unit charge, whose sign is reserved from
     # vasp convention of atomic site potential.
     potentials: List[float]
-    fermi_level: float
     electronic_conv: Optional[bool] = None
     ionic_conv: Optional[bool] = None
 
