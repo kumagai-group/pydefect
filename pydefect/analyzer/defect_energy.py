@@ -216,11 +216,6 @@ def make_single_defect_energy(perfect: CalcResults,
                               correction.correction_energy)
 
 
-def reservoir_energy(diffs: Dict[Element, int],
-                     abs_chem_pot: Dict[Element, float]) -> float:
-    return sum([-diff * abs_chem_pot[elem] for elem, diff in diffs.items()])
-
-
 def num_atom_differences(structure: IStructure,
                          ref_structure: IStructure,
                          str_key: bool = False

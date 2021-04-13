@@ -188,13 +188,6 @@ def test_make_single_defect_energy(mocker):
     assert single_defect_energy == SingleDefectEnergy(name, charge, energy, 7.0)
 
 
-def test_reservoir_energy():
-    num_atom_diff = {Element.He: 1, Element.Li: -1}
-    abs_chem_pot = {Element.He: 10.0, Element.Li: 100.0, Element.H: 1000.0}
-    actual = reservoir_energy(num_atom_diff, abs_chem_pot)
-    assert actual == -10.0 + 100.0
-
-
 def test_num_atom_diff():
     s1 = IStructure(Lattice.cubic(1), ["H", "He"], [[0] * 3] * 2)
     s2 = IStructure(Lattice.cubic(1), ["H", "Li"], [[0] * 3] * 2)

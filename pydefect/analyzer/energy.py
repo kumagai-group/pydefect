@@ -47,3 +47,17 @@ class Energy(MSONable):
         if self.correction_energy is not None:
             return sum([v for v in self.correction_energy.values()])
         return None
+
+    def defect_formation_energy(self,
+                                abs_chem_pot: Dict[Element, float]) -> float:
+        if self.total_correction is None:
+            raise ValueError("correction argument must be set to evaluate the"
+                             "defect formation energy.")
+
+        return (self.rel_energy + self.total_correction -
+                reservoir_energy(self.atom_io, abs_chem_pot))
+
+
+def reservoir_energy(atom_io: Dict[Element, int],
+                     abs_chem_pot: Dict[Element, float]) -> float:
+    return sum([-diff * abs_chem_pot[elem] for elem, diff in atom_io.items()])
