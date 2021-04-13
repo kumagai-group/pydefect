@@ -30,9 +30,9 @@ def test_single_calc_summary_msonable(single_summary):
 
 def test_single_calc_summary_properties(single_summary):
     other = copy(single_summary)
-    assert single_summary.same_ion_charge_io(other) is True
+    assert single_summary.same_atom_charge_io(other) is True
     other.charge = 1
-    assert single_summary.same_ion_charge_io(other) is False
+    assert single_summary.same_atom_charge_io(other) is False
 
     assert single_summary.is_converged is True
     assert single_summary.is_proper_result is True

@@ -11,7 +11,7 @@ from tabulate import tabulate
 @dataclass
 class SingleCalcSummary(MSONable):
     charge: int
-    ion_io: dict
+    atom_io: dict
     electronic_conv: Optional[bool] = None
     ionic_conv: Optional[bool] = None
     is_energy_strange: Optional[bool] = None
@@ -24,8 +24,8 @@ class SingleCalcSummary(MSONable):
     occupied_deep_state: Optional[bool] = None
     same_structure: Optional[str] = None
 
-    def same_ion_charge_io(self, other: "SingleCalcSummary"):
-        return self.charge == other.charge and self.ion_io == other.ion_io
+    def same_atom_charge_io(self, other: "SingleCalcSummary"):
+        return self.charge == other.charge and self.atom_io == other.atom_io
 
     @property
     def is_converged(self):
