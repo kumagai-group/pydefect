@@ -74,7 +74,8 @@ class ChemPotDiag(MSONable):
         composition_energies = []
         for k, v in d.items():
             composition_energies.append(
-                CompositionEnergy(Composition(k), v["energy"], getattr(v, 'source', None)))
+                CompositionEnergy(Composition(k), v["energy"],
+                                  getattr(v, 'source', None)))
         return cls(composition_energies, target, vertex_elements)
 
     @property
@@ -193,7 +194,8 @@ class ChemPotDiag(MSONable):
                 result[-1].append(round(v2, 3))
 
             for ie in self.impurity_elements:
-                competing_comp_for_impurity, energy = self.impurity_rel_energy(ie, k)
+                competing_comp_for_impurity, energy = \
+                    self.impurity_rel_energy(ie, k)
                 result[-1].append(round(energy, 3))
                 comp_name = \
                     competing_comp_for_impurity.composition.reduced_formula
