@@ -5,6 +5,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 from monty.json import MSONable
+from pydefect.analyzer.energy import Energy
 from pydefect.corrections.abstract_correction import Correction
 from tabulate import tabulate
 
@@ -28,9 +29,8 @@ class ExtendedFnvCorrection(Correction):
     defect_region_radius: float
     sites: List["PotentialSite"]
     defect_coords: Tuple[float, float, float]
-    additional_correction: float = 0.0
 
-    def __repr__(self):
+    def __str__(self):
         d = [["charge", self.charge],
              ["pc term", self.point_charge_correction],
              ["alignment term", self.alignment_correction],
@@ -48,8 +48,11 @@ class ExtendedFnvCorrection(Correction):
 
     @property
     def correction_energy(self) -> float:
-        return (self.point_charge_correction + self.alignment_correction
-                + self.additional_correction)
+        return self.point_charge_correction + self.alignment_correction
+
+    def set_correction_to_energy(self, energy: Energy) -> None:
+        energy.correction_energy = {"pc term": self.point_charge_correction,
+                                    "alignment term": self.alignment_correction}
 
 
 @dataclass

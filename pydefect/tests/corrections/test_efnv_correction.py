@@ -17,9 +17,9 @@ def test_repr(efnv_correction):
 | charge            |  10 |
 | pc term           |   1 |
 | alignment term    | -15 |
-| correction energy |  86 |
+| correction energy | -14 |
 +-------------------+-----+"""
-    assert repr(efnv_correction) == expected
+    assert str(efnv_correction) == expected
 
 
 def test_extended_fnv_correction_ave_pot_diff(efnv_correction):
@@ -33,7 +33,7 @@ def test_extended_fnv_correction_alignment_correction(efnv_correction):
 
 
 def test_extended_fnv_correction_correction_energy(efnv_correction):
-    expected = 1.0 - 10 * ((1.5 - 0.2) + (2.0 - 0.3)) / 2 + 100
+    expected = 1.0 - 10 * ((1.5 - 0.2) + (2.0 - 0.3)) / 2
     assert efnv_correction.correction_energy == expected
 
 
