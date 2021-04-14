@@ -15,7 +15,7 @@ class Energy(MSONable):
     charge: int
     rel_energy: float
     atom_io: Dict[Element, int]
-    correction_energy: Optional[Dict[str, float]] = None
+    correction_energy: Dict[str, float]
     is_shallow: Optional[bool] = None
 
     def to_yaml(self, filename: str = "energy.yaml") -> None:
@@ -29,8 +29,8 @@ class Energy(MSONable):
             lines.append(f"correction_energy:")
             for k, v in self.correction_energy.items():
                 lines.append(f"  {k}: {v}")
-        if self.is_shallow is not None:
-            lines.append(f"is_shallow: {self.is_shallow}")
+        is_shallow = "" if self.is_shallow is None else self.is_shallow
+        lines.append(f"is_shallow: {is_shallow}")
         Path(filename).write_text("\n".join(lines))
 
     @classmethod
