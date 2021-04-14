@@ -3,7 +3,7 @@
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.energy import EnergySummary, Energy
-from pydefect.analyzer.make_energy import make_energy
+from pydefect.analyzer.make_energy_summary import make_energy_summary
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import IStructure, Lattice, Element
@@ -29,8 +29,8 @@ def test_make_energy(mocker):
 
     standard_energies = {Element.Mg: 10.0, Element.O: 20.0}
 
-    actual = make_energy(defect_entry, calc_results, correction, p_calc_results,
-                         standard_energies)
+    actual = make_energy_summary(defect_entry, calc_results, correction, p_calc_results,
+                                 standard_energies)
     expected = EnergySummary(name="Va_Mg1", charge=-1,
                              energy=Energy(formation_energy=10.0 - 1.0 + 10,
                                            atom_io={Element.Mg: -1},

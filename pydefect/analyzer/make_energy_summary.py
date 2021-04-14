@@ -10,11 +10,12 @@ from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import Element
 
 
-def make_energy(defect_entry: DefectEntry,
-                calc_results: CalcResults,
-                correction: Correction,
-                perfect_calc_results: CalcResults,
-                standard_energies: Dict[Element, float]) -> EnergySummary:
+def make_energy_summary(defect_entry: DefectEntry,
+                        calc_results: CalcResults,
+                        correction: Correction,
+                        perfect_calc_results: CalcResults,
+                        standard_energies: Dict[Element, float]
+                        ) -> EnergySummary:
     atom_io = num_atom_differences(calc_results.structure,
                                    perfect_calc_results.structure)
     formation_energy = calc_results.energy - perfect_calc_results.energy
