@@ -9,8 +9,8 @@ import dash_html_components as html
 import numpy as np
 from pydefect.analyzer.band_edge_states import IsShallow
 from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.energy import Energy, reservoir_energy
 from pydefect.corrections.abstract_correction import Correction
-from pydefect.corrections.manual_correction import NoCorrection
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen.core import Element, IStructure
 from scipy.spatial import HalfspaceIntersection
@@ -139,7 +139,7 @@ class CrossPoints:
         return np.transpose(np.array(self.boundary_points)).tolist()
 
     @property
-    def charges(self):
+    def charges(self) -> List[int]:
         result = []
         for i, j in zip(self.all_sorted_points[:-1], self.all_sorted_points[1:]):
             dx = j[0] - i[0]
@@ -169,51 +169,22 @@ class CrossPoints:
         return "\n".join(lines)
 
 
-def make_defect_energies(single_energies: List[SingleDefectEnergy]
+def make_defect_energies(single_energies: List[Energy],
+                         abs_chem_pot:  Dict[Element, float],
+                         allow_shallow: bool,
                          ) -> List[DefectEnergy]:
+    if allow_shallow is False:
+        single_energies = [e for e in single_energies if e.is_shallow is False]
     sorted_energies = sorted(single_energies, key=lambda x: x.name)
     result = []
-    for _, grouped_energies in groupby(sorted_energies, lambda x: x.name):
-        charges = []
-        energies = []
-        corrections = []
-        for single_energy in grouped_energies:
-            charges.append(single_energy.charge)
-            energies.append(single_energy.energy)
-            corrections.append(single_energy.correction)
-        result.append(DefectEnergy(single_energy.name, charges, energies, corrections))
+    for _, grouped_es in groupby(sorted_energies, lambda x: x.name):
+        grouped_es = list(grouped_es)
+        name = grouped_es[0].name
+        charges = [e.charge for e in grouped_es]
+        energies = [e.formation_energy_wo_corr(abs_chem_pot) for e in grouped_es]
+        corrections = [e.total_correction for e in grouped_es]
+        result.append(DefectEnergy(name, charges, energies, corrections))
     return result
-
-
-def make_energies(perfect: CalcResults,
-                  defects: List[CalcResults],
-                  defect_entries: List[DefectEntry],
-                  corrections: List[Correction],
-                  abs_chem_pot: Dict[Element, float],
-                  allow_shallow: bool = True,
-                  is_shallows: List[IsShallow] = None):
-
-    single_energies = []
-    for i, (d, e, c) in enumerate(zip(defects, defect_entries, corrections)):
-        if allow_shallow is False:
-            if is_shallows and is_shallows[i].is_shallow:
-                continue
-        single_energies.append(
-            make_single_defect_energy(perfect, d, e, abs_chem_pot, c))
-    return make_defect_energies(single_energies)
-
-
-def make_single_defect_energy(perfect: CalcResults,
-                              defect: CalcResults,
-                              defect_entry: DefectEntry,
-                              abs_chem_pot: Dict[Element, float],
-                              correction: Optional[Correction] = NoCorrection()
-                              ) -> SingleDefectEnergy:
-    n_diffs = num_atom_differences(defect.structure, perfect.structure)
-    energy = (defect.energy - perfect.energy
-              + reservoir_energy(n_diffs, abs_chem_pot))
-    return SingleDefectEnergy(defect_entry.name, defect_entry.charge, energy,
-                              correction.correction_energy)
 
 
 def num_atom_differences(structure: IStructure,

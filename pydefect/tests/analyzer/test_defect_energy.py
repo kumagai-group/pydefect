@@ -2,15 +2,13 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import pytest
-from pydefect.analyzer.calc_results import CalcResults
 
 from pydefect.analyzer.defect_energy import (
-    DefectEnergy, CrossPoints, SingleDefectEnergy, make_defect_energies,
-    defect_mpl_name, slide_energy, sanitize_defect_energies_for_plot,
-    make_single_defect_energy, reservoir_energy, num_atom_differences,
-    defect_plotly_name)
-from pydefect.corrections.manual_correction import ManualCorrection
-from pydefect.input_maker.defect_entry import DefectEntry
+    DefectEnergy, CrossPoints, defect_mpl_name,
+    slide_energy, sanitize_defect_energies_for_plot,
+    num_atom_differences,
+    defect_plotly_name, make_defect_energies)
+from pydefect.analyzer.energy import Energy
 from pymatgen.core import IStructure, Lattice, Element
 
 
@@ -92,17 +90,31 @@ def test_cross_points_str(cross_points):
     assert str(cross_points) == expected
 
 
-def test_generate_defect_energies():
+def test_make_defect_energies():
     defect_energies = [
-        SingleDefectEnergy("Va_O1", 0, -1, 1),
-        SingleDefectEnergy("Va_Mg1", 0, -2, 2),
-        SingleDefectEnergy("Va_O1", 1, 7, 3),
-        SingleDefectEnergy("Va_Mg1", -1, -14, 4),
-        SingleDefectEnergy("Va_O1", 2, 15, 5),
-        SingleDefectEnergy("Va_Mg1", -2, -14, 6)]
-    actual = make_defect_energies(defect_energies)
-    expected = [DefectEnergy("Va_Mg1", [0, -1, -2], [-2, -14, -14], [2, 4, 6]),
-                DefectEnergy("Va_O1", [0, 1, 2], [-1, 7, 15], [1, 3, 5])]
+        Energy(name="Va_Mg1", charge=0, rel_energy=-2.0, atom_io={Element.Mg: -1},
+               correction_energy={"PC correction": 2.0}, is_shallow=False),
+        Energy(name="Va_Mg1", charge=-1, rel_energy=-14.0, atom_io={Element.Mg: -1},
+               correction_energy={"PC correction": 4.0}, is_shallow=False),
+        Energy(name="Va_Mg1", charge=-2, rel_energy=-14.0, atom_io={Element.Mg: -1},
+               correction_energy={"PC correction": 6.0}, is_shallow=True),
+
+        Energy(name="Va_O1", charge=0, rel_energy=-1.0, atom_io={Element.O: -1},
+               correction_energy={"PC correction": 1.0}, is_shallow=False),
+        Energy(name="Va_O1", charge=1, rel_energy=7.0, atom_io={Element.O: -1},
+               correction_energy={"PC correction": 3.0}, is_shallow=False),
+        Energy(name="Va_O1", charge=2, rel_energy=15.0, atom_io={Element.O: -1},
+               correction_energy={"PC correction": 5.0}, is_shallow=False),
+    ]
+    abs_chem_pot = {Element.Mg: 5.0, Element.O: 3.0}
+    actual = make_defect_energies(defect_energies, abs_chem_pot, allow_shallow=True)
+    expected = [DefectEnergy("Va_Mg1", [0, -1, -2], [-7.0, -19.0, -19.0], [2.0, 4.0, 6.0]),
+                DefectEnergy("Va_O1", [0, 1, 2], [-4.0, 4.0, 12.0], [1.0, 3.0, 5.0])]
+    assert actual == expected
+
+    actual = make_defect_energies(defect_energies, abs_chem_pot, allow_shallow=False)
+    expected = [DefectEnergy("Va_Mg1", [0, -1], [-7.0, -19.0], [2.0, 4.0]),
+                DefectEnergy("Va_O1", [0, 1, 2], [-4.0, 4.0, 12.0], [1.0, 3.0, 5.0])]
     assert actual == expected
 
 
@@ -160,32 +172,6 @@ def test_slide_energy():
     TODO
     - Evaluate the crossing points at given Fermi level range.
     """
-
-
-def test_make_single_defect_energy(mocker):
-    perfect = mocker.Mock(CalcResults, autospec=True)
-    perfect.energy = 1.0
-    perfect.structure = IStructure(Lattice.cubic(1), ["H"] * 2, [[0] * 3] * 2)
-
-    defect = mocker.Mock(CalcResults, autospec=True)
-    defect.energy = 3.0
-    defect.structure = IStructure(Lattice.cubic(1), ["H"], [[0] * 3])
-
-    name, charge = "Va_H1", 5
-    defect_entry = mocker.Mock(DefectEntry, autospec=True)
-    defect_entry.name = name
-    defect_entry.charge = charge
-
-    single_defect_energy = \
-        make_single_defect_energy(perfect=perfect,
-                                  defect=defect,
-                                  defect_entry=defect_entry,
-                                  abs_chem_pot={Element.H: 100},
-                                  correction=ManualCorrection(7.0))
-    energy = 3.0 - 1.0 + 100
-
-    assert isinstance(single_defect_energy, SingleDefectEnergy)
-    assert single_defect_energy == SingleDefectEnergy(name, charge, energy, 7.0)
 
 
 def test_num_atom_diff():
