@@ -34,28 +34,22 @@ class Energy(MSONable):
         Path(filename).write_text("\n".join(lines))
 
     @classmethod
-    def from_yaml(cls, filename: str = "energy.yaml"):
+    def from_yaml(cls, filename: str = "energy.yaml") -> "Energy":
         d = loadfn(filename)
-        if d["atom_io"] is None:
-            d["atom_io"] = {}
-        else:
-            d["atom_io"] = {Element(k): v for k, v in d["atom_io"].items()}
+        d["atom_io"] = {Element(k): v for k, v in d["atom_io"].items()} \
+            if d["atom_io"] else {}
         return cls(**d)
 
     @property
-    def total_correction(self):
-        if self.correction_energy is not None:
-            return sum([v for v in self.correction_energy.values()])
-        return None
-
-    def defect_formation_energy(self,
-                                abs_chem_pot: Dict[Element, float]) -> float:
-        if self.total_correction is None:
+    def total_correction(self) -> float:
+        if self.correction_energy is None:
             raise ValueError("correction argument must be set to evaluate the"
                              "defect formation energy.")
+        return sum([v for v in self.correction_energy.values()])
 
-        return (self.rel_energy + self.total_correction -
-                reservoir_energy(self.atom_io, abs_chem_pot))
+    def formation_energy_wo_corr(self,
+                                 abs_chem_pot: Dict[Element, float]) -> float:
+        return self.rel_energy - reservoir_energy(self.atom_io, abs_chem_pot)
 
 
 def reservoir_energy(atom_io: Dict[Element, int],
