@@ -37,6 +37,11 @@ def test_extended_fnv_correction_correction_energy(efnv_correction):
     assert efnv_correction.correction_energy == expected
 
 
+def test_extended_fnv_correction_correction_dict(efnv_correction):
+    expected = {"pc term": 1.0, "alignment term": -15.0}
+    assert efnv_correction.correction_dict == expected
+
+
 def test_defect_site_diff_pot():
     s = PotentialSite("H", distance=1.999, potential=1.0, pc_potential=0.1)
     assert s.diff_pot == 1.0 - 0.1
