@@ -187,20 +187,6 @@ def make_defect_energies(single_energies: List[Energy],
     return result
 
 
-def num_atom_differences(structure: IStructure,
-                         ref_structure: IStructure,
-                         str_key: bool = False
-                         ) -> Dict[Union[Element, str], int]:
-    target_composition = structure.composition.as_dict()
-    reference_composition = ref_structure.composition.as_dict()
-    result = {}
-    for k in set(target_composition.keys()) | set(reference_composition.keys()):
-        n_atom_diff = int(target_composition[k] - reference_composition[k])
-        if n_atom_diff:
-            result[k if str_key else Element(k)] = n_atom_diff
-    return result
-
-
 def remove_digits(name):
     return ''.join([i for i in name if not i.isdigit()])
 

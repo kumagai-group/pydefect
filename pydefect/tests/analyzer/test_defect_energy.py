@@ -174,8 +174,3 @@ def test_slide_energy():
     """
 
 
-def test_num_atom_diff():
-    s1 = IStructure(Lattice.cubic(1), ["H", "He"], [[0] * 3] * 2)
-    s2 = IStructure(Lattice.cubic(1), ["H", "Li"], [[0] * 3] * 2)
-    assert num_atom_differences(s1, s2) == {Element.He: 1, Element.Li: -1}
-    assert num_atom_differences(s1, s2, str_key=True) == {"He": 1, "Li": -1}

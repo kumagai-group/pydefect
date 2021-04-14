@@ -3,7 +3,8 @@
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.energy import EnergySummary, Energy
-from pydefect.analyzer.make_energy_summary import make_energy_summary
+from pydefect.analyzer.make_energy_summary import make_energy_summary, \
+    num_atom_differences
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import IStructure, Lattice, Element
@@ -36,3 +37,10 @@ def test_make_energy(mocker):
                                            atom_io={Element.Mg: -1},
                                            correction_energy={"a": 10.0}))
     assert actual == expected
+
+
+def test_num_atom_diff():
+    s1 = IStructure(Lattice.cubic(1), ["H", "He"], [[0] * 3] * 2)
+    s2 = IStructure(Lattice.cubic(1), ["H", "Li"], [[0] * 3] * 2)
+    assert num_atom_differences(s1, s2) == {Element.He: 1, Element.Li: -1}
+    assert num_atom_differences(s1, s2, str_key=True) == {"He": 1, "Li": -1}

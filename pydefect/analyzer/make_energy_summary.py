@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from typing import Dict
+from typing import Dict, Union
 
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.defect_energy import num_atom_differences
 from pydefect.analyzer.energy import EnergySummary, Energy
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import Element
+from pymatgen import Element, IStructure
 
 
 def make_energy_summary(defect_entry: DefectEntry,
@@ -26,3 +25,17 @@ def make_energy_summary(defect_entry: DefectEntry,
                     correction_energy=correction.correction_dict)
 
     return EnergySummary(defect_entry.name, defect_entry.charge, energy)
+
+
+def num_atom_differences(structure: IStructure,
+                         ref_structure: IStructure,
+                         str_key: bool = False
+                         ) -> Dict[Union[Element, str], int]:
+    target_composition = structure.composition.as_dict()
+    reference_composition = ref_structure.composition.as_dict()
+    result = {}
+    for k in set(target_composition.keys()) | set(reference_composition.keys()):
+        n_atom_diff = int(target_composition[k] - reference_composition[k])
+        if n_atom_diff:
+            result[k if str_key else Element(k)] = n_atom_diff
+    return result
