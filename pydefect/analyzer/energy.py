@@ -7,6 +7,7 @@ from typing import Dict, Optional
 from monty.json import MSONable
 from monty.serialization import loadfn
 from pymatgen import Element
+from vise.util.mix_in import ToYamlFileMixIn
 
 
 @dataclass
@@ -26,12 +27,12 @@ class Energy(MSONable):
 
 
 @dataclass
-class EnergySummary(MSONable):
+class EnergySummary(MSONable, ToYamlFileMixIn):
     name: str
     charge: int
     energy: Energy
 
-    def to_yaml(self, filename: str = "energy_summary.yaml") -> None:
+    def to_yaml(self) -> str:
         lines = [f"name: {self.name}",
                  f"charge: {self.charge}",
                  f"formation_energy: {self.energy.formation_energy}",
@@ -43,7 +44,7 @@ class EnergySummary(MSONable):
             lines.append(f"  {k}: {v}")
         is_shallow = "" if self.energy.is_shallow is None else self.energy.is_shallow
         lines.append(f"is_shallow: {is_shallow}")
-        Path(filename).write_text("\n".join(lines))
+        return "\n".join(lines)
 
     @classmethod
     def from_yaml(cls, filename: str = "energy.yaml") -> "EnergySummary":
@@ -51,6 +52,7 @@ class EnergySummary(MSONable):
         d["atom_io"] = {Element(k): v for k, v in d["atom_io"].items()} \
             if d["atom_io"] else {}
         return cls(name=d.pop("name"), charge=d.pop("charge"), energy=Energy(**d))
+
 
 def reservoir_energy(atom_io: Dict[Element, int],
                      abs_chem_pot: Dict[Element, float]) -> float:
