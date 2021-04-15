@@ -2,8 +2,8 @@
 #  Copyright (c) 2020 Kumagai group.
 
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.energy import EnergySummary, Energy
-from pydefect.analyzer.make_energy_summary import make_energy_summary, \
+from pydefect.analyzer.energy import DefectEnergyInfo, DefectEnergy
+from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info, \
     num_atom_differences
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.input_maker.defect_entry import DefectEntry
@@ -30,12 +30,12 @@ def test_make_energy(mocker):
 
     standard_energies = {Element.Mg: 10.0, Element.O: 20.0}
 
-    actual = make_energy_summary(defect_entry, calc_results, correction, p_calc_results,
-                                 standard_energies)
-    expected = EnergySummary(name="Va_Mg1", charge=-1,
-                             energy=Energy(formation_energy=10.0 - 1.0 + 10,
-                                           atom_io={Element.Mg: -1},
-                                           correction_energy={"a": 10.0}))
+    actual = make_defect_energy_info(defect_entry, calc_results, correction,
+                                     p_calc_results, standard_energies)
+    energy = DefectEnergy(formation_energy=10.0 - 1.0 + 10,
+                          atom_io={Element.Mg: -1},
+                          correction_energy={"a": 10.0})
+    expected = DefectEnergyInfo(name="Va_Mg1", charge=-1, energy=energy)
     assert actual == expected
 
 

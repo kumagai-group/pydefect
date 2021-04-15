@@ -3,28 +3,28 @@
 from typing import Dict, Union
 
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.energy import EnergySummary, Energy
+from pydefect.analyzer.energy import DefectEnergyInfo, DefectEnergy
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import Element, IStructure
 
 
-def make_energy_summary(defect_entry: DefectEntry,
-                        calc_results: CalcResults,
-                        correction: Correction,
-                        perfect_calc_results: CalcResults,
-                        standard_energies: Dict[Element, float]
-                        ) -> EnergySummary:
+def make_defect_energy_info(defect_entry: DefectEntry,
+                            calc_results: CalcResults,
+                            correction: Correction,
+                            perfect_calc_results: CalcResults,
+                            standard_energies: Dict[Element, float]
+                            ) -> DefectEnergyInfo:
     atom_io = num_atom_differences(calc_results.structure,
                                    perfect_calc_results.structure)
     formation_energy = calc_results.energy - perfect_calc_results.energy
     for k, v in atom_io.items():
         formation_energy -= standard_energies[k] * v
-    energy = Energy(formation_energy=formation_energy,
-                    atom_io=atom_io,
-                    correction_energy=correction.correction_dict)
+    energy = DefectEnergy(formation_energy=formation_energy,
+                          atom_io=atom_io,
+                          correction_energy=correction.correction_dict)
 
-    return EnergySummary(defect_entry.name, defect_entry.charge, energy)
+    return DefectEnergyInfo(defect_entry.name, defect_entry.charge, energy)
 
 
 def num_atom_differences(structure: IStructure,
