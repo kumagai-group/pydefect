@@ -1,54 +1,105 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
 from itertools import groupby, combinations
-from typing import List, Dict, Optional, Tuple, Union
+from typing import List, Dict, Optional, Tuple
 
 import dash_html_components as html
 import numpy as np
-from pydefect.analyzer.band_edge_states import IsShallow
-from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.energy import Energy, reservoir_energy
-from pydefect.corrections.abstract_correction import Correction
-from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen.core import Element, IStructure
+from monty.json import MSONable
+from monty.serialization import loadfn
+from pymatgen.core import Element
 from scipy.spatial import HalfspaceIntersection
+from vise.util.mix_in import ToYamlFileMixIn
 
 
 @dataclass
-class SingleDefectEnergy:
-    name: str
-    charge: int
-    energy: float
-    correction: float
+class DefectEnergy(MSONable):
+    formation_energy: float
+    correction_energy: Dict[str, float]
+    is_shallow: Optional[bool] = None
 
     @property
-    def corrected_energy(self):
-        return self.energy + self.correction
+    def total_correction(self) -> float:
+        return sum([v for v in self.correction_energy.values()])
 
 
 @dataclass
-class DefectEnergy:
+class DefectEnergyInfo(MSONable, ToYamlFileMixIn):
     name: str
-    charges: List[int]
-    energies: List[float]
-    corrections: List[float]
+    charge: int
+    atom_io: Dict[Element, int]
+    energy: DefectEnergy
 
-    def stable_charges(self, ef_min, ef_max):
-        return set(self.cross_points(ef_min, ef_max).charges)
+    def to_yaml(self) -> str:
+        lines = [f"name: {self.name}",
+                 f"charge: {self.charge}",
+                 f"formation_energy: {self.energy.formation_energy}",
+                 f"atom_io:"]
+        for k, v in self.atom_io.items():
+            lines.append(f"  {k}: {v}")
+        lines.append(f"correction_energy:")
+        for k, v in self.energy.correction_energy.items():
+            lines.append(f"  {k}: {v}")
+        is_shallow = "" if self.energy.is_shallow is None \
+            else self.energy.is_shallow
+        lines.append(f"is_shallow: {is_shallow}")
+        return "\n".join(lines)
+
+    @classmethod
+    def from_yaml(cls, filename: str = "energy.yaml") -> "DefectEnergyInfo":
+        d = loadfn(filename)
+        d["atom_io"] = {Element(k): v for k, v in d["atom_io"].items()} \
+            if d["atom_io"] else {}
+        return cls(d.pop("name"), d.pop("charge"), d.pop("atom_io"),
+                   DefectEnergy(**d))
+
+
+@dataclass
+class DefectEnergySummary:  # yaml
+    title: str
+    defect_energies: Dict[str, "DefectEnergies"]
+    rel_chem_pot: Dict[str, Dict[Element, float]]
+    vbm: float
+    cbm: float
+    supercell_vbm: float
+    supercell_cbm: float
+
+    def make_charge_and_energies(self, chem_pot, is_shallow, with_correction,
+                                 band_edge):
+        pass
+
+
+@dataclass
+class DefectEnergies:
+    atom_io: Dict[Element, int]
+    charges: List[int]
+    energies: List[DefectEnergy]
 
     @property
     def corrected_energies(self):
-        result = []
-        for energy, correction in zip(self.energies, self.corrections):
-            result.append(energy + correction)
-        return result
+        return [e.correction_energy for e in self.energies]
 
-    def cross_points(self, ef_min, ef_max, base_e=0.0):
+    def __str__(self):
+        lines = []
+        for c, e, cor in zip(self.charges, self.energies, self.corrections):
+            lines.append(f"{self.name:>10} {c:>4} {e:12.4f} {cor:12.4f}")
+        return "\n".join(lines)
+
+
+@dataclass
+class ChargesAndEnergies:
+    charges: Dict[str, List[int]]
+    energies: Dict[str, List[float]]
+    ef_min: InitVar[float]
+    ef_max: InitVar[float]
+    base_e: float = 0.0
+
+    def __post_init__(self, ef_min: float, ef_max: float):
         large_minus_number = -1e4
         half_spaces = []
-        for charge, corr_energy in zip(self.charges, self.corrected_energies):
+        for charge, corr_energy in zip(self.charges, self.energies):
             half_spaces.append([-charge, 1, -corr_energy])
 
         half_spaces.append([-1, 0, ef_min])
@@ -63,31 +114,34 @@ class DefectEnergy:
         for intersection in hs.intersections:
             x, y = np.round(intersection, 8)
             if ef_min + 0.001 < x < ef_max - 0.001:
-                inner_cross_points.append([x - base_e, y])
+                inner_cross_points.append([x - self.base_e, y])
             elif y > large_minus_number + 1:
-                boundary_points.append([x - base_e, y])
+                boundary_points.append([x - self.base_e, y])
 
-        return CrossPoints(inner_cross_points, boundary_points)
+        self.cross_points = CrossPoints(inner_cross_points, boundary_points)
 
-    def transition_levels(
-            self, base_e: float = 0.0) -> Dict[Tuple[int, int], float]:
+    @property
+    def stable_charges(self):
+        return set(self.cross_points.charges)
+
+    @property
+    def transition_levels(self) -> Dict[Tuple[int, int], float]:
         result = {}
         for (c1, e1), (c2, e2) in combinations(
-                zip(self.charges, self.corrected_energies), 2):
-            result[(c1, c2)] = - (e1 - e2) / (c1 - c2) - base_e
+                zip(self.charges, self.energies), 2):
+            result[(c1, c2)] = - (e1 - e2) / (c1 - c2) - self.base_e
         return result
 
-    def pinning_level(self,
-                      base_e: float = 0.0
-                      ) -> Tuple[Tuple[float, Optional[int]],
-                                 Tuple[float, Optional[int]]]:
+    @property
+    def pinning_level(self) -> Tuple[Tuple[float, Optional[int]],
+                                     Tuple[float, Optional[int]]]:
         """
         :param base_e: Reference to show the pinning level such as VBM.
         :return: ((Lower pinning, its charge), (Upper pinning, its charge))
         """
         lower_pinning, upper_pinning = float("-inf"), float("inf")
         lower_charge, upper_charge = None, None
-        for charge, corr_energy in zip(self.charges, self.corrected_energies):
+        for charge, corr_energy in zip(self.charges, self.energies):
             if charge == 0:
                 continue
             pinning = - corr_energy / charge
@@ -95,25 +149,19 @@ class DefectEnergy:
                 lower_pinning, lower_charge = pinning, charge
             elif pinning < upper_pinning:
                 upper_pinning, upper_charge = pinning, charge
-        return ((lower_pinning - base_e, lower_charge),
-                (upper_pinning - base_e, upper_charge))
+        return ((lower_pinning - self.base_e, lower_charge),
+                (upper_pinning - self.base_e, upper_charge))
 
     def energy_at_ef(self, ef: float) -> Tuple[float, int]:
         """
         :return: (Lowest energy, its charge)
         """
         result_e, result_charge = float("inf"), None
-        for charge, corr_energy in zip(self.charges, self.corrected_energies):
+        for charge, corr_energy in zip(self.charges, self.energies):
             energy = corr_energy + charge * ef
             if energy < result_e:
                 result_e, result_charge = energy, charge
         return result_e, result_charge
-
-    def __str__(self):
-        lines = []
-        for c, e, cor in zip(self.charges, self.energies, self.corrections):
-            lines.append(f"{self.name:>10} {c:>4} {e:12.4f} {cor:12.4f}")
-        return "\n".join(lines)
 
 
 @dataclass
@@ -169,7 +217,7 @@ class CrossPoints:
         return "\n".join(lines)
 
 
-def make_defect_energies(single_energies: List[Energy],
+def make_defect_energies(single_energies: List[DefectEnergyInfo],
                          abs_chem_pot:  Dict[Element, float],
                          allow_shallow: bool,
                          ) -> List[DefectEnergy]:
@@ -276,3 +324,8 @@ def slide_energy(defect_energies: List[DefectEnergy], base_level: float):
         ee.energies = [e + base_level * c for e, c in zip(e.energies, e.charges)]
         result.append(ee)
     return result
+
+
+def reservoir_energy(atom_io: Dict[Element, int],
+                     abs_chem_pot: Dict[Element, float]) -> float:
+    return sum([-diff * abs_chem_pot[elem] for elem, diff in atom_io.items()])
