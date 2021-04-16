@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues, \
     BandEdgeStates, OrbitalInfo, BandEdgeOrbitalInfos, PerfectBandEdgeState, \
-    EdgeInfo, BandEdgeState, LocalizedOrbital, IsShallow, pretty_orbital
+    EdgeInfo, BandEdgeState, LocalizedOrbital, pretty_orbital
 from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 
 
@@ -125,16 +125,3 @@ Index  Energy  P-ratio  Occupation  Orbitals
     assert band_edge_states.__str__() == expected
 
 
-@pytest.fixture
-def is_shallow():
-    return IsShallow(is_shallow=True)
-
-
-def test_is_shallow_yaml(tmpdir):
-    tmpdir.chdir()
-    IsShallow(True).to_yaml()
-    assert IsShallow.from_yaml() == IsShallow(True)
-    Path("a.yaml").write_text("t")
-    assert IsShallow.from_yaml("a.yaml") == IsShallow(True)
-    Path("a.yaml").write_text("f")
-    assert IsShallow.from_yaml("a.yaml") == IsShallow(False)

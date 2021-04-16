@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 
 import numpy as np
+import pydefect.tests.analyzer.test_defect_energy
 from monty.json import MSONable
 from pydefect.util.coords import pretty_coords
 from tabulate import tabulate
@@ -87,7 +88,7 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
             for band_idx in range(min_idx, max_idx):
                 for kpt_idx, orb_info in enumerate(orb_infos[band_idx], 1):
                     actual_band_idx = band_idx + self.lowest_band_index + 1
-                    energy = f"{orb_info.energy:5.2f}"
+                    energy = f"{orb_info.energy :5.2f}"
                     occupation = f"{orb_info.occupation:4.1f}"
                     p_ratio = f"{orb_info.participation_ratio:4.1f}"
                     orbs = pretty_orbital(orb_info.orbitals)
@@ -208,8 +209,8 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
     @property
     def is_shallow(self):
         if any([i.is_shallow for i in self.states]):
-            return IsShallow(True)
-        return IsShallow(False)
+            return True
+        return False
 
     @property
     def band_indices_for_parchgs(self):
@@ -232,17 +233,4 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
 
         return "\n".join(lines)
 
-
-@dataclass
-class IsShallow:
-    is_shallow: bool
-
-    def to_yaml(self, filename="is_shallow.yaml"):
-        Path(filename).write_text(str(self.is_shallow))
-
-    @classmethod
-    def from_yaml(cls, filename="is_shallow.yaml"):
-        first_letter = Path(filename).read_text()[0].upper()
-        is_shallow = True if first_letter == "T" else False
-        return cls(is_shallow=is_shallow)
 
