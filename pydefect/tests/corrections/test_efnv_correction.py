@@ -34,7 +34,7 @@ def test_extended_fnv_correction_alignment_correction(efnv_correction):
 
 def test_extended_fnv_correction_correction_energy(efnv_correction):
     expected = 1.0 - 10 * ((1.5 - 0.2) + (2.0 - 0.3)) / 2
-    assert efnv_correction.correction_energy == expected
+    assert efnv_correction.energy_corrections == expected
 
 
 def test_extended_fnv_correction_correction_dict(efnv_correction):
