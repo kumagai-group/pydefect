@@ -93,10 +93,9 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
             width=900, height=700)
 
         for name, ce in self._defect_energies.items():
-            cp = ce.make_cross_point()
-            xs, ys = cp.t_all_sorted_points
+            xs, ys = ce.cross_points.t_all_sorted_points
             fig.add_trace(go.Scatter(x=xs, y=ys, name=name,
-                                     text=cp.charge_list,
+                                     text=ce.cross_points.charge_list,
                                      hovertemplate=
                                      f'{name}<br>' +
                                      'Charges %{text}<br>' +
@@ -169,7 +168,7 @@ class DefectEnergyMplPlotter(DefectEnergyPlotter):
     def _add_energies(self):
         for name, ce in self._defect_energies.items():
             color = next(self._mpl_defaults.colors)
-            cp = ce.make_cross_point()
+            cp = ce.cross_points
             self.plt.plot(*cp.t_all_sorted_points, color=color,
                           linewidth=self._mpl_defaults.line_width,
                           label=name)

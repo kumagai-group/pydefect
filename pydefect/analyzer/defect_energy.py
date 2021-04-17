@@ -118,7 +118,7 @@ class ChargeEnergies:
     e_min: float
     e_max: float
 
-    def make_cross_point(self):
+    def __post_init__(self):
         large_minus_number = -1e4
         half_spaces = []
         for charge, corr_energy in self.charge_energies:
@@ -140,7 +140,7 @@ class ChargeEnergies:
             elif y > large_minus_number + 1:
                 boundary_points.append([x, y])
 
-        return CrossPoints(inner_cross_points, boundary_points)
+        self.cross_points = CrossPoints(inner_cross_points, boundary_points)
 
     @property
     def transition_levels(self) -> Dict[Tuple[int, int], float]:

@@ -133,7 +133,7 @@ def charge_energies():
 
 
 def test_charge_energies_cross_points(charge_energies):
-    actual = charge_energies.make_cross_point()
+    actual = charge_energies.cross_points
     expected = CrossPoints([[3.0, 6.0]], [[6.0, 6.0], [1.0, 4.0]])
     assert actual == expected
 
