@@ -5,7 +5,6 @@ from dataclasses import dataclass, InitVar
 from itertools import groupby, combinations
 from typing import List, Dict, Optional, Tuple
 
-import dash_html_components as html
 import numpy as np
 from monty.json import MSONable
 from monty.serialization import loadfn
@@ -17,12 +16,17 @@ from vise.util.mix_in import ToYamlFileMixIn
 @dataclass
 class DefectEnergy(MSONable):
     formation_energy: float
-    correction_energy: Dict[str, float]
+    energy_corrections: Dict[str, float]
     is_shallow: Optional[bool] = None
 
     @property
     def total_correction(self) -> float:
-        return sum([v for v in self.correction_energy.values()])
+        return sum([v for v in self.energy_corrections.values()])
+
+    def energy(self, with_correction):
+        if with_correction:
+            return self.formation_energy + self.total_correction
+        return self.formation_energy
 
 
 @dataclass
@@ -30,25 +34,26 @@ class DefectEnergyInfo(MSONable, ToYamlFileMixIn):
     name: str
     charge: int
     atom_io: Dict[Element, int]
-    energy: DefectEnergy
+    defect_energy: DefectEnergy
 
     def to_yaml(self) -> str:
         lines = [f"name: {self.name}",
                  f"charge: {self.charge}",
-                 f"formation_energy: {self.energy.formation_energy}",
+                 f"formation_energy: {self.defect_energy.formation_energy}",
                  f"atom_io:"]
         for k, v in self.atom_io.items():
             lines.append(f"  {k}: {v}")
-        lines.append(f"correction_energy:")
-        for k, v in self.energy.correction_energy.items():
+        lines.append(f"energy_corrections:")
+        for k, v in self.defect_energy.energy_corrections.items():
             lines.append(f"  {k}: {v}")
-        is_shallow = "" if self.energy.is_shallow is None \
-            else self.energy.is_shallow
+        is_shallow = "" if self.defect_energy.is_shallow is None \
+            else self.defect_energy.is_shallow
         lines.append(f"is_shallow: {is_shallow}")
         return "\n".join(lines)
 
     @classmethod
-    def from_yaml(cls, filename: str = "energy.yaml") -> "DefectEnergyInfo":
+    def from_yaml(cls, filename: str = "defect_energy_info.yaml"
+                  ) -> "DefectEnergyInfo":
         d = loadfn(filename)
         d["atom_io"] = {Element(k): v for k, v in d["atom_io"].items()} \
             if d["atom_io"] else {}
@@ -57,108 +62,120 @@ class DefectEnergyInfo(MSONable, ToYamlFileMixIn):
 
 
 @dataclass
-class DefectEnergySummary:  # yaml
-    title: str
-    defect_energies: Dict[str, "DefectEnergies"]
-    rel_chem_pot: Dict[str, Dict[Element, float]]
-    vbm: float
-    cbm: float
-    supercell_vbm: float
-    supercell_cbm: float
-
-    def make_charge_and_energies(self, chem_pot, is_shallow, with_correction,
-                                 band_edge):
-        pass
-
-
-@dataclass
 class DefectEnergies:
     atom_io: Dict[Element, int]
     charges: List[int]
-    energies: List[DefectEnergy]
-
-    @property
-    def corrected_energies(self):
-        return [e.correction_energy for e in self.energies]
-
-    def __str__(self):
-        lines = []
-        for c, e, cor in zip(self.charges, self.energies, self.corrections):
-            lines.append(f"{self.name:>10} {c:>4} {e:12.4f} {cor:12.4f}")
-        return "\n".join(lines)
+    defect_energies: List[DefectEnergy]
 
 
 @dataclass
-class ChargesAndEnergies:
-    charges: Dict[str, List[int]]
-    energies: Dict[str, List[float]]
-    ef_min: InitVar[float]
-    ef_max: InitVar[float]
-    base_e: float = 0.0
+class DefectEnergySummary:
+    title: str
+    defect_energies: Dict[str, "DefectEnergies"]
+    rel_chem_pots: Dict[str, Dict[Element, float]]
+    cbm: float
+    supercell_vbm: float
+    supercell_cbm: float
+    e_min: Optional[float] = 0.0
+    e_max: Optional[float] = None
+    """ The base Fermi level is set at the VBM."""
+    # TODO: when making this class, if all the defect charges show shallow
+    # show warning.
+    def charge_and_energies(self,
+                            chem_pot_label: str,
+                            allow_shallow: bool,
+                            with_correction: bool
+                            ) -> Dict[str, "ChargeEnergies"]:
+        e_max = self.cbm if self.e_max is None else self.e_max
+        #TODO: generate logger.info when e_min < supercell_vbm.
+        rel_chem_pot = self.rel_chem_pots[chem_pot_label]
+        result = {}
+        for k, v in self.defect_energies.items():
+            x = []
+            for c, e in zip(v.charges, v.defect_energies):
+                if allow_shallow is False and e.is_shallow is True:
+                    continue
+                reservoir_e = sum([-diff * rel_chem_pot[elem]
+                                  for elem, diff in v.atom_io.items()])
+                x.append((c, e.energy(with_correction) + reservoir_e))
 
-    def __post_init__(self, ef_min: float, ef_max: float):
+            if x:
+                result[k] = ChargeEnergies(x, self.e_min, e_max)
+        return result
+
+
+@dataclass
+class ChargeEnergies:
+    charge_energies: List[Tuple[int, float]]
+    e_min: float
+    e_max: float
+
+    def make_cross_point(self):
         large_minus_number = -1e4
         half_spaces = []
-        for charge, corr_energy in zip(self.charges, self.energies):
+        for charge, corr_energy in self.charge_energies:
             half_spaces.append([-charge, 1, -corr_energy])
 
-        half_spaces.append([-1, 0, ef_min])
-        half_spaces.append([1, 0, -ef_max])
+        half_spaces.append([-1, 0, self.e_min])
+        half_spaces.append([1, 0, -self.e_max])
         half_spaces.append([0, -1, large_minus_number])
 
-        feasible_point = np.array([(ef_min + ef_max) / 2, -1e3])
+        feasible_point = np.array([(self.e_min + self.e_max) / 2, -1e3])
 
         hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
         boundary_points = []
         inner_cross_points = []
         for intersection in hs.intersections:
             x, y = np.round(intersection, 8)
-            if ef_min + 0.001 < x < ef_max - 0.001:
-                inner_cross_points.append([x - self.base_e, y])
+            if self.e_min + 0.001 < x < self.e_max - 0.001:
+                inner_cross_points.append([x, y])
             elif y > large_minus_number + 1:
-                boundary_points.append([x - self.base_e, y])
+                boundary_points.append([x, y])
 
-        self.cross_points = CrossPoints(inner_cross_points, boundary_points)
-
-    @property
-    def stable_charges(self):
-        return set(self.cross_points.charges)
+        return CrossPoints(inner_cross_points, boundary_points)
 
     @property
     def transition_levels(self) -> Dict[Tuple[int, int], float]:
         result = {}
-        for (c1, e1), (c2, e2) in combinations(
-                zip(self.charges, self.energies), 2):
-            result[(c1, c2)] = - (e1 - e2) / (c1 - c2) - self.base_e
+        for (c1, e1), (c2, e2) in combinations(self.charge_energies, 2):
+            result[(c1, c2)] = - (e1 - e2) / (c1 - c2)
         return result
 
     @property
     def pinning_level(self) -> Tuple[Tuple[float, Optional[int]],
                                      Tuple[float, Optional[int]]]:
         """
-        :param base_e: Reference to show the pinning level such as VBM.
         :return: ((Lower pinning, its charge), (Upper pinning, its charge))
         """
         lower_pinning, upper_pinning = float("-inf"), float("inf")
         lower_charge, upper_charge = None, None
-        for charge, corr_energy in zip(self.charges, self.energies):
+        for charge, energy in self.charge_energies:
             if charge == 0:
                 continue
-            pinning = - corr_energy / charge
+            pinning = - energy / charge
             if charge > 0 and pinning > lower_pinning:
                 lower_pinning, lower_charge = pinning, charge
             elif pinning < upper_pinning:
                 upper_pinning, upper_charge = pinning, charge
-        return ((lower_pinning - self.base_e, lower_charge),
-                (upper_pinning - self.base_e, upper_charge))
+
+        if lower_charge is None or lower_pinning < self.e_min:
+            lower = None
+        else:
+            lower = (lower_pinning, lower_charge)
+
+        if upper_charge is None or upper_pinning > self.e_max:
+            upper = None
+        else:
+            upper = (lower_pinning, lower_charge)
+        return lower, upper
 
     def energy_at_ef(self, ef: float) -> Tuple[float, int]:
         """
         :return: (Lowest energy, its charge)
         """
         result_e, result_charge = float("inf"), None
-        for charge, corr_energy in zip(self.charges, self.energies):
-            energy = corr_energy + charge * ef
+        for charge, energy in self.charge_energies:
+            energy = energy + charge * ef
             if energy < result_e:
                 result_e, result_charge = energy, charge
         return result_e, result_charge
@@ -216,116 +233,3 @@ class CrossPoints:
             lines.append(f"{point[0]:12.4f} {point[1]:12.4f}")
         return "\n".join(lines)
 
-
-def make_defect_energies(single_energies: List[DefectEnergyInfo],
-                         abs_chem_pot:  Dict[Element, float],
-                         allow_shallow: bool,
-                         ) -> List[DefectEnergy]:
-    if allow_shallow is False:
-        single_energies = [e for e in single_energies if e.is_shallow is False]
-    sorted_energies = sorted(single_energies, key=lambda x: x.name)
-    result = []
-    for _, grouped_es in groupby(sorted_energies, lambda x: x.name):
-        grouped_es = list(grouped_es)
-        name = grouped_es[0].name
-        charges = [e.charge for e in grouped_es]
-        energies = [e.formation_energy_wo_corr(abs_chem_pot) for e in grouped_es]
-        corrections = [e.total_correction for e in grouped_es]
-        result.append(DefectEnergy(name, charges, energies, corrections))
-    return result
-
-
-def remove_digits(name):
-    return ''.join([i for i in name if not i.isdigit()])
-
-
-def only_digits(name):
-    return ''.join([i for i in name if i.isdigit()])
-
-
-elements = [str(e) for e in Element]
-
-
-def defect_mpl_name(name):
-    in_name, out_name = name.split("_")
-    if in_name in elements:
-        in_name = "{\\rm " + in_name + "}"
-    elif in_name == "Va":
-        in_name = "V"
-
-    r_out_name = remove_digits(out_name)
-    if r_out_name in elements:
-        out_name = "{{\\rm " + r_out_name + "}" + only_digits(out_name) + "}"
-    else:
-        out_name = "{" + out_name + "}"
-
-    return f"${in_name}_{out_name}$"
-
-
-def defect_plotly_name(name):
-    in_name, out_name = name.split("_")
-    if in_name == "Va":
-        in_name = "<i>V</i>"
-
-    out_name = f"<sub>{out_name}</sub>"
-    return f"{in_name}{out_name}"
-
-
-def defect_plotly_full_name(fullname):
-    in_name, out_name, charge = fullname.split("_")
-    if in_name == "Va":
-        in_name = "<i>V</i>"
-    return f"{in_name}<sub>{out_name}</sub><sup>{charge}</sup>"
-
-
-def defect_html_title_name(fullname):
-    x = fullname.split("_")
-    if len(x) == 2:
-        in_name, out_name = x
-    elif len(x) == 3:
-        in_name, out_name, charge = x
-    else:
-        raise ValueError
-
-    if in_name == "Va":
-        in_name = html.I("V")
-    else:
-        in_name = html.Span(in_name)
-
-    result = [in_name, html.Sub(out_name)]
-    if len(x) == 3:
-        result.append(html.Sup(charge))
-    return result
-
-
-def sanitize_defect_energies_for_plot(defect_energies: List[DefectEnergy],
-                                      for_plotly: bool = False):
-    result = []
-    out_names = [e.name.split("_")[1] for e in defect_energies]
-
-    for e in defect_energies:
-        ee = deepcopy(e)
-        in_name, out_name = e.name.split("_")
-        r_out_name = remove_digits(out_name)
-        out_name = r_out_name if f"{r_out_name}2" not in out_names else out_name
-        if for_plotly:
-            ee.name = defect_plotly_name("_".join([in_name, out_name]))
-        else:
-            ee.name = defect_mpl_name("_".join([in_name, out_name]))
-        result.append(ee)
-
-    return result
-
-
-def slide_energy(defect_energies: List[DefectEnergy], base_level: float):
-    result = []
-    for e in defect_energies:
-        ee = deepcopy(e)
-        ee.energies = [e + base_level * c for e, c in zip(e.energies, e.charges)]
-        result.append(ee)
-    return result
-
-
-def reservoir_energy(atom_io: Dict[Element, int],
-                     abs_chem_pot: Dict[Element, float]) -> float:
-    return sum([-diff * abs_chem_pot[elem] for elem, diff in atom_io.items()])
