@@ -88,7 +88,7 @@ class DefectEnergySummary:
                             allow_shallow: bool,
                             with_correction: bool,
                             name_style: Optional[str] = None,
-                            ) -> Dict[str, "ChargeEnergies"]:
+                            ) -> Dict[str, "SingleChargeEnergies"]:
         e_max = self.cbm if self.e_max is None else self.e_max
         #TODO: generate logger.info when e_min < supercell_vbm.
         rel_chem_pot = self.rel_chem_pots[chem_pot_label]
@@ -103,7 +103,7 @@ class DefectEnergySummary:
                 x.append((c, e.energy(with_correction) + reservoir_e))
 
             if x:
-                result[k] = ChargeEnergies(x, self.e_min, e_max)
+                result[k] = SingleChargeEnergies(x, self.e_min, e_max)
 
         return prettify_names(result, name_style)
 
@@ -113,7 +113,7 @@ class DefectEnergySummary:
 
 
 @dataclass
-class ChargeEnergies:
+class SingleChargeEnergies:
     charge_energies: List[Tuple[int, float]]
     e_min: float
     e_max: float
@@ -191,7 +191,7 @@ class ChargeEnergies:
 
 @dataclass
 class CrossPoints:
-    inner_cross_points: List[List[float]]
+    inner_cross_points: List[List[float]]  # [Fermi level, energy]
     boundary_points: List[List[float]]
 
     @property
@@ -240,4 +240,5 @@ class CrossPoints:
         for point in self.all_sorted_points:
             lines.append(f"{point[0]:12.4f} {point[1]:12.4f}")
         return "\n".join(lines)
+
 
