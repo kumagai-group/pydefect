@@ -11,6 +11,7 @@ from monty.serialization import loadfn
 from pymatgen.core import Element
 from scipy.spatial import HalfspaceIntersection
 from vise.util.mix_in import ToYamlFileMixIn
+from vise.util.string import latexify
 
 
 @dataclass
@@ -102,6 +103,9 @@ class DefectEnergySummary:
             if x:
                 result[k] = ChargeEnergies(x, self.e_min, e_max)
         return result
+
+    def latexified_title(self):
+        return latexify(self.title)
 
 
 @dataclass

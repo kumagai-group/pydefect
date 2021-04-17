@@ -74,7 +74,7 @@ def defect_energies():
 @pytest.fixture
 def defect_energy_summary(defect_energies):
     return DefectEnergySummary(
-        title="title",
+        title="MgAl2O4",
         defect_energies={"Va_O1": defect_energies},
         rel_chem_pots={"A": {Element.O: -1.0}, "B": {Element.O: -2.0}},
         cbm=2.0, supercell_vbm=-1.0, supercell_cbm=3.0)
@@ -118,6 +118,12 @@ def test_defect_energy_summary_charge_and_energies(
     expected = ChargeEnergies(
         charge_energies=[(0, 2.0), (1, 3.0), (2, 4.0)], e_min=-1.0, e_max=3.0)
     assert actual["Va_O1"] == expected
+
+
+def test_defect_energy_summary_latexified_title(defect_energy_summary):
+    actual = defect_energy_summary.latexified_title()
+    expected = "MgAl$_{2}$O$_{4}$"
+    assert actual == expected
 
 
 @pytest.fixture
