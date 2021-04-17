@@ -148,6 +148,12 @@ def test_charge_energies_cross_points(charge_energies):
     assert actual == expected
 
 
+def test_charge_energies_energy_range(charge_energies):
+    actual = charge_energies.energy_range(0.2)
+    expected = (3.8, 6.2)
+    assert actual == expected
+
+
 def test_charge_energies_transition_levels(single_charge_energies):
     actual = single_charge_energies.transition_levels
     expected = {(0, 1): 3.0}
