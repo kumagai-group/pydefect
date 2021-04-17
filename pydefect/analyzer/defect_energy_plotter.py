@@ -61,18 +61,10 @@ class DefectEnergyPlotter:
         self._x_range = x_range or [0, defect_energy_summary.cbm]
         defect_energy_summary.e_min = self._x_range[0]
         defect_energy_summary.e_max = self._x_range[1]
-        self._defect_energies = defect_energy_summary.charge_and_energies(
+        charge_energies = defect_energy_summary.charge_energies(
             chem_pot_label, allow_shallow, with_correction, name_style)
-
-        self._y_range = y_range or [-5.0, 10.0]
-        # else:
-        #     all_y = []
-        #     for de in self._defect_energies:
-        #         cp = de.cross_points(self._x_range[0], self._x_range[1])
-        #         xs, ys = cp.t_all_sorted_points
-        #         all_y.extend(ys)
-        #     self._y_range = [min(all_y) - 0.2, max(all_y) + 0.2]
-
+        self._cross_points = charge_energies.cross_point_dicts
+        self._y_range = y_range or charge_energies.energy_range(space=0.2)
         self._vline_threshold = vline_threshold
         self._x_unit = x_unit
         self._y_unit = y_unit
@@ -92,10 +84,10 @@ class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
             font_size=24,
             width=900, height=700)
 
-        for name, ce in self._defect_energies.items():
-            xs, ys = ce.cross_points.t_all_sorted_points
+        for name, cp in self._cross_points.items():
+            xs, ys = cp.t_all_sorted_points
             fig.add_trace(go.Scatter(x=xs, y=ys, name=name,
-                                     text=ce.cross_points.charge_list,
+                                     text=cp.charge_list,
                                      hovertemplate=
                                      f'{name}<br>' +
                                      'Charges %{text}<br>' +
@@ -166,9 +158,8 @@ class DefectEnergyMplPlotter(DefectEnergyPlotter):
         self.plt.tight_layout()
 
     def _add_energies(self):
-        for name, ce in self._defect_energies.items():
+        for name, cp in self._cross_points.items():
             color = next(self._mpl_defaults.colors)
-            cp = ce.cross_points
             self.plt.plot(*cp.t_all_sorted_points, color=color,
                           linewidth=self._mpl_defaults.line_width,
                           label=name)
