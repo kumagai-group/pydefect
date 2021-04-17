@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+import re
+from typing import Dict, Any
+
 from pymatgen import Element
 
 
@@ -14,6 +17,8 @@ def only_digits(name: str) -> str:
 
 
 elements = [str(e) for e in Element]
+e_va = elements + ["Va"]
+e_i = elements + ["i"]
 
 
 def defect_mpl_name(name: str) -> str:
@@ -49,6 +54,39 @@ def defect_plotly_full_name(fullname: str) -> str:
     return f"{defect_plotly_name(name)}<sup>{charge}</sup>"
 
 
+def typical_defect_name(name: str) -> bool:
+    x = name.split("_")
+    if len(x) == 2:
+        _in, _out = x
+        if _in in e_va and remove_digits(_out) in e_i:
+            return True
+    return False
+
+
+def prettify_names(d: Dict[str, Any], style) -> Dict[str, Any]:
+    result = {}
+    out_names = [name.split("_")[1] for name in d.keys()]
+    for name, v in d.items():
+        in_name, out_name = name.split("_")
+        r_out_name = remove_digits(out_name)
+        out_name = r_out_name if f"{r_out_name}2" not in out_names else out_name
+        _name = "_".join([in_name, out_name])
+        if _name in result:
+            raise ValueError("The prettified names are conflicted. "
+                             "Change the defect names, please.")
+        if style is None:
+            pass
+        elif style == "mpl":
+            _name = defect_mpl_name(_name)
+        elif style == "plotly":
+            _name = defect_plotly_name(_name)
+        else:
+            raise ValueError(f"Style {style} is not adequate. Choose from mpl"
+                             f"or plotly.")
+        result[_name] = v
+    return result
+
+
 # def defect_html_title_name(fullname):
 #     x = fullname.split("_")
 #     if len(x) == 2:
@@ -68,22 +106,4 @@ def defect_plotly_full_name(fullname: str) -> str:
 #         result.append(html.Sup(charge))
 #     return result
 
-
-# def sanitize_defect_energies_for_plot(defect_energies: List[DefectEnergy],
-#                                       for_plotly: bool = False):
-#     result = []
-#     out_names = [e.name.split("_")[1] for e in defect_energies]
-
-# for e in defect_energies:
-#     ee = deepcopy(e)
-#     in_name, out_name = e.name.split("_")
-#     r_out_name = remove_digits(out_name)
-#     out_name = r_out_name if f"{r_out_name}2" not in out_names else out_name
-#     if for_plotly:
-#         ee.name = defect_plotly_name("_".join([in_name, out_name]))
-#     else:
-#         ee.name = defect_mpl_name("_".join([in_name, out_name]))
-#     result.append(ee)
-
-# return result
 
