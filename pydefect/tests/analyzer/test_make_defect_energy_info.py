@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.energy import DefectEnergyInfo, DefectEnergy
+from pydefect.analyzer.defect_energy import DefectEnergy, DefectEnergyInfo
 from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info, \
     num_atom_differences
 from pydefect.corrections.abstract_correction import Correction
@@ -10,7 +9,7 @@ from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import IStructure, Lattice, Element
 
 
-def test_make_energy(mocker):
+def test_make_defect_energy_info(mocker):
     defect_entry = mocker.Mock(DefectEntry, autospec=True)
     defect_entry.name = "Va_Mg1"
     defect_entry.charge = -1
@@ -33,9 +32,10 @@ def test_make_energy(mocker):
     actual = make_defect_energy_info(defect_entry, calc_results, correction,
                                      p_calc_results, standard_energies)
     energy = DefectEnergy(formation_energy=10.0 - 1.0 + 10,
-                          atom_io={Element.Mg: -1},
-                          correction_energy={"a": 10.0})
-    expected = DefectEnergyInfo(name="Va_Mg1", charge=-1, energy=energy)
+                          energy_corrections={"a": 10.0},
+                          is_shallow=None)
+    expected = DefectEnergyInfo(name="Va_Mg1", charge=-1,
+                                atom_io={Element.Mg: -1}, defect_energy=energy)
     assert actual == expected
 
 
