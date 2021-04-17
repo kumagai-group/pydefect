@@ -83,12 +83,12 @@ class DefectEnergySummary:
     """ The base Fermi level is set at the VBM."""
     # TODO: when making this class, if all the defect charges show shallow
     # show warning.
-    def charge_and_energies(self,
-                            chem_pot_label: str,
-                            allow_shallow: bool,
-                            with_correction: bool,
-                            name_style: Optional[str] = None,
-                            ) -> Dict[str, "SingleChargeEnergies"]:
+    def charge_energies(self,
+                        chem_pot_label: str,
+                        allow_shallow: bool,
+                        with_correction: bool,
+                        name_style: Optional[str] = None,
+                        ) -> "ChargeEnergies":
         e_max = self.cbm if self.e_max is None else self.e_max
         #TODO: generate logger.info when e_min < supercell_vbm.
         rel_chem_pot = self.rel_chem_pots[chem_pot_label]
@@ -103,9 +103,9 @@ class DefectEnergySummary:
                 x.append((c, e.energy(with_correction) + reservoir_e))
 
             if x:
-                result[k] = SingleChargeEnergies(x, self.e_min, e_max)
+                result[k] = SingleChargeEnergies(x)
 
-        return prettify_names(result, name_style)
+        return ChargeEnergies(prettify_names(result, name_style), self.e_min, e_max)
 
     @property
     def latexified_title(self):
@@ -113,34 +113,42 @@ class DefectEnergySummary:
 
 
 @dataclass
-class SingleChargeEnergies:
-    charge_energies: List[Tuple[int, float]]
+class ChargeEnergies:
+    charge_energies_dict: Dict[str, "SingleChargeEnergies"]
     e_min: float
     e_max: float
 
     def __post_init__(self):
+        self.cross_point_dicts = {}
         large_minus_number = -1e4
         half_spaces = []
-        for charge, corr_energy in self.charge_energies:
-            half_spaces.append([-charge, 1, -corr_energy])
+        for name, ce in self.charge_energies_dict.items():
+            for charge, corr_energy in ce.charge_energies:
+                half_spaces.append([-charge, 1, -corr_energy])
 
-        half_spaces.append([-1, 0, self.e_min])
-        half_spaces.append([1, 0, -self.e_max])
-        half_spaces.append([0, -1, large_minus_number])
+            half_spaces.append([-1, 0, self.e_min])
+            half_spaces.append([1, 0, -self.e_max])
+            half_spaces.append([0, -1, large_minus_number])
 
-        feasible_point = np.array([(self.e_min + self.e_max) / 2, -1e3])
+            feasible_point = np.array([(self.e_min + self.e_max) / 2, -1e3])
 
-        hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
-        boundary_points = []
-        inner_cross_points = []
-        for intersection in hs.intersections:
-            x, y = np.round(intersection, 8)
-            if self.e_min + 0.001 < x < self.e_max - 0.001:
-                inner_cross_points.append([x, y])
-            elif y > large_minus_number + 1:
-                boundary_points.append([x, y])
+            hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
+            boundary_points = []
+            inner_cross_points = []
+            for intersection in hs.intersections:
+                x, y = np.round(intersection, 8)
+                if self.e_min + 0.001 < x < self.e_max - 0.001:
+                    inner_cross_points.append([x, y])
+                elif y > large_minus_number + 1:
+                    boundary_points.append([x, y])
 
-        self.cross_points = CrossPoints(inner_cross_points, boundary_points)
+            self.cross_point_dicts[name] = CrossPoints(inner_cross_points,
+                                                       boundary_points)
+
+
+@dataclass
+class SingleChargeEnergies:
+    charge_energies: List[Tuple[int, float]]
 
     @property
     def transition_levels(self) -> Dict[Tuple[int, int], float]:
@@ -149,9 +157,9 @@ class SingleChargeEnergies:
             result[(c1, c2)] = - (e1 - e2) / (c1 - c2)
         return result
 
-    @property
-    def pinning_level(self) -> Tuple[Tuple[float, Optional[int]],
-                                     Tuple[float, Optional[int]]]:
+    def pinning_level(self, e_min, e_max
+                      ) -> Tuple[Tuple[float, Optional[int]],
+                                 Tuple[float, Optional[int]]]:
         """
         :return: ((Lower pinning, its charge), (Upper pinning, its charge))
         """
@@ -166,12 +174,12 @@ class SingleChargeEnergies:
             elif pinning < upper_pinning:
                 upper_pinning, upper_charge = pinning, charge
 
-        if lower_charge is None or lower_pinning < self.e_min:
+        if lower_charge is None or lower_pinning < e_min:
             lower = None
         else:
             lower = (lower_pinning, lower_charge)
 
-        if upper_charge is None or upper_pinning > self.e_max:
+        if upper_charge is None or upper_pinning > e_max:
             upper = None
         else:
             upper = (lower_pinning, lower_charge)

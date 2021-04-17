@@ -6,7 +6,7 @@ import pytest
 
 from pydefect.analyzer.defect_energy import (
     DefectEnergy, CrossPoints, DefectEnergyInfo, DefectEnergies,
-    DefectEnergySummary, SingleChargeEnergies)
+    DefectEnergySummary, SingleChargeEnergies, ChargeEnergies)
 from pymatgen.core import Element
 from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
@@ -80,44 +80,49 @@ def defect_energy_summary(defect_energies):
         cbm=2.0, supercell_vbm=-1.0, supercell_cbm=3.0)
 
 
-def test_defect_energy_summary_charge_and_energies(
+def test_defect_energy_summary_charge_energies(
         defect_energy_summary, defect_energies):
-    actual = defect_energy_summary.charge_and_energies(
+    actual = defect_energy_summary.charge_energies(
         chem_pot_label="A", allow_shallow=True, with_correction=False)
-    expected = SingleChargeEnergies(
-        charge_energies=[(0, 0.0), (1, 1.0), (2, 2.0)], e_min=0.0, e_max=2.0)
-    assert actual["Va_O"] == expected
+    expected = ChargeEnergies(
+        charge_energies_dict={"Va_O": SingleChargeEnergies([(0, 0.0), (1, 1.0), (2, 2.0)])},
+        e_min=0.0, e_max=2.0)
+    assert actual == expected
 
     # change chem_pot_label
-    actual = defect_energy_summary.charge_and_energies(
+    actual = defect_energy_summary.charge_energies(
         chem_pot_label="B", allow_shallow=True, with_correction=False)
-    expected = SingleChargeEnergies(
-        charge_energies=[(0, -1.0), (1, 0.0), (2, 1.0)], e_min=0.0, e_max=2.0)
-    assert actual["Va_O"] == expected
+    expected = ChargeEnergies(
+        charge_energies_dict={"Va_O": SingleChargeEnergies([(0, -1.0), (1, 0.0), (2, 1.0)])},
+        e_min=0.0, e_max=2.0)
+    assert actual == expected
 
     # change allow_shallow
-    actual = defect_energy_summary.charge_and_energies(
+    actual = defect_energy_summary.charge_energies(
         chem_pot_label="A", allow_shallow=False, with_correction=False)
-    expected = SingleChargeEnergies(
-        charge_energies=[(0, 0.0), (1, 1.0)], e_min=0.0, e_max=2.0)
-    assert actual["Va_O"] == expected
+    expected = ChargeEnergies(
+        charge_energies_dict={"Va_O": SingleChargeEnergies([(0, 0.0), (1, 1.0)])},
+        e_min=0.0, e_max=2.0)
+    assert actual == expected
 
     # change with_correction
-    actual = defect_energy_summary.charge_and_energies(
+    actual = defect_energy_summary.charge_energies(
         chem_pot_label="A", allow_shallow=True, with_correction=True)
-    expected = SingleChargeEnergies(
-        charge_energies=[(0, 2.0), (1, 3.0), (2, 4.0)], e_min=0.0, e_max=2.0)
-    assert actual["Va_O"] == expected
+    expected = ChargeEnergies(
+        charge_energies_dict={"Va_O": SingleChargeEnergies([(0, 2.0), (1, 3.0), (2, 4.0)])},
+        e_min=0.0, e_max=2.0)
+    assert actual == expected
 
     # change e_min, e_max
     _defect_energy_summary = deepcopy(defect_energy_summary)
     _defect_energy_summary.e_min = -1.0
     _defect_energy_summary.e_max = 3.0
-    actual = _defect_energy_summary.charge_and_energies(
+    actual = _defect_energy_summary.charge_energies(
         chem_pot_label="A", allow_shallow=True, with_correction=True)
-    expected = SingleChargeEnergies(
-        charge_energies=[(0, 2.0), (1, 3.0), (2, 4.0)], e_min=-1.0, e_max=3.0)
-    assert actual["Va_O"] == expected
+    expected = ChargeEnergies(
+        charge_energies_dict={"Va_O": SingleChargeEnergies([(0, 2.0), (1, 3.0), (2, 4.0)])},
+        e_min=-1, e_max=3.0)
+    assert actual == expected
 
 
 def test_defect_energy_summary_latexified_title(defect_energy_summary):
@@ -127,33 +132,37 @@ def test_defect_energy_summary_latexified_title(defect_energy_summary):
 
 
 @pytest.fixture
-def charge_energies():
-    return SingleChargeEnergies(charge_energies=[(0, 6.0), (1, 3.0)],
-                                e_min=1.0, e_max=6.0)
+def single_charge_energies():
+    return SingleChargeEnergies([(0, 6.0), (1, 3.0)])
+
+
+@pytest.fixture
+def charge_energies(single_charge_energies):
+    return ChargeEnergies({"Va_O": single_charge_energies},
+                          e_min=1.0, e_max=6.0)
 
 
 def test_charge_energies_cross_points(charge_energies):
-    actual = charge_energies.cross_points
-    expected = CrossPoints([[3.0, 6.0]], [[6.0, 6.0], [1.0, 4.0]])
+    actual = charge_energies.cross_point_dicts
+    expected = {"Va_O": CrossPoints([[3.0, 6.0]], [[6.0, 6.0], [1.0, 4.0]])}
     assert actual == expected
 
 
-def test_charge_energies_transition_levels(charge_energies):
-    actual = charge_energies.transition_levels
+def test_charge_energies_transition_levels(single_charge_energies):
+    actual = single_charge_energies.transition_levels
     expected = {(0, 1): 3.0}
     assert actual == expected
 
 
-def test_charge_energies_pinning_level(charge_energies):
-    assert charge_energies.pinning_level == (None, None)
-    ce = SingleChargeEnergies(charge_energies=[(0, 6.0), (1, 3.0)],
-                              e_min=-4.0, e_max=6.0)
-    assert ce.pinning_level == ((-3.0, 1), None)
+def test_charge_energies_pinning_level(single_charge_energies):
+    assert single_charge_energies.pinning_level(1.0, 6.0) == (None, None)
+    ce = SingleChargeEnergies(charge_energies=[(0, 6.0), (1, 3.0)])
+    assert ce.pinning_level(-4.0, 6.0) == ((-3.0, 1), None)
 
 
-def test_charge_energies_energy_at_ef(charge_energies):
-    assert charge_energies.energy_at_ef(ef=0.0) == (3.0, 1)
-    assert charge_energies.energy_at_ef(ef=10.0) == (6.0, 0)
+def test_charge_energies_energy_at_ef(single_charge_energies):
+    assert single_charge_energies.energy_at_ef(ef=0.0) == (3.0, 1)
+    assert single_charge_energies.energy_at_ef(ef=10.0) == (6.0, 0)
 
 
 @pytest.fixture
@@ -181,7 +190,3 @@ def test_cross_points_str(cross_points):
       4.0000      40.0000"""
     assert str(cross_points) == expected
 
-
-def test_erange_from_charge_energies_dict():
-    d = {"Va_O1":  SingleChargeEnergies(charge_energies=[(0, 6.0), (1, 3.0)], e_min=1.0, e_max=6.0),
-         "Va_Mg1":  SingleChargeEnergies(charge_energies=[(0, 6.0), (1, 3.0)], e_min=1.0, e_max=6.0)}
