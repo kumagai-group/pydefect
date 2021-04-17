@@ -150,7 +150,7 @@ def test_charge_energies_cross_points(charge_energies):
 
 def test_charge_energies_energy_range(charge_energies):
     actual = charge_energies.energy_range(0.2)
-    expected = (3.8, 6.2)
+    expected = [3.8, 6.2]
     assert actual == expected
 
 

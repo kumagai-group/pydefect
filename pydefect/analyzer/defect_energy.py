@@ -145,11 +145,11 @@ class ChargeEnergies:
             self.cross_point_dicts[name] = CrossPoints(inner_cross_points,
                                                        boundary_points)
 
-    def energy_range(self, space: float) -> Tuple[float, float]:
+    def energy_range(self, space: float) -> List[float]:
         candidates = []
         for cp in self.cross_point_dicts.values():
             candidates.extend(cp.t_all_sorted_points[1])
-        return min(candidates) - space, max(candidates) + space
+        return [min(candidates) - space, max(candidates) + space]
 
 
 @dataclass
