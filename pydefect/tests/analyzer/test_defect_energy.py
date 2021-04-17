@@ -86,28 +86,28 @@ def test_defect_energy_summary_charge_and_energies(
         chem_pot_label="A", allow_shallow=True, with_correction=False)
     expected = ChargeEnergies(
         charge_energies=[(0, 0.0), (1, 1.0), (2, 2.0)], e_min=0.0, e_max=2.0)
-    assert actual["Va_O1"] == expected
+    assert actual["Va_O"] == expected
 
     # change chem_pot_label
     actual = defect_energy_summary.charge_and_energies(
         chem_pot_label="B", allow_shallow=True, with_correction=False)
     expected = ChargeEnergies(
         charge_energies=[(0, -1.0), (1, 0.0), (2, 1.0)], e_min=0.0, e_max=2.0)
-    assert actual["Va_O1"] == expected
+    assert actual["Va_O"] == expected
 
     # change allow_shallow
     actual = defect_energy_summary.charge_and_energies(
         chem_pot_label="A", allow_shallow=False, with_correction=False)
     expected = ChargeEnergies(
         charge_energies=[(0, 0.0), (1, 1.0)], e_min=0.0, e_max=2.0)
-    assert actual["Va_O1"] == expected
+    assert actual["Va_O"] == expected
 
     # change with_correction
     actual = defect_energy_summary.charge_and_energies(
         chem_pot_label="A", allow_shallow=True, with_correction=True)
     expected = ChargeEnergies(
         charge_energies=[(0, 2.0), (1, 3.0), (2, 4.0)], e_min=0.0, e_max=2.0)
-    assert actual["Va_O1"] == expected
+    assert actual["Va_O"] == expected
 
     # change e_min, e_max
     _defect_energy_summary = deepcopy(defect_energy_summary)
@@ -117,7 +117,7 @@ def test_defect_energy_summary_charge_and_energies(
         chem_pot_label="A", allow_shallow=True, with_correction=True)
     expected = ChargeEnergies(
         charge_energies=[(0, 2.0), (1, 3.0), (2, 4.0)], e_min=-1.0, e_max=3.0)
-    assert actual["Va_O1"] == expected
+    assert actual["Va_O"] == expected
 
 
 def test_defect_energy_summary_latexified_title(defect_energy_summary):

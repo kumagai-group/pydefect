@@ -8,6 +8,7 @@ from typing import List, Dict, Optional, Tuple
 import numpy as np
 from monty.json import MSONable
 from monty.serialization import loadfn
+from pydefect.util.prepare_names import prettify_names
 from pymatgen.core import Element
 from scipy.spatial import HalfspaceIntersection
 from vise.util.mix_in import ToYamlFileMixIn
@@ -85,7 +86,8 @@ class DefectEnergySummary:
     def charge_and_energies(self,
                             chem_pot_label: str,
                             allow_shallow: bool,
-                            with_correction: bool
+                            with_correction: bool,
+                            name_style: Optional[str] = None,
                             ) -> Dict[str, "ChargeEnergies"]:
         e_max = self.cbm if self.e_max is None else self.e_max
         #TODO: generate logger.info when e_min < supercell_vbm.
@@ -102,7 +104,8 @@ class DefectEnergySummary:
 
             if x:
                 result[k] = ChargeEnergies(x, self.e_min, e_max)
-        return result
+
+        return prettify_names(result, name_style)
 
     def latexified_title(self):
         return latexify(self.title)
