@@ -121,7 +121,7 @@ def test_defect_energy_summary_charge_and_energies(
 
 
 def test_defect_energy_summary_latexified_title(defect_energy_summary):
-    actual = defect_energy_summary.latexified_title()
+    actual = defect_energy_summary.latexified_title
     expected = "MgAl$_{2}$O$_{4}$"
     assert actual == expected
 

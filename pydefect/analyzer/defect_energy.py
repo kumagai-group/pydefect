@@ -107,6 +107,7 @@ class DefectEnergySummary:
 
         return prettify_names(result, name_style)
 
+    @property
     def latexified_title(self):
         return latexify(self.title)
 
