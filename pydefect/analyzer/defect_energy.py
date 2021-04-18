@@ -10,8 +10,9 @@ from monty.json import MSONable
 from monty.serialization import loadfn
 from pydefect.util.prepare_names import prettify_names
 from scipy.spatial import HalfspaceIntersection
+from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn, ToYamlFileMixIn
-from vise.util.string import latexify
+from vise.util.string import latexify, numbers_to_lowercases
 
 
 @dataclass
@@ -81,6 +82,36 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
     supercell_vbm: float
     supercell_cbm: float
     """ The base Fermi level is set at the VBM."""
+
+    def __str__(self):
+        lines = [f"title: {numbers_to_lowercases(self.title)}",
+                 "rel_chem_pots:"]
+        chem_pot = []
+        for k, v in self.rel_chem_pots.items():
+            elem_list = [f"{elem}: {val:.2f}" for elem, val in v.items()]
+            chem_pot.append(f" -{k} " + " ".join(elem_list))
+        lines.append('\n'.join(chem_pot))
+        lines.append(f"vbm: 0.00, cbm: {self.cbm:.2f}, "
+                     f"supercell vbm: {self.supercell_vbm:.2f}, "
+                     f"supercell_cbm: {self.supercell_cbm:.2f}")
+        lines.append("")
+
+        defects = []
+        for name, des in self.defect_energies.items():
+            atom_io = " ".join(
+                [f"{elem}: {io}" for elem, io in des.atom_io.items()])
+            charges_energies = list(zip(des.charges, des.defect_energies))
+            charges_energies.sort(key=lambda x: x[0])
+            for charge, de in charges_energies:
+                defects.append([name, atom_io, charge, de.formation_energy,
+                                de.total_correction, de.is_shallow])
+                name, atom_io = "", ""
+        headers = ("name", "atom_io", "charge", "energy", "correction",
+                   "is_shallow")
+        floatfmt = ("", "", "", ".3f", ".3f", "")
+        lines.append(tabulate(defects, headers=headers, floatfmt=floatfmt))
+
+        return "\n".join(lines)
 
     # TODO: when making this class, if all the defect charges show shallow
     # show warning.

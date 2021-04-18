@@ -84,6 +84,38 @@ def test_defect_energy_summary_json_roundtrip(defect_energy_summary, tmpdir):
     assert_json_roundtrip(defect_energy_summary, tmpdir)
 
 
+def test_defect_energy_summary_str():
+    defect_energies = DefectEnergies(
+        atom_io={"O": -1},
+        charges=[1, 2, 0],
+        defect_energies=[
+            DefectEnergy(2.0001, {"corr": 2.0001}, is_shallow=False),
+            DefectEnergy(3.0001, {"corr": 2.0001}, is_shallow=True),
+            DefectEnergy(1.0001, {"corr": 2.0001}, is_shallow=False),
+        ])
+
+    defect_energy_summary = DefectEnergySummary(
+        title="MgAl2O4",
+        defect_energies={"Va_O1": defect_energies},
+        rel_chem_pots={"A": {"O": -1.000000001}, "B": {"O": -2.000000001}},
+        cbm=2.000000001, supercell_vbm=-1.000000001, supercell_cbm=3.000000001)
+
+    actual = defect_energy_summary.__str__()
+    print(actual)
+    expected = """title: MgAl₂O₄
+rel_chem_pots:
+ -A O: -1.00
+ -B O: -2.00
+vbm: 0.00, cbm: 2.00, supercell vbm: -1.00, supercell_cbm: 3.00
+
+name    atom_io      charge    energy    correction  is_shallow
+------  ---------  --------  --------  ------------  ------------
+Va_O1   O: -1             0     1.000         2.000  False
+                          1     2.000         2.000  False
+                          2     3.000         2.000  True"""
+    assert actual == expected
+
+
 def test_defect_energy_summary_charge_energies(
         defect_energy_summary, defect_energies):
     actual = defect_energy_summary.charge_energies(
