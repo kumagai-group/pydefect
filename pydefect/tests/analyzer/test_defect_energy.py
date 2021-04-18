@@ -87,7 +87,7 @@ def test_defect_energy_summary_json_roundtrip(defect_energy_summary, tmpdir):
 def test_defect_energy_summary_charge_energies(
         defect_energy_summary, defect_energies):
     actual = defect_energy_summary.charge_energies(
-        chem_pot_label="A", allow_shallow=True, with_correction=False)
+        chem_pot_label="A", allow_shallow=True, with_correction=False, e_range=(0.0, 2.0))
     expected = ChargeEnergies(
         charge_energies_dict={"Va_O": SingleChargeEnergies([(0, 0.0), (1, 1.0), (2, 2.0)])},
         e_min=0.0, e_max=2.0)
@@ -95,7 +95,7 @@ def test_defect_energy_summary_charge_energies(
 
     # change chem_pot_label
     actual = defect_energy_summary.charge_energies(
-        chem_pot_label="B", allow_shallow=True, with_correction=False)
+        chem_pot_label="B", allow_shallow=True, with_correction=False, e_range=(0.0, 2.0))
     expected = ChargeEnergies(
         charge_energies_dict={"Va_O": SingleChargeEnergies([(0, -1.0), (1, 0.0), (2, 1.0)])},
         e_min=0.0, e_max=2.0)
@@ -103,7 +103,7 @@ def test_defect_energy_summary_charge_energies(
 
     # change allow_shallow
     actual = defect_energy_summary.charge_energies(
-        chem_pot_label="A", allow_shallow=False, with_correction=False)
+        chem_pot_label="A", allow_shallow=False, with_correction=False, e_range=(0.0, 2.0))
     expected = ChargeEnergies(
         charge_energies_dict={"Va_O": SingleChargeEnergies([(0, 0.0), (1, 1.0)])},
         e_min=0.0, e_max=2.0)
@@ -111,21 +111,10 @@ def test_defect_energy_summary_charge_energies(
 
     # change with_correction
     actual = defect_energy_summary.charge_energies(
-        chem_pot_label="A", allow_shallow=True, with_correction=True)
+        chem_pot_label="A", allow_shallow=True, with_correction=True, e_range=(0.0, 2.0))
     expected = ChargeEnergies(
         charge_energies_dict={"Va_O": SingleChargeEnergies([(0, 2.0), (1, 3.0), (2, 4.0)])},
         e_min=0.0, e_max=2.0)
-    assert actual == expected
-
-    # change e_min, e_max
-    _defect_energy_summary = deepcopy(defect_energy_summary)
-    _defect_energy_summary.e_min = -1.0
-    _defect_energy_summary.e_max = 3.0
-    actual = _defect_energy_summary.charge_energies(
-        chem_pot_label="A", allow_shallow=True, with_correction=True)
-    expected = ChargeEnergies(
-        charge_energies_dict={"Va_O": SingleChargeEnergies([(0, 2.0), (1, 3.0), (2, 4.0)])},
-        e_min=-1, e_max=3.0)
     assert actual == expected
 
 

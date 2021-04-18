@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from itertools import cycle
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import plotly.graph_objects as go
 from adjustText import adjust_text
@@ -48,8 +48,8 @@ class DefectEnergyPlotter:
                  allow_shallow: bool,
                  with_correction: bool,
                  name_style: Optional[str],
-                 x_range: Optional[List[float]] = None,
-                 y_range: Optional[List[float]] = None,
+                 x_range: Optional[Tuple[float, float]] = None,
+                 y_range: Optional[Tuple[float, float]] = None,
                  vline_threshold: float = 0.02,
                  x_unit: Optional[str] = "eV",
                  y_unit: Optional[str] = "eV",
@@ -58,11 +58,12 @@ class DefectEnergyPlotter:
         self._title = defect_energy_summary.latexified_title
         self._supercell_vbm = defect_energy_summary.supercell_vbm
         self._supercell_cbm = defect_energy_summary.supercell_cbm
-        self._x_range = x_range or [0, defect_energy_summary.cbm]
+        self._x_range = x_range or (0, defect_energy_summary.cbm)
         defect_energy_summary.e_min = self._x_range[0]
         defect_energy_summary.e_max = self._x_range[1]
         charge_energies = defect_energy_summary.charge_energies(
-            chem_pot_label, allow_shallow, with_correction, name_style)
+            chem_pot_label, allow_shallow, with_correction, self._x_range,
+            name_style)
         self._cross_points = charge_energies.cross_point_dicts
         self._y_range = y_range or charge_energies.energy_range(space=0.2)
         self._vline_threshold = vline_threshold

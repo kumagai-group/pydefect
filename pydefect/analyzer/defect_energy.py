@@ -80,8 +80,6 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
     cbm: float
     supercell_vbm: float
     supercell_cbm: float
-    e_min: Optional[float] = 0.0
-    e_max: Optional[float] = None
     """ The base Fermi level is set at the VBM."""
 
     # TODO: when making this class, if all the defect charges show shallow
@@ -90,9 +88,9 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
                         chem_pot_label: str,
                         allow_shallow: bool,
                         with_correction: bool,
+                        e_range: Tuple[float, float],
                         name_style: Optional[str] = None,
                         ) -> "ChargeEnergies":
-        e_max = self.cbm if self.e_max is None else self.e_max
         #TODO: generate logger.info when e_min < supercell_vbm.
         rel_chem_pot = self.rel_chem_pots[chem_pot_label]
         result = {}
@@ -107,8 +105,7 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
 
             if x:
                 result[k] = SingleChargeEnergies(x)
-
-        return ChargeEnergies(prettify_names(result, name_style), self.e_min, e_max)
+        return ChargeEnergies(prettify_names(result, name_style), e_range[0], e_range[1])
 
     @property
     def latexified_title(self):

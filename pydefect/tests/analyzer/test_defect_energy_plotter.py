@@ -7,7 +7,6 @@ from pydefect.analyzer.defect_energy import DefectEnergy, DefectEnergies, \
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter, \
     DefectEnergiesMplSettings, DefectEnergyPlotlyPlotter
 from pydefect.defaults import defaults
-from pymatgen import Element
 from vise.util.dash_helper import show_png
 
 try:
@@ -30,12 +29,12 @@ def defect_energy_summary():
     de1 = DefectEnergy(0.0, {"PC correction": 2.0}, False)
     de2 = DefectEnergy(-5.0, {"PC correction": 3.0}, True)
 
-    defect_energies = {"Va_Mg1": DefectEnergies(atom_io={Element.Mg: -1},
+    defect_energies = {"Va_Mg1": DefectEnergies(atom_io={"Mg": -1},
                                                 charges=[0, 1],
                                                 defect_energies=[de1, de2])}
     return DefectEnergySummary(title="MgAl2O4",
                                defect_energies=defect_energies,
-                               rel_chem_pots={"A": {Element.Mg: -1}},
+                               rel_chem_pots={"A": {"Mg": -1}},
                                cbm=7.0,
                                supercell_vbm=-1.0,
                                supercell_cbm=4.0)
