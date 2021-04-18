@@ -9,9 +9,8 @@ import numpy as np
 from monty.json import MSONable
 from monty.serialization import loadfn
 from pydefect.util.prepare_names import prettify_names
-from pymatgen.core import Element
 from scipy.spatial import HalfspaceIntersection
-from vise.util.mix_in import ToYamlFileMixIn
+from vise.util.mix_in import ToJsonFileMixIn, ToYamlFileMixIn
 from vise.util.string import latexify
 
 
@@ -35,7 +34,7 @@ class DefectEnergy(MSONable):
 class DefectEnergyInfo(MSONable, ToYamlFileMixIn):
     name: str
     charge: int
-    atom_io: Dict[Element, int]
+    atom_io: Dict[str, int]
     defect_energy: DefectEnergy
 
     def to_yaml(self) -> str:
@@ -57,30 +56,34 @@ class DefectEnergyInfo(MSONable, ToYamlFileMixIn):
     def from_yaml(cls, filename: str = "defect_energy_info.yaml"
                   ) -> "DefectEnergyInfo":
         d = loadfn(filename)
-        d["atom_io"] = {Element(k): v for k, v in d["atom_io"].items()} \
-            if d["atom_io"] else {}
+        if d["atom_io"] is None:
+            d["atom_io"] = {}
         return cls(d.pop("name"), d.pop("charge"), d.pop("atom_io"),
                    DefectEnergy(**d))
 
 
 @dataclass
-class DefectEnergies:
-    atom_io: Dict[Element, int]
+class DefectEnergies(MSONable):
+    atom_io: Dict[str, int]
     charges: List[int]
     defect_energies: List[DefectEnergy]
 
+    def to_yaml(self):
+        pass
+
 
 @dataclass
-class DefectEnergySummary:
+class DefectEnergySummary(MSONable, ToJsonFileMixIn):
     title: str
     defect_energies: Dict[str, "DefectEnergies"]
-    rel_chem_pots: Dict[str, Dict[Element, float]]
+    rel_chem_pots: Dict[str, Dict[str, float]]
     cbm: float
     supercell_vbm: float
     supercell_cbm: float
     e_min: Optional[float] = 0.0
     e_max: Optional[float] = None
     """ The base Fermi level is set at the VBM."""
+
     # TODO: when making this class, if all the defect charges show shallow
     # show warning.
     def charge_energies(self,
