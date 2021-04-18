@@ -7,12 +7,11 @@ from pydefect.analyzer.band_edge_states import PerfectBandEdgeState
 from pydefect.analyzer.defect_energy import DefectEnergyInfo, \
     DefectEnergySummary, DefectEnergies
 from pydefect.analyzer.unitcell import Unitcell
-from pymatgen import Element
 
 
 def make_defect_energy_summary(
         single_energies: List[DefectEnergyInfo],
-        rel_chem_pot: Dict[str, Dict[Element, float]],
+        rel_chem_pot: Dict[str, Dict[str, float]],
         unitcell: Unitcell,
         perf_be_state: PerfectBandEdgeState) -> DefectEnergySummary:
 
