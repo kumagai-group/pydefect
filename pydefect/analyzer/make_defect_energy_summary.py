@@ -26,7 +26,7 @@ def make_defect_energy_summary(
             des.append(es.defect_energy)
         defect_energies[name] = DefectEnergies(atom_io, charges, des)
 
-    return DefectEnergySummary(title=unitcell.title,
+    return DefectEnergySummary(title=unitcell.system,
                                defect_energies=defect_energies,
                                rel_chem_pots=rel_chem_pot,
                                cbm=unitcell.cbm,

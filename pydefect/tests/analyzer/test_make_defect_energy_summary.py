@@ -23,7 +23,7 @@ def test_make_defect_energy_summary(mocker):
     defect_energies = {"Va_Mg1": DefectEnergies(atom_io={"Mg": -1},
                                                 charges=[0, 1],
                                                 defect_energies=[de1, de2])}
-    expected = DefectEnergySummary(title=unitcell.title,
+    expected = DefectEnergySummary(title=unitcell.system,
                                    defect_energies=defect_energies,
                                    rel_chem_pots=rel_chem_pot,
                                    cbm=unitcell.cbm,
