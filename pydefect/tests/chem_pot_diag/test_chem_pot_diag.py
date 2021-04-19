@@ -7,24 +7,80 @@ import numpy as np
 import pandas as pd
 import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
-    NoElementEnergyError, CompositionEnergy, replace_comp_energy
+    NoElementEnergyError, CompositionEnergy, replace_comp_energy, \
+    CompositionEnergies, ReferenceEnergies, RelativeEnergies
 # When same keys are inserted, only the latter one is accepted.
 from pymatgen.core import Composition, Element
-from vise.tests.helpers.assertion import assert_msonable
-
-energies = [CompositionEnergy(Composition("H"), 0.0, "a"),
-            CompositionEnergy(Composition("H4O2"), -4.0, "c"),
-            CompositionEnergy(Composition("O"), 1.0, "b"),
-            CompositionEnergy(Composition("Cl"), 12.0, "f"),
-            CompositionEnergy(Composition("O2Cl"), 3.0, "e"),
-            CompositionEnergy(Composition("O2Cl2"), 6.0, "d"),
-            ]
+from vise.tests.helpers.assertion import assert_msonable, assert_yaml_roundtrip
 
 
 @pytest.fixture
-def cpd_h2o():
-    return ChemPotDiag(energies, target=Composition("H2O"),
-                       vertex_elements=[Element.H, Element.O])
+def comp_es():
+    return CompositionEnergies(
+        {Composition("H"): CompositionEnergy(0.0, "a"),
+         Composition("H4O2"): CompositionEnergy(-4.0, "c"),
+         Composition("O"): CompositionEnergy(1.0, "b"),
+         Composition("Cl"): CompositionEnergy(12.0, "f"),
+         Composition("O2Cl"): CompositionEnergy(3.0, "e"),
+         Composition("O2Cl2"): CompositionEnergy(6.0, "d")})
+
+
+def test_comp_es_yaml_roundtrip(comp_es, tmpdir):
+    expected_text = """Cl1:
+  energy: 12.0
+  source: f
+H1:
+  energy: 0.0
+  source: a
+H4O2:
+  energy: -4.0
+  source: c
+O1:
+  energy: 1.0
+  source: b
+O2Cl1:
+  energy: 3.0
+  source: e
+O2Cl2:
+  energy: 6.0
+  source: d
+"""
+    assert_yaml_roundtrip(comp_es, tmpdir, expected_text, pass_comp_dict=True, pass_comp_items=True)
+
+
+def test_comp_es_elements(comp_es):
+    assert comp_es.elements == ["Cl", "H", "O"]
+
+
+@pytest.fixture
+def ref_es():
+    return ReferenceEnergies({"Mg": 1.0, "O": 2.0})
+
+
+def test_ref_es(ref_es, tmpdir):
+    expected_text = """Mg: 1.0
+O: 2.0
+"""
+    assert_yaml_roundtrip(ref_es, tmpdir, expected_text, pass_comp_dict=True, pass_comp_items=True)
+
+
+@pytest.fixture
+def rel_es():
+    return RelativeEnergies({"MgO": 1.0})
+
+
+def test_rel_es(rel_es, tmpdir):
+    expected_text = """MgO: 1.0
+"""
+    assert_yaml_roundtrip(rel_es, tmpdir, expected_text, pass_comp_dict=True, pass_comp_items=True)
+
+
+def test_make_ref_rel_energies(comp_es):
+    actual = comp_es.reference_relative_energies
+    expected_ref = ReferenceEnergies({"H": 0.0, "O": 1.0, "Cl": 12.0})
+    expected_rel = ReferenceEnergies({'ClO': -5.0, 'ClO2': -3.666666666666667, 'H2O': -1.0})
+    assert actual[0] == expected_ref
+    assert actual[1] == expected_rel
 
 
 def test_print(cpd_h2o):

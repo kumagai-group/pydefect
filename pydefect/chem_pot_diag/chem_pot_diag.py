@@ -3,9 +3,9 @@
 import string
 from copy import deepcopy
 from dataclasses import dataclass, InitVar
-from itertools import chain
+from itertools import chain, product
 from pathlib import Path
-from typing import Dict, Optional, Union, List, Tuple
+from typing import Dict, Optional, Union, List, Mapping
 
 import numpy as np
 import pandas as pd
@@ -17,37 +17,97 @@ from pydefect.util.error_classes import CpdNotSupportedError
 from pymatgen.core import Composition, Element
 from scipy.spatial.qhull import HalfspaceIntersection, QhullError
 from tabulate import tabulate
+from vise.util.mix_in import ToYamlFileMixIn
 
-
-alphabets = list(string.ascii_uppercase) + \
-            ["A"+i for i in string.ascii_uppercase] + \
-            ["B"+i for i in string.ascii_uppercase] + \
-            ["C"+i for i in string.ascii_uppercase]
+AtoZ = list(string.ascii_uppercase)
 
 
 @dataclass
 class CompositionEnergy(MSONable):
-    composition: InitVar[Union[Composition, dict]]
     energy: float
     source: str = None
 
-    def __post_init__(self, composition):
-        if isinstance(composition, Composition):
-            self.composition: Composition = composition
-        else:
-            self.composition: Composition = Composition.from_dict(composition)
+
+class CompositionEnergies(ToYamlFileMixIn, dict):
+    def to_yaml(self) -> str:
+        d = {}
+        for k, v in self.items():
+            key = str(k.iupac_formula).replace(" ", "")
+            val = {"energy": v.energy, "source": str(v.source)}
+            d[key] = val
+        return yaml.dump(d)
+
+    @classmethod
+    def from_yaml(cls, filename: str = None):
+        name = filename or cls._yaml_filename()
+        d = loadfn(name)
+        composition_energies = {}
+        for k, v in d.items():
+            source = v.get('source', None)
+            key = Composition(k)
+            composition_energies[key] = CompositionEnergy(v["energy"], source)
+        return cls(composition_energies)
 
     @property
-    def abs_energy_per_atom(self):
-        return self.energy / self.composition.num_atoms
+    def elements(self):
+        result = set()
+        for c in self:
+            result.update(set([str(e) for e in c.elements]))
+        return sorted(result)
+
+    @property
+    def reference_relative_energies(self):
+        reference, rel = ReferenceEnergies(), RelativeEnergies()
+        abs_energies_per_atom = {k.reduced_formula: v.energy / k.num_atoms
+                                 for k, v in self.items()}
+        ref_energy_list = []
+        for vertex_element in self.elements:
+            # This target is needed as some reduced formulas shows molecule
+            # ones such as H2 and O2.
+            target = Composition({vertex_element: 1.0}).reduced_formula
+            candidates = filter(lambda x: x[0] == target,
+                                abs_energies_per_atom.items())
+            try:
+                min_abs_energy = min([x[1] for x in candidates])
+            except ValueError:
+                raise NoElementEnergyError
+            reference[vertex_element] = min_abs_energy
+            ref_energy_list.append(min_abs_energy)
+
+        for formula, e in abs_energies_per_atom.items():
+            comp = Composition(formula)
+            if comp.is_element:
+                continue
+            frac = [comp.fractional_composition[e] for e in self.elements]
+            offset = sum([a * b for a, b in zip(frac, ref_energy_list)])
+            rel[formula] = e - offset
+
+        return reference, rel
+
+
+class CpdAbstractEnergies(ToYamlFileMixIn, dict):
+    def to_yaml(self) -> str:
+        return yaml.dump(dict(self))
+
+    @classmethod
+    def from_yaml(cls, filename: str = None):
+        return cls(loadfn(filename or cls._yaml_filename()))
+
+
+class ReferenceEnergies(CpdAbstractEnergies):
+    pass
+
+
+class RelativeEnergies(CpdAbstractEnergies):
+    pass
 
 
 class ChemPotDiag(MSONable):
     def __init__(self,
-                 comp_energies: List[CompositionEnergy],
+                 relative_energies: RelativeEnergies,
                  target: Union[Composition, dict],
                  vertex_elements: Optional[List[Element]] = None):
-        self.comp_energies = comp_energies
+        self.comp_energies = relative_energies
         self.target = target if isinstance(target, Composition) \
             else Composition.from_dict(target)
         self.vertex_elements = vertex_elements or sorted(self.target.elements)
@@ -177,10 +237,10 @@ class ChemPotDiag(MSONable):
 
     @property
     def target_vertices(self) -> Dict[str, List[float]]:
-        label = iter(alphabets)
+        AtoZZ = product([""] + AtoZ, AtoZ)
         fractions = self.atomic_fractions(self.target)
         energy = self.rel_energies[self.target.reduced_composition]
-        return {next(label): c for c in self.vertex_coords
+        return {"".join(next(AtoZZ)): c for c in self.vertex_coords
                 if on_composition(fractions, c, energy)}
 
     @property
