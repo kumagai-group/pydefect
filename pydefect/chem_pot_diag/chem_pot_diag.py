@@ -1,25 +1,22 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import string
-from copy import deepcopy
-from dataclasses import dataclass, InitVar
-from itertools import chain, product
-from pathlib import Path
-from typing import Dict, Optional, Union, List, Mapping
+from copy import copy
+from dataclasses import dataclass
+from itertools import product
+from typing import Dict, Optional, Union, List, Set
 
 import numpy as np
-import pandas as pd
 import yaml
 from monty.json import MSONable
 from monty.serialization import loadfn
 from pydefect.error import PydefectError
-from pydefect.util.error_classes import CpdNotSupportedError
-from pymatgen.core import Composition, Element
-from scipy.spatial.qhull import HalfspaceIntersection, QhullError
-from tabulate import tabulate
+from pymatgen.core import Composition
+from scipy.spatial.qhull import HalfspaceIntersection
 from vise.util.mix_in import ToYamlFileMixIn
 
 AtoZ = list(string.ascii_uppercase)
+LargeMinusNumber = -1e5
 
 
 @dataclass
@@ -56,8 +53,8 @@ class CompositionEnergies(ToYamlFileMixIn, dict):
         return sorted(result)
 
     @property
-    def reference_relative_energies(self):
-        reference, rel = ReferenceEnergies(), RelativeEnergies()
+    def std_rel_energies(self):
+        std, rel = StandardEnergies(), RelativeEnergies()
         abs_energies_per_atom = {k.reduced_formula: v.energy / k.num_atoms
                                  for k, v in self.items()}
         ref_energy_list = []
@@ -71,7 +68,7 @@ class CompositionEnergies(ToYamlFileMixIn, dict):
                 min_abs_energy = min([x[1] for x in candidates])
             except ValueError:
                 raise NoElementEnergyError
-            reference[vertex_element] = min_abs_energy
+            std[vertex_element] = min_abs_energy
             ref_energy_list.append(min_abs_energy)
 
         for formula, e in abs_energies_per_atom.items():
@@ -82,7 +79,7 @@ class CompositionEnergies(ToYamlFileMixIn, dict):
             offset = sum([a * b for a, b in zip(frac, ref_energy_list)])
             rel[formula] = e - offset
 
-        return reference, rel
+        return std, rel
 
 
 class CpdAbstractEnergies(ToYamlFileMixIn, dict):
@@ -94,307 +91,230 @@ class CpdAbstractEnergies(ToYamlFileMixIn, dict):
         return cls(loadfn(filename or cls._yaml_filename()))
 
 
-class ReferenceEnergies(CpdAbstractEnergies):
+class StandardEnergies(CpdAbstractEnergies):
     pass
+
+
+def atomic_fractions(comp: Union[Composition, str], elements: List[str]):
+    return [Composition(comp).fractional_composition[e] for e in elements]
+
+
+def comp_to_element_set(comp: str) -> Set[str]:
+    return {str(e) for e in Composition(comp).elements}
+
+
+def calc_chem_pot(comp, energy_per_atom, target_elem, other_elem_chem_pot):
+    x = 0.0
+    fracs = Composition(comp).fractional_composition
+    for element, frac in fracs.items():
+        if target_elem == str(element):
+            continue
+        x += other_elem_chem_pot[str(element)] * frac
+    return (energy_per_atom - x) / fracs[target_elem]
 
 
 class RelativeEnergies(CpdAbstractEnergies):
-    pass
+    #TODO: add stability
+    @property
+    def all_element_set(self) -> Set[str]:
+        return set().union(*[comp_to_element_set(c) for c in self])
+
+    def related_comp_energies(self, elements: List[str]) -> Dict[str, float]:
+        return {c: e for c, e in self.items()
+                if comp_to_element_set(c).issubset(elements)}
+
+    def comp_energies_w_element(self, element: str) -> Dict[str, float]:
+        return {c: e for c, e in self.items()
+                if element in comp_to_element_set(c)}
+
+    def impurity_info(self,
+                      impurity: str,
+                      host_chem_pot: Dict[str, float]) -> "ImpurityInfo":
+        candidates = {impurity: 0.0}
+        for c, e in self.comp_energies_w_element(impurity).items():
+            candidates[c] = calc_chem_pot(c, e, impurity, host_chem_pot)
+
+        min_key = min(candidates, key=candidates.get)
+        return ImpurityInfo(candidates[min_key], min_key)
 
 
-class ChemPotDiag(MSONable):
+class ChemPotDiagMaker:
     def __init__(self,
-                 relative_energies: RelativeEnergies,
-                 target: Union[Composition, dict],
-                 vertex_elements: Optional[List[Element]] = None):
-        self.comp_energies = relative_energies
-        self.target = target if isinstance(target, Composition) \
-            else Composition.from_dict(target)
-        self.vertex_elements = vertex_elements or sorted(self.target.elements)
+                 rel_energies: RelativeEnergies,
+                 elements: List[str],
+                 target: str = None):
+        self.rel_energies = rel_energies
+        self.comp_energies = rel_energies.related_comp_energies(elements)
+        self.elements = elements
+        self.impurities = rel_energies.all_element_set.difference(elements)
+        self.dim = len(elements)
+        if target:
+            try:
+                assert target in rel_energies.keys()
+            except AssertionError:
+                print(f"Target {target} is not in relative energy compounds.")
+        self.target = target
 
-    def __eq__(self, other: "ChemPotDiag"):
-        return (self.comp_energies == other.comp_energies
-                and self.target == other.target
-                and self.vertex_elements == other.vertex_elements)
+    def _set_vertices(self):
+        half_spaces = []
 
-    def to_yaml(self, filename: str = "cpd.yaml") -> None:
-        d = {"target": str(self.target).replace(" ", ""),
-             "vertex_elements": [str(e) for e in self.vertex_elements]}
-        for ce in self.comp_energies:
-            key = str(ce.composition.iupac_formula).replace(" ", "")
-            val = {"energy": ce.energy, "source": str(ce.source)}
-            d[key] = val
-        Path(filename).write_text(yaml.dump(d))
+        for c, e in self.comp_energies.items():
+            half_spaces.append(atomic_fractions(c, self.elements) + [-e])
 
-    @classmethod
-    def from_yaml(cls, filename: str = "cpd.yaml") -> "ChemPotDiag":
-        d = loadfn(filename)
-        target = d.pop("target")
-        vertex_elements = [Element(e) for e in d.pop("vertex_elements")]
-        composition_energies = []
-        for k, v in d.items():
-            composition_energies.append(
-                CompositionEnergy(Composition(k), v["energy"],
-                                  getattr(v, 'source', None)))
-        return cls(composition_energies, target, vertex_elements)
+        for i in range(self.dim):
+            upper_boundary, lower_boundary = [0.0] * self.dim, [0.0] * self.dim
+            upper_boundary[i], lower_boundary[i] = 1.0, -1.0
+
+            upper_boundary.append(0.0)
+            lower_boundary.append(LargeMinusNumber)
+            half_spaces.extend([upper_boundary, lower_boundary])
+
+        # When used in vertex_coords min_range is large_minus_number
+        feasible_point = np.array([LargeMinusNumber + 1.0] * self.dim,
+                                  dtype=float)
+        hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
+        self.vertices = hs.intersections.tolist()
+
+    def _on_comp(self, coord, composition, energy):
+        atom_frac = atomic_fractions(composition, self.elements)
+        return on_composition(atom_frac, coord, energy)
+
+    def _min_value(self, mul: float = 1.1):
+        candidates = [x for x in sum(self.vertices, []) if x != LargeMinusNumber]
+        return min(candidates) * mul
+
+    def _polygons(self):
+        self._set_vertices()
+        result = {}
+        comp_energies = copy(self.comp_energies)
+
+        if self.target:
+            target_coords = [[round(j, ndigits=5) for j in i]
+                              for i in self.vertices
+                              if self._on_comp(i, self.target,
+                                               self.comp_energies[self.target])]
+            competing_phases = [[] for i in target_coords]
+
+        min_val = self._min_value()
+
+        # elements
+        for _idx, element in enumerate(self.elements):
+            coords = [[round(j, ndigits=5) for j in i]
+                      for i in self.vertices if round(i[_idx], ndigits=5) == 0.0]
+            coords = [[c if c != LargeMinusNumber else min_val for c in cc] for cc in coords]
+            result[element] = coords
+
+            if self.target:
+                for c in coords:
+                    if c in target_coords:
+                        _idx = target_coords.index(c)
+                        competing_phases[_idx].append(element)
+
+        # compounds
+        for comp, energy in comp_energies.items():
+            coords = [[round(j, ndigits=5) for j in i]
+                      for i in self.vertices if self._on_comp(i, comp, energy)]
+            if coords:
+                result[comp] = coords
+                if self.target and comp != self.target:
+                    for c in coords:
+                        if c in target_coords:
+                            _idx = target_coords.index(c)
+                            competing_phases[_idx].append(comp)
+
+        x = []
+        if self.target:
+            for v, w in zip(target_coords, competing_phases):
+                host_chem_pot = dict(zip(self.elements, v))
+                i = {imp: self.rel_energies.impurity_info(imp, host_chem_pot)
+                     for imp in self.impurities}
+                x.append(TargetVertex(v, w, i))
+        return result, x or None
 
     @property
-    def abs_energies_per_atom(self) -> Dict[Composition, float]:
-        return {ce.composition.reduced_composition: ce.abs_energy_per_atom
-                for ce in self.comp_energies}
+    def chem_pot_diag(self):
+        AtoZZ = product([""] + AtoZ, AtoZ)
+        polygons, target_vertices = self._polygons()
+        if self.target:
+            target_vertices = TargetVertices(self.target, {"".join(next(AtoZZ)): v for v in target_vertices})
+        else:
+            target_vertices = None
+        return ChemPotDiag(vertex_elements=self.elements,
+                           polygons=polygons,
+                           target_vertices=target_vertices)
+
+
+@dataclass
+class ImpurityInfo:
+    rel_chem_pot: float
+    competing_phase: str
+
+
+@dataclass
+class TargetVertex(MSONable):
+    coords: List[float]
+    competing_phases: Optional[List[str]]
+    impurity_info: Optional[Dict[str, ImpurityInfo]]
 
     @property
-    def all_compounds(self) -> List[Composition]:
-        return list(self.abs_energies_per_atom.keys())
+    def impurity_chem_pot(self):
+        return {k: v.rel_chem_pot for k, v in self.impurity_info.items()}
+
+
+@dataclass
+class TargetVertices:
+    target: str
+    vertices: Dict[str, TargetVertex]
+
+
+@dataclass
+class ChemPotDiag(MSONable):
+    vertex_elements: List[str]
+    polygons: Dict[str, List[List[float]]]
+    target_vertices: TargetVertices = None
 
     @property
-    def impurity_elements(self):
-        result = set()
-        for c in self.all_compounds:
-            result.update(set(c.elements))
-        result.difference_update(set(self.vertex_elements))
-        return list(result)
+    def min_value(self):
+        return np.min(sum(self.polygons.values(), []))
+
+    @property
+    def target(self):
+        if self.target_vertices:
+            return self.target_vertices.target
+        return
 
     @property
     def dim(self):
         return len(self.vertex_elements)
 
     @property
-    def vertex_elements_abs_energies_per_atom(self) -> Dict[Composition, float]:
-        result = {}
-        for k, v in self.abs_energies_per_atom.items():
-            if set(k.elements).issubset(set(self.vertex_elements)):
-                result[k] = v
-        return result
-
-    def impurity_abs_energy_per_atom(self, elem: Element):
-        for k, v in self.abs_energies_per_atom.items():
-            if len(k.elements) == 1 and k.elements[0] == elem:
-                return v
-        raise ValueError(f"{elem} is not included.")
-
-    @property
-    def offset_to_abs(self) -> List[float]:
-        result = []
-        for vertex_element in self.vertex_elements:
-            target = Composition({vertex_element: 1.0}).reduced_composition
-            candidates = \
-                filter(lambda x: x[0] == target,
-                       self.vertex_elements_abs_energies_per_atom.items())
-            try:
-                result.append(min([x[1] for x in candidates]))
-            except ValueError:
-                raise NoElementEnergyError
-        return result
-
-    @property
-    def rel_energies(self) -> Dict[Composition, float]:
-        result = {}
-        for c, e in self.vertex_elements_abs_energies_per_atom.items():
-            sub = sum(f * offset for f, offset
-                      in zip(self.atomic_fractions(c), self.offset_to_abs))
-            result[c] = e - sub
-
-        return result
-
-    def atomic_fractions(self, c):
-        return [c.fractional_composition[e] for e in self.vertex_elements]
-
-    @property
-    def vertex_coords(self):
-        if self.dim == 1:
-            return [np.array([0.0])]
-
-        large_minus_number = -1e5
-        hs = self.get_half_space_intersection(large_minus_number)
-
-        result = []
-        for intersection in hs.intersections:
-            if min(intersection) != large_minus_number:
-                result.append(intersection)
-
-        return result
-
-    @property
-    def lowest_relative_energy(self):
-        return min(chain(*self.vertex_coords))
-
-    def get_half_space_intersection(self, min_range, feasible_dist=1.0):
-        half_spaces = []
-        for c, e in self.rel_energies.items():
-            half_spaces.append(self.atomic_fractions(c) + [-e])
-        for i in range(self.dim):
-            x = [0.0] * self.dim
-            x[i] = -1.0
-            x.append(min_range)
-            half_spaces.append(x)
-        # When used in vertex_coords  min_range is large_minum_number
-        feasible_point = np.array([min_range + feasible_dist] * self.dim,
-                                  dtype=float)
-        hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
-
-        return hs
-
-    @property
-    def target_vertices(self) -> Dict[str, List[float]]:
-        AtoZZ = product([""] + AtoZ, AtoZ)
-        fractions = self.atomic_fractions(self.target)
-        energy = self.rel_energies[self.target.reduced_composition]
-        return {"".join(next(AtoZZ)): c for c in self.vertex_coords
-                if on_composition(fractions, c, energy)}
-
-    @property
-    def target_vertex_list_dataframe(self):
-        index = []
-        result = []
-        for k, v in self.target_vertices.items():
-            index.append(k)
-            result.append([])
-            for k2, v2 in zip(self.vertex_elements, v):
-                result[-1].append(round(v2, 3))
-
-            for ie in self.impurity_elements:
-                competing_comp_for_impurity, energy = \
-                    self.impurity_rel_energy(ie, k)
-                result[-1].append(round(energy, 3))
-                comp_name = \
-                    competing_comp_for_impurity.composition.reduced_formula
-                result[-1].append(comp_name)
-
-        columns = [f"mu_{e}" for e in self.vertex_elements]
-        for e in self.impurity_elements:
-            columns += [f"mu_{e}", f"{e} competing phase"]
-        return pd.DataFrame(result, index=index, columns=columns)
-
-    def __repr__(self):
-        return tabulate(self.target_vertex_list_dataframe,
-                        headers='keys', tablefmt='psql')
-
-    def target_abs_chem_pot_dict(self, label) -> Dict[Element, float]:
-        rel_chem_pots = self.target_vertices[label]
-        abs_chem_pots = [x + y for x, y in zip(rel_chem_pots,
-                                               self.offset_to_abs)]
-        return dict(zip(self.vertex_elements, abs_chem_pots))
-
-    def abs_chem_pot_dict(self, label) -> Dict[Element, float]:
-        result = deepcopy(self.target_abs_chem_pot_dict(label))
-        for e in self.impurity_elements:
-            _, result[e] = self.impurity_abs_energy(e, label)
-        return result
-
-    def label_at_rich_condition(self, element: Element) -> str:
-        """Return abs_chem_pot_dict at condition where an element is rich."""
-        ref_e = -float("inf")
-        target_index = self.vertex_elements.index(element)
-        result = None
-        for label, vertex in self.target_vertices.items():
-            if vertex[target_index] > ref_e:
-                result, ref_e = label, vertex[target_index]
-        return result
-
-    def label_at_poor_condition(self, element: Element) -> str:
-        """Return abs_chem_pot_dict at condition where an element is poor."""
-        ref_e = float("inf")
-        target_index = self.vertex_elements.index(element)
-        result = None
-        for label, vertex in self.target_vertices.items():
-            if vertex[target_index] < ref_e:
-                result, ref_e = label, vertex[target_index]
-        return result
-
-    def impurity_abs_energy(self, element: Element, label: str):
-        if element not in self.impurity_elements:
-            raise ValueError(
-                f"Element {element} not in impurities. List of impurities are "
-                f"{self.impurity_elements}.")
-        comp_set = set(self.vertex_elements) | {element}
-        competing_comp_e = None
-        y = float("inf")
-        for ce in self.comp_energies:
-            if element in set(ce.composition.elements):
-                if set(ce.composition.elements).issubset(comp_set) is False:
-                    raise CpdNotSupportedError(
-                        "Other element(s) than host elements exists.")
-                abs_chem_pot = self.target_abs_chem_pot_dict(label)
-                mu = ce.energy
-                comp_d = ce.composition.as_dict()
-                for ve in self.vertex_elements:
-                    mu -= comp_d[str(ve)] * abs_chem_pot[ve]
-                mu /= comp_d[str(element)]
-                if mu < y:
-                    competing_comp_e, y = ce, mu
-        if competing_comp_e is None:
-            raise CpdNotSupportedError(f"No compounds with element {element}.")
-        return competing_comp_e, y
-
-    def impurity_rel_energy(self, element: Element, label: str):
-        competing_comp_e, y = self.impurity_abs_energy(element, label)
-        return competing_comp_e,  y - self.impurity_abs_energy_per_atom(element)
-
-    @property
-    def target_formation_energy(self):
-        return self.rel_energies[self.target]
-
-
-class CpdPlotInfo:
-    def __init__(self,
-                 cpd: ChemPotDiag,
-                 min_range: Optional[float] = None):
-        self.cpd = cpd
-        self.min_range = min_range or self.cpd.lowest_relative_energy * 1.1
-
-        self.dim = cpd.dim
-        self.comp_vertices = self._get_comp_vertices(self.min_range)
-
-    def _get_comp_vertices(self, min_range
-                           ) -> Dict[Composition, List[List[float]]]:
-        try:
-            hs = self.cpd.get_half_space_intersection(min_range)
-        except QhullError:
-            hs = self.cpd.get_half_space_intersection(min_range,
-                                                      feasible_dist=0.01)
-
-        intersections = hs.intersections.tolist()
-        result = {}
-        for c, e in self.cpd.rel_energies.items():
-            def on_comp(coord):
-                return on_composition(self.cpd.atomic_fractions(c), coord, e)
-
-            coords = [[round(j, ndigits=5) for j in i]
-                      for i in intersections if on_comp(i)]
-
-            if coords:
-                result[c] = coords
-
-        return result
-
-    @property
     def comp_centers(self):
+        _polygons = {}
         return {c: np.average(np.array(v), axis=0).tolist()
-                for c, v in self.comp_vertices.items()}
+                for c, v in self.polygons.items()}
 
     def atomic_fractions(self, composition: Composition):
         return [composition.get_atomic_fraction(e)
-                for e in self.cpd.vertex_elements]
+                for e in self.vertex_elements]
 
 
-def on_composition(atomic_fractions, coord, energy) -> bool:
-    diff = sum([x * y for x, y in zip(atomic_fractions, coord)]) - energy
+def on_composition(atomic_fracs, coord, energy) -> bool:
+    diff = sum([x * y for x, y in zip(atomic_fracs, coord)]) - energy
     return abs(diff) < 1e-8
 
 
-def replace_comp_energy(chem_pot_diag: ChemPotDiag,
-                        replaced_comp_energies: List[CompositionEnergy]):
-    new_comp_energies = []
-    for ce in chem_pot_diag.comp_energies:
-        for replaced_comp_energy in replaced_comp_energies:
-            if (ce.composition.reduced_composition
-                    == replaced_comp_energy.composition.reduced_composition):
-                new_comp_energies.append(replaced_comp_energy)
-                break
-        else:
-            new_comp_energies.append(ce)
-    chem_pot_diag.comp_energies = new_comp_energies
+# def replace_comp_energy(chem_pot_diag: ChemPotDiag,
+#                         replaced_comp_energies: List[CompositionEnergy]):
+#     new_comp_energies = []
+#     for ce in chem_pot_diag.comp_energies:
+#         for replaced_comp_energy in replaced_comp_energies:
+#             if (ce.composition.reduced_composition
+#                     == replaced_comp_energy.composition.reduced_composition):
+#                 new_comp_energies.append(replaced_comp_energy)
+#                 break
+#         else:
+#             new_comp_energies.append(ce)
+#     chem_pot_diag.comp_energies = new_comp_energies
 
 
 class NoElementEnergyError(PydefectError):
