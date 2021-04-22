@@ -112,37 +112,43 @@ def cpd_maker():
 
 
 def test_cpd_maker_chem_pot_diag(cpd_maker):
-    actual = cpd_maker.chem_pot_diag
+    actual = cpd_maker.chem_pot_diag_and_target_vertex
     min_val = -9.0 * 1.1
     expected = ChemPotDiag(vertex_elements=["Mg", "O"],
                            polygons={'Mg': [[0.0, min_val], [0.0, -4.5]],
                                      'MgO2': [[0.0, -4.5], [-9.0, 0.0]],
                                      'O': [[min_val, 0.0], [-9.0, 0.0]]})
-    assert actual == expected
+    assert actual == (expected, None)
 
 
 @pytest.fixture
 def cpd():
-    vertex_a = TargetVertex(coords=[0.0, -4.5],
-                            competing_phases=["Mg"],
-                            impurity_info={"Al": ImpurityInfo(-1.0, "MgAlO2")})
-    vertex_b = TargetVertex(coords=[-9.0, 0.0],
-                            competing_phases=["O"],
-                            impurity_info={"Al": ImpurityInfo(-1.0, "MgAlO2")})
     min_val = -9.0 * 1.1
     return ChemPotDiag(
         vertex_elements=["Mg", "O"],
         polygons={'Mg': [[0.0, min_val], [0.0, -4.5]],
                   'MgO2': [[0.0, -4.5], [-9.0, 0.0]],
                   'O': [[min_val, 0.0], [-9.0, 0.0]]},
-        target_vertices=TargetVertices("MgO2", {"A": vertex_a, "B": vertex_b}))
+        target="MgO2",
+        target_vertices={"A": [0.0, -4.5], "B": [-9.0, 0.0]})
 
 
-def test_cpd_maker_chem_pot_diag_with_target(cpd_maker, cpd):
+@pytest.fixture
+def target_vertices():
+    vertex_a = TargetVertex(coords=[0.0, -4.5],
+                            competing_phases=["Mg"],
+                            impurity_info={"Al": ImpurityInfo(-1.0, "MgAlO2")})
+    vertex_b = TargetVertex(coords=[-9.0, 0.0],
+                            competing_phases=["O"],
+                            impurity_info={"Al": ImpurityInfo(-1.0, "MgAlO2")})
+    return TargetVertices(target="MgO2", vertices={"A": vertex_a, "B": vertex_b})
+
+
+def test_cpd_maker_chem_pot_diag_with_target(cpd_maker, cpd, target_vertices):
     cpd_maker_2 = copy(cpd_maker)
     cpd_maker_2.target = "MgO2"
-    actual = cpd_maker_2.chem_pot_diag
-    assert actual == cpd
+    actual = cpd_maker_2.chem_pot_diag_and_target_vertex
+    assert actual == (cpd, target_vertices)
 
 
 def test_cpd(cpd):

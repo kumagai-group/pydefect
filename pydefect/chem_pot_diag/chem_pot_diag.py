@@ -232,16 +232,20 @@ class ChemPotDiagMaker:
         return result, x or None
 
     @property
-    def chem_pot_diag(self):
+    def chem_pot_diag_and_target_vertex(self):
         AtoZZ = product([""] + AtoZ, AtoZ)
         polygons, target_vertices = self._polygons()
         if self.target:
-            target_vertices = TargetVertices(self.target, {"".join(next(AtoZZ)): v for v in target_vertices})
+            t_vertices = TargetVertices(self.target, {"".join(next(AtoZZ)): v for v in target_vertices})
+            v_coords = t_vertices.vertex_coords
         else:
-            target_vertices = None
-        return ChemPotDiag(vertex_elements=self.elements,
-                           polygons=polygons,
-                           target_vertices=target_vertices)
+            t_vertices, v_coords = None, None
+
+        cpd = ChemPotDiag(vertex_elements=self.elements,
+                          polygons=polygons,
+                          target=self.target,
+                          target_vertices=v_coords)
+        return cpd, t_vertices
 
 
 @dataclass
@@ -254,34 +258,36 @@ class ImpurityInfo:
 class TargetVertex(MSONable):
     coords: List[float]
     competing_phases: Optional[List[str]]
-    impurity_info: Optional[Dict[str, ImpurityInfo]]
+    impurity_info: Optional[Dict[str, ImpurityInfo]] = None
 
     @property
     def impurity_chem_pot(self):
-        return {k: v.rel_chem_pot for k, v in self.impurity_info.items()}
+        if self.impurity_info:
+            return {k: v.rel_chem_pot for k, v in self.impurity_info.items()}
+        return {}
 
 
+# To yaml
 @dataclass
 class TargetVertices:
     target: str
     vertices: Dict[str, TargetVertex]
+
+    @property
+    def vertex_coords(self):
+        return {k: v.coords for k, v in self.vertices.items()}
 
 
 @dataclass
 class ChemPotDiag(MSONable):
     vertex_elements: List[str]
     polygons: Dict[str, List[List[float]]]
-    target_vertices: TargetVertices = None
+    target: str = None
+    target_vertices: Dict[str, List[float]] = None
 
     @property
     def min_value(self):
         return np.min(sum(self.polygons.values(), []))
-
-    @property
-    def target(self):
-        if self.target_vertices:
-            return self.target_vertices.target
-        return
 
     @property
     def dim(self):
@@ -293,8 +299,8 @@ class ChemPotDiag(MSONable):
         return {c: np.average(np.array(v), axis=0).tolist()
                 for c, v in self.polygons.items()}
 
-    def atomic_fractions(self, composition: Composition):
-        return [composition.get_atomic_fraction(e)
+    def atomic_fractions(self, composition: str):
+        return [Composition(composition).get_atomic_fraction(e)
                 for e in self.vertex_elements]
 
 

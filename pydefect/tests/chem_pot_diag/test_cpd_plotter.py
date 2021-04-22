@@ -2,8 +2,8 @@
 
 import numpy as np
 import pytest
-from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo, \
-    CompositionEnergy
+from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, TargetVertices, \
+    TargetVertex
 from pydefect.chem_pot_diag.cpd_plotter import (
     ChemPotDiagMpl2DMplPlotter, transpose, sort_coords,
     ChemPotDiagMpl3DMplPlotter, ChemPotDiagPlotly2DMplPlotter,
@@ -20,35 +20,39 @@ except ModuleNotFoundError:
 
 
 @pytest.fixture
-def cpd_plot_info_2d():
-    energies = [CompositionEnergy(Composition("H"), 0.0, ""),
-                CompositionEnergy(Composition("O"), 1.0, ""),
-                CompositionEnergy(Composition("H4O2"), -4.0, "")]
-    cpd = ChemPotDiag(energies, target=Composition("H2O"))
-    return CpdPlotInfo(cpd, min_range=-10)
+def cpd_2d():
+    polygons = {"H": [[0.0, -3.3], [0.0, -3.0]],
+                "O": [[-3.3, 0.0], [-3.0, 0.0]],
+                "HO": [[-3.0, 0.0], [0.0, -3.0]]}
+    return ChemPotDiag(
+        vertex_elements=["H", "O"],
+        polygons=polygons,
+        target="HO",
+        target_vertices={"A": [-3.0, 0.0], "B": [0.0, -3.0]})
 
 
 @pytest.mark.skipif(False, reason="")
-def test_cpd_2d_draw(cpd_plot_info_2d):
-    plotter = ChemPotDiagMpl2DMplPlotter(cpd_plot_info_2d)
+def test_cpd_2d_draw(cpd_2d):
+    plotter = ChemPotDiagMpl2DMplPlotter(cpd_2d)
     plotter.draw_diagram().show()
 
 
 @pytest.fixture
-def cpd_3d_info():
-    energies = [CompositionEnergy(Composition("H"), 0.0, ""),
-                CompositionEnergy(Composition("O"), 1.0, ""),
-                CompositionEnergy(Composition("H4O2"), -4.0, ""),
-                CompositionEnergy(Composition("MgH2O"), -10.0, ""),
-                CompositionEnergy(Composition("Mg"), 0.0, ""),
-                CompositionEnergy(Composition("MgO"), -3.0, "")]
-    cpd = ChemPotDiag(energies, target=Composition("MgH2O"))
-    return CpdPlotInfo(cpd)
+def cpd_3d():
+    polygons = {"H": [[0.0, 0.0, -3.3], [0.0, 0.0, -3.0], [0.0, -3.0, 0.0], [0.0, -3.3, 0.0], [0.0, -3.3, -3.3]],
+                "O": [[0.0, 0.0, -3.3], [0.0, 0.0, -3.0], [-3.0, 0.0, 0.0], [-3.3, 0.0, 0.0], [-3.3, 0.0, -3.3]],
+                "N": [[-3.3, 0.0, 0.0], [-3.0, 0.0, 0.0], [0.0, -3.0, 0.0], [0.0, -3.3, 0.0], [-3.3, -3.3, 0.0]],
+                "HON":  [[0.0, 0.0, -3.0], [0.0, -3.0, 0.0], [-3.0, 0.0, 0.0]]}
+    return ChemPotDiag(
+        vertex_elements=["H", "O", "N"],
+        polygons=polygons,
+        target="HON",
+        target_vertices={"A": [0.0, 0.0, -3.0], "B": [0.0, -3.0, 0.0], "C": [-3.0, 0.0, 0.0]})
 
 
 @pytest.mark.skipif(False, reason="")
-def test_cpd_3d_draw(cpd_3d_info):
-    plotter = ChemPotDiagMpl3DMplPlotter(cpd_3d_info)
+def test_cpd_3d_draw(cpd_3d):
+    plotter = ChemPotDiagMpl3DMplPlotter(cpd_3d)
     plotter.draw_diagram().show()
 
 
@@ -66,16 +70,16 @@ def test_sort_coords():
 
 
 @pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
-def test_plotly_2d(cpd_plot_info_2d):
-    plotter = ChemPotDiagPlotly2DMplPlotter(cpd_plot_info_2d)
+def test_plotly_2d(cpd_2d):
+    plotter = ChemPotDiagPlotly2DMplPlotter(cpd_2d)
     fig = plotter.figure
     # fig.show()
     show_png(fig)
 
 
 @pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
-def test_plotly_3d(cpd_3d_info):
-    plotter = ChemPotDiagPlotly3DMplPlotter(cpd_3d_info)
+def test_plotly_3d(cpd_3d):
+    plotter = ChemPotDiagPlotly3DMplPlotter(cpd_3d)
     fig = plotter.figure
     # fig.show()
     show_png(fig)

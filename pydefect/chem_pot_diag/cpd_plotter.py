@@ -8,7 +8,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo
+from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
 from pymatgen.core import Composition
 from vise.util.plotly_util import sort_coords, make_triangles
 from vise.util.string import latexify
@@ -44,9 +44,9 @@ class CpdMplSettings:
 
 class ChemPotDiagMplPlotter(ABC):
     def __init__(self,
-                 cpd_plot_info: CpdPlotInfo,
+                 cpd: ChemPotDiag,
                  mpl_defaults: Optional[CpdMplSettings] = CpdMplSettings()):
-        self.info = cpd_plot_info
+        self.cpd = cpd
         self._mpl_defaults = mpl_defaults
         self._add_ax()
 
@@ -79,11 +79,11 @@ class ChemPotDiagMplPlotter(ABC):
         pass
 
     def _plot(self):
-        for composition, position in self.info.comp_centers.items():
-            self.draw_simplex(composition)
+        for comp, position in self.cpd.comp_centers.items():
+            self.draw_simplex(comp)
             self._ax.text(*position,
-                          latexify(composition.reduced_formula),
-                          color=self._text_color(composition),
+                          latexify(comp),
+                          color=self._text_color(comp),
                           **self._mpl_defaults.label,
                           **self._text_kwargs)
 
@@ -97,19 +97,19 @@ class ChemPotDiagMplPlotter(ABC):
         pass
 
     def _text_color(self, composition):
-        if self.info.cpd.target and composition == self.info.cpd.target:
+        if self.cpd.target_vertices and composition == self.cpd.target:
             return self._mpl_defaults.target_comp_text_color
         return self._mpl_defaults.comp_text_color
 
     def _set_title(self, title):
         if not title:
-            elements_str = [str(elem) for elem in self.info.cpd.vertex_elements]
+            elements_str = [str(elem) for elem in self.cpd.vertex_elements]
             title = f"Chemical potential diagram of {'-'.join(elements_str)}"
         self._ax.set_title(title)
 
     def _add_alphabet_labels(self):
-        if self.info.cpd.target:
-            for label, cp in self.info.cpd.target_vertices.items():
+        if self.cpd.target:
+            for label, cp in self.cpd.target_vertices.items():
                 self._ax.text(*transpose(cp), label,
                               **self._mpl_defaults.alphabet_label)
 
@@ -124,12 +124,12 @@ class ChemPotDiagMpl2DMplPlotter(ChemPotDiagMplPlotter):
         return {}
 
     def _set_lims(self):
-        self._ax.set_xlim(self.info.min_range, 0)
-        self._ax.set_ylim(self.info.min_range, 0)
+        self._ax.set_xlim(self.cpd.min_value, 0)
+        self._ax.set_ylim(self.cpd.min_value, 0)
         self._ax.set_aspect('equal', adjustable='box')
 
     def _set_labels(self):
-        vertex_elements = self.info.cpd.vertex_elements
+        vertex_elements = self.cpd.vertex_elements
         self._ax.set_xlabel(f"Chemical potential of {vertex_elements[0]}")
         self._ax.set_ylabel(f"Chemical potential of {vertex_elements[1]}")
 
@@ -137,7 +137,7 @@ class ChemPotDiagMpl2DMplPlotter(ChemPotDiagMplPlotter):
         self._ax.grid(**self._mpl_defaults.grid_2d)
 
     def draw_simplex(self, composition):
-        vertex_coords = self.info.comp_vertices[composition]
+        vertex_coords = self.cpd.polygons[composition]
         plt.plot(*transpose(vertex_coords), **self._mpl_defaults.simplex_2d)
 
 
@@ -150,12 +150,12 @@ class ChemPotDiagMpl3DMplPlotter(ChemPotDiagMplPlotter):
         return {"ha": "center", "va": "center"}
 
     def _set_lims(self):
-        self._ax.set_xlim3d(self.info.min_range, 0)
-        self._ax.set_ylim3d(0, self.info.min_range)
-        self._ax.set_zlim3d(self.info.min_range, 0)
+        self._ax.set_xlim3d(self.cpd.min_value, 0)
+        self._ax.set_ylim3d(0, self.cpd.min_value)
+        self._ax.set_zlim3d(self.cpd.min_value, 0)
 
     def _set_labels(self):
-        vertex_elements = self.info.cpd.vertex_elements
+        vertex_elements = self.cpd.vertex_elements
         self._ax.set_xlabel(f"Chemical potential of {vertex_elements[0]}")
         self._ax.set_ylabel(f"Chemical potential of {vertex_elements[1]}")
         self._ax.set_zlabel(f"Chemical potential of {vertex_elements[2]}")
@@ -164,8 +164,8 @@ class ChemPotDiagMpl3DMplPlotter(ChemPotDiagMplPlotter):
         pass
 
     def draw_simplex(self, composition):
-        vertex_coords = self.info.comp_vertices[composition]
-        atomic_fractions = self.info.atomic_fractions(composition)
+        vertex_coords = self.cpd.polygons[composition]
+        atomic_fractions = self.cpd.atomic_fractions(composition)
 
         face = Poly3DCollection([sort_coords(np.array(vertex_coords))])
         face.set_color(self._3d_simplex_color(atomic_fractions))
@@ -183,14 +183,14 @@ def transpose(target_list) -> list:
 
 class ChemPotDiagPlotly2DMplPlotter:
 
-    def __init__(self, cpd_plot_info: CpdPlotInfo):
-        self.info = cpd_plot_info
+    def __init__(self, cpd: ChemPotDiag):
+        self.cpd = cpd
 
     @property
     def figure(self):
         fig = go.Figure()
 
-        for comp, vertices in self.info.comp_vertices.items():
+        for comp, vertices in self.cpd.polygons.items():
             (x0, y0), (x1, y1) = vertices[0], vertices[1]
             x_ave, y_ave = (x0 + x1) / 2, (y0 + y1) / 2
             if x_ave == 0.0:
@@ -209,9 +209,9 @@ class ChemPotDiagPlotly2DMplPlotter:
                                      textfont=dict(color="black", size=24),
                                      hoverinfo='skip'))
 
-        if self.info.cpd.target:
+        if self.cpd.target:
             x, y, text = [], [], []
-            for label, cp in self.info.cpd.target_vertices.items():
+            for label, cp in self.cpd.polygons.items():
                 x.append(cp[0])
                 y.append(cp[1])
                 text.append(label)
@@ -221,11 +221,10 @@ class ChemPotDiagPlotly2DMplPlotter:
                                      hovertemplate="<b>label %{text}</b><br>"
                                                    "energy (%{x:.2f}, %{y:.2f})"))
 
-        vertex_elements = self.info.cpd.vertex_elements
+        vertex_elements = self.cpd.vertex_elements
         fig.update_traces(marker_size=15)
-        elements_str = [str(elem) for elem in self.info.cpd.vertex_elements]
         fig.update_layout(
-            title=f"Chemical potential diagram of {'-'.join(elements_str)}",
+            title=f"Chemical potential diagram of {'-'.join(self.cpd.vertex_elements)}",
             xaxis_title=f"&#181;<sub>{vertex_elements[0]}</sub> (eV)",
             yaxis_title=f"&#181;<sub>{vertex_elements[1]}</sub> (eV)",
             width=700, height=700,
@@ -233,7 +232,7 @@ class ChemPotDiagPlotly2DMplPlotter:
             font_size=24,
             showlegend=False)
 
-        _range = [self.info.min_range, -self.info.min_range * 0.1]
+        _range = [self.cpd.min_value, -self.cpd.min_value * 0.1]
         fig.update_xaxes(range=_range)
         fig.update_yaxes(range=_range)
         return fig
@@ -241,15 +240,15 @@ class ChemPotDiagPlotly2DMplPlotter:
 
 class ChemPotDiagPlotly3DMplPlotter:
 
-    def __init__(self, cpd_plot_info: CpdPlotInfo):
-        self.info = cpd_plot_info
+    def __init__(self, cpd: ChemPotDiag):
+        self.cpd = cpd
 
     @property
     def figure(self):
         data = []
         color_cycle = cycle(px.colors.qualitative.Dark24)
 
-        for comp, vertex_coords in self.info.comp_vertices.items():
+        for comp, vertex_coords in self.cpd.polygons.items():
 
             color = next(color_cycle)
             vertex_coords = sort_coords(np.array(vertex_coords))
@@ -271,9 +270,9 @@ class ChemPotDiagPlotly3DMplPlotter:
                                      textfont=dict(color=color, size=24),
                                      hoverinfo='skip'))
 
-        if self.info.cpd.target:
+        if self.cpd.target:
             x, y, z, text = [], [], [], []
-            for label, cp in self.info.cpd.target_vertices.items():
+            for label, cp in self.cpd.polygons.items():
                 x.append(cp[0])
                 y.append(cp[1])
                 z.append(cp[2])
@@ -286,15 +285,13 @@ class ChemPotDiagPlotly3DMplPlotter:
 
         fig = go.Figure(data=data)
         # fig.update_traces(marker_size=15)
-        _range = [self.info.min_range * 1.001, -self.info.min_range * 0.1]
-        vertex_elements = self.info.cpd.vertex_elements
-        elements_str = [str(elem) for elem in self.info.cpd.vertex_elements]
+        _range = [self.cpd.min_value * 1.001, -self.cpd.min_value * 0.1]
         fig.update_layout(
-            title=f"Chemical potential diagram of {'-'.join(elements_str)}",
+            title=f"Chemical potential diagram of {'-'.join(self.cpd.vertex_elements)}",
             scene=dict(
-                xaxis_title=f"{vertex_elements[0]} (eV)",
-                yaxis_title=f"{vertex_elements[1]} (eV)",
-                zaxis_title=f"{vertex_elements[2]} (eV)",
+                xaxis_title=f"{self.cpd.vertex_elements[0]} (eV)",
+                yaxis_title=f"{self.cpd.vertex_elements[1]} (eV)",
+                zaxis_title=f"{self.cpd.vertex_elements[2]} (eV)",
                 xaxis_range=_range,
                 yaxis_range=_range,
                 zaxis_range=_range,
@@ -307,9 +304,9 @@ class ChemPotDiagPlotly3DMplPlotter:
         return fig
 
 
-def clean_formula(comp: Composition):
+def clean_formula(comp: str):
     s = []
-    for char in str(comp):
+    for char in comp:
         if char == "1" or char == " ":
             continue
         elif char.isdigit():
