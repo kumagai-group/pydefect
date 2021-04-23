@@ -201,7 +201,7 @@ class ChemPotDiagMaker:
         feasible_point = np.array([LargeMinusNumber + 1.0] * self.dim,
                                   dtype=float)
         hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
-        self.vertices = hs.intersections.tolist()
+        self.vertices: List[List[float]] = hs.intersections.tolist()
 
     def _is_composition_involved(self,
                                  coord: List[float],
@@ -216,74 +216,55 @@ class ChemPotDiagMaker:
                          if x != LargeMinusNumber]
         return min(vertex_values) * mul
 
-    def _polygons(self):
-        self._calc_vertices()
-        min_val = self._min_energy_range()
-
-        result = {}
-        target_coords = None
-        if self.target:
-            target_coords = [[round(j, ndigits=5) for j in i]
-                             for i in self.vertices
-                             if self._is_composition_involved(i, self.target,
-                                                              self.host_composition_energies[self.target])]
-            competing_phases = [[] for i in target_coords]
-
-        # elements
-        for _idx, element in enumerate(self.elements):
-            coords = [[round(j, ndigits=5) for j in i]
-                      for i in self.vertices if round(i[_idx], ndigits=5) == 0.0]
-            coords = [[c if c != LargeMinusNumber else min_val for c in cc] for cc in coords]
-            result[element] = coords
-
-            if self.target:
-                for c in coords:
-                    if c in target_coords:
-                        _idx = target_coords.index(c)
-                        competing_phases[_idx].append(element)
-
-        # compounds
-        for comp, energy in self.host_composition_energies.items():
-            coords = [[round(j, ndigits=5) for j in i]
-                      for i in self.vertices if self._is_composition_involved(i, comp, energy)]
-            if coords:
-                result[comp] = coords
-                if self.target and comp != self.target:
-                    for c in coords:
-                        if c in target_coords:
-                            _idx = target_coords.index(c)
-                            competing_phases[_idx].append(comp)
-
-        x = []
-        if self.target:
-            for v, w in zip(target_coords, competing_phases):
-                impurity_phases = []
-                host_chem_pot = dict(zip(self.elements, v))
-                i = {imp: self.relative_energies.impurity_chem_pot(imp, host_chem_pot)
-                     for imp in self.impurity_elements}
-                d = dict(zip(self.elements, v))
-                for k, (chem_pot, formula) in i.items():
-                    d[k] = chem_pot
-                    impurity_phases.append(formula)
-                x.append(TargetVertex(d, w, impurity_phases))
-        return result, x or None, target_coords
-
     @property
-    def chem_pot_diag_and_target_vertex(self):
-        polygons, target_vertices, target_coords = self._polygons()
-        if self.target:
-            AtoZZ = product([""] + AtoZ, AtoZ)
-            t_vertices = TargetVertices(self.target, {"".join(next(AtoZZ)): v for v in target_vertices})
-            AtoZZ = product([""] + AtoZ, AtoZ)
-            v_coords = {"".join(next(AtoZZ)): v for v in target_coords}
-        else:
-            t_vertices, v_coords = None, None
+    def chem_pot_diag(self):
+        self._calc_vertices()
+        elem_energies = {element: 0.0 for element in self.elements}
+        host_energies = dict(**self.host_composition_energies, **elem_energies)
 
-        cpd = ChemPotDiag(vertex_elements=self.elements,
-                          polygons=polygons,
-                          target=self.target,
-                          target_vertices=v_coords)
-        return cpd, t_vertices
+        polygons = {}
+        for comp, energy in host_energies.items():
+            vertices = []
+            for coord in self.vertices:
+                if self._is_composition_involved(coord, comp, energy):
+                    vertex = [round(c, ndigits=5) if c != LargeMinusNumber
+                              else self._min_energy_range() for c in coord]
+                    vertices.append(vertex)
+            if vertices:
+                polygons[comp] = vertices
+
+        vertices = None
+        if self.target:
+            target_vertices = []
+            for coord in polygons[self.target]:
+                competing_phases = []
+                for comp, vertices in polygons.items():
+                    if comp == self.target:
+                        continue
+                    if coord in vertices:
+                        competing_phases.append(comp)
+
+                impurity_phases = []
+                host_chem_pots = dict(zip(self.elements, coord))
+                impurity_chem_pots = {}
+                for i_element in self.impurity_elements:
+                    i_chem_pot, i_phase = \
+                        self.relative_energies.impurity_chem_pot(
+                            i_element, host_chem_pots)
+                    impurity_chem_pots[i_element] = i_chem_pot
+                    impurity_phases.append(i_phase)
+                chem_pot = dict(**host_chem_pots, **impurity_chem_pots)
+                target_vertices.append(TargetVertex(chem_pot,
+                                                    competing_phases,
+                                                    impurity_phases))
+
+            AtoZZ = product([""] + AtoZ, AtoZ)
+            vertices = {"".join(next(AtoZZ)): v for v in target_vertices}
+
+        return ChemPotDiag(vertex_elements=self.elements,
+                           polygons=polygons,
+                           target=self.target,
+                           target_vertices=vertices)
 
 
 @dataclass
@@ -328,7 +309,13 @@ class ChemPotDiag(MSONable):
     vertex_elements: List[str]
     polygons: Dict[str, List[List[float]]]
     target: str = None
-    target_vertices: Dict[str, List[float]] = None
+    target_vertices: Dict[str, TargetVertex] = None
+
+    @property
+    def target_coords(self):
+        if self.target_vertices:
+            return {k: [v.chem_pot[e] for e in self.vertex_elements]
+                    for k, v in self.target_vertices.items()}
 
     @property
     def min_value(self):
@@ -348,6 +335,12 @@ class ChemPotDiag(MSONable):
         return [Composition(composition).get_atomic_fraction(e)
                 for e in self.vertex_elements]
 
+    @property
+    def to_target_vertices(self):
+        if self.target and self.target_vertices:
+            return TargetVertices(self.target, self.target_vertices)
+        print("Need to set target and target_vertices.")
+        raise ValueError
 
 # def replace_comp_energy(chem_pot_diag: ChemPotDiag,
 #                         replaced_comp_energies: List[CompositionEnergy]):

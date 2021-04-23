@@ -97,7 +97,7 @@ class ChemPotDiagMplPlotter(ABC):
         pass
 
     def _text_color(self, composition):
-        if self.cpd.target_vertices and composition == self.cpd.target:
+        if self.cpd.target_coords and composition == self.cpd.target:
             return self._mpl_defaults.target_comp_text_color
         return self._mpl_defaults.comp_text_color
 
@@ -109,7 +109,7 @@ class ChemPotDiagMplPlotter(ABC):
 
     def _add_alphabet_labels(self):
         if self.cpd.target:
-            for label, cp in self.cpd.target_vertices.items():
+            for label, cp in self.cpd.target_coords.items():
                 self._ax.text(*transpose(cp), label,
                               **self._mpl_defaults.alphabet_label)
 
