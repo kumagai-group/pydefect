@@ -183,15 +183,16 @@ class ChemPotDiagPlotlyPlotter(ABC):
         self.cpd = cpd
         self.axes_titles = [f"μ <sub>{el}</sub> (eV)"
                             for el in self.cpd.vertex_elements]
+        print(self.axes_titles)
         self.hover = "<b>label %{text}</b><br> energy (%{x:.2f}, %{y:.2f})"
         title = f"Chemical potential diagram of {self.cpd.chemical_system}"
         self.range = [self.cpd.min_range * 1.001, -self.cpd.min_range * 0.1]
         self.common_layout = dict(title=title, width=700, height=700,
-                                  title_font_size=30, showlegend=False,
-                                  xaxis_title=self.axes_titles[0],
-                                  yaxis_title=self.axes_titles[1],
-                                  xaxis_range=self.range,
-                                  yaxis_range=self.range)
+                                  title_font_size=30, showlegend=False)
+        self.title_axis = dict(xaxis_title=self.axes_titles[0],
+                               yaxis_title=self.axes_titles[1],
+                               xaxis_range=self.range,
+                               yaxis_range=self.range)
 
 
 class ChemPotDiagPlotly2DMplPlotter(ChemPotDiagPlotlyPlotter):
@@ -229,7 +230,7 @@ class ChemPotDiagPlotly2DMplPlotter(ChemPotDiagPlotlyPlotter):
                                      hovertemplate=self.hover))
 
         fig.update_traces(marker_size=15)
-        fig.update_layout(font_size=24, **self.common_layout)
+        fig.update_layout(font_size=24, **self.common_layout, **self.title_axis)
         return fig
 
 
@@ -268,7 +269,9 @@ class ChemPotDiagPlotly3DMplPlotter(ChemPotDiagPlotlyPlotter):
         fig = go.Figure(data=data)
         # fig.update_traces(marker_size=15)
         fig.update_layout(scene=dict(zaxis_title=self.axes_titles[2],
-                                     zaxis_range=self.range), font_size=15,
+                                     zaxis_range=self.range,
+                                     **self.title_axis),
+                          font_size=15,
                           **self.common_layout)
 
         return fig

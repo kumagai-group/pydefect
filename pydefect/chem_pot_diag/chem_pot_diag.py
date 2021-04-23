@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import string
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from itertools import product
 from typing import Dict, Optional, Union, List, Set, Tuple
 
@@ -12,10 +12,13 @@ from monty.serialization import loadfn
 from pydefect.error import PydefectError
 from pymatgen.core import Composition
 from scipy.spatial.qhull import HalfspaceIntersection
+from vise.util.logger import get_logger
 from vise.util.mix_in import ToYamlFileMixIn
 
 AtoZ = list(string.ascii_uppercase)
 LargeMinusNumber = -1e5
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -342,7 +345,7 @@ class ChemPotDiag(MSONable):
     def to_target_vertices(self):
         if self.target and self.target_vertices:
             return TargetVertices(self.target, self.target_vertices)
-        print("Need to set target and target_vertices.")
+        logger.warning("Need to set target and target_vertices.")
         raise ValueError
 
 
