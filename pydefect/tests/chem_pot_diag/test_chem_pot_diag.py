@@ -159,19 +159,30 @@ def test_cpd_maker_chem_pot_diag_with_target(cpd_maker, cpd, target_vertices):
     assert actual == cpd
 
 
-def test_target_vertices(target_vertices):
+def test_target_vertices(target_vertices, tmpdir):
+    print(tmpdir)
+    tmpdir.chdir()
     expected_text = """target: MgO2
-vertices:
-  A:
-    chem_pot:
-      Mg: -1.235
-      O: -24.1
-      Al: -88.9
-    competing_phases:
-      - MgO
-      - O2
-    impurity_phases:
-      - MgAlO2"""
+A:
+  chem_pot:
+    Al: -1.0
+    Mg: 0.0
+    O: -4.5
+  competing_phases:
+  - Mg
+  impurity_phases:
+  - MgAlO2
+B:
+  chem_pot:
+    Al: -1.0
+    Mg: -9.0
+    O: 0.0
+  competing_phases:
+  - O
+  impurity_phases:
+  - MgAlO2
+"""
+    assert_yaml_roundtrip(target_vertices, tmpdir, expected_text)
 
 
 def test_cpd(cpd):

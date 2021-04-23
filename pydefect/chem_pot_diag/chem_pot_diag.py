@@ -276,9 +276,8 @@ class TargetVertex(MSONable):
     impurity_phases: Optional[List[str]] = None
 
 
-# To yaml
 @dataclass
-class TargetVertices:
+class TargetVertices(ToYamlFileMixIn):
     target: str
     vertices: Dict[str, TargetVertex]
 
@@ -286,24 +285,18 @@ class TargetVertices:
     def chem_pots(self) -> Dict[str, List[float]]:
         return {k: v.chem_pot for k, v in self.vertices.items()}
 
-    # def to_yaml(self) -> str:
-    #     d = {}
-    #     for k, v in self.items():
-    #         key = str(k.iupac_formula).replace(" ", "")
-    #         val = {"energy": v.energy, "source": str(v.source)}
-    #         d[key] = val
-    #     return yaml.dump(d)
+    def to_yaml(self) -> str:
+        header = f"target: {self.target}"
+        d = {k: asdict(v) for k, v in self.vertices.items()}
+        return "\n".join([header, yaml.dump(d)])
 
-    # @classmethod
-    # def from_yaml(cls, filename: str = None):
-    #     name = filename or cls._yaml_filename()
-    #     d = loadfn(name)
-    #     composition_energies = {}
-    #     for k, v in d.items():
-    #         source = v.get('source', None)
-    #         key = Composition(k)
-    #         composition_energies[key] = CompositionEnergy(v["energy"], source)
-    #     return cls(composition_energies)
+    @classmethod
+    def from_yaml(cls, filename: str = None):
+        name = filename or cls._yaml_filename()
+        d = loadfn(name)
+        target = d.pop("target")
+        vertices = {k: TargetVertex(**v) for k, v in d.items()}
+        return cls(target=target, vertices=vertices)
 
 
 @dataclass
