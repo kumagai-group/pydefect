@@ -22,7 +22,7 @@ def test_unitcell(vasp_files):
  ------------------------------------------------------
     """
 
-    path = vasp_files / "unitcell_He_solid"
+    path = vasp_files / "unitcell_Ne_solid"
     unitcell = make_unitcell_from_vasp(
         vasprun_band=Vasprun(path / "vasprun-band.xml"),
         outcar_band=Outcar(path / "OUTCAR-band"),
