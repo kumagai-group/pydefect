@@ -6,8 +6,7 @@ import numpy as np
 import pytest
 
 from pydefect.analyzer.unitcell import Unitcell
-from vise.tests.helpers.assertion import assert_json_roundtrip, \
-    assert_yaml_roundtrip
+from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
 
 @pytest.fixture

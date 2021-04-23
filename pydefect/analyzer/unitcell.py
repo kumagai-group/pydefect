@@ -32,7 +32,7 @@ class Unitcell:
                  + np.array(self.ion_dielectric_const))
         return total.tolist()
 
-    def to_yaml_file(self, filename):
+    def to_yaml_file(self, filename: str = "unitcell.yaml"):
         with open(Path(filename), 'w', encoding='utf-8') as f:
             yaml.dump(asdict(self), f)
 

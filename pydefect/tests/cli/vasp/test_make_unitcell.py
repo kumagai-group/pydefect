@@ -30,6 +30,7 @@ def test_unitcell(vasp_files):
         outcar_dielectric_ionic=Outcar(path / "OUTCAR-dielectric"),
         )
 
+    assert unitcell.system == "Ne"
     assert unitcell.vbm == -10.3168
     assert unitcell.cbm == 1.2042
     assert unitcell.ele_dielectric_const[0][0] == 1.255879
