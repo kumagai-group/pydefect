@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import string
-from copy import copy
 from dataclasses import dataclass
 from itertools import product
 from typing import Dict, Optional, Union, List, Set, Tuple
@@ -78,12 +77,12 @@ class CompositionEnergies(ToYamlFileMixIn, dict):
             std[vertex_element] = min_abs_energy
             std_energies_list.append(min_abs_energy)
 
-        for reduced_formula, abs_energy_per_atom in abs_energies_per_atom.items():
-            if Composition(reduced_formula).is_element:
+        for formula, abs_energy_per_atom in abs_energies_per_atom.items():
+            if Composition(formula).is_element:
                 continue
-            frac = atomic_fractions(reduced_formula, self.elements)
+            frac = atomic_fractions(formula, self.elements)
             offset = sum([a * b for a, b in zip(frac, std_energies_list)])
-            rel[reduced_formula] = abs_energy_per_atom - offset
+            rel[formula] = abs_energy_per_atom - offset
 
         return std, rel
 
@@ -318,7 +317,7 @@ class ChemPotDiag(MSONable):
                     for k, v in self.target_vertices.items()}
 
     @property
-    def min_value(self):
+    def min_range(self):
         return np.min(sum(self.polygons.values(), []))
 
     @property
@@ -336,24 +335,15 @@ class ChemPotDiag(MSONable):
                 for e in self.vertex_elements]
 
     @property
+    def chemical_system(self) -> str:
+        return "-".join([el for el in self.vertex_elements])
+
+    @property
     def to_target_vertices(self):
         if self.target and self.target_vertices:
             return TargetVertices(self.target, self.target_vertices)
         print("Need to set target and target_vertices.")
         raise ValueError
-
-# def replace_comp_energy(chem_pot_diag: ChemPotDiag,
-#                         replaced_comp_energies: List[CompositionEnergy]):
-#     new_comp_energies = []
-#     for ce in chem_pot_diag.comp_energies:
-#         for replaced_comp_energy in replaced_comp_energies:
-#             if (ce.composition.reduced_composition
-#                     == replaced_comp_energy.composition.reduced_composition):
-#                 new_comp_energies.append(replaced_comp_energy)
-#                 break
-#         else:
-#             new_comp_energies.append(ce)
-#     chem_pot_diag.comp_energies = new_comp_energies
 
 
 class NoElementEnergyError(PydefectError):

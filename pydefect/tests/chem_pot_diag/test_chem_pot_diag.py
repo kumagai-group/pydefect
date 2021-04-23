@@ -4,8 +4,8 @@ from copy import copy
 
 import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
-    CompositionEnergy, CompositionEnergies, StandardEnergies, RelativeEnergies, \
-    ChemPotDiagMaker, TargetVertices, TargetVertex, \
+    CompositionEnergy, CompositionEnergies, StandardEnergies, \
+    RelativeEnergies, ChemPotDiagMaker, TargetVertices, TargetVertex, \
     target_element_chem_pot
 from pymatgen.core import Composition
 from vise.tests.helpers.assertion import assert_yaml_roundtrip
@@ -134,8 +134,10 @@ def cpd():
                   'MgO2': [[0.0, -4.5], [-9.0, 0.0]],
                   'O': [[min_val, 0.0], [-9.0, 0.0]]},
         target="MgO2",
-        target_vertices={"A": TargetVertex({"Mg": 0.0, "O": -4.5, "Al": -1.0}, ["Mg"], ["MgAlO2"]),
-                         "B": TargetVertex({"Mg": -9.0, "O": 0.0, "Al": -1.0}, ["O"], ["MgAlO2"])})
+        target_vertices={"A": TargetVertex({"Mg": 0.0, "O": -4.5, "Al": -1.0},
+                                           ["Mg"], ["MgAlO2"]),
+                         "B": TargetVertex({"Mg": -9.0, "O": 0.0, "Al": -1.0},
+                                           ["O"], ["MgAlO2"])})
 
 
 @pytest.fixture
@@ -146,7 +148,8 @@ def target_vertices():
     vertex_b = TargetVertex(chem_pot={"Mg": -9.0, "O": 0.0, "Al": -1.0},
                             competing_phases=["O"],
                             impurity_phases=["MgAlO2"])
-    return TargetVertices(target="MgO2", vertices={"A": vertex_a, "B": vertex_b})
+    return TargetVertices(target="MgO2",
+                          vertices={"A": vertex_a, "B": vertex_b})
 
 
 def test_cpd_maker_chem_pot_diag_with_target(cpd_maker, cpd, target_vertices):
@@ -177,4 +180,5 @@ def test_cpd(cpd):
     assert cpd.comp_centers == {"Mg": [0.0, (-9.9 - 4.5) / 2],
                                 "MgO2": [-4.5, -2.25],
                                 "O": [(-9.9 - 9.0) / 2, 0.0]}
-    assert cpd.min_value == -9.9
+    assert cpd.min_range == -9.9
+    assert cpd.chemical_system == "Mg-O"
