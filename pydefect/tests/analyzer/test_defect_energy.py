@@ -101,7 +101,6 @@ def test_defect_energy_summary_str():
         cbm=2.000000001, supercell_vbm=-1.000000001, supercell_cbm=3.000000001)
 
     actual = defect_energy_summary.__str__()
-    print(actual)
     expected = """title: MgAl₂O₄
 rel_chem_pots:
  -A O: -1.00

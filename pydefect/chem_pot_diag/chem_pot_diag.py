@@ -282,7 +282,7 @@ class TargetVertices(ToYamlFileMixIn):
     vertices: Dict[str, TargetVertex]
 
     @property
-    def chem_pots(self) -> Dict[str, List[float]]:
+    def chem_pots(self) -> Dict[str, Dict[str, float]]:
         return {k: v.chem_pot for k, v in self.vertices.items()}
 
     def to_yaml(self) -> str:

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from typing import Dict, Union
+from typing import Dict
 
 from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import DefectEnergy, DefectEnergyInfo
+from pydefect.chem_pot_diag.chem_pot_diag import StandardEnergies
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import IStructure
@@ -14,7 +15,7 @@ def make_defect_energy_info(defect_entry: DefectEntry,
                             calc_results: CalcResults,
                             correction: Correction,
                             perfect_calc_results: CalcResults,
-                            standard_energies: Dict[str, float],
+                            standard_energies: StandardEnergies,
                             band_edge_states: BandEdgeStates = None
                             ) -> DefectEnergyInfo:
     atom_io = num_atom_differences(calc_results.structure,

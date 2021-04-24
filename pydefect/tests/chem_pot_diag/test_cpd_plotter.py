@@ -5,9 +5,9 @@ import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, TargetVertices, \
     TargetVertex
 from pydefect.chem_pot_diag.cpd_plotter import (
-    ChemPotDiagMpl2DMplPlotter, transpose, sort_coords,
-    ChemPotDiagMpl3DMplPlotter, ChemPotDiagPlotly2DMplPlotter,
-    ChemPotDiagPlotly3DMplPlotter)
+    ChemPotDiag2DMplPlotter, transpose, sort_coords,
+    ChemPotDiag3DMplPlotter, ChemPotDiag2DPlotlyPlotter,
+    ChemPotDiag3DPlotlyPlotter)
 from pymatgen.core.composition import Composition
 from vise.util.dash_helper import show_png
 
@@ -34,7 +34,7 @@ def cpd_2d():
 
 @pytest.mark.skipif(False, reason="")
 def test_cpd_2d_draw(cpd_2d):
-    plotter = ChemPotDiagMpl2DMplPlotter(cpd_2d)
+    plotter = ChemPotDiag2DMplPlotter(cpd_2d)
     plotter.draw_diagram().show()
 
 
@@ -55,7 +55,7 @@ def cpd_3d():
 
 @pytest.mark.skipif(False, reason="")
 def test_cpd_3d_draw(cpd_3d):
-    plotter = ChemPotDiagMpl3DMplPlotter(cpd_3d)
+    plotter = ChemPotDiag3DMplPlotter(cpd_3d)
     plotter.draw_diagram().show()
 
 
@@ -74,7 +74,7 @@ def test_sort_coords():
 
 @pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
 def test_plotly_2d(cpd_2d):
-    plotter = ChemPotDiagPlotly2DMplPlotter(cpd_2d)
+    plotter = ChemPotDiag2DPlotlyPlotter(cpd_2d)
     fig = plotter.figure
     # fig.show()
     show_png(fig)
@@ -82,7 +82,7 @@ def test_plotly_2d(cpd_2d):
 
 @pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
 def test_plotly_3d(cpd_3d):
-    plotter = ChemPotDiagPlotly3DMplPlotter(cpd_3d)
+    plotter = ChemPotDiag3DPlotlyPlotter(cpd_3d)
     fig = plotter.figure
     # fig.show()
     show_png(fig)

@@ -7,16 +7,17 @@ from pydefect.analyzer.band_edge_states import PerfectBandEdgeState
 from pydefect.analyzer.defect_energy import DefectEnergyInfo, \
     DefectEnergySummary, DefectEnergies
 from pydefect.analyzer.unitcell import Unitcell
+from pydefect.chem_pot_diag.chem_pot_diag import TargetVertices
 
 
 def make_defect_energy_summary(
-        single_energies: List[DefectEnergyInfo],
-        rel_chem_pot: Dict[str, Dict[str, float]],
+        energy_infos: List[DefectEnergyInfo],
+        target_vertices: TargetVertices,
         unitcell: Unitcell,
-        perf_be_state: PerfectBandEdgeState) -> DefectEnergySummary:
+        perfect_band_edge: PerfectBandEdgeState) -> DefectEnergySummary:
 
     defect_energies = {}
-    for _, grouped_es in groupby(single_energies, lambda x: x.name):
+    for _, grouped_es in groupby(energy_infos, lambda x: x.name):
         grouped_es = list(grouped_es)
         name, atom_io = grouped_es[0].name, grouped_es[0].atom_io
         charges, des = [], []
@@ -28,7 +29,7 @@ def make_defect_energy_summary(
 
     return DefectEnergySummary(title=unitcell.system,
                                defect_energies=defect_energies,
-                               rel_chem_pots=rel_chem_pot,
+                               rel_chem_pots=target_vertices.chem_pots,
                                cbm=unitcell.cbm,
-                               supercell_vbm=perf_be_state.vbm_info.energy,
-                               supercell_cbm=perf_be_state.cbm_info.energy)
+                               supercell_vbm=perfect_band_edge.vbm_info.energy,
+                               supercell_cbm=perfect_band_edge.cbm_info.energy)

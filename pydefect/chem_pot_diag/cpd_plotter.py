@@ -111,7 +111,7 @@ class ChemPotDiagMplPlotter(ABC):
                               **self._mpl_defaults.alphabet_label)
 
 
-class ChemPotDiagMpl2DMplPlotter(ChemPotDiagMplPlotter):
+class ChemPotDiag2DMplPlotter(ChemPotDiagMplPlotter):
 
     def _add_ax(self):
         self._ax = plt.figure().add_subplot(111)
@@ -138,7 +138,7 @@ class ChemPotDiagMpl2DMplPlotter(ChemPotDiagMplPlotter):
         plt.plot(*transpose(vertex_coords), **self._mpl_defaults.simplex_2d)
 
 
-class ChemPotDiagMpl3DMplPlotter(ChemPotDiagMplPlotter):
+class ChemPotDiag3DMplPlotter(ChemPotDiagMplPlotter):
     def _add_ax(self):
         self._ax = plt.figure().add_subplot(111, projection='3d')
 
@@ -195,7 +195,7 @@ class ChemPotDiagPlotlyPlotter(ABC):
                                yaxis_range=self.range)
 
 
-class ChemPotDiagPlotly2DMplPlotter(ChemPotDiagPlotlyPlotter):
+class ChemPotDiag2DPlotlyPlotter(ChemPotDiagPlotlyPlotter):
 
     @property
     def figure(self):
@@ -234,7 +234,7 @@ class ChemPotDiagPlotly2DMplPlotter(ChemPotDiagPlotlyPlotter):
         return fig
 
 
-class ChemPotDiagPlotly3DMplPlotter(ChemPotDiagPlotlyPlotter):
+class ChemPotDiag3DPlotlyPlotter(ChemPotDiagPlotlyPlotter):
 
     @property
     def figure(self):
