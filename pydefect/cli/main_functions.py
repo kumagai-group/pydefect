@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 from monty.serialization import loadfn
-from pydefect.analyzer.defect_energy import DefectEnergyInfo, \
-    DefectEnergySummary
+from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.make_band_edge_states import make_band_edge_states
 from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info
 from pydefect.analyzer.make_defect_energy_summary import \
     make_defect_energy_summary
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergies, \
-    RelativeEnergies, ChemPotDiagMaker, ChemPotDiag, StandardEnergies, \
-    TargetVertices
-from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DPlotlyPlotter, \
-    ChemPotDiag3DPlotlyPlotter, ChemPotDiag2DMplPlotter, ChemPotDiag3DMplPlotter
+    RelativeEnergies, ChemPotDiagMaker, ChemPotDiag, TargetVertices
+from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DMplPlotter, ChemPotDiag3DMplPlotter
 from pydefect.cli.main_tools import sanitize_matrix
 from pydefect.cli.vasp.make_efnv_correction import make_efnv_correction
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
@@ -128,7 +125,7 @@ def make_efnv_correction_main_func(args):
 def make_band_edge_states_main_func(args):
     for d in args.dirs:
         try:
-            print(f"-- {d}")
+            logger.info(f"Parsing data in {d} ...")
             orb_infos = loadfn(d / "band_edge_orbital_infos.json")
             band_edge_states = make_band_edge_states(orb_infos, args.p_state)
             band_edge_states.to_json_file(d / "band_edge_states.json")
@@ -138,29 +135,28 @@ def make_band_edge_states_main_func(args):
 
 def make_defect_energy_info_main_func(args):
     for d in args.dirs:
+        logger.info(f"Parsing data in {d} ...")
+        defect_entry = loadfn(d / "defect_entry.json")
+        calc_results = loadfn(d / "calc_results.json")
+        correction = loadfn(d / "correction.json")
         try:
-            print(f"-- {d}")
-            defect_entry = loadfn(d / "defect_entry.json")
-            calc_results = loadfn(d / "calc_results.json")
-            correction = loadfn(d / "correction.json")
-            try:
-                band_edge_states = loadfn(d / "band_edge_states.json")
-            except:
-                band_edge_states = None
-            defect_energy_info = make_defect_energy_info(defect_entry,
-                                                         calc_results,
-                                                         correction,
-                                                         args.perf_calc_results,
-                                                         args.std_energies,
-                                                         band_edge_states)
-            defect_energy_info.to_yaml_file(d / "defect_energy_info.yaml")
-        except ValueError as e:
-            print(e)
+            band_edge_states = loadfn(d / "band_edge_states.json")
+        except FileNotFoundError:
+            band_edge_states = None
+        defect_energy_info = make_defect_energy_info(
+            defect_entry=defect_entry,
+            calc_results=calc_results,
+            correction=correction,
+            perfect_calc_results=args.perf_calc_results,
+            standard_energies=args.std_energies,
+            band_edge_states=band_edge_states)
+        defect_energy_info.to_yaml_file(d / "defect_energy_info.yaml")
 
 
 def make_defect_energy_summary_main_func(args):
-    energy_infos = [DefectEnergyInfo.from_yaml(d / "calc_results.json")
-                    for d in args.dirs]
+    energy_infos = []
+    for d in args.dirs:
+        energy_infos.append(DefectEnergyInfo.from_yaml(d / "calc_results.json"))
     target_vertices = TargetVertices.from_yaml(args.cpd_yaml)
     defect_energy_summary = make_defect_energy_summary(
         energy_infos, target_vertices, args.unitell, args.perfect_calc_results)

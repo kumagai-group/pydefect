@@ -197,22 +197,24 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
 
 
 def test_make_band_edge_states(mocker):
-    mock_perf_bes = mocker.Mock(spec=PerfectBandEdgeState, autospec=True)
-    args = Namespace(dirs=[Path("Va_O1_2")], p_state=mock_perf_bes)
-    mocker_beoi = mocker.Mock(spec=BandEdgeOrbitalInfos, autospec=True)
+    mock_perfect_edge_states = mocker.Mock(
+        spec=PerfectBandEdgeState, autospec=True)
+    mocker_band_edge_orbital_infos = mocker.Mock(spec=BandEdgeOrbitalInfos,
+                                                 autospec=True)
 
     def side_effect(key):
         if str(key) == "Va_O1_2/band_edge_orbital_infos.json":
-            return mocker_beoi
+            return mocker_band_edge_orbital_infos
         else:
             raise ValueError
 
     mocker_loadfn = mocker.patch(
         "pydefect.cli.main_functions.loadfn", side_effect=side_effect)
-    mocker_mbes = mocker.patch(
+    mocker_make_edge_states = mocker.patch(
         "pydefect.cli.main_functions.make_band_edge_states")
+
+    args = Namespace(dirs=[Path("Va_O1_2")], p_state=mock_perfect_edge_states)
     make_band_edge_states_main_func(args)
-    mocker_mbes.assert_called_with(mocker_beoi, mock_perf_bes)
-
-
+    mocker_make_edge_states.assert_called_with(mocker_band_edge_orbital_infos,
+                                               mock_perfect_edge_states)
 
