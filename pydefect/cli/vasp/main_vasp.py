@@ -9,6 +9,7 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect import __version__
+from pydefect.cli.main import epilog, description, add_sub_parser
 from pydefect.cli.vasp.main_vasp_functions import make_defect_entries, \
     make_unitcell, make_competing_phase_dirs, \
     make_calc_results, \
@@ -22,28 +23,13 @@ warnings.simplefilter('ignore', UnknownPotcarWarning)
 
 def parse_args_main_vasp(args):
 
-    parser = argparse.ArgumentParser(
-        description="""                            
-    pydefect is a package that helps researchers to do first-principles point 
-    defect calculations with the VASP code.
-    The command is used for creating and analyzing VASP IO files.""",
-        epilog=f"Author: Yu Kumagai Version: {__version__}")
+    parser = argparse.ArgumentParser(epilog=epilog,
+                                     description=description + """       
+    The command is used for creating and analyzing VASP IO files.""")
 
     subparsers = parser.add_subparsers()
-
-    # ++ parent parser: dirs
-    dirs_parser = argparse.ArgumentParser(
-        description="", add_help=False)
-    dirs_parser.add_argument(
-        "-d", "--dirs", nargs="+", type=Path,
-        help="Directory paths to be parsed.")
-
-    # ++ parent parser: pcr
-    pcr_parser = argparse.ArgumentParser(
-        description="", add_help=False)
-    pcr_parser.add_argument(
-        "-pcr", "--perfect_calc_results", required=True, type=loadfn,
-        help="Path to the calc_results.json for the perfect supercell.")
+    dirs_parser = add_sub_parser(argparse, name="dirs")
+    pcr_parser = add_sub_parser(argparse, name="perfect_calc_results")
 
     # -- unitcell ------------------------------------------------
     parser_unitcell = subparsers.add_parser(
