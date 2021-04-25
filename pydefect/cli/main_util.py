@@ -7,7 +7,8 @@ import warnings
 
 from monty.serialization import loadfn
 from pydefect.cli.main import description, epilog, add_sub_parser
-from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp
+from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp, \
+    composition_energies_from_mp
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
@@ -20,6 +21,23 @@ def parse_args_main_util(args):
 
     subparsers = parser.add_subparsers()
     unitcell_parser = add_sub_parser(argparse, name="unitcell")
+
+    # -- composition energies from mp ------------------------------------------
+    parser_comp_es_from_mp = subparsers.add_parser(
+        name="composition_energies_from_mp",
+        description="Retrieve composition energies from Materials Project.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['cefm'])
+
+    parser_comp_es_from_mp.add_argument(
+        "-e", "--elements", type=str, nargs="+",
+        help="Element names considered in chemical potential diagram. Used for "
+             "creating the diagram from mp data with atom energy alignment.")
+    parser_comp_es_from_mp.add_argument(
+        "-a", "--atom_energy_yaml", type=str,
+        help="Yaml file storing atom energies for energy alignment.")
+
+    parser_comp_es_from_mp.set_defaults(func=composition_energies_from_mp)
 
     # -- gkfo correction ------------------------------------------------
     parser_gkfo = subparsers.add_parser(

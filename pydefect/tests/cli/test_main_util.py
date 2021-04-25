@@ -9,6 +9,17 @@ from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
 
 
+def test_make_cpd_options():
+    parsed_args = parse_args_main_util(["cefm",
+                                        "-e", "Mg", "O",
+                                        "-a", "atom_energies.yaml"])
+    expected = Namespace(
+        elements=["Mg", "O"],
+        atom_energy_yaml="atom_energies.yaml",
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
 def test_gkfo_correction(mocker):
     mock_i_correction = mocker.Mock(spec=ExtendedFnvCorrection, autospec=True)
     mock_i_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
