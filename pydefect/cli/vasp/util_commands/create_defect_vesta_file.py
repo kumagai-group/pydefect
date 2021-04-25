@@ -15,7 +15,7 @@ from pymatgen.core import Structure, DummySpecies, Element
 def make_defect_vesta_file(defect_structure: Structure,
                            def_str_info: DefectStructureInfo,
                            title: str = None,
-                           cutoff: float = 5.0,
+                           cutoff: float = defaults.show_structure_cutoff,
                            show_disp_min: float = 0.1,
                            disp_enhance_factor: float = 3.0,
                            initial_filename: str = "defect_initial.vesta",
@@ -24,7 +24,7 @@ def make_defect_vesta_file(defect_structure: Structure,
     vectors, vector_colors = {}, []
     i = 1
     for f_idx, (s, disp) in enumerate(zip(defect_structure, def_str_info.displacements)):
-        if disp and disp.distance_from_defect < defaults.show_structure_cutoff:
+        if disp and disp.distance_from_defect < cutoff:
             species.append(disp.specie)
             initial_coords.append(disp.original_pos)
             final_coords.append(s.frac_coords)
