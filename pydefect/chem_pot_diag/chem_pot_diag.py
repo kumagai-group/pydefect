@@ -13,7 +13,7 @@ from pydefect.error import PydefectError
 from pymatgen.core import Composition
 from scipy.spatial.qhull import HalfspaceIntersection
 from vise.util.logger import get_logger
-from vise.util.mix_in import ToYamlFileMixIn
+from vise.util.mix_in import ToYamlFileMixIn, ToJsonFileMixIn
 
 AtoZ = list(string.ascii_uppercase)
 LargeMinusNumber = -1e5
@@ -300,7 +300,7 @@ class TargetVertices(ToYamlFileMixIn):
 
 
 @dataclass
-class ChemPotDiag(MSONable):
+class ChemPotDiag(MSONable, ToJsonFileMixIn):
     vertex_elements: List[str]
     polygons: Dict[str, List[List[float]]]
     target: str = None
