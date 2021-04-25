@@ -19,7 +19,7 @@ from pydefect.cli.main_functions import plot_defect_energy, \
     calc_defect_structure_info
 from pydefect.cli.main_tools import str_int_to_int
 from pydefect.defaults import defaults
-from pymatgen.core import IStructure, Composition, Structure
+from pymatgen.core import IStructure, Structure
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
@@ -50,6 +50,11 @@ def add_sub_parser(_argparse, name: str):
         result.add_argument(
             "-pcr", "--perfect_calc_results", required=True, type=loadfn,
             help="Path to the calc_results.json for the perfect supercell.")
+    elif name == "perfect_band_edge_state":
+        result.add_argument(
+            "-p", "--p_state", required=True, type=loadfn,
+            help="Path to the perfect_band_edge_state.json.")
+
     else:
         raise ValueError
     return result
@@ -64,6 +69,7 @@ def parse_args_main(args):
     unitcell_parser = add_sub_parser(argparse, name="unitcell")
     si_parser = add_sub_parser(argparse, name="supercell_info")
     pcr_parser = add_sub_parser(argparse, name="perfect_calc_results")
+    pbes_parser = add_sub_parser(argparse, name="perfect_band_edge_state")
     # -- make_standard_and_relative_energies -----------------------------------
     parser_make_standard_and_relative_energies = subparsers.add_parser(
         name="standard_and_relative_energies",
@@ -117,7 +123,7 @@ def parse_args_main(args):
         aliases=['s'])
 
     parser_supercell.add_argument(
-        "-p", "--unitcell", type=IStructure.from_file,
+        "-p", "--unitcell", type=IStructure.from_file, required=True,
         help="Base structure file, which must be the standardized primitive "
              "cell.")
     parser_supercell.add_argument(
@@ -222,13 +228,9 @@ def parse_args_main(args):
     parser_band_edge_states = subparsers.add_parser(
         name="band_edge_states",
         description="Show edge state for each spin channel.",
-        parents=[dirs_parser],
+        parents=[dirs_parser, pbes_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['bes'])
-
-    parser_band_edge_states.add_argument(
-        "-p", "--p_state", required=True, type=loadfn,
-        help="Path to the perfect_band_edge_state.json.")
 
     parser_band_edge_states.set_defaults(func=make_band_edge_states_main_func)
 
@@ -254,8 +256,8 @@ def parse_args_main(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['des'])
     parser_defect_energy_summary.add_argument(
-        "-c", "--cpd_json", required=True, type=loadfn,
-        help="Path to the chem_pot_diag.json file.")
+        "-t", "--target_vertices_json", required=True, type=loadfn,
+        help="Path to the target_vertices.json file.")
 
     parser_defect_energy_summary.set_defaults(
         func=make_defect_energy_summary_main_func)

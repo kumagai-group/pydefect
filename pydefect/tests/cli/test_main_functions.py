@@ -192,8 +192,6 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
     mock_site_pot_plotter.from_efnv_corr.assert_called_with(
         title="Va_O1_2", efnv_correction=mock_efnv)
     plotter.construct_plot.assert_called_once_with()
-    plotter.return_value.plt.savefig.assert_called_once_with(
-        fname=Path("Va_O1_2") / "correction.pdf")
 
 
 def test_make_band_edge_states(mocker):

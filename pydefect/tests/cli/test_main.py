@@ -5,11 +5,9 @@ from pathlib import Path
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import DefectEnergySummary
-from pydefect.analyzer.unitcell import Unitcell
-from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
+from pydefect.chem_pot_diag.chem_pot_diag import TargetVertices
 from pydefect.cli.main import parse_args_main
 from pydefect.input_maker.supercell_info import SupercellInfo
-from pymatgen.core import Composition
 
 
 def test_make_standard_and_relative_energies_options():
@@ -21,13 +19,12 @@ def test_make_standard_and_relative_energies_options():
 
 
 def test_make_cpd_and_vertices_options():
-    parsed_args = parse_args_main(["cv", "-d", "a",  "b",
+    parsed_args = parse_args_main(["cv",
                                    "-t", "MgO",
                                    "-e", "Mg", "O", "Al"])
     expected = Namespace(
-        dirs=[Path("a"), Path("b")],
         rel_energy_yaml="relative_energies.yaml",
-        target=Composition("MgO"),
+        target="MgO",
         elements=["Mg", "O", "Al"],
         func=parsed_args.func)
     assert parsed_args == expected
@@ -44,7 +41,7 @@ def test_plot_cpd_options(mocker):
 
 def test_make_supercell_wo_options(mocker):
     mock = mocker.patch("pydefect.cli.main.IStructure")
-    parsed_args = parse_args_main(["s"])
+    parsed_args = parse_args_main(["s", "-p", "POSCAR-tmp"])
     # func is a pointer so need to point the same address.
     expected = Namespace(
         unitcell=mock.from_file.return_value,
@@ -53,7 +50,6 @@ def test_make_supercell_wo_options(mocker):
         max_num_atoms=300,
         func=parsed_args.func)
     assert parsed_args == expected
-    mock.from_file.assert_called_once_with("POSCAR")
 
 
 def test_make_supercell_w_options(mocker):
@@ -156,13 +152,11 @@ def test_defect_structure_info(mocker):
 
 def test_efnv_correction(mocker):
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
-    mock_unitcell = mocker.Mock(spec=Unitcell, autospec=True)
+    mock_unitcell = mocker.patch("pydefect.cli.main.Unitcell")
 
     def side_effect(filename):
         if filename == "perfect/calc_results.json":
             return mock_calc_results
-        elif filename == "unitcell.json":
-            return mock_unitcell
         else:
             raise ValueError
 
@@ -174,7 +168,7 @@ def test_efnv_correction(mocker):
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         perfect_calc_results=mock_calc_results,
-        unitcell=mock_unitcell,
+        unitcell=mock_unitcell.from_yaml.return_value,
         func=parsed_args.func)
     assert parsed_args == expected
 
@@ -211,18 +205,17 @@ def test_defect_energy_infos(mocker):
 
 
 def test_defect_energy_summary(mocker):
-    mock_cpd = mocker.Mock(spec=ChemPotDiag, autospec=True)
+    mock_target_vertices = mocker.Mock(spec=TargetVertices, autospec=True)
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
-    mock_unitcell = mocker.Mock(spec=Unitcell, autospec=True)
+    mock_unitcell = mocker.patch("pydefect.cli.main.Unitcell")
 
     def side_effect(filename):
-        if filename == "chem_pot_diag.json":
-            return mock_cpd
+        if filename == "target_vertices.json":
+            return mock_target_vertices
         elif filename == "perfect/calc_results.json":
             return mock_calc_results
-        elif filename == "unitcell.json":
-            return mock_unitcell
         else:
+            print(filename)
             raise ValueError
 
     mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
@@ -230,12 +223,12 @@ def test_defect_energy_summary(mocker):
                                    "-d", "Va_O1_0", "Va_O1_1",
                                    "-pcr", "perfect/calc_results.json",
                                    "-u", "unitcell.json",
-                                   "-c", "chem_pot_diag.json"])
+                                   "-t", "target_vertices.json"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         perfect_calc_results=mock_calc_results,
-        unitcell=mock_unitcell,
-        cpd_json=mock_cpd,
+        unitcell=mock_unitcell.from_yaml.return_value,
+        target_vertices_json=mock_target_vertices,
         func=parsed_args.func)
     assert parsed_args == expected
 

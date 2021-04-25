@@ -165,7 +165,7 @@ def make_defect_energy_infos_main_func(args):
             defect_entry=defect_entry,
             calc_results=calc_results,
             correction=correction,
-            perfect_calc_results=args.perf_calc_results,
+            perfect_calc_results=args.perfect_calc_results,
             standard_energies=args.std_energies,
             band_edge_states=band_edge_states)
         defect_energy_info.to_yaml_file(d / "defect_energy_info.yaml")
@@ -175,7 +175,7 @@ def make_defect_energy_summary_main_func(args):
     energy_infos = []
     for d in args.dirs:
         energy_infos.append(DefectEnergyInfo.from_yaml(d / "calc_results.json"))
-    target_vertices = TargetVertices.from_yaml(args.cpd_json)
+    target_vertices = TargetVertices.from_yaml(args.target_vertices_json)
     defect_energy_summary = make_defect_energy_summary(
         energy_infos, target_vertices, args.unitell, args.perfect_calc_results)
     defect_energy_summary.to_json_file()

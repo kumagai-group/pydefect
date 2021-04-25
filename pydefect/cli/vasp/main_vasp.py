@@ -27,7 +27,7 @@ def parse_args_main_vasp(args):
 
     subparsers = parser.add_subparsers()
     dirs_parser = add_sub_parser(argparse, name="dirs")
-    pcr_parser = add_sub_parser(argparse, name="perfect_calc_results")
+    pbes_parser = add_sub_parser(argparse, name="perfect_band_edge_state")
 
     # -- unitcell ------------------------------------------------
     parser_unitcell = subparsers.add_parser(
@@ -89,18 +89,6 @@ def parse_args_main_vasp(args):
         aliases=['cr'])
     parser_calc_results.set_defaults(func=make_calc_results)
 
-    # -- band edge orbital infos  ----------------------------------------------
-    parser_band_edge_orb_infos = subparsers.add_parser(
-        name="band_edge_orbital_infos",
-        description="Generate band_edge_orbital_infos.json and "
-                    "eigenvalues.pdf.",
-        parents=[dirs_parser, pcr_parser],
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['beoi'])
-
-    parser_band_edge_orb_infos.set_defaults(
-        func=make_band_edge_orb_infos_and_eigval_plot)
-
     # -- perfect band edge state  ----------------------------------------------
     parser_perf_band_edge_state = subparsers.add_parser(
         name="perfect_band_edge_state",
@@ -113,6 +101,19 @@ def parse_args_main_vasp(args):
         help="Directory path to the perfect supercell calculation.")
 
     parser_perf_band_edge_state.set_defaults(func=make_perfect_band_edge_state)
+
+    # -- band edge orbital infos  ----------------------------------------------
+    parser_band_edge_orb_infos = subparsers.add_parser(
+        name="band_edge_orbital_infos",
+        description="Generate band_edge_orbital_infos.json and "
+                    "eigenvalues.pdf.",
+        parents=[dirs_parser, pbes_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['beoi'])
+
+    parser_band_edge_orb_infos.set_defaults(
+        func=make_band_edge_orb_infos_and_eigval_plot)
+
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
 

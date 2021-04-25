@@ -88,9 +88,19 @@ def make_calc_results(args):
         calc_results.to_json_file(str(Path(d) / "calc_results.json"))
 
 
+def make_perfect_band_edge_state(args):
+    procar = Procar(args.dir / defaults.procar)
+    vasprun = Vasprun(args.dir / defaults.vasprun)
+    outcar = Outcar(args.dir / defaults.outcar)
+    perfect_band_edge_state = \
+        make_perfect_band_edge_state_from_vasp(procar, vasprun, outcar)
+    perfect_band_edge_state.to_json_file(
+        args.dir / "perfect_band_edge_state.json")
+
+
 def make_band_edge_orb_infos_and_eigval_plot(args):
-    supercell_vbm = args.perfect_calc_results.vbm
-    supercell_cbm = args.perfect_calc_results.cbm
+    supercell_vbm = args.p_state.vbm_info.energy
+    supercell_cbm = args.p_state.cbm_info.energy
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
         try:
@@ -110,14 +120,3 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
         plotter.construct_plot()
         plotter.plt.savefig(fname=d / "eigenvalues.pdf")
         plotter.plt.clf()
-
-
-def make_perfect_band_edge_state(args):
-    procar = Procar(args.dir / defaults.procar)
-    vasprun = Vasprun(args.dir / defaults.vasprun)
-    outcar = Outcar(args.dir / defaults.outcar)
-    perfect_band_edge_state = \
-        make_perfect_band_edge_state_from_vasp(procar, vasprun, outcar)
-    perfect_band_edge_state.to_json_file(
-        args.dir / "perfect_band_edge_state.json")
-
