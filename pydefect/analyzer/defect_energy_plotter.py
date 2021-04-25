@@ -46,7 +46,7 @@ class DefectEnergyPlotter:
                  defect_energy_summary: DefectEnergySummary,
                  chem_pot_label: "str",
                  allow_shallow: bool,
-                 with_correction: bool,
+                 with_corrections: bool,
                  name_style: Optional[str],
                  x_range: Optional[Tuple[float, float]] = None,
                  y_range: Optional[Tuple[float, float]] = None,
@@ -62,7 +62,7 @@ class DefectEnergyPlotter:
         defect_energy_summary.e_min = self._x_range[0]
         defect_energy_summary.e_max = self._x_range[1]
         charge_energies = defect_energy_summary.charge_energies(
-            chem_pot_label, allow_shallow, with_correction, self._x_range,
+            chem_pot_label, allow_shallow, with_corrections, self._x_range,
             name_style)
         self._cross_points = charge_energies.cross_point_dicts
         self._y_range = y_range or charge_energies.energy_range(space=0.2)

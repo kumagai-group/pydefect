@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from copy import deepcopy
-from dataclasses import dataclass, InitVar
-from itertools import groupby, combinations
+from dataclasses import dataclass
+from itertools import combinations
 from typing import List, Dict, Optional, Tuple
 
 import numpy as np
@@ -118,7 +117,7 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
     def charge_energies(self,
                         chem_pot_label: str,
                         allow_shallow: bool,
-                        with_correction: bool,
+                        with_corrections: bool,
                         e_range: Tuple[float, float],
                         name_style: Optional[str] = None,
                         ) -> "ChargeEnergies":
@@ -132,7 +131,7 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
                     continue
                 reservoir_e = sum([-diff * rel_chem_pot[elem]
                                   for elem, diff in v.atom_io.items()])
-                x.append((c, e.energy(with_correction) + reservoir_e))
+                x.append((c, e.energy(with_corrections) + reservoir_e))
 
             if x:
                 result[k] = SingleChargeEnergies(x)
@@ -149,6 +148,7 @@ class ChargeEnergies:
     e_min: float
     e_max: float
 
+    # change to lazy evaluation?
     def __post_init__(self):
         self.cross_point_dicts = {}
         large_minus_number = -1e4
