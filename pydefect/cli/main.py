@@ -8,6 +8,7 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect import __version__
+from pydefect.analyzer.unitcell import Unitcell
 from pydefect.chem_pot_diag.chem_pot_diag import StandardEnergies
 from pydefect.cli.main_functions import plot_defect_energy, \
     make_standard_and_relative_energies, make_cpd_and_vertices, \
@@ -38,8 +39,8 @@ def add_sub_parser(_argparse, name: str):
             help="Directory paths to be parsed.")
     elif name == "unitcell":
         result.add_argument(
-            "-u", "--unitcell", type=loadfn, required=True,
-            help="Path to the unitcell.json file.")
+            "-u", "--unitcell", type=Unitcell.from_yaml, required=True,
+            help="Path to the unitcell.yaml file.")
     elif name == "supercell_info":
         result.add_argument(
             "-s", "--supercell_info", required=True, type=loadfn,
@@ -116,8 +117,9 @@ def parse_args_main(args):
         aliases=['s'])
 
     parser_supercell.add_argument(
-        "-p", "--unitcell", default="POSCAR", type=IStructure.from_file,
-        help="Base POSCAR, which must be the standardized primitive cell.")
+        "-p", "--unitcell", type=IStructure.from_file,
+        help="Base structure file, which must be the standardized primitive "
+             "cell.")
     parser_supercell.add_argument(
         "--matrix", nargs="+", type=int,
         help="Supercell matrix applied to the conventional cell. "
@@ -141,7 +143,7 @@ def parse_args_main(args):
 
     parser_append_interstitial.add_argument(
         "-p", "--base_structure", required=True, type=Structure.from_file,
-        help="POSCAR file used for generating AECCAR files, which must be the "
+        help="Structure file defining the fractional coordinates such as the "
              "standardized primitive cell.")
     parser_append_interstitial.add_argument(
         "-c", "--frac_coords", required=True, nargs=3, type=float,
