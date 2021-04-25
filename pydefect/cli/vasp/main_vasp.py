@@ -7,8 +7,6 @@ import sys
 import warnings
 from pathlib import Path
 
-from monty.serialization import loadfn
-from pydefect import __version__
 from pydefect.cli.main import epilog, description, add_sub_parser
 from pydefect.cli.vasp.main_vasp_functions import make_defect_entries, \
     make_unitcell, make_competing_phase_dirs, \

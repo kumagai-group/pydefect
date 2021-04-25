@@ -49,25 +49,9 @@ def add_sub_parser(_argparse, name: str):
         result.add_argument(
             "-pcr", "--perfect_calc_results", required=True, type=loadfn,
             help="Path to the calc_results.json for the perfect supercell.")
+    else:
+        raise ValueError
     return result
-
-
-def add_dir_parser(_argparse):
-    # ++ parent parser: dirs
-    dirs_parser = _argparse.ArgumentParser(description="", add_help=False)
-    dirs_parser.add_argument(
-        "-d", "--dirs", nargs="+", type=Path, required=True,
-        help="Directory paths to be parsed.")
-    return dirs_parser
-
-
-def add_unitcell_parser(_argparse):
-    # ++ parent parser: dirs
-    unitcell_parser = _argparse.ArgumentParser(description="", add_help=False)
-    unitcell_parser.add_argument(
-        "-u", "--unitcell", required=True, type=loadfn,
-        help="Path to the unitcell.json file.")
-    return unitcell_parser
 
 
 def parse_args_main(args):
