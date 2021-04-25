@@ -6,6 +6,7 @@ from typing import Optional, Dict
 from monty.json import MSONable
 from pydefect.analyzer.defect_structure_info import SymmRelation, DefectType
 from tabulate import tabulate
+from vise.util.mix_in import ToJsonFileMixIn
 
 
 @dataclass
@@ -58,7 +59,7 @@ class SingleCalcSummary(MSONable):
 
 
 @dataclass
-class CalcSummary(MSONable):
+class CalcSummary(MSONable, ToJsonFileMixIn):
     single_summaries: Dict[str, SingleCalcSummary]
 
     def __str__(self):
