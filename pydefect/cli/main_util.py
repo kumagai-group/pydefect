@@ -7,8 +7,7 @@ import warnings
 
 from monty.serialization import loadfn
 from pydefect.cli.main import description, epilog, add_sub_parser
-from pydefect.cli.vasp.main_vasp_util_functions import \
-    make_gkfo_correction_from_vasp
+from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
