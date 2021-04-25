@@ -5,6 +5,7 @@ from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_info import make_defect_structure_info
 from pydefect.analyzer.make_band_edge_states import make_band_edge_states
+from pydefect.analyzer.make_calc_summary import make_calc_summary
 from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info
 from pydefect.analyzer.make_defect_energy_summary import \
     make_defect_energy_summary
@@ -179,6 +180,17 @@ def make_defect_energy_summary_main_func(args):
     defect_energy_summary = make_defect_energy_summary(
         energy_infos, target_vertices, args.unitcell, args.p_state)
     defect_energy_summary.to_json_file()
+
+
+def make_calc_summary_main_func(args):
+    defect_entries, calc_results, str_infos = [], [], []
+    for d in args.dirs:
+        defect_entries.append(loadfn(d / "defect_entry.json"))
+        calc_results.append(loadfn(d / "calc_results.json"))
+        str_infos.append(loadfn(d / "defect_structure_info.json"))
+    calc_summary = make_calc_summary(defect_entries, calc_results, str_infos,
+                                     args.perfect_calc_results)
+    calc_summary.to_json_file()
 
 
 def plot_defect_energy(args):

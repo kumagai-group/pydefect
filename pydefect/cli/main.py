@@ -16,7 +16,7 @@ from pydefect.cli.main_functions import plot_defect_energy, \
     pop_interstitial_from_supercell_info, make_defect_set, \
     make_efnv_correction_main_func, make_band_edge_states_main_func, \
     make_defect_energy_infos_main_func, make_defect_energy_summary_main_func, \
-    calc_defect_structure_info
+    calc_defect_structure_info, make_calc_summary_main_func
 from pydefect.cli.main_tools import str_int_to_int
 from pydefect.defaults import defaults
 from pymatgen.core import IStructure, Structure
@@ -261,6 +261,17 @@ def parse_args_main(args):
 
     parser_defect_energy_summary.set_defaults(
         func=make_defect_energy_summary_main_func)
+
+    # -- calc summary -------------------------------------------------
+    parser_calc_summary = subparsers.add_parser(
+        name="calc_summary",
+        description="",
+        parents=[dirs_parser, pcr_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['cs'])
+
+    parser_calc_summary.set_defaults(
+        func=make_calc_summary_main_func)
 
     # -- plot defect formation energy ------------------------------------------
     parser_plot_energy = subparsers.add_parser(
