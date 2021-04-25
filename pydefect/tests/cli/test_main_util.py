@@ -29,6 +29,7 @@ def test_gkfo_correction(mocker):
 
     mocker.patch("pydefect.cli.main_util.loadfn",
                  side_effect=side_effect)
+    mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
     parsed_args = parse_args_main_util([
         "gkfo", "-iefnv", "a/correction.json", "-cd", "1",
         "-icr", "a/calc_results.json", "-fcr", "a/absorption/calc_results.json",
