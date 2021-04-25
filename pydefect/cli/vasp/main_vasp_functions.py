@@ -29,7 +29,8 @@ def make_unitcell(args):
         vasprun_band=args.vasprun_band,
         outcar_band=args.outcar_band,
         outcar_dielectric_clamped=args.outcar_dielectric_clamped,
-        outcar_dielectric_ionic=args.outcar_dielectric_ionic)
+        outcar_dielectric_ionic=args.outcar_dielectric_ionic,
+        system_name=args.name)
     unitcell.to_yaml_file()
 
 

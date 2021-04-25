@@ -42,7 +42,8 @@ def test_make_unitcell(tmpdir, mocker):
         vasprun_band=vasprun_band_mock,
         outcar_band=outcar_band_mock,
         outcar_dielectric_clamped=outcar_dielectric_mock,
-        outcar_dielectric_ionic=outcar_dielectric_mock)
+        outcar_dielectric_ionic=outcar_dielectric_mock,
+        system_name="H")
 
 
 def test_make_competing_phase_dirs(mocker):
