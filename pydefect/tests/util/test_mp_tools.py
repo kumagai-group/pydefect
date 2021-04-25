@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# from vise.util.mp_tools import make_poscars_from_mp
-# .testing import ViseTest
 import pytest
 
 from pydefect.util.mp_tools import elements, MpQuery
@@ -39,12 +37,3 @@ def test_mp_query(mocker):
                   "e_above_hull": {"$lte": 1e-5}},
         properties=["full_formula"])
     assert mp_query.materials == expected
-
-
-"""
-TODO
-- Get materials' formula containing given elements via MPRester.
-
-DONE
-- create list of elements. 
-"""
