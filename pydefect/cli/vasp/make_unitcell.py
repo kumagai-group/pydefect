@@ -20,6 +20,7 @@ def make_unitcell_from_vasp(vasprun_band: Vasprun,
 
     return Unitcell(
         system=name,
-        vbm=vbm, cbm=cbm,
+        # vbm and cbm are <class 'numpy.float64'>.
+        vbm=float(vbm), cbm=float(cbm),
         ele_dielectric_const=outcar_dielectric_clamped.dielectric_tensor,
         ion_dielectric_const=outcar_dielectric_ionic.dielectric_ionic_tensor)

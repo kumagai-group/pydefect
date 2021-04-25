@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List
 
 import numpy as np
+from monty.json import MSONable
 from monty.serialization import loadfn
 from ruamel.yaml import add_constructor, resolver, YAML
 
@@ -19,7 +20,7 @@ yaml.default_flow_style = False
 
 
 @dataclass
-class Unitcell:
+class Unitcell(MSONable):
     system: str
     vbm: float
     cbm: float
