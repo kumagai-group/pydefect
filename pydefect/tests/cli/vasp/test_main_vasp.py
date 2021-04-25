@@ -77,7 +77,7 @@ def test_band_edge_orbital_infos(mocker):
         else:
             raise ValueError
 
-    mocker.patch("pydefect.cli.vasp.main_vasp.loadfn", side_effect=side_effect)
+    mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
     parsed_args = parse_args_main_vasp(["beoi", "-d", "Va_O1_0", "Va_O1_1",
                                         "-pcr", "perfect/calc_results.json"])
     expected = Namespace(
