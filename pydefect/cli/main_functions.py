@@ -3,13 +3,15 @@
 from monty.serialization import loadfn
 from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
+from pydefect.analyzer.defect_structure_info import make_defect_structure_info
 from pydefect.analyzer.make_band_edge_states import make_band_edge_states
 from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info
 from pydefect.analyzer.make_defect_energy_summary import \
     make_defect_energy_summary
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergies, \
-    RelativeEnergies, ChemPotDiagMaker, ChemPotDiag, TargetVertices
-from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DMplPlotter, ChemPotDiag3DMplPlotter
+    RelativeEnergies, ChemPotDiagMaker, TargetVertices
+from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DMplPlotter, \
+    ChemPotDiag3DMplPlotter
 from pydefect.cli.main_tools import sanitize_matrix
 from pydefect.cli.vasp.make_efnv_correction import make_efnv_correction
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
@@ -37,7 +39,7 @@ def make_cpd_and_vertices(args):
         elements = args.elements or \
                    Composition(args.target).chemical_system.split("-")
     else:
-        elements = list(rel_energies.all_element_set)
+        elements = args.elements or list(rel_energies.all_element_set)
 
     cpd_maker = ChemPotDiagMaker(rel_energies, elements, args.target)
     cpd = cpd_maker.chem_pot_diag
@@ -46,7 +48,7 @@ def make_cpd_and_vertices(args):
 
 
 def plot_chem_pot_diag(args):
-    cpd: ChemPotDiag = args.chem_pot_diag
+    cpd = args.chem_pot_diag
     if cpd.dim == 2:
         plotter = ChemPotDiag2DMplPlotter(cpd)
     elif cpd.dim == 3:
@@ -103,6 +105,22 @@ def make_defect_set(args):
     maker.defect_set.to_yaml()
 
 
+def calc_defect_structure_info(args):
+    supercell_info = args.supercell_info
+    for d in args.dirs:
+        logger.info(f"Parsing data in {d} ...")
+        calc_results = loadfn(d / "calc_results.json")
+        defect_entry = loadfn(d / "defect_entry.json")
+        defect_str_info = make_defect_structure_info(
+            supercell_info.structure,
+            defect_entry.structure,
+            calc_results.structure,
+            dist_tol=args.dist_tolerance,
+            symprec=args.symprec,
+            init_site_sym=defect_entry.site_symmetry)
+        defect_str_info.to_json_file(str(d / "defect_structure_info.json"))
+
+
 def make_efnv_correction_main_func(args):
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
@@ -133,7 +151,7 @@ def make_band_edge_states_main_func(args):
             print(e)
 
 
-def make_defect_energy_info_main_func(args):
+def make_defect_energy_infos_main_func(args):
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
         defect_entry = loadfn(d / "defect_entry.json")
@@ -157,7 +175,7 @@ def make_defect_energy_summary_main_func(args):
     energy_infos = []
     for d in args.dirs:
         energy_infos.append(DefectEnergyInfo.from_yaml(d / "calc_results.json"))
-    target_vertices = TargetVertices.from_yaml(args.cpd_yaml)
+    target_vertices = TargetVertices.from_yaml(args.cpd_json)
     defect_energy_summary = make_defect_energy_summary(
         energy_infos, target_vertices, args.unitell, args.perfect_calc_results)
     defect_energy_summary.to_json_file()
@@ -167,8 +185,9 @@ def plot_defect_energy(args):
     plotter = DefectEnergyMplPlotter(
         defect_energy_summary=args.defect_energy_summary,
         chem_pot_label=args.label,
+        y_range=args.y_range,
         allow_shallow=args.allow_shallow,
-        with_correction=args.with_correction,
+        with_corrections=args.with_corrections,
         label_line=args.label_line,
         add_charges=args.add_charges)
     plotter.construct_plot()
