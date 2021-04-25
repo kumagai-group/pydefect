@@ -38,10 +38,11 @@ def test_make_unitcell(tmpdir, mocker):
                                  ele_dielectric_const=np.eye(3).tolist(),
                                  ion_dielectric_const=np.eye(3).tolist())
     make_unitcell(args)
-    mock.assert_called_once_with(vasprun_band=vasprun_band_mock,
-                                 outcar_band=outcar_band_mock,
-                                 outcar_dielectric_clamped=outcar_dielectric_mock,
-                                 outcar_dielectric_ionic=outcar_dielectric_mock)
+    mock.assert_called_once_with(
+        vasprun_band=vasprun_band_mock,
+        outcar_band=outcar_band_mock,
+        outcar_dielectric_clamped=outcar_dielectric_mock,
+        outcar_dielectric_ionic=outcar_dielectric_mock)
 
 
 def test_make_competing_phase_dirs(mocker):
@@ -53,7 +54,8 @@ def test_make_competing_phase_dirs(mocker):
     make_competing_phase_dirs(args)
     mock.assert_called_once_with(element_list=args.elements,
                                  e_above_hull=args.e_above_hull)
-    mock_make.assert_called_once_with(materials_query=mock.return_value.materials, path=Path.cwd())
+    mock_make.assert_called_once_with(
+        materials_query=mock.return_value.materials, path=Path.cwd())
 
 
 def test_make_composition_energies(mocker, tmpdir):
@@ -94,12 +96,14 @@ def test_make_defect_entries(tmpdir, supercell_info):
     args = Namespace()
     make_defect_entries(args)
     names = {str(name) for name in Path(".").glob("*")}
-    assert names == {'Va_He1_-1', 'defect_in.yaml', 'perfect', 'Va_He1_0', 'supercell_info.json'}
+    assert names == {'Va_He1_-1', 'defect_in.yaml', 'perfect', 'Va_He1_0',
+                     'supercell_info.json'}
 
-    perfect_structure = Structure.from_file(Path("perfect") / "POSCAR")
+    perfect_structure = Structure.from_file(str(Path("perfect") / "POSCAR"))
     assert perfect_structure == supercell_info.structure
 
-    file_names = {str(file_name.name) for file_name in Path("Va_He1_-1").glob("*")}
+    file_names = {str(file_name.name)
+                  for file_name in Path("Va_He1_-1").glob("*")}
     assert file_names == {"POSCAR", "defect_entry.json", "prior_info.yaml"}
 
     expected = """charge: -1
@@ -109,7 +113,8 @@ def test_make_defect_entries(tmpdir, supercell_info):
 
 def test_make_calc_results(tmpdir, mocker):
     tmpdir.chdir()
-    mock = mocker.patch("pydefect.cli.vasp.main_vasp_functions.make_calc_results_from_vasp")
+    mock = mocker.patch(
+        "pydefect.cli.vasp.main_vasp_functions.make_calc_results_from_vasp")
     mock_vasprun = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Vasprun")
     mock_outcar = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Outcar")
     mock_calc_results = mocker.Mock(spec=CalcResults)
@@ -119,7 +124,8 @@ def test_make_calc_results(tmpdir, mocker):
 
     mock_vasprun.assert_called_with(Path("a") / defaults.vasprun)
     mock_outcar.assert_called_with(Path("a") / defaults.outcar)
-    mock.assert_called_with(vasprun=mock_vasprun.return_value, outcar=mock_outcar.return_value)
+    mock.assert_called_with(vasprun=mock_vasprun.return_value,
+                            outcar=mock_outcar.return_value)
     mock_calc_results.to_json_file.assert_called_with("a/calc_results.json")
 
 
