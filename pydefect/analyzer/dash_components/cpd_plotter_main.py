@@ -4,7 +4,7 @@ import argparse
 import sys
 
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, CpdPlotInfo
-from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagPlotly3DMplPlotter
+from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag3DPlotlyPlotter
 
 
 def parse_args(args):
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     print(cpd.vertex_coords)
     cpd_plot_info = CpdPlotInfo(cpd)
     print(cpd_plot_info.comp_vertices)
-    plotter = ChemPotDiagPlotly3DMplPlotter(cpd_plot_info)
+    plotter = ChemPotDiag3DPlotlyPlotter(cpd_plot_info)
     fig = plotter.figure
     fig.show()
 #    ctc.register_crystal_toolkit(app=app, layout=layout, cache=None)

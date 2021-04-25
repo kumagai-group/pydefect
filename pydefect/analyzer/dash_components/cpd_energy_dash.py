@@ -9,11 +9,11 @@ from crystal_toolkit.helpers.layouts import Column, dcc, html, Columns
 from dash.dependencies import Input, Output
 from pydefect.analyzer.band_edge_states import IsShallow
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.defect_energy import make_energies
+from pydefect.analyzer.defect_energy import make_charge_energies
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotlyPlotter
 from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo
-from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiagPlotly2DMplPlotter, \
-    ChemPotDiagPlotly3DMplPlotter
+from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DPlotlyPlotter, \
+    ChemPotDiag3DPlotlyPlotter
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.input_maker.defect_entry import DefectEntry
 
@@ -66,7 +66,7 @@ class CpdEnergyComponent(MPComponent):
                         "width": 700})
 
     def energy_fig(self, abs_chem_pot, label, allow_shallow):
-        defect_energies = make_energies(self.perfect,
+        defect_energies = make_charge_energies(self.perfect,
                                         self.defect_calc_results,
                                         self.defect_entries,
                                         self.corrections,
@@ -95,9 +95,9 @@ class CpdEnergyComponent(MPComponent):
 
         if self.dim in [2, 3]:
             if self.cpd_plot_info.dim == 2:
-                fig = ChemPotDiagPlotly2DMplPlotter(self.cpd_plot_info).figure
+                fig = ChemPotDiag2DPlotlyPlotter(self.cpd_plot_info).figure
             else:
-                fig = ChemPotDiagPlotly3DMplPlotter(self.cpd_plot_info).figure
+                fig = ChemPotDiag3DPlotlyPlotter(self.cpd_plot_info).figure
             cpd = dcc.Graph(id="cpd", figure=fig)
             energy = dcc.Graph(id=self.id('energy'))
             return {"cpd": cpd, "energy": energy, "allow_shallow": allow_shallow}
