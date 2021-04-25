@@ -30,14 +30,44 @@ do first-principles point defect calculations with the VASP code."""
 epilog = f"Author: Yu Kumagai Version: {__version__}"
 
 
+def add_sub_parser(_argparse, name: str):
+    result = _argparse.ArgumentParser(description="", add_help=False)
+    if name == "dirs":
+        result.add_argument(
+            "-d", "--dirs", nargs="+", type=Path, required=True,
+            help="Directory paths to be parsed.")
+    elif name == "unitcell":
+        result.add_argument(
+            "-u", "--unitcell", type=loadfn, required=True,
+            help="Path to the unitcell.json file.")
+    elif name == "supercell_info":
+        result.add_argument(
+            "-s", "--supercell_info", required=True, type=loadfn,
+            default="supercell_info.json",
+            help="Path to the supercell_info.json file.")
+    elif name == "perfect_calc_results":
+        result.add_argument(
+            "-pcr", "--perfect_calc_results", required=True, type=loadfn,
+            help="Path to the calc_results.json for the perfect supercell.")
+    return result
+
+
 def add_dir_parser(_argparse):
     # ++ parent parser: dirs
-    dirs_parser = _argparse.ArgumentParser(
-        description="", add_help=False)
+    dirs_parser = _argparse.ArgumentParser(description="", add_help=False)
     dirs_parser.add_argument(
         "-d", "--dirs", nargs="+", type=Path, required=True,
         help="Directory paths to be parsed.")
     return dirs_parser
+
+
+def add_unitcell_parser(_argparse):
+    # ++ parent parser: dirs
+    unitcell_parser = _argparse.ArgumentParser(description="", add_help=False)
+    unitcell_parser.add_argument(
+        "-u", "--unitcell", required=True, type=loadfn,
+        help="Path to the unitcell.json file.")
+    return unitcell_parser
 
 
 def parse_args_main(args):
@@ -45,30 +75,10 @@ def parse_args_main(args):
     parser = argparse.ArgumentParser(description=description, epilog=epilog)
     subparsers = parser.add_subparsers()
 
-    dirs_parser = add_dir_parser(argparse)
-
-    # ++ parent parser: supercell_info
-    si_parser = argparse.ArgumentParser(
-        description="", add_help=False)
-    si_parser.add_argument(
-        "-s", "--supercell_info", required=True, type=loadfn,
-        default="supercell_info.json",
-        help="Path to the supercell_info.json file.")
-
-    # ++ parent parser: pcr
-    pcr_parser = argparse.ArgumentParser(
-        description="", add_help=False)
-    pcr_parser.add_argument(
-        "-pcr", "--perfect_calc_results", required=True, type=loadfn,
-        help="Path to the calc_results.json for the perfect supercell.")
-
-    # ++ parent parser: unitcell
-    unitcell_parser = argparse.ArgumentParser(
-        description="", add_help=False)
-    unitcell_parser.add_argument(
-        "-u", "--unitcell", required=True, type=loadfn,
-        help="Path to the unitcell.json file.")
-
+    dirs_parser = add_sub_parser(argparse, name="dirs")
+    unitcell_parser = add_sub_parser(argparse, name="unitcell")
+    si_parser = add_sub_parser(argparse, name="supercell_info")
+    pcr_parser = add_sub_parser(argparse, name="perfect_calc_results")
     # -- make_standard_and_relative_energies -----------------------------------
     parser_make_standard_and_relative_energies = subparsers.add_parser(
         name="standard_and_relative_energies",

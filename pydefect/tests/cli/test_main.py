@@ -8,9 +8,6 @@ from pydefect.analyzer.defect_energy import DefectEnergySummary
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
 from pydefect.cli.main import parse_args_main
-from pydefect.corrections.efnv_correction import \
-    ExtendedFnvCorrection
-from pydefect.defaults import defaults
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pymatgen.core import Composition
 
