@@ -34,10 +34,11 @@ def make_composition_energies_from_mp(elements: List[str],
         diff = {e: 0.0 for e in elements}
 
     for m in query.materials:
+        key = Composition(m["full_formula"])
         energy = m["final_energy"]
-        for k, v in Composition(m["full_formula"]).as_dict().items():
+        for k, v in key.as_dict().items():
             energy += diff[k] * v
-        comp_es[m["full_formula"]] = CompositionEnergy(energy, m["task_id"])
+        comp_es[key] = CompositionEnergy(energy, m["task_id"])
     comp_es = remove_higher_energy_comp(comp_es)
     return CompositionEnergies(comp_es)
 
