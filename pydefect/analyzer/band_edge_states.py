@@ -2,16 +2,17 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from copy import deepcopy
 from dataclasses import dataclass
-from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 
 import numpy as np
-import pydefect.tests.analyzer.test_defect_energy
 from monty.json import MSONable
 from pydefect.util.coords import pretty_coords
 from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.typing import Coords
+
+
+printed_orbital_weight_threshold = 0.1
 
 
 @dataclass
@@ -22,18 +23,22 @@ class BandEdgeEigenvalues(MSONable, ToJsonFileMixIn):
     lowest_band_index: int
 
 
-def pretty_orbital(orbitals):
-    x = []
+def pretty_orbital(orbitals: Dict[str, List[float]]):
+    """
+    :param orbitals: An example is {"Mn": [0.5, 0.4, 0.01]} (no f-orbital)
+    :return: "Mn-s: 0.50, Mn-p: 0.40"
+    """
+    orbital_infos = []
     for elem, orbs in orbitals.items():
         for orb_name, weight in zip(["s", "p", "d", "f"], orbs):
-            if weight > 0.1:
-                x.append(f"{elem}-{orb_name}: {weight:.2f}")
-    return ", ".join(x)
+            if weight > printed_orbital_weight_threshold:
+                orbital_infos.append(f"{elem}-{orb_name}: {weight:.2f}")
+    return ", ".join(orbital_infos)
 
 
 @dataclass
 class OrbitalInfo(MSONable):
-    """Code and its version dependent quantities. """
+    """Note that this is code and its version dependent quantities. """
     energy: float  # max eigenvalue
     # {"Mn": [0.01, ..], "O": [0.03, 0.5]},
     # where lists contain s, p, d, (f) orbital components.
@@ -51,43 +56,33 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     fermi_level: float
 
     @property
-    def energies_and_occupations(self):
-        result = deepcopy(self.orbital_infos)
+    def energies_and_occupations(self) -> List[List[List[List[float]]]]:
+        result = np.zeros(np.shape(self.orbital_infos) + (2,))
         for i, x in enumerate(self.orbital_infos):
             for j, y in enumerate(x):
                 for k, z in enumerate(y):
                     result[i][j][k] = [z.energy, z.occupation]
-        return result
+        return result.tolist()
 
     def __str__(self):
-        lines = [" -- band-edge orbitals info", "K-points info"]
-        kpt_block = [["Index", "Coords", "Weight"]]
-        for i, (c, w) in enumerate(zip(self.kpt_coords, self.kpt_weights), 1):
-            kpt_block.append([i, pretty_coords(c), f"{w:4.3f}"])
+        return "\n".join([" -- band-edge orbitals info",
+                          "K-points info",
+                          self._kpt_block,
+                          "",
+                          "Band info near band edges",
+                          self._band_block])
 
-        lines.append(tabulate(kpt_block, tablefmt="plain"))
-        lines.append("")
-        lines.append("Band info near band edges")
-
+    @property
+    def _band_block(self):
         band_block = [["Index", "Kpoint index", "Energy", "Occupation",
                        "P-ratio", "Orbital"]]
-        for oi in self.orbital_infos:
-            orb_infos = np.array(oi).T
-
-            # determine the band_idx where the occupation changes
-            middle_idx = int(len(orb_infos) / 2)
-            for band_idx in range(0, len(orb_infos) - 1):
-                occu_diff = (orb_infos[band_idx][0].occupation
-                             - orb_infos[band_idx + 1][0].occupation)
-                if occu_diff > 0.1:
-                    middle_idx = band_idx
-                    break
-            min_idx = max(middle_idx - 3, 0)
-            max_idx = min(middle_idx + 3, len(orb_infos))
+        for orbital_info in self.orbital_infos:
+            max_idx, min_idx = self._band_idx_range(orbital_info)
 
             for band_idx in range(min_idx, max_idx):
-                for kpt_idx, orb_info in enumerate(orb_infos[band_idx], 1):
-                    actual_band_idx = band_idx + self.lowest_band_index + 1
+                # Need to start from 1
+                actual_band_idx = band_idx + self.lowest_band_index + 1
+                for kpt_idx, orb_info in enumerate(orbital_info[band_idx], 1):
                     energy = f"{orb_info.energy :5.2f}"
                     occupation = f"{orb_info.occupation:4.1f}"
                     p_ratio = f"{orb_info.participation_ratio:4.1f}"
@@ -96,9 +91,33 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
                                        occupation, p_ratio, orbs])
                 band_block.append(["--"])
             band_block.append("")
-        lines.append(tabulate(band_block, tablefmt="plain"))
+        return tabulate(band_block, tablefmt="plain")
 
-        return "\n".join(lines)
+    @property
+    def _kpt_block(self):
+        kpt_block = [["Index", "Coords", "Weight"]]
+        for index, (kpt_coord, kpt_weight) in enumerate(
+                zip(self.kpt_coords, self.kpt_weights), 1):
+            coord = pretty_coords(kpt_coord)
+            weight = f"{kpt_weight:4.3f}"
+            kpt_block.append([index, coord, weight])
+        return tabulate(kpt_block, tablefmt="plain")
+
+    @staticmethod
+    def _band_idx_range(orbital_info: List[List[OrbitalInfo]]
+                        ) -> Tuple[int, int]:
+        orbital_info = np.array(orbital_info).T
+        middle_idx = int(len(orbital_info) / 2)
+        for idx, (former, latter) in enumerate(
+                zip(orbital_info[1:], orbital_info[-1])):
+            occu_diff = former.occupation - latter.occupation
+            # determine the band_idx where the occupation changes largely.
+            if occu_diff > 0.1:
+                middle_idx = idx + 1
+                break
+        max_idx = min(middle_idx + 3, len(orbital_info))
+        min_idx = max(middle_idx - 3, 0)
+        return max_idx, min_idx
 
 
 def is_any_part_occ(x: OrbitalInfo, y: OrbitalInfo):
