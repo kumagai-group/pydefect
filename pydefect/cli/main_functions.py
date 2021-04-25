@@ -174,10 +174,10 @@ def make_defect_energy_infos_main_func(args):
 def make_defect_energy_summary_main_func(args):
     energy_infos = []
     for d in args.dirs:
-        energy_infos.append(DefectEnergyInfo.from_yaml(d / "calc_results.json"))
-    target_vertices = TargetVertices.from_yaml(args.target_vertices_json)
+        energy_infos.append(DefectEnergyInfo.from_yaml(d / "defect_energy_info.yaml"))
+    target_vertices = TargetVertices.from_yaml(args.target_vertices_yaml)
     defect_energy_summary = make_defect_energy_summary(
-        energy_infos, target_vertices, args.unitell, args.perfect_calc_results)
+        energy_infos, target_vertices, args.unitcell, args.p_state)
     defect_energy_summary.to_json_file()
 
 

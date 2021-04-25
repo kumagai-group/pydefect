@@ -52,7 +52,7 @@ def add_sub_parser(_argparse, name: str):
             help="Path to the calc_results.json for the perfect supercell.")
     elif name == "perfect_band_edge_state":
         result.add_argument(
-            "-p", "--p_state", required=True, type=loadfn,
+            "-pbes", "--p_state", required=True, type=loadfn,
             help="Path to the perfect_band_edge_state.json.")
 
     else:
@@ -252,12 +252,12 @@ def parse_args_main(args):
     parser_defect_energy_summary = subparsers.add_parser(
         name="defect_energy_summary",
         description="",
-        parents=[dirs_parser, pcr_parser, unitcell_parser],
+        parents=[dirs_parser, unitcell_parser, pbes_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['des'])
     parser_defect_energy_summary.add_argument(
-        "-t", "--target_vertices_json", required=True, type=loadfn,
-        help="Path to the target_vertices.json file.")
+        "-t", "--target_vertices_yaml", required=True, type=str,
+        help="Path to the target_vertices.yaml file.")
 
     parser_defect_energy_summary.set_defaults(
         func=make_defect_energy_summary_main_func)

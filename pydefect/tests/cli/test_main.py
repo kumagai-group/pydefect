@@ -3,6 +3,7 @@
 from argparse import Namespace
 from pathlib import Path
 
+from pydefect.analyzer.band_edge_states import PerfectBandEdgeState
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import DefectEnergySummary
 from pydefect.chem_pot_diag.chem_pot_diag import TargetVertices
@@ -205,15 +206,12 @@ def test_defect_energy_infos(mocker):
 
 
 def test_defect_energy_summary(mocker):
-    mock_target_vertices = mocker.Mock(spec=TargetVertices, autospec=True)
-    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_pbes = mocker.Mock(spec=PerfectBandEdgeState, autospec=True)
     mock_unitcell = mocker.patch("pydefect.cli.main.Unitcell")
 
     def side_effect(filename):
-        if filename == "target_vertices.json":
-            return mock_target_vertices
-        elif filename == "perfect/calc_results.json":
-            return mock_calc_results
+        if filename == "perfect/calc_results.json":
+            return mock_pbes
         else:
             print(filename)
             raise ValueError
@@ -221,14 +219,14 @@ def test_defect_energy_summary(mocker):
     mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
     parsed_args = parse_args_main(["des",
                                    "-d", "Va_O1_0", "Va_O1_1",
-                                   "-pcr", "perfect/calc_results.json",
+                                   "-p", "perfect/calc_results.json",
                                    "-u", "unitcell.json",
-                                   "-t", "target_vertices.json"])
+                                   "-t", "target_vertices.yaml"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
-        perfect_calc_results=mock_calc_results,
+        p_state=mock_pbes,
         unitcell=mock_unitcell.from_yaml.return_value,
-        target_vertices_json=mock_target_vertices,
+        target_vertices_yaml="target_vertices.yaml",
         func=parsed_args.func)
     assert parsed_args == expected
 
