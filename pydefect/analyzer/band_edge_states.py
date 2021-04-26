@@ -13,8 +13,8 @@ from vise.util.typing import Coords
 
 
 printed_orbital_weight_threshold = 0.1
-state_occupied_number = 0.3
-state_unoccupied_number = 1 - state_occupied_number
+state_occupied_threshold = 0.3
+state_unoccupied_threshold = 1 - state_occupied_threshold
 
 
 @dataclass
@@ -185,25 +185,25 @@ class BandEdgeState(MSONable):
 
     @property
     def is_shallow(self):
-        return self.vbm_info.occupation < state_unoccupied_number \
-               or self.cbm_info.occupation > state_occupied_number
+        return self.vbm_info.occupation < state_unoccupied_threshold \
+               or self.cbm_info.occupation > state_occupied_threshold
 
     @property
     def has_donor_phs(self):
-        return self.cbm_info.orbital_info.occupation > state_occupied_number
+        return self.cbm_info.orbital_info.occupation > state_occupied_threshold
 
     @property
     def has_acceptor_phs(self):
-        return self.vbm_info.orbital_info.occupation < state_unoccupied_number
+        return self.vbm_info.orbital_info.occupation < state_unoccupied_threshold
 
     @property
     def has_unoccupied_localized_state(self):
-        return any([lo.occupation < state_unoccupied_number
+        return any([lo.occupation < state_unoccupied_threshold
                     for lo in self.localized_orbitals])
 
     @property
     def has_occupied_localized_state(self):
-        return any([lo.occupation > state_occupied_number
+        return any([lo.occupation > state_occupied_threshold
                     for lo in self.localized_orbitals])
 
     def __str__(self):
