@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-import pydefect.tests.analyzer.test_defect_energy
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.calc_summary import SingleCalcSummary, CalcSummary
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo
@@ -17,28 +16,30 @@ def test_make_calc_summary(mocker):
     defect_entry.full_name = "Va_O1_1"
 
     calc_results = mocker.Mock(spec=CalcResults, autospec=True)
-    calc_results.structure = IStructure(Lattice.cubic(1.0), ["Mg"], [[0.0]*3])
+    calc_results.structure = \
+        IStructure(Lattice.cubic(1.0), ["Mg"], [[0.0]*3])
     calc_results.energy = 10.0 + defaults.abs_strange_energy - 0.1
 
     structure_info = mocker.Mock(spec=DefectStructureInfo, autospec=True)
 
     p_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
-    p_calc_results.structure = IStructure(Lattice.cubic(1.0), ["Mg", "O"], [[0.0]*3]*2)
+    p_calc_results.structure = \
+        IStructure(Lattice.cubic(1.0), ["Mg", "O"], [[0.0]*3]*2)
     p_calc_results.energy = 10.0
 
     actual = make_calc_summary(defect_entry_list=[defect_entry],
                                calc_results_list=[calc_results],
                                structure_list=[structure_info],
                                p_calc_results=p_calc_results)
-
-    single_summary = SingleCalcSummary(charge=1,
-                                       atom_io={"O": -1},
-                                       electronic_conv=calc_results.electronic_conv,
-                                       ionic_conv=calc_results.ionic_conv,
-                                       is_energy_strange=False,
-                                       same_config_from_init=structure_info.same_config_from_init,
-                                       defect_type=structure_info.defect_type,
-                                       symm_relation=structure_info.symm_relation)
+    single_summary = SingleCalcSummary(
+        charge=1,
+        atom_io={"O": -1},
+        electronic_conv=calc_results.electronic_conv,
+        ionic_conv=calc_results.ionic_conv,
+        is_energy_strange=False,
+        same_config_from_init=structure_info.same_config_from_init,
+        defect_type=structure_info.defect_type,
+        symm_relation=structure_info.symm_relation)
     expected = CalcSummary({"Va_O1_1": single_summary})
 
     assert actual == expected
