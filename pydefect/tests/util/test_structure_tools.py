@@ -4,6 +4,7 @@
 import numpy as np
 
 from pydefect.util.structure_tools import Distances, Coordination
+from vise.tests.helpers.assertion import assert_msonable
 
 
 def test_distances(ortho_conventional):
@@ -46,11 +47,15 @@ def test_coord_distances(mocker, ortho_conventional):
     actual = distances.coordination(include_on_site=True)
     expected = Coordination({"H": [2.5, 3.0, 3.5], "He": [0.0, 3.91]},
                             3.905,
-                            neighboring_atom_indices={1, 2, 3, 4, 7})
+                            neighboring_atom_indices=[1, 2, 3, 4, 7])
     assert actual == expected
 
     actual = distances.coordination()
     expected = Coordination({"H": [2.5, 3.0, 3.5], "He": [3.91]},
                             3.905,
-                            neighboring_atom_indices={1, 2, 3, 4})
+                            neighboring_atom_indices=[1, 2, 3, 4])
     assert actual == expected
+
+
+def test_coordination_msonable(tmpdir):
+    assert_msonable(Coordination({"H": [2.5, 3.0, 3.5]}, 3.905, [1]))

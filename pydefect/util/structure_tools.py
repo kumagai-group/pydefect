@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional, Set
 
 import numpy as np
+from monty.json import MSONable
 from pydefect.defaults import defaults
 from pymatgen.core import Structure, Element
 
@@ -52,13 +53,13 @@ class Distances:
         e_d = zip(elements, self.distances(remove_self=False))
 
         unsorted_distances = defaultdict(list)
-        neighboring_atom_indices = set()
+        neighboring_atom_indices = []
         for i, (element, distance) in enumerate(e_d):
             if distance < cutoff:
                 if include_on_site or \
                         (include_on_site is False and distance > 1e-5):
                     unsorted_distances[element].append(round(distance, 2))
-                    neighboring_atom_indices.add(i)
+                    neighboring_atom_indices.append(i)
 
         distance_dict = {}
         for element, distances in unsorted_distances.items():
@@ -69,7 +70,7 @@ class Distances:
 
 
 @dataclass
-class Coordination:
+class Coordination(MSONable):
     distance_dict: Dict[str, List]
     cutoff: float
-    neighboring_atom_indices: Set[int]
+    neighboring_atom_indices: List[int]
