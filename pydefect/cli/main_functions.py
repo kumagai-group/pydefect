@@ -82,7 +82,7 @@ def make_supercell(args):
 def append_interstitial_to_supercell_info(args):
     supercell_info = append_interstitial(args.supercell_info,
                                          args.base_structure,
-                                         args.frac_coords)
+                                         [args.frac_coords])
     supercell_info.to_json_file()
 
 

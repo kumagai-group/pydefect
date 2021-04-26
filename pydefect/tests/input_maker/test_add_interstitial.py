@@ -14,10 +14,12 @@ def test_add_interstitial(cubic_supercell_info_wo_int):
                           coords=[[0.0]*3, [0.5]*3])
     new_supercell_info = append_interstitial(cubic_supercell_info_wo_int,
                                              primitive,
-                                             [1/4, 1/4, 1/4])
+                                             [[1/4, 1/4, 1/4]],
+                                             infos=["test1"])
     expected = Interstitial(frac_coords=[1/8, 1/8, 1/8],
                             wyckoff_letter="d",
-                            site_symmetry="-43m")
+                            site_symmetry="-43m",
+                            info="test1")
     assert new_supercell_info.interstitials[0] == expected
 
 
@@ -36,5 +38,5 @@ def test_add_interstitial_not_primitive_error(cubic_supercell_info_wo_int):
                                         ])
     with pytest.raises(NotPrimitiveError):
         append_interstitial(cubic_supercell_info_wo_int, conventional_cell,
-                            [1/4, 1/4, 1/4])
+                            [[1/4, 1/4, 1/4]], ["test1"])
 

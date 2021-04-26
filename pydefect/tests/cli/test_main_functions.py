@@ -116,7 +116,7 @@ def test_add_interstitials(mocker):
     mock = mocker.patch("pydefect.cli.main_functions.append_interstitial")
 
     append_interstitial_to_supercell_info(args)
-    mock.assert_called_once_with(mock_1, mock_2, mock_3)
+    mock.assert_called_once_with(mock_1, mock_2, [mock_3])
     mock.return_value.to_json_file.assert_called_once_with()
 
 
