@@ -209,17 +209,18 @@ class BandEdgeState(MSONable):
     @property
     def _edge_info(self):
         inner_table = [["", "Index", "Energy", "P-ratio", "Occupation",
-                        "Orbitals", "K-point coords"],
-                       ["VBM"] + self._show_edge_info(self.vbm_info),
-                       ["CBM"] + self._show_edge_info(self.cbm_info)]
+                        "OrbDiff", "Orbitals", "K-point coords"],
+                       ["VBM"] + self._show_edge_info(self.vbm_info, self.vbm_orbital_diff),
+                       ["CBM"] + self._show_edge_info(self.cbm_info, self.cbm_orbital_diff)]
         return tabulate(inner_table, tablefmt="plain")
 
     @staticmethod
-    def _show_edge_info(edge_info: EdgeInfo):
+    def _show_edge_info(edge_info: EdgeInfo, orb_diff: float):
         return [edge_info.band_idx + 1,
                 f"{edge_info.energy:7.3f}",
                 f"{edge_info.p_ratio:5.2f}",
                 f"{edge_info.occupation:5.2f}",
+                f"{orb_diff:5.2f}",
                 pretty_orbital(edge_info.orbital_info.orbitals),
                 pretty_coords(edge_info.kpt_coord)]
 

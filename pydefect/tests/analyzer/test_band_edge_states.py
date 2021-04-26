@@ -113,9 +113,9 @@ def test_band_edge_states_band_indices(band_edge_states):
 def test_band_edge_states_str(band_edge_states):
     expected = """ -- band-edge states info
 Spin-up
-     Index  Energy  P-ratio  Occupation  Orbitals                K-point coords
-VBM  11     1.000   0.10     1.00        Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
-CBM  13     1.000   0.10     1.00        Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
+     Index  Energy  P-ratio  Occupation  OrbDiff  Orbitals                K-point coords
+VBM  11     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
+CBM  13     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
 ---
 Localized Orbital(s)
 Index  Energy  P-ratio  Occupation  Orbitals
