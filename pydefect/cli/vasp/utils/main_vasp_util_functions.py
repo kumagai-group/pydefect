@@ -3,7 +3,9 @@
 import os
 from pathlib import Path
 
+from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeStates
+from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.grids import Grids
 from pydefect.cli.vasp.make_defect_charge_info import make_spin_charges, \
     make_defect_charge_info
@@ -20,16 +22,26 @@ def is_file(filename):
     return Path(filename).is_file() and os.stat(filename).st_size != 0
 
 
-def make_parchg_dir(band_edge_states: BandEdgeStates):
+def make_parchg_dir(args):
+    os.chdir(args.dir)
     if is_file("WAVECAR") is False:
         raise FileNotFoundError("WAVECAR does not exist or is empty.")
 
-    parchg = Path("parchg")
-    parchg.mkdir()
+    try:
+        calc_results: CalcResults = loadfn("calc_results.json")
+    except FileNotFoundError:
+        logger.info("Need to create calc_results.json beforehand.")
+        raise
+    calc_results.show_convergence_warning()
+
     # Increment index by 1 as VASP band index begins from 1.
     incar = ViseIncar.from_file("INCAR")
+    band_edge_states = loadfn("band_edge_states.json")
     iband = [i + 1 for i in band_edge_states.band_indices_from_vbm_to_cbm]
     incar.update({"LPARD": True, "LSEPB": True, "KPAR": 1, "IBAND": iband})
+
+    parchg = Path("parchg")
+    parchg.mkdir()
     os.chdir("parchg")
     incar.write_file("INCAR")
     FileLink(Path("../WAVECAR")).transfer(Path.cwd())
