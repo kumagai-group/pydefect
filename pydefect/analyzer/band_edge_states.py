@@ -13,6 +13,8 @@ from vise.util.typing import Coords
 
 
 printed_orbital_weight_threshold = 0.1
+occupation_judging_state_occupied = 0.3
+occupation_judging_state_unoccupied = 1 - occupation_judging_state_occupied
 
 
 @dataclass
@@ -106,23 +108,18 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     @staticmethod
     def _band_idx_range(orbital_info: List[List[OrbitalInfo]]
                         ) -> Tuple[int, int]:
+        # swap [kpt_idx][band_idx] -> [bane_idx][kpt_idx]
         orbital_info = np.array(orbital_info).T
         middle_idx = int(len(orbital_info) / 2)
-        for idx, (former, latter) in enumerate(
-                zip(orbital_info[1:], orbital_info[-1])):
-            occu_diff = former.occupation - latter.occupation
+        for band_idx, (upper, lower) in enumerate(zip(orbital_info[1:],
+                                                      orbital_info[-1])):
             # determine the band_idx where the occupation changes largely.
-            if occu_diff > 0.1:
-                middle_idx = idx + 1
+            if lower.occupation - upper.occupation > 0.1:
+                middle_idx = band_idx + 1
                 break
         max_idx = min(middle_idx + 3, len(orbital_info))
         min_idx = max(middle_idx - 3, 0)
         return max_idx, min_idx
-
-
-def is_any_part_occ(x: OrbitalInfo, y: OrbitalInfo):
-    return (min(x.occupation, (1.0 - x.occupation)) > 0.01
-            or min(y.occupation, (1.0 - y.occupation)) > 0.01)
 
 
 @dataclass
@@ -188,38 +185,43 @@ class BandEdgeState(MSONable):
 
     @property
     def is_shallow(self):
-        return self.vbm_info.occupation < 0.7 or self.cbm_info.occupation > 0.3
+        return self.vbm_info.occupation < occupation_judging_state_unoccupied \
+               or self.cbm_info.occupation > occupation_judging_state_occupied
 
     def __str__(self):
-        def show_edge_info(edge_info: EdgeInfo):
-            return [edge_info.band_idx + 1,
-                    f"{edge_info.energy:7.3f}",
-                    f"{edge_info.p_ratio:5.2f}",
-                    f"{edge_info.occupation:5.2f}",
-                    pretty_orbital(edge_info.orbital_info.orbitals),
-                    pretty_coords(edge_info.kpt_coord)]
+        return "\n".join([self._edge_info,
+                          "---", "Localized Orbital(s)",
+                          self._orbital_info])
 
-        lines = []
-        inner_table = [["", "Index", "Energy", "P-ratio", "Occupation",
-                        "Orbitals", "K-point coords"],
-                       ["VBM"] + show_edge_info(self.vbm_info),
-                       ["CBM"] + show_edge_info(self.cbm_info)]
-        lines.append(tabulate(inner_table, tablefmt="plain"))
-
-        lines.append("---")
-        lines.append("Localized Orbital(s)")
+    @property
+    def _orbital_info(self):
         inner_table = [["Index", "Energy", "P-ratio", "Occupation", "Orbitals"]]
         for lo in self.localized_orbitals:
-            pr = f"{lo.participation_ratio:5.2f}" \
+            participation_ratio = f"{lo.participation_ratio:5.2f}" \
                 if lo.participation_ratio else "None"
             inner_table.append([lo.band_idx + 1,
                                 f"{lo.ave_energy:7.3f}",
-                                pr,
+                                participation_ratio,
                                 f"{lo.occupation:5.2f}",
                                 pretty_orbital(lo.orbitals)])
-        lines.append(tabulate(inner_table, tablefmt="plain"))
-        return "\n".join(lines)
+        return tabulate(inner_table, tablefmt="plain")
 
+    @property
+    def _edge_info(self):
+        inner_table = [["", "Index", "Energy", "P-ratio", "Occupation",
+                        "Orbitals", "K-point coords"],
+                       ["VBM"] + self._show_edge_info(self.vbm_info),
+                       ["CBM"] + self._show_edge_info(self.cbm_info)]
+        return tabulate(inner_table, tablefmt="plain")
+
+    @staticmethod
+    def _show_edge_info(edge_info: EdgeInfo):
+        return [edge_info.band_idx + 1,
+                f"{edge_info.energy:7.3f}",
+                f"{edge_info.p_ratio:5.2f}",
+                f"{edge_info.occupation:5.2f}",
+                pretty_orbital(edge_info.orbital_info.orbitals),
+                pretty_coords(edge_info.kpt_coord)]
 
 @dataclass
 class BandEdgeStates(MSONable, ToJsonFileMixIn):
