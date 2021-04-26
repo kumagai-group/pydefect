@@ -7,9 +7,10 @@ import sys
 import warnings
 from pathlib import Path
 
+from monty.serialization import loadfn
 from pydefect.cli.main import epilog, description
 from pydefect.cli.vasp.utils.main_vasp_util_functions import \
-    calc_defect_charge_info
+    calc_defect_charge_info, make_parchg_dir
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
@@ -21,6 +22,16 @@ def parse_args_main_vasp_util(args):
     This command provides some utilities related to the VASP calculations""")
 
     subparsers = parser.add_subparsers()
+
+    # -- make parchg dir -----------------------------------------------
+    parser_make_parchg_dir = subparsers.add_parser(
+        name="parchg_dir",
+        description="Make parchg dir.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['pd'])
+
+    parser_make_parchg_dir.add_argument("-d", "--dir", type=Path)
+    parser_make_parchg_dir.set_defaults(func=make_parchg_dir)
 
     # -- calc defect charge info -----------------------------------------------
     parser_calc_def_charge_info = subparsers.add_parser(
