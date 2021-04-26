@@ -16,8 +16,3 @@ class Correction(ABC, MSONable):
     @classmethod
     def from_json_file(cls, filename: str = "correction.json"):
         return loadfn(filename)
-
-    @property
-    @abstractmethod
-    def correction_dict(self) -> Dict[str, float]:
-        pass
