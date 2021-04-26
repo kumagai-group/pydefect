@@ -37,10 +37,15 @@ def test_gkfo_correction(mocker):
 
     mocker.patch("pydefect.cli.main_util.loadfn", side_effect=side_effect)
     mock_unitcell = mocker.patch("pydefect.cli.main.Unitcell")
+
     parsed_args = parse_args_main_util([
-        "gkfo", "-iefnv", "a/correction.json", "-cd", "1",
-        "-icr", "a/calc_results.json", "-fcr", "a/absorption/calc_results.json",
+        "gkfo",
+        "-iefnv", "a/correction.json",
+        "-cd", "1",
+        "-icr", "a/calc_results.json",
+        "-fcr", "a/absorption/calc_results.json",
         "-u", "unitcell.json"])
+
     expected = Namespace(
         initial_efnv_correction=mock_i_correction,
         initial_calc_results=mock_i_calc_results,
@@ -48,5 +53,6 @@ def test_gkfo_correction(mocker):
         charge_diff=1,
         unitcell=mock_unitcell.from_yaml.return_value,
         func=parsed_args.func)
+
     assert parsed_args == expected
 
