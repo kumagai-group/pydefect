@@ -218,8 +218,10 @@ class BandEdgeState(MSONable):
     def _edge_info(self):
         inner_table = [["", "Index", "Energy", "P-ratio", "Occupation",
                         "OrbDiff", "Orbitals", "K-point coords"],
-                       ["VBM"] + self._show_edge_info(self.vbm_info, self.vbm_orbital_diff),
-                       ["CBM"] + self._show_edge_info(self.cbm_info, self.cbm_orbital_diff)]
+                       ["VBM"] + self._show_edge_info(
+                           self.vbm_info, self.vbm_orbital_diff),
+                       ["CBM"] + self._show_edge_info(
+                           self.cbm_info, self.cbm_orbital_diff)]
         return tabulate(inner_table, tablefmt="plain")
 
     @staticmethod
@@ -232,15 +234,14 @@ class BandEdgeState(MSONable):
                 pretty_orbital(edge_info.orbital_info.orbitals),
                 pretty_coords(edge_info.kpt_coord)]
 
+
 @dataclass
 class BandEdgeStates(MSONable, ToJsonFileMixIn):
     states: List[BandEdgeState]  # by spin.
 
     @property
     def is_shallow(self):
-        if any([i.is_shallow for i in self.states]):
-            return True
-        return False
+        return any([i.is_shallow for i in self.states])
 
     @property
     def has_donor_phs(self):
@@ -270,5 +271,3 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
             lines.append("")
 
         return "\n".join(lines)
-
-
