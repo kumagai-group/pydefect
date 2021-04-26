@@ -155,6 +155,9 @@ def parse_args_main(args):
         "-c", "--frac_coords", required=True, nargs=3, type=float,
         help="Fractional coordinates in the standardized primitive cell added "
              "as an interstitial ")
+    parser_append_interstitial.add_argument(
+        "-i", "--info", type=str, default="None",
+        help="Information related to the appended interstitial site if exists.")
 
     parser_append_interstitial.set_defaults(
         func=append_interstitial_to_supercell_info)

@@ -80,11 +80,13 @@ def test_append_interstitial(mocker):
     parsed_args = parse_args_main(["ai",
                                    "-s", "supercell_info.json",
                                    "-p", "POSCAR",
-                                   "-c", "0.1", "0.2", "0.3"])
+                                   "-c", "0.1", "0.2", "0.3",
+                                   "-i", "info"])
     expected = Namespace(
         supercell_info=mock_supercell_info,
         base_structure=mock_structure.from_file.return_value,
         frac_coords=[0.1, 0.2, 0.3],
+        info="info",
         func=parsed_args.func)
     assert parsed_args == expected
 
