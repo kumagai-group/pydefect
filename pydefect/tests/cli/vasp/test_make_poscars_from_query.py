@@ -17,7 +17,7 @@ def test_make_poscars_from_query(tmpdir):
               "band_gap": 0.0,
               "structure": mg_structure},
              {"full_formula": "O16"}]
-    make_poscars_from_query(query, path=tmpdir)
+    make_poscars_from_query(query, path=Path(tmpdir))
     tmpdir.chdir()
     s_mg = Structure.from_file(Path("Mg_mp-1") / "POSCAR")
     assert s_mg == mg_structure
