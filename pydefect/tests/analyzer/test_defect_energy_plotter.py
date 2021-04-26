@@ -45,7 +45,7 @@ def test_defect_energies_mpl_plot(defect_energy_summary):
         defect_energy_summary=defect_energy_summary,
         chem_pot_label="A",
         allow_shallow=True,
-        with_correction=True)
+        with_corrections=True)
     plotter.construct_plot()
     plotter.plt.show()
 
@@ -56,7 +56,7 @@ def test_defect_energies_plotly_plot(defect_energy_summary):
         defect_energy_summary=defect_energy_summary,
         chem_pot_label="A",
         allow_shallow=False,
-        with_correction=True)
+        with_corrections=True)
     fig = plotter.create_figure()
     show_png(fig)
 
