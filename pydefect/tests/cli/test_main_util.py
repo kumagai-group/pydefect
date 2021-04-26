@@ -24,7 +24,6 @@ def test_gkfo_correction(mocker):
     mock_i_correction = mocker.Mock(spec=ExtendedFnvCorrection, autospec=True)
     mock_i_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
     mock_f_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
-    mock_unitcell = mocker.Mock(spec=Unitcell, autospec=True)
 
     def side_effect(filename):
         if filename == "a/correction.json":
@@ -33,14 +32,11 @@ def test_gkfo_correction(mocker):
             return mock_i_calc_results
         elif filename == "a/absorption/calc_results.json":
             return mock_f_calc_results
-        elif filename == "unitcell.json":
-            return mock_unitcell
         else:
             raise ValueError
 
-    mocker.patch("pydefect.cli.main_util.loadfn",
-                 side_effect=side_effect)
-    mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
+    mocker.patch("pydefect.cli.main_util.loadfn", side_effect=side_effect)
+    mock_unitcell = mocker.patch("pydefect.cli.main.Unitcell")
     parsed_args = parse_args_main_util([
         "gkfo", "-iefnv", "a/correction.json", "-cd", "1",
         "-icr", "a/calc_results.json", "-fcr", "a/absorption/calc_results.json",
@@ -50,7 +46,7 @@ def test_gkfo_correction(mocker):
         initial_calc_results=mock_i_calc_results,
         final_calc_results=mock_f_calc_results,
         charge_diff=1,
-        unitcell=mock_unitcell,
+        unitcell=mock_unitcell.from_yaml.return_value,
         func=parsed_args.func)
     assert parsed_args == expected
 
