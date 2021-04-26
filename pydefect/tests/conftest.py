@@ -113,7 +113,8 @@ def c_centered_monoclinic():
 @pytest.fixture(scope="session")
 def fcc():
     lattice = Lattice.cubic(1.0)
-    coords = [[0.0, 0.0, 0.0], [0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.0, 0.5, 0.5]]
+    coords = [[0.0, 0.0, 0.0], [0.5, 0.5, 0.0],
+              [0.5, 0.0, 0.5], [0.0, 0.5, 0.5]]
     return IStructure(lattice=lattice, species=["H"] * 4, coords=coords)
 
 
@@ -245,7 +246,8 @@ def supercell_info(mocker, ortho_conventional):
                         equivalent_atoms=[0, 1, 2, 3]),
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="mmm",
                          equivalent_atoms=[4, 5, 6, 7])}
-    interstitial = Interstitial([0.25]*3, wyckoff_letter="x", site_symmetry="yy")
+    interstitial = Interstitial(frac_coords=[0.25]*3, wyckoff_letter="x",
+                                site_symmetry="yy")
     return SupercellInfo(ortho_conventional,
                          "Fmmm",
                          [[1, 0, 0], [0, 1, 0], [0, 0, 1]], sites,
@@ -271,9 +273,12 @@ def cubic_supercell_info_wo_int(mocker, cubic_supercell):
 
 @pytest.fixture
 def efnv_correction():
-    s1 = PotentialSite(specie="H", distance=1.999, potential=1.0, pc_potential=None)
-    s2 = PotentialSite(specie="He", distance=2.0001, potential=1.5, pc_potential=0.2)
-    s3 = PotentialSite(specie="He", distance=3.0, potential=2.0, pc_potential=0.3)
+    s1 = PotentialSite(specie="H", distance=1.999, potential=1.0,
+                       pc_potential=None)
+    s2 = PotentialSite(specie="He", distance=2.0001, potential=1.5,
+                       pc_potential=0.2)
+    s3 = PotentialSite(specie="He", distance=3.0, potential=2.0,
+                       pc_potential=0.3)
 
     return ExtendedFnvCorrection(charge=10,
                                  point_charge_correction=1.0,
