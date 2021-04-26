@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeStates, BandEdgeState
-from pydefect.cli.vasp.util_commands.make_parchg_dir import make_parchg_dir
+from pydefect.cli.vasp.utils.make_parchg_dir import make_parchg_dir
 from pymatgen import Lattice, Structure
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 
-from pydefect.cli.vasp.util_commands.recommend_interstitials import \
+from pydefect.cli.vasp.utils.recommend_interstitials import \
     interstitials_from_volumetric_data
 from pymatgen.io.vasp import Chgcar
 

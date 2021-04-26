@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from pydefect.cli.vasp.util_commands.create_spin_polarized_parchg import \
+from pydefect.cli.vasp.utils.create_spin_polarized_parchg import \
     make_spin_decomposed_parchg
 from pymatgen import Structure, Lattice
 from pymatgen.io.vasp import Chgcar

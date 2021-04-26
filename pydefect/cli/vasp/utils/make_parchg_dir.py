@@ -19,7 +19,6 @@ def is_file(filename):
 
 
 def make_parchg_dir(band_edge_states: BandEdgeStates):
-
     if is_file("WAVECAR") is False:
         raise FileNotFoundError("WAVECAR does not exist or is empty.")
 

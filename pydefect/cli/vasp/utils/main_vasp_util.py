@@ -8,7 +8,7 @@ import warnings
 from pathlib import Path
 
 from pydefect.cli.main import epilog, description
-from pydefect.cli.vasp.main_vasp_util_functions import \
+from pydefect.cli.vasp.utils.main_vasp_util_functions import \
     calc_defect_charge_info
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 

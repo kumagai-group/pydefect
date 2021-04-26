@@ -2,7 +2,7 @@
 #  Copyright (c) 2020 Kumagai group.
 from pathlib import Path
 
-from pydefect.cli.vasp.util_commands.make_refined_poscar import \
+from pydefect.cli.vasp.utils.make_refined_poscar import \
     make_refined_structure
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen.core import Structure
@@ -26,8 +26,8 @@ def test_make_refined_structure(tmpdir, mocker, simple_cubic):
         else:
             raise ValueError
 
-    mock_loadfn = mocker.patch("pydefect.cli.vasp.util_commands.make_refined_poscar.loadfn", side_effect=side_effect)
-    mock = mocker.patch("pydefect.cli.vasp.util_commands.make_refined_poscar.symmetrize_defect_structure")
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.utils.make_refined_poscar.loadfn", side_effect=side_effect)
+    mock = mocker.patch("pydefect.cli.vasp.utils.make_refined_poscar.symmetrize_defect_structure")
     mock.return_value = simple_cubic
 
     make_refined_structure()
