@@ -1,15 +1,42 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+import os
 from pathlib import Path
 
+from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.grids import Grids
 from pydefect.cli.vasp.make_defect_charge_info import make_spin_charges, \
     make_defect_charge_info
 from pydefect.cli.vasp.make_light_chgcar import make_light_chgcar
 from pymatgen.io.vasp import Chgcar
+from vise.input_set.incar import ViseIncar
+from vise.util.file_transfer import FileLink
 from vise.util.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+def is_file(filename):
+    return Path(filename).is_file() and os.stat(filename).st_size != 0
+
+
+def make_parchg_dir(band_edge_states: BandEdgeStates):
+    if is_file("WAVECAR") is False:
+        raise FileNotFoundError("WAVECAR does not exist or is empty.")
+
+    parchg = Path("parchg")
+    parchg.mkdir()
+    # Increment index by 1 as VASP band index begins from 1.
+    incar = ViseIncar.from_file("INCAR")
+    iband = [i + 1 for i in band_edge_states.band_indices_from_vbm_to_cbm]
+    incar.update({"LPARD": True, "LSEPB": True, "KPAR": 1, "IBAND": iband})
+    os.chdir("parchg")
+    incar.write_file("INCAR")
+    FileLink(Path("../WAVECAR")).transfer(Path.cwd())
+    FileLink(Path("../POSCAR")).transfer(Path.cwd())
+    FileLink(Path("../POTCAR")).transfer(Path.cwd())
+    FileLink(Path("../KPOINTS")).transfer(Path.cwd())
+    os.chdir("..")
 
 
 def calc_defect_charge_info(args):
