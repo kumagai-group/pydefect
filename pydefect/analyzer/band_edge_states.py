@@ -13,8 +13,8 @@ from vise.util.typing import Coords
 
 
 printed_orbital_weight_threshold = 0.1
-occupation_judging_state_occupied = 0.3
-occupation_judging_state_unoccupied = 1 - occupation_judging_state_occupied
+state_occupied_number = 0.3
+state_unoccupied_number = 1 - state_occupied_number
 
 
 @dataclass
@@ -185,8 +185,16 @@ class BandEdgeState(MSONable):
 
     @property
     def is_shallow(self):
-        return self.vbm_info.occupation < occupation_judging_state_unoccupied \
-               or self.cbm_info.occupation > occupation_judging_state_occupied
+        return self.vbm_info.occupation < state_unoccupied_number \
+               or self.cbm_info.occupation > state_occupied_number
+
+    @property
+    def has_donor_phs(self):
+        return self.cbm_info.orbital_info.occupation > state_occupied_number
+
+    @property
+    def has_acceptor_phs(self):
+        return self.vbm_info.orbital_info.occupation < state_unoccupied_number
 
     def __str__(self):
         return "\n".join([self._edge_info,
@@ -233,6 +241,14 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
         if any([i.is_shallow for i in self.states]):
             return True
         return False
+
+    @property
+    def has_donor_phs(self):
+        return any([i.has_donor_phs for i in self.states])
+
+    @property
+    def has_acceptor_phs(self):
+        return any([i.has_acceptor_phs for i in self.states])
 
     @property
     def band_indices_for_parchgs(self):

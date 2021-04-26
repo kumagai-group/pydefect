@@ -110,6 +110,11 @@ def test_band_edge_states_band_indices(band_edge_states):
     assert band_edge_states.band_indices_for_parchgs == [11, 12, 13]
 
 
+def test_band_edge_states_has_donor_phs(band_edge_states):
+    assert band_edge_states.has_donor_phs is True
+    assert band_edge_states.has_acceptor_phs is False
+
+
 def test_band_edge_states_str(band_edge_states):
     expected = """ -- band-edge states info
 Spin-up
