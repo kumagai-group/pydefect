@@ -25,11 +25,10 @@ def make_parchg_dir(band_edge_states: BandEdgeStates):
 
     Path("parchg").mkdir()
     os.chdir("parchg")
-    user_incar_settings = {"LPARD": True,
-                           "LSEPB": True,
-                           "KPAR": 1,
-                           "IBAND": band_edge_states.band_indices_from_vbm_to_cbm}
-
+    # Increment index by 1 as VASP band index begins from 1.
+    iband = [i + 1 for i in band_edge_states.band_indices_from_vbm_to_cbm]
+    user_incar_settings = \
+        {"LPARD": True, "LSEPB": True, "KPAR": 1, "IBAND": iband}
     options = CategorizedInputOptions(
         structure=Structure.from_file(Path.cwd() / ".." / defaults.contcar),
         task=Task.defect, xc=defaults.xc)

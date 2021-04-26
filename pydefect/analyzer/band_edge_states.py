@@ -277,8 +277,7 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
             for lo in state.localized_orbitals:
                 indices_set.add(lo.band_idx)
             indices_set.add(state.cbm_info.band_idx)
-        # Increment index by 1 as VASP band index begins from 1.
-        return sorted([i+ 1 for i in indices_set])
+        return sorted([i for i in indices_set])
 
     def __str__(self):
         lines = [" -- band-edge states info"]
