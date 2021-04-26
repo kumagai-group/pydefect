@@ -135,7 +135,7 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
     mock_procar = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Procar")
     mock_vasprun = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Vasprun")
 
-    mock_p_state = mocker.Mock(spec=PerfectBandEdgeState)
+    mock_p_state = mocker.Mock()
     mock_p_state.vbm_info.energy = 10
     mock_p_state.cbm_info.energy = 20
 
