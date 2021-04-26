@@ -13,7 +13,7 @@ def test_make_parchg_dir(tmpdir, mocker):
     tmpdir.chdir()
     Path("WAVECAR").touch()
     band_edge_states = mocker.Mock(spec=BandEdgeStates, autospec=True)
-    band_edge_states.band_indices_for_parchgs = [1, 2]
+    band_edge_states.band_indices_from_vbm_to_cbm = [1, 2]
 
     with pytest.raises(FileNotFoundError):
         make_parchg_dir(band_edge_states=band_edge_states)

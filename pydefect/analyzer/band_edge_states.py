@@ -2,7 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Set
 
 import numpy as np
 from monty.json import MSONable
@@ -270,16 +270,15 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
         return any([i.has_occupied_localized_state for i in self.states])
 
     @property
-    def band_indices_for_parchgs(self):
-        result = set()
+    def band_indices_from_vbm_to_cbm(self) -> List[int]:
+        indices_set = set()
         for state in self.states:
-            result.add(state.vbm_info.band_idx)
+            indices_set.add(state.vbm_info.band_idx)
             for lo in state.localized_orbitals:
-                result.add(lo.band_idx)
-            result.add(state.cbm_info.band_idx)
-
+                indices_set.add(lo.band_idx)
+            indices_set.add(state.cbm_info.band_idx)
         # Increment index by 1 as VASP band index begins from 1.
-        return sorted([i + 1 for i in result])
+        return sorted([i+ 1 for i in indices_set])
 
     def __str__(self):
         lines = [" -- band-edge states info"]

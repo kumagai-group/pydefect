@@ -28,7 +28,7 @@ def make_parchg_dir(band_edge_states: BandEdgeStates):
     user_incar_settings = {"LPARD": True,
                            "LSEPB": True,
                            "KPAR": 1,
-                           "IBAND": band_edge_states.band_indices_for_parchgs}
+                           "IBAND": band_edge_states.band_indices_from_vbm_to_cbm}
 
     options = CategorizedInputOptions(
         structure=Structure.from_file(Path.cwd() / ".." / defaults.contcar),

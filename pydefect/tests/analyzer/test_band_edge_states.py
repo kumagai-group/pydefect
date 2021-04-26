@@ -107,7 +107,7 @@ def test_band_edge_states_json_roundtrip(band_edge_states, tmpdir):
 
 
 def test_band_edge_states_band_indices(band_edge_states):
-    assert band_edge_states.band_indices_for_parchgs == [11, 12, 13]
+    assert band_edge_states.band_indices_from_vbm_to_cbm == [11, 12, 13]
 
 
 def test_band_edge_states_has_donor_phs(band_edge_states):
