@@ -4,6 +4,7 @@ from argparse import Namespace
 from pathlib import Path
 
 import numpy as np
+from pydefect.analyzer.band_edge_states import PerfectBandEdgeState
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo
 from pydefect.analyzer.unitcell import Unitcell
@@ -134,9 +135,9 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
     mock_procar = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Procar")
     mock_vasprun = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Vasprun")
 
-    mock_perfect_calc_results = mocker.Mock(spec=CalcResults)
-    mock_perfect_calc_results.vbm = 10
-    mock_perfect_calc_results.cbm = 20
+    mock_p_state = mocker.Mock(spec=PerfectBandEdgeState)
+    mock_p_state.vbm_info.energy = 10
+    mock_p_state.cbm_info.energy = 20
 
     mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
 
@@ -161,7 +162,7 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
                                side_effect=side_effect)
 
     args = Namespace(dirs=[Path("Va_O1_2")],
-                     perfect_calc_results=mock_perfect_calc_results)
+                     p_state=mock_p_state)
     make_band_edge_orb_infos_and_eigval_plot(args)
 
     mock_procar.assert_called_with(Path("Va_O1_2") / defaults.procar)
