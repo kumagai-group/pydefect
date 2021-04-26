@@ -3,7 +3,7 @@
 from argparse import Namespace
 from pathlib import Path
 
-from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.band_edge_states import PerfectBandEdgeState
 from pydefect.cli.vasp.main_vasp import parse_args_main_vasp
 from pydefect.defaults import defaults
 
@@ -69,20 +69,22 @@ def test_calc_results():
 
 
 def test_band_edge_orbital_infos(mocker):
-    mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
+    mock_p_edge_state = mocker.Mock(spec=PerfectBandEdgeState, autospec=True)
 
     def side_effect(filename):
-        if filename == "perfect/calc_results.json":
-            return mock_calc_results
+        if filename == "perfect_band_edge_state.json":
+            return mock_p_edge_state
         else:
             raise ValueError
 
     mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
-    parsed_args = parse_args_main_vasp(["beoi", "-d", "Va_O1_0", "Va_O1_1",
-                                        "-pcr", "perfect/calc_results.json"])
+    parsed_args = parse_args_main_vasp([
+        "beoi",
+        "-d", "Va_O1_0", "Va_O1_1",
+        "-pbes", "perfect_band_edge_state.json"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
-        perfect_calc_results=mock_calc_results,
+        p_state=mock_p_edge_state,
         func=parsed_args.func)
     assert parsed_args == expected
 
