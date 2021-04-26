@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 
 def make_composition_energies_from_mp(elements: List[str],
                                       atom_energy_yaml: Optional[str] = None,
-                                      ) ->CompositionEnergies:
+                                      ) -> CompositionEnergies:
     """Obtain the energies from Materials Project.
 
     When the atom_energy_yaml is provided, the total energies are aligned
@@ -39,11 +39,13 @@ def make_composition_energies_from_mp(elements: List[str],
         for k, v in key.as_dict().items():
             energy += diff[k] * v
         comp_es[key] = CompositionEnergy(energy, m["task_id"])
+    print(comp_es)
     comp_es = remove_higher_energy_comp(comp_es)
+    print(comp_es)
     return CompositionEnergies(comp_es)
 
 
-def remove_higher_energy_comp(comp_energies: Dict[str, CompositionEnergy]):
+def remove_higher_energy_comp(comp_energies: Dict[Composition, CompositionEnergy]):
     _l = [[k, v] for k, v in comp_energies.items()]
     result = {}
     for _, grouped_k_v in groupby(
@@ -53,5 +55,3 @@ def remove_higher_energy_comp(comp_energies: Dict[str, CompositionEnergy]):
                                              / Composition(y[0]).num_atoms))
         result[formula] = comp_e
     return result
-
-
