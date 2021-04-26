@@ -5,7 +5,11 @@ from typing import List, Optional
 
 from monty.json import MSONable
 from pymatgen.core import IStructure
+from vise.util.logger import get_logger
 from vise.util.mix_in import ToJsonFileMixIn
+
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -19,6 +23,12 @@ class CalcResults(MSONable, ToJsonFileMixIn):
     potentials: List[float]
     electronic_conv: Optional[bool] = None
     ionic_conv: Optional[bool] = None
+
+    def show_convergence_warning(self):
+        if self.electronic_conv is False:
+            logger.warning("SCF is not converged.")
+        if self.ionic_conv is False:
+            logger.warning("Ionic relaxation is not converged.")
 
     def __str__(self):
         return f""" -- calc results info

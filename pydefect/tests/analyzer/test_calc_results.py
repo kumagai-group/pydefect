@@ -15,17 +15,21 @@ def calc_results():
                        energy=1.0,
                        magnetization=0.0,
                        potentials=[0.0],
-                       electronic_conv=True,
-                       ionic_conv=True)
+                       electronic_conv=False,
+                       ionic_conv=False)
 
 
 def test_calc_results_json_roundtrip(calc_results, tmpdir):
     assert_json_roundtrip(calc_results, tmpdir)
 
 
+def test_calc_results_show_convergence_warning(calc_results):
+    calc_results.show_convergence_warning()
+
+
 def test_calc_results_str(calc_results):
     assert calc_results.__str__() == """ -- calc results info
 energy:      1.000
 magnetization:   0.00
-electronic convergence: True
-ionic convergence: True"""
+electronic convergence: False 
+ionic convergence:  False"""
