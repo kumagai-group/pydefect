@@ -2,7 +2,7 @@
 #  Copyright (c) 2020 Kumagai group.
 
 import pytest
-from pydefect.input_maker.add_interstitial import append_interstitial
+from pydefect.input_maker.append_interstitial import append_interstitial
 from pydefect.input_maker.supercell_info import Interstitial
 from pydefect.util.error_classes import NotPrimitiveError
 from pymatgen.core import Structure, Lattice

@@ -16,7 +16,7 @@ from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DMplPlotter, \
 from pydefect.cli.main_tools import sanitize_matrix
 from pydefect.cli.vasp.make_efnv_correction import make_efnv_correction
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
-from pydefect.input_maker.add_interstitial import append_interstitial
+from pydefect.input_maker.append_interstitial import append_interstitial
 from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pymatgen import Composition
