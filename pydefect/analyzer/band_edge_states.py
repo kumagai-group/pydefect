@@ -79,12 +79,10 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
         band_block = [["Index", "Kpoint index", "Energy", "Occupation",
                        "P-ratio", "Orbital"]]
         for orbital_info in self.orbital_infos:
-            max_idx, min_idx = self._band_idx_range(orbital_info)
-
+            max_idx, min_idx, t_orb_info = self._band_idx_range(orbital_info)
             for band_idx in range(min_idx, max_idx):
-                # Need to start from 1
                 actual_band_idx = band_idx + self.lowest_band_index + 1
-                for kpt_idx, orb_info in enumerate(orbital_info[band_idx], 1):
+                for kpt_idx, orb_info in enumerate(t_orb_info[band_idx], 1):
                     energy = f"{orb_info.energy :5.2f}"
                     occupation = f"{orb_info.occupation:4.1f}"
                     p_ratio = f"{orb_info.participation_ratio:4.1f}"
@@ -107,19 +105,19 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
 
     @staticmethod
     def _band_idx_range(orbital_info: List[List[OrbitalInfo]]
-                        ) -> Tuple[int, int]:
+                        ) -> Tuple[int, int, List[List[OrbitalInfo]]]:
         # swap [kpt_idx][band_idx] -> [bane_idx][kpt_idx]
-        orbital_info = np.array(orbital_info).T
-        middle_idx = int(len(orbital_info) / 2)
-        for band_idx, (upper, lower) in enumerate(zip(orbital_info[1:],
-                                                      orbital_info[-1])):
+        t_orbital_info = np.array(orbital_info).T.tolist()
+        middle_idx = int(len(t_orbital_info) / 2)
+        for band_idx, (upper, lower) in enumerate(zip(t_orbital_info[1:],
+                                                      t_orbital_info[:-1])):
             # determine the band_idx where the occupation changes largely.
-            if lower.occupation - upper.occupation > 0.1:
+            if lower[0].occupation - upper[0].occupation > 0.1:
                 middle_idx = band_idx + 1
                 break
-        max_idx = min(middle_idx + 3, len(orbital_info))
+        max_idx = min(middle_idx + 3, len(t_orbital_info))
         min_idx = max(middle_idx - 3, 0)
-        return max_idx, min_idx
+        return max_idx, min_idx, t_orbital_info
 
 
 @dataclass

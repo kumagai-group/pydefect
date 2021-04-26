@@ -59,7 +59,25 @@ def test_band_edge_orbital_info_energies_occupations(band_edge_orbital_infos):
     assert actual == expected
 
 
-def test_band_edge_orbital_info_repr(band_edge_orbital_infos):
+def test_band_edge_orbital_info_repr():
+    orbital_info_1 = OrbitalInfo(energy=1.23456789,
+                                 orbitals={"Mn": [0.5, 0.4, 0.0, 0.0],
+                                           "Fe": [0.0, 0.0, 0.0, 0.0]},
+                                 occupation=0.99998,
+                                 participation_ratio=0.1111111)
+    orbital_info_2 = OrbitalInfo(energy=2.34567890,
+                                 orbitals={"Mn": [0.1, 0.1, 0.0, 0.0],
+                                           "Fe": [0.0, 0.0, 0.0, 0.0]},
+                                 occupation=0.0001,
+                                 participation_ratio=0.2222222)
+
+    band_edge_orbital_infos =  \
+        BandEdgeOrbitalInfos(orbital_infos=[[[orbital_info_1, orbital_info_2]]],
+                             kpt_coords=[(0.0, 0.0, 0.0)],
+                             kpt_weights=[1.0],
+                             lowest_band_index=10,
+                             fermi_level=0.5)
+
     actual = band_edge_orbital_infos.__str__()
     print(actual)
     expected = """ -- band-edge orbitals info
@@ -69,7 +87,9 @@ Index  Coords                    Weight
 
 Band info near band edges
 Index  Kpoint index  Energy  Occupation  P-ratio  Orbital
-11     1             1.00    1.0         0.1      Mn-s: 0.50, Mn-p: 0.40
+11     1             1.23    1.0         0.1      Mn-s: 0.50, Mn-p: 0.40
+--
+12     1             2.35    0.0         0.2
 --
 """
     assert actual == expected
