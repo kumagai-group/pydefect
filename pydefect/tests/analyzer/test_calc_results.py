@@ -31,5 +31,5 @@ def test_calc_results_str(calc_results):
     assert calc_results.__str__() == """ -- calc results info
 energy:      1.000
 magnetization:   0.00
-electronic convergence: False 
-ionic convergence:  False"""
+electronic convergence: False
+ionic convergence: False"""
