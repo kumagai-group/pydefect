@@ -196,6 +196,16 @@ class BandEdgeState(MSONable):
     def has_acceptor_phs(self):
         return self.vbm_info.orbital_info.occupation < state_unoccupied_number
 
+    @property
+    def has_unoccupied_localized_state(self):
+        return any([lo.occupation < state_unoccupied_number
+                    for lo in self.localized_orbitals])
+
+    @property
+    def has_occupied_localized_state(self):
+        return any([lo.occupation > state_occupied_number
+                    for lo in self.localized_orbitals])
+
     def __str__(self):
         return "\n".join([self._edge_info,
                           "---", "Localized Orbital(s)",
@@ -250,6 +260,14 @@ class BandEdgeStates(MSONable, ToJsonFileMixIn):
     @property
     def has_acceptor_phs(self):
         return any([i.has_acceptor_phs for i in self.states])
+
+    @property
+    def has_unoccupied_localized_state(self):
+        return any([i.has_unoccupied_localized_state for i in self.states])
+
+    @property
+    def has_occupied_localized_state(self):
+        return any([i.has_occupied_localized_state for i in self.states])
 
     @property
     def band_indices_for_parchgs(self):

@@ -113,6 +113,8 @@ def test_band_edge_states_band_indices(band_edge_states):
 def test_band_edge_states_has_donor_phs(band_edge_states):
     assert band_edge_states.has_donor_phs is True
     assert band_edge_states.has_acceptor_phs is False
+    assert band_edge_states.has_unoccupied_localized_state is False
+    assert band_edge_states.has_occupied_localized_state is True
 
 
 def test_band_edge_states_str(band_edge_states):
