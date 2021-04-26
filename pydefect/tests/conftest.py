@@ -247,7 +247,7 @@ def supercell_info(mocker, ortho_conventional):
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="mmm",
                          equivalent_atoms=[4, 5, 6, 7])}
     interstitial = Interstitial(frac_coords=[0.25]*3, wyckoff_letter="x",
-                                site_symmetry="yy")
+                                site_symmetry="yy", info="test")
     return SupercellInfo(ortho_conventional,
                          "Fmmm",
                          [[1, 0, 0], [0, 1, 0], [0, 0, 1]], sites,

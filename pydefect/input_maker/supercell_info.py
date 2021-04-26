@@ -20,6 +20,7 @@ class Interstitial(MSONable):
     frac_coords: List[float]
     wyckoff_letter: str
     site_symmetry: str
+    info: str = None
 
 
 @dataclass(frozen=True)
@@ -89,6 +90,9 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
             coordination = self.interstitial_coords(idx).distance_dict
 
             lines.append(f"#{idx + 1}")
+            if site.info:
+                lines.append(f"                  Info: {site.info}")
+
             frac = \
                 "{0[0]:9.7f}  {0[1]:9.7f}  {0[2]:9.7f}".format(site.frac_coords)
             lines.append(f"Fractional coordinates: {frac}")
