@@ -67,5 +67,5 @@ def test_refine_poscar(tmpdir, mocker, before_refine, after_refine):
     args = Namespace(structure=before_refine, defect_entry=mock_defect_entry)
     make_refine_defect_poscar(args)
 
-    assert Structure.from_file(Path("POSCAR")) == after_refine
+    assert Structure.from_file("refined_POSCAR") == after_refine
 

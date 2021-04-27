@@ -57,7 +57,7 @@ def make_refine_defect_poscar(args):
                                         args.defect_entry.anchor_atom_index,
                                         args.defect_entry.anchor_atom_coords)
     if structure:
-        structure.to(filename="POSCAR")
+        structure.to(filename="refined_POSCAR")
 
 
 def calc_defect_charge_info(args):
