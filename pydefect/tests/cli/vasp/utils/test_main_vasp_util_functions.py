@@ -6,8 +6,11 @@ from pathlib import Path
 import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.cli.vasp.utils.main_vasp_util_functions import make_parchg_dir
+from pydefect.cli.vasp.utils.main_vasp_util_functions import make_parchg_dir, \
+    make_refine_defect_poscar
+from pymatgen import Structure
 from vise.input_set.incar import ViseIncar
+import numpy as np
 
 
 def test_make_parchg_dir(tmpdir, mocker):
@@ -52,3 +55,17 @@ def test_make_parchg_dir(tmpdir, mocker):
     expected = {"ALGO": "Normal", "LPARD": True, "LSEPB": True, "KPAR": 1,
                 "IBAND": "2 3"}
     assert actual == expected
+
+
+def test_refine_poscar(tmpdir, mocker, before_refine, after_refine):
+    print(tmpdir)
+    tmpdir.chdir()
+    mock_defect_entry = mocker.Mock()
+    mock_defect_entry.anchor_atom_index = 1
+    mock_defect_entry.anchor_atom_coords = np.array([0.0, 0.5, 0.5])
+
+    args = Namespace(structure=before_refine, defect_entry=mock_defect_entry)
+    make_refine_defect_poscar(args)
+
+    assert Structure.from_file(Path("POSCAR")) == after_refine
+

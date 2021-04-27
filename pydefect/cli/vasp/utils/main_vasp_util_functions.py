@@ -7,6 +7,7 @@ from monty.serialization import loadfn
 from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.grids import Grids
+from pydefect.analyzer.refine_defect_structure import refine_defect_structure
 from pydefect.cli.vasp.make_defect_charge_info import make_spin_charges, \
     make_defect_charge_info
 from pydefect.cli.vasp.make_light_chgcar import make_light_chgcar
@@ -49,6 +50,14 @@ def make_parchg_dir(args):
     FileLink(Path("../POTCAR")).transfer(Path.cwd())
     FileLink(Path("../KPOINTS")).transfer(Path.cwd())
     os.chdir("..")
+
+
+def make_refine_defect_poscar(args):
+    structure = refine_defect_structure(args.structure,
+                                        args.defect_entry.anchor_atom_index,
+                                        args.defect_entry.anchor_atom_coords)
+    if structure:
+        structure.to(filename="POSCAR")
 
 
 def calc_defect_charge_info(args):
