@@ -45,6 +45,8 @@ def parse_args_main_vasp_util(args):
         "-p", "--poscar", dest="structure", type=Structure.from_file)
     parser_make_refine_defect_poscar.add_argument(
         "-d", "--defect_entry", type=loadfn)
+    parser_make_refine_defect_poscar.add_argument(
+        "-n", "--poscar_name", type=str)
     parser_make_refine_defect_poscar.set_defaults(func=make_parchg_dir)
 
     # -- calc defect charge info -----------------------------------------------

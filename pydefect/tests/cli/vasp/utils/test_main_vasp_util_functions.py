@@ -64,7 +64,9 @@ def test_refine_poscar(tmpdir, mocker, before_refine, after_refine):
     mock_defect_entry.anchor_atom_index = 1
     mock_defect_entry.anchor_atom_coords = np.array([0.0, 0.5, 0.5])
 
-    args = Namespace(structure=before_refine, defect_entry=mock_defect_entry)
+    args = Namespace(structure=before_refine,
+                     defect_entry=mock_defect_entry,
+                     poscar_name="refined_POSCAR")
     make_refine_defect_poscar(args)
 
     assert Structure.from_file("refined_POSCAR") == after_refine

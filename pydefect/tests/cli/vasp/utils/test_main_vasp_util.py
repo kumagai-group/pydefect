@@ -21,10 +21,11 @@ def test_refine_defect_poscar(mocker, simple_cubic):
     mock_loadfn = mocker.patch("pydefect.cli.vasp.utils.main_vasp_util.loadfn")
 
     parsed_args = parse_args_main_vasp_util(
-        ["rdp", "-p", "POSCAR", "-d", "defect_entry.json"])
+        ["rdp", "-p", "POSCAR", "-d", "defect_entry.json", "-n", "refined"])
     expected = Namespace(
         structure=mock_structure.from_file.return_value,
         defect_entry=mock_loadfn.return_value,
+        poscar_name="refined",
         func=parsed_args.func)
     assert parsed_args == expected
     mock_structure.from_file.assert_called_once_with("POSCAR")
