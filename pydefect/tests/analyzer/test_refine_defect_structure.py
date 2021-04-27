@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 import numpy as np
-from pydefect.analyzer.defect_structure_symmetrizer import \
-    symmetrize_defect_structure
-from pydefect.defaults import defaults
+from pydefect.analyzer.refine_defect_structure import refine_defect_structure
 from pymatgen.core import Structure
-from vise.util.structure_symmetrizer import StructureSymmetrizer
 
 
 def test_symmetrize_defect_structure():
@@ -24,13 +21,9 @@ Direct
 0.5045613848356609  0.4811103128264023  0.4933877756337353
 0.0013796816599694  0.9829379087234287  0.4953360299212051
 0.0083465288988691  0.4848714537370853  0.9941122597789658""")
-    structure_symmetrizer = StructureSymmetrizer(
-        structure,
-        defaults.symmetry_length_tolerance,
-        defaults.symmetry_angle_tolerance)
-    actual = symmetrize_defect_structure(structure_symmetrizer,
-                                         anchor_atom_idx=1,
-                                         anchor_atom_coord=np.array([0.0, 0.5, 0.5]))
+    actual = refine_defect_structure(structure,
+                                     anchor_atom_index=1,
+                                     anchor_atom_coords=np.array([0.0, 0.5, 0.5]))
     expected = Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
 1.00000000000000
 5 0 0
@@ -89,13 +82,9 @@ Direct
   0.7814464623477875  0.5003886730650109  0.7494947707104060
   0.4996606931909255  0.2496508616713697  0.7186036919929819
   0.2506716727065808  0.7181216545822622  0.5001902272634595""")
-    structure_symmetrizer = StructureSymmetrizer(
-        structure,
-        defaults.symmetry_length_tolerance,
-        defaults.symmetry_angle_tolerance)
-    actual = symmetrize_defect_structure(structure_symmetrizer,
-                                         anchor_atom_idx=15,
-                                         anchor_atom_coord=np.array([0.5, 0.5, 0.0]))
+    actual = refine_defect_structure(
+        structure, anchor_atom_index=15,
+        anchor_atom_coords=np.array([0.5, 0.5, 0.0]))
 
     expected = Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
 1.00000000000000
@@ -155,21 +144,5 @@ Direct
 0.51 0.51 0.51
 0.01 0.01 0.51
 0.01 0.51 0.01""")
-    structure_symmetrizer = StructureSymmetrizer(structure)
-    actual = symmetrize_defect_structure(structure_symmetrizer=structure_symmetrizer)
-    expected = Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
-1.00000000000000
-5 0 0
-0 5 0
-0 0 5
-Mg   O
-4     3
-Direct
-0.01 0.01 0.01
-0.01 0.51 0.51
-0.51 0.01 0.51
-0.51 0.51 0.01
-0.51 0.51 0.51
-0.01 0.01 0.51
-0.01 0.51 0.01""")
-    assert actual == expected
+    actual = refine_defect_structure(structure=structure)
+    assert actual is None
