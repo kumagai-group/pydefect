@@ -285,3 +285,42 @@ def efnv_correction():
                                  defect_region_radius=2.0,
                                  sites=[s1, s2, s3],
                                  defect_coords=(0.0, 0.0, 0.0))
+
+
+@pytest.fixture(scope="session")
+def before_refine():
+    return Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
+1.00000000000000
+5 0 0
+0 5 0
+0 0 5
+Mg   O
+4     3
+Direct
+0.0051896248240553  0.9835077947659414  0.9945137498637422
+0.0047282952713914  0.4827940046010823  0.4942929782542009
+0.5040349492352973  0.9821499237428384  0.4944941755970405
+0.5058945352747628  0.4828206016032297  0.9940420309511140
+0.5045613848356609  0.4811103128264023  0.4933877756337353
+0.0013796816599694  0.9829379087234287  0.4953360299212051
+0.0083465288988691  0.4848714537370853  0.9941122597789658""")
+
+
+# refine with anchor_atom_index=1, anchor_atom_coords=np.array([0.0, 0.5, 0.5])
+@pytest.fixture(scope="session")
+def after_refine():
+    return Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
+1.00000000000000
+5 0 0
+0 5 0
+0 0 5
+Mg   O
+4     3
+Direct
+0.0 0.0 0.0
+0.0 0.5 0.5
+0.5 0.0 0.5
+0.5 0.5 0.0
+0.5 0.5 0.5
+0.0 0.0 0.5
+0.0 0.5 0.0""")
