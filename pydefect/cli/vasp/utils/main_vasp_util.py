@@ -11,6 +11,7 @@ from monty.serialization import loadfn
 from pydefect.cli.main import epilog, description
 from pydefect.cli.vasp.utils.main_vasp_util_functions import \
     calc_defect_charge_info, make_parchg_dir
+from pymatgen import Structure
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
@@ -32,6 +33,19 @@ def parse_args_main_vasp_util(args):
 
     parser_make_parchg_dir.add_argument("-d", "--dir", type=Path)
     parser_make_parchg_dir.set_defaults(func=make_parchg_dir)
+
+    # -- make refine defect poscar ---------------------------------------------
+    parser_make_refine_defect_poscar = subparsers.add_parser(
+        name="refine_defect_poscar",
+        description="Refine defect structure POSCAR.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['rdp'])
+
+    parser_make_refine_defect_poscar.add_argument(
+        "-p", "--poscar", dest="structure", type=Structure.from_file)
+    parser_make_refine_defect_poscar.add_argument(
+        "-d", "--defect_entry", type=loadfn)
+    parser_make_refine_defect_poscar.set_defaults(func=make_parchg_dir)
 
     # -- calc defect charge info -----------------------------------------------
     parser_calc_def_charge_info = subparsers.add_parser(
