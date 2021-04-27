@@ -14,21 +14,18 @@ def symmetrize_defect_structure(structure_symmetrizer: StructureSymmetrizer,
                                 anchor_atom_coord: Optional[np.ndarray] = None
                                 ) -> Structure:
     result = structure_symmetrizer.structure.copy()
+    spglib_data = structure_symmetrizer.spglib_sym_data
 
-    logger.info(f"The symmetry is {structure_symmetrizer.point_group}")
+    origin_shift = spglib_data["origin_shift"]
+    inv_trans_mat = inv(spglib_data["transformation_matrix"])
+    coords = spglib_data["std_positions"]
 
-    origin_shift = structure_symmetrizer.spglib_sym_data["origin_shift"]
-    inv_trans_mat = inv(structure_symmetrizer.spglib_sym_data["transformation_matrix"])
-    coords = structure_symmetrizer.spglib_sym_data["std_positions"]
-    new_coords = []
-    for i in range(len(result)):
-        new_coords.append(np.dot(inv_trans_mat, (coords[i] - origin_shift)))
-
+    new_coords = np.array([np.dot(inv_trans_mat, (coords[i] - origin_shift))
+                           for i in range(len(result))])
     if anchor_atom_idx:
         offset = new_coords[anchor_atom_idx] - anchor_atom_coord
-    else:
-        offset = np.array([0.0]*3)
-    new_coords = np.array(new_coords) - offset
+        new_coords = new_coords - offset
+
     for i, coords in zip(result, new_coords):
         i.frac_coords = coords % 1
     return result
