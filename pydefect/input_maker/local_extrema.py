@@ -11,7 +11,7 @@ from vise.util.typing import Coords
 
 
 @dataclass
-class LocalExtremum(MSONable):
+class CoordInfo(MSONable):
     frac_coords: Coords
     site_symmetry: str
     coordination: Coordination
@@ -21,6 +21,6 @@ class LocalExtremum(MSONable):
 @dataclass
 class LocalExtrema(MSONable, ToJsonFileMixIn):
     unit_cell: Structure
-    info: str
     is_min: bool
-    extrema_points: List[LocalExtremum]
+    extrema_points: List[CoordInfo]
+    info: str
