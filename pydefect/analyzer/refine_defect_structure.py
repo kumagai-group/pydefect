@@ -31,9 +31,8 @@ def refine_defect_structure(structure: Structure,
         i.frac_coords = coords % 1
 
     if result != structure:
-        logger.info(f"The point group is {symmetrizer.point_group}.")
-        logger.info(f"The structure is refined and POSCAR is being created.")
+        logger.info(f"Structure is refined to the one with point group "
+                    f"{symmetrizer.point_group}.")
         return result
     else:
-        logger.info(f"The refined structure is the same as before, so do "
-                    f"nothing.")
+        logger.info(f"Refined structure is same as before, so do nothing.")
