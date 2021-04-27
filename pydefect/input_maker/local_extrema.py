@@ -5,7 +5,8 @@ from typing import List
 
 from monty.json import MSONable
 from pydefect.util.structure_tools import Coordination
-from vise.util.mix_in import ToYamlFileMixIn, ToJsonFileMixIn
+from pymatgen import Structure
+from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.typing import Coords
 
 
@@ -19,6 +20,7 @@ class LocalExtremum(MSONable):
 
 @dataclass
 class LocalExtrema(MSONable, ToJsonFileMixIn):
+    unit_cell: Structure
     info: str
     is_min: bool
     extrema_points: List[LocalExtremum]

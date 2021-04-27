@@ -8,7 +8,7 @@ from vise.tests.helpers.assertion import assert_yaml_roundtrip, \
 
 
 @pytest.fixture
-def local_extrema():
+def local_extrema(simple_cubic):
     coordination = Coordination({"Mn": [1.0, 2.0]}, cutoff=4.0,
                                 neighboring_atom_indices=[1, 2])
     local_extremum = LocalExtremum(frac_coords=(0.1, 0.1, 0.1),
@@ -16,7 +16,8 @@ def local_extrema():
                                    coordination=coordination,
                                    quantity=2.1)
 
-    return LocalExtrema(info="test", is_min=True,
+    return LocalExtrema(unit_cell=simple_cubic,
+                        info="test", is_min=True,
                         extrema_points=[local_extremum])
 
 
