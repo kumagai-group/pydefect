@@ -9,6 +9,7 @@ import pytest
 from pydefect.corrections.efnv_correction import PotentialSite, \
     ExtendedFnvCorrection
 from pydefect.defaults import defaults
+from pydefect.input_maker.local_extrema import VolumetricDataAnalyzeParams
 from pydefect.input_maker.supercell_info import Site, SupercellInfo, \
     Interstitial
 from pymatgen.core import Lattice, IStructure, Structure
@@ -324,3 +325,8 @@ Direct
 0.5 0.5 0.5
 0.0 0.0 0.5
 0.0 0.5 0.0""")
+
+
+@pytest.fixture(scope="session")
+def vol_params():
+    return VolumetricDataAnalyzeParams(None, None, 0.5, 0.5, 0.4)

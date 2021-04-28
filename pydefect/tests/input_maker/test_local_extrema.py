@@ -8,7 +8,7 @@ from vise.tests.helpers.assertion import assert_json_roundtrip
 
 
 @pytest.fixture
-def local_extrema(simple_cubic):
+def local_extrema(simple_cubic, vol_params):
     coordination = Coordination({"Mn": [1.0, 2.0]}, cutoff=4.0,
                                 neighboring_atom_indices=[1, 2])
     local_extremum = CoordInfo(site_symmetry="1",
@@ -16,11 +16,10 @@ def local_extrema(simple_cubic):
                                frac_coords=[(0.1, 0.1, 0.1)],
                                quantities=[2.1])
 
-    params = VolumetricDataAnalyzeParams(None, None, 0.5, 0.5, 0.4)
     return VolumetricDataLocalExtrema(unit_cell=simple_cubic, is_min=True,
                                       extrema_points=[local_extremum],
                                       info="test",
-                                      params=params)
+                                      params=vol_params)
 
 
 def test_local_extrema_json_roundtrip(local_extrema, tmpdir):
