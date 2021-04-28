@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 
 def make_local_extrema_from_volumetric_data(
         volumetric_data: VolumetricData,
-        params: VolumetricDataAnalyzeParams = VolumetricDataAnalyzeParams(),
+        params: VolumetricDataAnalyzeParams,
         info: str = None,
         find_min: bool = True) -> VolumetricDataLocalExtrema:
     extrema = extrema_coords(volumetric_data, find_min, params)
