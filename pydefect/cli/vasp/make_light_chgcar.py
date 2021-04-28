@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List
 
 import numpy as np
-from pydefect.analyzer.vesta.create_vesta_file import add_density
+from pydefect.analyzer.vesta.vesta_file import add_density
 from pymatgen.io.vasp import Chgcar
 from scipy.constants.codata import physical_constants as pc
 
