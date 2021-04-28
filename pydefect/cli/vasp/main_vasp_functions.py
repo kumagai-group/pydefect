@@ -6,6 +6,8 @@ from monty.serialization import loadfn
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergy, \
     CompositionEnergies
+from pydefect.cli.vasp.create_local_extrema import \
+    make_local_extrema_from_volumetric_data
 from pydefect.cli.vasp.make_band_edge_orbital_infos import \
     make_band_edge_orbital_infos
 from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
@@ -15,6 +17,7 @@ from pydefect.cli.vasp.make_poscars_from_query import make_poscars_from_query
 from pydefect.cli.vasp.make_unitcell import make_unitcell_from_vasp
 from pydefect.input_maker.defect_entries_maker import DefectEntriesMaker
 from pydefect.input_maker.defect_set import DefectSet
+from pydefect.input_maker.local_extrema import VolumetricDataAnalyzeParams
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.util.mp_tools import MpQuery
 from pymatgen.io.vasp import Vasprun, Outcar, Procar
@@ -51,6 +54,20 @@ def make_composition_energies(args):
         energy = float(vasprun.final_energy)  # original type is FloatWithUnit
         composition_energies[composition] = CompositionEnergy(energy, "local")
     composition_energies.to_yaml_file()
+
+
+def make_local_extrema(args):
+    params = VolumetricDataAnalyzeParams(args.threshold_frac,
+                                         args.threshold_abs,
+                                         args.min_dist,
+                                         args.tol,
+                                         args.radius)
+    local_extrema = make_local_extrema_from_volumetric_data(
+        volumetric_data=args.volumetric_data,
+        params=params,
+        info=args.info,
+        find_min=args.find_min)
+    local_extrema.to_json_file()
 
 
 def make_defect_entries(args):

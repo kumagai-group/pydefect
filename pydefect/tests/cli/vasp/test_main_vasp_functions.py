@@ -4,19 +4,18 @@ from argparse import Namespace
 from pathlib import Path
 
 import numpy as np
-from pydefect.analyzer.band_edge_states import PerfectBandEdgeState
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.vasp.main_vasp_functions import make_unitcell, \
     make_competing_phase_dirs, make_composition_energies, make_defect_entries, \
     make_calc_results, make_band_edge_orb_infos_and_eigval_plot, \
-    make_perfect_band_edge_state
+    make_perfect_band_edge_state, make_local_extrema
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
 from pymatgen.core import Composition, Structure
-from pymatgen.io.vasp import Vasprun, Outcar
+from pymatgen.io.vasp import Vasprun, Outcar, VolumetricData
 from vise.defaults import defaults
 
 
@@ -88,6 +87,31 @@ O2:
   source: local
 """
     assert actual == expected
+
+
+def test_make_local_extrema(tmpdir, mocker, simple_cubic):
+    print(tmpdir)
+    tmpdir.chdir()
+
+    mock_params = mocker.patch("pydefect.cli.vasp.main_vasp_functions.VolumetricDataAnalyzeParams")
+    mock_make_extrema = mocker.patch("pydefect.cli.vasp.main_vasp_functions.make_local_extrema_from_volumetric_data")
+    volumetric_data = VolumetricData(simple_cubic,
+                                     data={"total": np.array([[[0.0]]])})
+    args = Namespace(volumetric_data=volumetric_data,
+                     find_min=True,
+                     info="a",
+                     threshold_frac=None,
+                     threshold_abs=None,
+                     min_dist=0.1,
+                     tol=0.2,
+                     radius=0.3)
+    make_local_extrema(args)
+    mock_params.assert_called_once_with(None, None, 0.1, 0.2, 0.3)
+    mock_make_extrema.assert_called_once_with(volumetric_data=volumetric_data,
+                                              params=mock_params.return_value,
+                                              info="a",
+                                              find_min=True)
+    mock_make_extrema.return_value.to_json_file.assert_called_once_with()
 
 
 def test_make_defect_entries(tmpdir, supercell_info):
