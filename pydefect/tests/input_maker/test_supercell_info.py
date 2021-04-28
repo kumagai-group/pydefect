@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import pytest
+from pydefect.defaults import defaults
 
 from pydefect.input_maker.supercell_info import Interstitial, SupercellInfo
 from pydefect.util.structure_tools import Coordination
@@ -31,7 +32,10 @@ def test_supercell_info_from_dict(supercell_info):
     assert expected == supercell_info
 
 
-def test_supercell_info_distances(supercell_info):
+def test_supercell_info_distances(mocker, supercell_info):
+    mock = mocker.patch("pydefect.util.structure_tools.defaults")
+    mock.dist_tol = defaults.dist_tol
+    mock.cutoff_distance_factor = 1.7
     assert supercell_info.coords("H1") == \
            Coordination({"H": [3.91], "He": [2.5, 3.0, 3.5]},
                         4.25, [1, 4, 5, 6])
@@ -40,7 +44,10 @@ def test_supercell_info_distances(supercell_info):
                         4.25, [0, 2, 3, 7])
 
 
-def test_supercell_info_interstitials_distances(supercell_info):
+def test_supercell_info_interstitials_distances(mocker, supercell_info):
+    mock = mocker.patch("pydefect.util.structure_tools.defaults")
+    mock.dist_tol = defaults.dist_tol
+    mock.cutoff_distance_factor = 1.7
     actual = supercell_info.interstitial_coords(0)
     expected = Coordination(distance_dict={'H': [2.62, 2.62, 2.62, 2.62],
                                            'He': [2.62, 2.62, 2.62, 2.62]},
@@ -49,7 +56,10 @@ def test_supercell_info_interstitials_distances(supercell_info):
     assert actual == expected
 
 
-def test_supercell_info_str(supercell_info):
+def test_supercell_info_str(mocker, supercell_info):
+    mock = mocker.patch("pydefect.util.structure_tools.defaults")
+    mock.dist_tol = defaults.dist_tol
+    mock.cutoff_distance_factor = 1.7
     expected = """Space group: Fmmm
 Transformation matrix: [1, 0, 0]  [0, 1, 0]  [0, 0, 1]
 Cell multiplicity: 1

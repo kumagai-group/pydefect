@@ -239,10 +239,7 @@ def cubic_supercell_w_vacancy_w_perturb(cubic_supercell_w_vacancy):
 
 
 @pytest.fixture
-def supercell_info(mocker, ortho_conventional):
-    mock = mocker.patch("pydefect.util.structure_tools.defaults")
-    mock.dist_tol = defaults.dist_tol
-    mock.cutoff_distance_factor = 1.7
+def supercell_info(ortho_conventional):
     sites = {"H1": Site(element="H", wyckoff_letter="a", site_symmetry="mmm",
                         equivalent_atoms=[0, 1, 2, 3]),
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="mmm",
@@ -256,10 +253,7 @@ def supercell_info(mocker, ortho_conventional):
 
 
 @pytest.fixture
-def cubic_supercell_info_wo_int(mocker, cubic_supercell):
-    mock = mocker.patch("pydefect.util.structure_tools.defaults")
-    mock.dist_tol = defaults.dist_tol
-    mock.cutoff_distance_factor = 1.7
+def cubic_supercell_info_wo_int(cubic_supercell):
     sites = {"H1": Site(element="H", wyckoff_letter="a", site_symmetry="m-3m",
                         equivalent_atoms=[0, 1, 2, 3]),
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="m-3m",
