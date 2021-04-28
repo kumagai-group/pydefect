@@ -27,3 +27,12 @@ def test_local_extrema_json_roundtrip(local_extrema, tmpdir):
     assert_json_roundtrip(local_extrema, tmpdir)
 
 
+def test_local_extrema_str(local_extrema, tmpdir):
+    actual = local_extrema.__str__()
+    expected = """info: test
+min_or_max: min
+extrema_points:
+site_sym  coordination        frac_coords               quantity
+1         {'Mn': [1.0, 2.0]}  ( 0.100,  0.100,  0.100)  2.1"""
+    print(actual)
+    assert actual == expected
