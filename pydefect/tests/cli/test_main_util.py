@@ -20,6 +20,25 @@ def test_make_cpd_options():
     assert parsed_args == expected
 
 
+def test_add_interstitials_from_local_extrema(mocker):
+
+    mock_loadfn_main = mocker.patch("pydefect.cli.main.loadfn")
+    mock_loadfn_main_util = mocker.patch("pydefect.cli.main_util.loadfn")
+
+    parsed_args = parse_args_main_util(["ai",
+                                        "-s", "supercell_info.json",
+                                        "--local_extrema", "local_extrema.json",
+                                        "--indices", "1", "2"])
+    expected = Namespace(
+        supercell_info=mock_loadfn_main.return_value,
+        local_extrema=mock_loadfn_main_util.return_value,
+        indices=[1, 2],
+        func=parsed_args.func)
+    assert parsed_args == expected
+    mock_loadfn_main.assert_called_once_with("supercell_info.json")
+    mock_loadfn_main_util.assert_called_once_with("local_extrema.json")
+
+
 def test_gkfo_correction(mocker):
     mock_i_correction = mocker.Mock(spec=ExtendedFnvCorrection, autospec=True)
     mock_i_calc_results = mocker.Mock(spec=CalcResults, autospec=True)

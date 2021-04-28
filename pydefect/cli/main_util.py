@@ -8,7 +8,8 @@ import warnings
 from monty.serialization import loadfn
 from pydefect.cli.main import description, epilog, add_sub_parser
 from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp, \
-    composition_energies_from_mp
+    composition_energies_from_mp, add_interstitials_from_local_extrema
+from pydefect.defaults import defaults
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
@@ -20,7 +21,9 @@ def parse_args_main_util(args):
     This command provide some utilities related to the VASP calculations""")
 
     subparsers = parser.add_subparsers()
+    dirs_parser = add_sub_parser(argparse, name="dirs")
     unitcell_parser = add_sub_parser(argparse, name="unitcell")
+    si_parser = add_sub_parser(argparse, name="supercell_info")
 
     # -- composition energies from mp ------------------------------------------
     parser_comp_es_from_mp = subparsers.add_parser(
@@ -39,7 +42,23 @@ def parse_args_main_util(args):
 
     parser_comp_es_from_mp.set_defaults(func=composition_energies_from_mp)
 
-    # -- gkfo correction ------------------------------------------------
+    # -- add interstitials from local extrema ----------------------------------
+    parser_ai = subparsers.add_parser(
+        name="add_interstitials_from_local_extrema",
+        description="Add interstitials via volumetric_data_local_extrema.json "
+                    "file.",
+        parents=[si_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['ai'])
+    parser_ai.add_argument(
+        "--local_extrema", required=True, type=loadfn,
+        help="volumetric_data_local_extrema.json file name.")
+    parser_ai.add_argument(
+        "-i", "--indices", required=True, type=int, nargs="+",
+        help="Indices to be added to SupercellInfo.")
+    parser_ai.set_defaults(func=add_interstitials_from_local_extrema)
+
+    # -- gkfo correction -------------------------------------------------------
     parser_gkfo = subparsers.add_parser(
         name="gkfo",
         description="Generate GKFO correction files.",

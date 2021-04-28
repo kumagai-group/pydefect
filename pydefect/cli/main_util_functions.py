@@ -17,6 +17,10 @@ def composition_energies_from_mp(args) -> None:
     composition_energies.to_yaml_file()
 
 
+def add_interstitials_from_local_extrema(args) -> None:
+    return
+
+
 def make_gkfo_correction_from_vasp(args):
     gkfo = make_gkfo_correction(
         efnv_correction=args.initial_efnv_correction,
