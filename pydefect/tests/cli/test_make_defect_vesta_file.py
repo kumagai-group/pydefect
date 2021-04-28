@@ -5,7 +5,7 @@ from pathlib import Path
 from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo, \
     Displacement
-from pydefect.cli.vasp.utils.create_defect_vesta_file import \
+from pydefect.cli.make_defect_vesta_file import \
     MakeDefectVestaFile
 from pymatgen.core import Structure, Lattice
 
