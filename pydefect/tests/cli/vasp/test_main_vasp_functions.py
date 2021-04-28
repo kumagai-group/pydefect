@@ -97,7 +97,7 @@ def test_make_local_extrema(tmpdir, mocker, simple_cubic):
     mock_make_extrema = mocker.patch("pydefect.cli.vasp.main_vasp_functions.make_local_extrema_from_volumetric_data")
     volumetric_data = VolumetricData(simple_cubic,
                                      data={"total": np.array([[[0.0]]])})
-    args = Namespace(volumetric_data=volumetric_data,
+    args = Namespace(volumetric_data=[volumetric_data],
                      find_min=True,
                      info="a",
                      threshold_frac=None,

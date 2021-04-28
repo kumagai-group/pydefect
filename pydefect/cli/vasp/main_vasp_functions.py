@@ -57,13 +57,18 @@ def make_composition_energies(args):
 
 
 def make_local_extrema(args):
+    volumetric_data = args.volumetric_data[0]
+    if len(args.volumetric_data) > 1:
+        for i in args.volumetric_data[1:]:
+            volumetric_data += i
+
     params = VolumetricDataAnalyzeParams(args.threshold_frac,
                                          args.threshold_abs,
                                          args.min_dist,
                                          args.tol,
                                          args.radius)
     local_extrema = make_local_extrema_from_volumetric_data(
-        volumetric_data=args.volumetric_data,
+        volumetric_data=volumetric_data,
         params=params,
         info=args.info,
         find_min=args.find_min)
