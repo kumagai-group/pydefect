@@ -16,10 +16,11 @@ def local_extrema(simple_cubic):
                                frac_coords=[(0.1, 0.1, 0.1)],
                                quantities=[2.1])
 
+    params = VolumetricDataAnalyzeParams(None, None, 0.5, 0.5, 0.4)
     return VolumetricDataLocalExtrema(unit_cell=simple_cubic, is_min=True,
                                       extrema_points=[local_extremum],
                                       info="test",
-                                      params=VolumetricDataAnalyzeParams())
+                                      params=params)
 
 
 def test_local_extrema_json_roundtrip(local_extrema, tmpdir):

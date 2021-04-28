@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from monty.json import MSONable
 from pydefect.util.structure_tools import Coordination
@@ -20,11 +20,11 @@ class CoordInfo(MSONable):
 
 @dataclass
 class VolumetricDataAnalyzeParams(MSONable):
-    threshold_frac: float = None
-    threshold_abs: float = None
-    min_dist: float = 0.5
-    tol: float = 0.5
-    radius: float = 0.4
+    threshold_frac: Optional[float]
+    threshold_abs: Optional[float]
+    min_dist: float
+    tol: float
+    radius: float
 
 
 @dataclass
