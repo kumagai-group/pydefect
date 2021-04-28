@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from monty.json import MSONable
+from pydefect.input_maker.append_interstitial import append_interstitial
 from pydefect.util.coords import pretty_coords
 from pydefect.util.structure_tools import Coordination
 from pymatgen import Structure
@@ -39,9 +40,10 @@ class VolumetricDataLocalExtrema(MSONable, ToJsonFileMixIn):
 
     def __str__(self):
         min_or_max = "min" if self.is_min else "max"
-        extrema_points = [["site_sym", "coordination", "frac_coords", "quantity"]]
-        for ep in self.extrema_points:
-            extrema_points.append([ep.site_symmetry,
+        extrema_points = [["#", "site_sym", "coordination", "frac_coords", "quantity"]]
+        for idx, ep in enumerate(self.extrema_points, 1):
+            extrema_points.append([idx,
+                                   ep.site_symmetry,
                                    ep.coordination.distance_dict,
                                    pretty_coords(ep.frac_coords[0]),
                                    f"{ep.quantities[0]:.2g}"])
@@ -50,3 +52,17 @@ class VolumetricDataLocalExtrema(MSONable, ToJsonFileMixIn):
                  f"extrema_points:",
                  tabulate(extrema_points, tablefmt="plain")]
         return "\n".join(lines)
+
+    def append_sites_to_supercell_info(self, supercell_info, indices):
+        frac_coords, infos = [], []
+        for idx, ep in enumerate(self.extrema_points, 1):
+            if idx in indices:
+                frac_coords.append(ep.frac_coords[0])
+                infos.append(f"{self.info} #{idx}")
+
+        result = append_interstitial(supercell_info,
+                                     self.unit_cell,
+                                     frac_coords=frac_coords,
+                                     infos=infos)
+        return result
+
