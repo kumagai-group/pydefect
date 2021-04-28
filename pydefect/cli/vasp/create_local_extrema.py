@@ -4,6 +4,7 @@ from itertools import groupby
 from typing import List
 
 from pandas import DataFrame
+from pydefect.analyzer.defect_structure_info import remove_dot
 from pydefect.input_maker.local_extrema import VolumetricDataLocalExtrema, \
     CoordInfo, VolumetricDataAnalyzeParams
 from pydefect.util.structure_tools import Distances
@@ -62,7 +63,7 @@ def find_inequivalent_coords(structure: Structure,
                 distances = Distances(structure, fcoord)
                 coordination = distances.coordination()
 
-        coord_info = CoordInfo(site_symmetry=site_sym,
+        coord_info = CoordInfo(site_symmetry=remove_dot(site_sym),
                                coordination=coordination,
                                frac_coords=coords,
                                quantities=quantity)

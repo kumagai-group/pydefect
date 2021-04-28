@@ -21,6 +21,7 @@ def test_make_local_extrema_from_volumetric_data(vasp_files):
 
 
 def test_find_inequivalent_coords(simple_cubic):
+
     df = DataFrame([[0.1, 0.0, 0.0, 1.0],
                     [0.0, 0.1, 0.0, 1.0],
                     [0.0, 0.0, 0.1, 1.0],
@@ -29,12 +30,12 @@ def test_find_inequivalent_coords(simple_cubic):
                     [0.0, 0.0, 0.9, 1.0]],
                    columns=["a", "b", "c", "value"])
     actual = find_inequivalent_coords(simple_cubic, df)
-    expected = CoordInfo(site_symmetry="4m.m",
-                         coordination=Coordination({"H": [0.1]}, 0.13, [0]),
-                         frac_coords=[(0.1, 0.0, 0.0), (0.0, 0.1, 0.0),
-                                      (0.0, 0.0, 0.1), (0.9, 0.0, 0.0),
-                                      (0.0, 0.9, 0.0), (0.0, 0.0, 0.9)],
-                         quantities=[1.0]*6)
+    expected = CoordInfo(
+        site_symmetry="4mm",
+        coordination=Coordination({"H": [0.1]}, 0.13, [0]),
+        frac_coords=[(0.1, 0.0, 0.0), (0.0, 0.1, 0.0), (0.0, 0.0, 0.1),
+                     (0.9, 0.0, 0.0), (0.0, 0.9, 0.0), (0.0, 0.0, 0.9)],
+        quantities=[1.0]*6)
     assert actual[0] == expected
 
 
