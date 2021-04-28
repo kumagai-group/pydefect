@@ -3,7 +3,7 @@
 import math
 import warnings
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Union
 
 import numpy as np
 from monty.json import MSONable
@@ -19,6 +19,7 @@ from vise.util.enum import ExtendedEnum
 from vise.util.logger import get_logger
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.structure_symmetrizer import StructureSymmetrizer
+from vise.util.typing import Coords
 
 logger = get_logger(__name__)
 
@@ -28,7 +29,7 @@ def folded_coords(site: PeriodicSite, center: List[float]):
     return tuple(site.frac_coords - image)
 
 
-def fold_coords_in_structure(structure: Structure, center: List[float]):
+def fold_coords_in_structure(structure: Structure, center: Union[Coords, List[float]]):
     for site in structure:
         _, image = site.distance_and_image_from_frac_coords(center)
         site.frac_coords -= image
