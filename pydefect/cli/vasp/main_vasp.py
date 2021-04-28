@@ -11,9 +11,10 @@ from pydefect.cli.main import epilog, description, add_sub_parser
 from pydefect.cli.vasp.main_vasp_functions import make_defect_entries, \
     make_unitcell, make_competing_phase_dirs, \
     make_calc_results, \
-    make_band_edge_orb_infos_and_eigval_plot, make_perfect_band_edge_state
+    make_band_edge_orb_infos_and_eigval_plot, make_perfect_band_edge_state, \
+    make_local_extrema
 from pydefect.defaults import defaults
-from pymatgen.io.vasp import Vasprun, Outcar
+from pymatgen.io.vasp import Vasprun, Outcar, Chgcar
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
@@ -69,6 +70,50 @@ def parse_args_main_vasp(args):
 
     parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
 
+    # -- make_local_extrema ----------------------------------------------------
+    parser_make_local_extrema = subparsers.add_parser(
+        name="local_extrema",
+        description="Make local volumetric_data_local_extrema.json file.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['le'])
+
+    parser_make_local_extrema.add_argument(
+        "-v", "--volumetric_data", type=Chgcar.from_file, required=True,
+        help="File names such as CHGCAR or LOCPOT.")
+    parser_make_local_extrema.add_argument(
+        "--find_min", action="store_false",
+        help="Set when local maxima are searched instead of local minima.")
+    parser_make_local_extrema.add_argument(
+        "-i", "--info", type=str, default="",
+        help="Information related to the parsed volumetric data.")
+    parser_make_local_extrema.add_argument(
+        "--threshold_frac", default=1.0, type=float,
+        help="""Optional fraction of extrema shown, which returns 
+        `threshold_frac * tot_num_extrema` extrema fractional coordinates 
+         based on highest/lowest intensity. It takes from 0 to 1.""")
+    parser_make_local_extrema.add_argument(
+        "--threshold_abs", default=None, type=float,
+        help="""Optional filter. When searching for local
+        minima, intensity <= threshold_abs returns; when searching for
+        local maxima, intensity >= threshold_abs returns.
+
+        Note that threshold_abs and threshold_frac should not set in the
+        same time.""")
+    parser_make_local_extrema.add_argument(
+        "--min_dist", type=str, metavar="Angstrom", default=0.5,
+        help="""Used to remove the predicted sites that are too close to 
+        *existing atoms* in the structure. The minimum distance that a vertex 
+        needs to be from existing atoms. Set 0 when switch off this flag.""")
+    parser_make_local_extrema.add_argument(
+        "--tol", type=str, metavar="Angstrom", default=0.5,
+        help="""Group interstitials that are too close together using a tol.
+        Set 0 when switch off this flag.""")
+    parser_make_local_extrema.add_argument(
+        "--radius", type=str, default=0.4,
+        help="Radius of sphere around each site to evaluate the average "
+             "quantity.")
+
+    parser_make_local_extrema.set_defaults(func=make_local_extrema)
     # -- defect_entries ------------------------------------------------
     parser_defect_entries = subparsers.add_parser(
         name="defect_entries",

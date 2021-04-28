@@ -53,6 +53,20 @@ def test_make_poscars_w_options():
     assert parsed_args == expected
 
 
+def test_make_local_extrema_wo_options():
+    parsed_args = parse_args_main_vasp(["le",
+                                        "-v", "CHGCAR",
+                                        ])
+    expected = Namespace(
+        elements=["Mg", "O"],
+        e_above_hull=defaults.e_above_hull,
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
+
+
+
 def test_defect_entries():
     parsed_args = parse_args_main_vasp(["de"])
     expected = Namespace(func=parsed_args.func)
