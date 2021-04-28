@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from copy import copy
 from typing import List, Union
 
 import numpy as np
 from numpy.linalg import inv
 from pydefect.input_maker.supercell_info import SupercellInfo, Interstitial
 from pydefect.util.error_classes import NotPrimitiveError
+from pymatgen import IStructure
 from pymatgen.core import Structure, Element
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 from vise.util.typing import Coords
 
 
 def append_interstitial(supercell_info: SupercellInfo,
-                        unitcell_structure: Structure,
+                        unitcell_structure: Union[Structure, IStructure],
                         frac_coords: List[Union[List[float], Coords]],
                         infos: List[str]
                         ) -> SupercellInfo:
@@ -35,7 +35,7 @@ def append_interstitial(supercell_info: SupercellInfo,
         frac_coords = [frac_coords]
 
     for fcoord, info in zip(frac_coords, infos):
-        us = copy(unitcell_structure)
+        us = Structure.from_dict(unitcell_structure.as_dict())
         us.append(species=Element.H, coords=fcoord)
         symmetrizer = StructureSymmetrizer(us)
         site_symm = symmetrizer.spglib_sym_data["site_symmetry_symbols"][-1]
