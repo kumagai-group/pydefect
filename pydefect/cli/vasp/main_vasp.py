@@ -84,13 +84,14 @@ def parse_args_main_vasp(args):
         "--find_min", action="store_false",
         help="Set when local maxima are searched instead of local minima.")
     parser_make_local_extrema.add_argument(
-        "-i", "--info", type=str, default="",
+        "-i", "--info", type=str,
         help="Information related to the parsed volumetric data.")
     parser_make_local_extrema.add_argument(
-        "--threshold_frac", default=1.0, type=float,
+        "--threshold_frac", default=None, type=float,
         help="""Optional fraction of extrema shown, which returns 
         `threshold_frac * tot_num_extrema` extrema fractional coordinates 
-         based on highest/lowest intensity. It takes from 0 to 1.""")
+         based on highest/lowest intensity. It takes from 0 to 1.,
+         If not set, 1 will be set.""")
     parser_make_local_extrema.add_argument(
         "--threshold_abs", default=None, type=float,
         help="""Optional filter. When searching for local
@@ -100,16 +101,16 @@ def parse_args_main_vasp(args):
         Note that threshold_abs and threshold_frac should not set in the
         same time.""")
     parser_make_local_extrema.add_argument(
-        "--min_dist", type=str, metavar="Angstrom", default=0.5,
+        "--min_dist", type=float, metavar="Angstrom", default=0.5,
         help="""Used to remove the predicted sites that are too close to 
         *existing atoms* in the structure. The minimum distance that a vertex 
         needs to be from existing atoms. Set 0 when switch off this flag.""")
     parser_make_local_extrema.add_argument(
-        "--tol", type=str, metavar="Angstrom", default=0.5,
+        "--tol", type=float, metavar="Angstrom", default=0.5,
         help="""Group interstitials that are too close together using a tol.
         Set 0 when switch off this flag.""")
     parser_make_local_extrema.add_argument(
-        "--radius", type=str, default=0.4,
+        "--radius", type=float, default=0.4,
         help="Radius of sphere around each site to evaluate the average "
              "quantity.")
 

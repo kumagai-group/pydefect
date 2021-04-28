@@ -53,18 +53,45 @@ def test_make_poscars_w_options():
     assert parsed_args == expected
 
 
-def test_make_local_extrema_wo_options():
-    parsed_args = parse_args_main_vasp(["le",
-                                        "-v", "CHGCAR",
-                                        ])
+def test_make_local_extrema_wo_options(mocker):
+    mock_chgcar = mocker.patch("pydefect.cli.vasp.main_vasp.Chgcar")
+    parsed_args = parse_args_main_vasp(["le", "-v", "CHGCAR"])
     expected = Namespace(
-        elements=["Mg", "O"],
-        e_above_hull=defaults.e_above_hull,
+        volumetric_data=mock_chgcar.from_file.return_value,
+        find_min=True,
+        info=None,
+        threshold_frac=None,
+        threshold_abs=None,
+        min_dist=0.5,
+        tol=0.5,
+        radius=0.4,
         func=parsed_args.func)
     assert parsed_args == expected
+    mock_chgcar.from_file.assert_called_once_with("CHGCAR")
 
 
-
+def test_make_local_extrema_w_options(mocker):
+    mock_chgcar = mocker.patch("pydefect.cli.vasp.main_vasp.Chgcar")
+    parsed_args = parse_args_main_vasp(["le",
+                                        "-v", "CHGCAR",
+                                        "--find_min",
+                                        "--info", "a",
+                                        "--threshold_frac", "0.1",
+                                        "--threshold_abs", "0.2",
+                                        "--min_dist", "0.3",
+                                        "--tol", "0.4",
+                                        "--radius", "0.5"])
+    expected = Namespace(
+        volumetric_data=mock_chgcar.from_file.return_value,
+        find_min=False,
+        info="a",
+        threshold_frac=0.1,
+        threshold_abs=0.2,
+        min_dist=0.3,
+        tol=0.4,
+        radius=0.5,
+        func=parsed_args.func)
+    assert parsed_args == expected
 
 
 def test_defect_entries():
