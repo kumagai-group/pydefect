@@ -10,7 +10,10 @@ from pydefect.util.structure_tools import Distances
 from pymatgen.analysis.defects.utils import ChargeDensityAnalyzer
 from pymatgen.core import Element, Structure
 from pymatgen.io.vasp import VolumetricData
+from vise.util.logger import get_logger
 from vise.util.structure_symmetrizer import StructureSymmetrizer
+
+logger = get_logger(__name__)
 
 
 def make_local_extrema_from_volumetric_data(
@@ -52,7 +55,8 @@ def find_inequivalent_coords(structure: Structure,
         for repr_idx, atom_idx in equiv_sites:
             fcoord = added_structure[atom_idx].frac_coords
             coords.append(tuple(fcoord))
-            quantity.append(df["Charge Density"][atom_idx - start_index])
+            key = "ave_value" if "ave_value" in df else "value"
+            quantity.append(df[key][atom_idx - start_index])
             if repr_idx == atom_idx:
                 site_sym = sym_data["site_symmetry_symbols"][atom_idx]
                 distances = Distances(added_structure, fcoord)
@@ -73,14 +77,22 @@ def extrema_coords(volumetric_data: VolumetricData,
     result.get_local_extrema(threshold_frac=params.threshold_frac,
                              threshold_abs=params.threshold_abs,
                              find_min=find_min)
-    result.sort_sites_by_integrated_chg(r=params.radius)
-    # Remove sites near host atoms.
-    result.remove_collisions(params.min_dist)
-    try:
-        # Cluster interstitials that are too close together using a tol.
-        result.cluster_nodes(tol=params.tol)
-    except ValueError:
-        # error raised when only a single local extreme point.
-        pass
-    return result.extrema_df
+    if params.min_dist:
+        # Remove sites near host atoms.
+        result.remove_collisions(params.min_dist)
+    if params.tol:
+        try:
+            # Cluster interstitials that are too close together using a tol.
+            result.cluster_nodes(tol=params.tol)
+        except ValueError:
+            # error raised when only a single local extreme point.
+            pass
+    if params.radius:
+        result.sort_sites_by_integrated_chg(r=params.radius)
+    result = result.extrema_df
+    if "avg_charge_den" in result.columns:
+        result.rename(columns={'avg_charge_den': 'ave_value'}, inplace=True)
+    result.rename(columns={'Charge Density': 'value'}, inplace=True)
+    logger.info("\n" + result.__str__())
+    return result
 
