@@ -59,7 +59,7 @@ def find_inequivalent_coords(structure: Structure,
             quantity.append(df[key][atom_idx - start_index])
             if repr_idx == atom_idx:
                 site_sym = sym_data["site_symmetry_symbols"][atom_idx]
-                distances = Distances(added_structure, fcoord)
+                distances = Distances(structure, fcoord)
                 coordination = distances.coordination()
 
         coord_info = CoordInfo(site_symmetry=site_sym,
