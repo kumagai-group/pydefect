@@ -8,7 +8,6 @@ from pathlib import Path
 import pytest
 from pydefect.corrections.efnv_correction import PotentialSite, \
     ExtendedFnvCorrection
-from pydefect.defaults import defaults
 from pydefect.input_maker.local_extrema import VolumetricDataAnalyzeParams
 from pydefect.input_maker.supercell_info import Site, SupercellInfo, \
     Interstitial
@@ -244,7 +243,7 @@ def supercell_info(ortho_conventional):
                         equivalent_atoms=[0, 1, 2, 3]),
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="mmm",
                          equivalent_atoms=[4, 5, 6, 7])}
-    interstitial = Interstitial(frac_coords=[0.25]*3, wyckoff_letter="x",
+    interstitial = Interstitial(frac_coords=[0.25]*3,
                                 site_symmetry="yy", info="test")
     return SupercellInfo(ortho_conventional,
                          "Fmmm",

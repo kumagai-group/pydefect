@@ -18,7 +18,6 @@ logger = get_logger(__name__)
 @dataclass(frozen=True)
 class Interstitial(MSONable):
     frac_coords: List[float]
-    wyckoff_letter: str
     site_symmetry: str
     info: str = None
 
@@ -96,7 +95,6 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
             frac = \
                 "{0[0]:9.7f}  {0[1]:9.7f}  {0[2]:9.7f}".format(site.frac_coords)
             lines.append(f"Fractional coordinates: {frac}")
-            lines.append(f"        Wyckoff letter: {site.wyckoff_letter}")
             lines.append(f"         Site symmetry: {site.site_symmetry}")
             lines.append(f"          Coordination: {coordination}")
             lines.append("")

@@ -9,11 +9,12 @@ from pydefect.input_maker.supercell_info import SupercellInfo, Interstitial
 from pydefect.util.error_classes import NotPrimitiveError
 from pymatgen.core import Structure, Element
 from vise.util.structure_symmetrizer import StructureSymmetrizer
+from vise.util.typing import Coords
 
 
 def append_interstitial(supercell_info: SupercellInfo,
                         unitcell_structure: Structure,
-                        frac_coords: Union[List[List[float]]],
+                        frac_coords: List[Union[List[float], Coords]],
                         infos: List[str]
                         ) -> SupercellInfo:
     """
@@ -36,14 +37,14 @@ def append_interstitial(supercell_info: SupercellInfo,
     for fcoord, info in zip(frac_coords, infos):
         us = copy(unitcell_structure)
         us.append(species=Element.H, coords=fcoord)
-        symmetrizer = StructureSymmetrizer(unitcell_structure)
-        wyckoff_letter = (symmetrizer.spglib_sym_data["wyckoffs"][-1])
-        site_symmetry = (symmetrizer.spglib_sym_data["site_symmetry_symbols"][-1])
+        symmetrizer = StructureSymmetrizer(us)
+        site_symm = symmetrizer.spglib_sym_data["site_symmetry_symbols"][-1]
 
         inv_matrix = inv(np.array(supercell_info.transformation_matrix))
         new_coords = np.dot(fcoord, inv_matrix).tolist()
 
         supercell_info.interstitials.append(
-            Interstitial(frac_coords=new_coords, wyckoff_letter=wyckoff_letter,
-                         site_symmetry=site_symmetry, info=info))
+            Interstitial(frac_coords=new_coords,
+                         site_symmetry=site_symm,
+                         info=info))
     return supercell_info

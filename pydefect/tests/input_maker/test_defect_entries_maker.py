@@ -22,7 +22,7 @@ def cubic_supercell_info(cubic_supercell):
                         equivalent_atoms=list(range(32))),
              "He1": Site(element="He", wyckoff_letter="b", site_symmetry="m-3m",
                          equivalent_atoms=list(range(32, 64)))}
-    interstitial = Interstitial([0.25]*3, wyckoff_letter="xx", site_symmetry="yy")
+    interstitial = Interstitial([0.25]*3, site_symmetry="yy")
     return SupercellInfo(cubic_supercell,
                          "Fm-3m",
                          [[2, 0, 0], [0, 2, 0], [0, 0, 2]],
