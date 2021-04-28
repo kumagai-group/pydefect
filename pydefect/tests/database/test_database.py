@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
-from pydefect.database.database import electronegativity, oxidation_state, rcore
+from pydefect.database.database import electronegativity, oxidation_state
 
 
 def test_electronegativity():
@@ -22,7 +22,3 @@ def test_oxidation_state_bi():
 
 def test_oxidation_state_not_exist():
     assert oxidation_state("Os") == 0
-
-
-def test_rcore():
-    assert rcore["H"] == 0.582

@@ -8,8 +8,6 @@ from vise.util.logger import get_logger
 
 logger = get_logger(__name__)
 
-rcore = loadfn(Path(__file__).parent / "rcore.yaml")
-
 electroneg_data = loadfn(Path(__file__).parent / "electronegativity.yaml")
 oxi_state_data = loadfn(Path(__file__).parent / "oxidation_state.yaml")
 
