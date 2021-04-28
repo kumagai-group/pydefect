@@ -12,15 +12,25 @@ from vise.util.typing import Coords
 
 @dataclass
 class CoordInfo(MSONable):
-    frac_coords: Coords
     site_symmetry: str
     coordination: Coordination
-    quantity: float
+    frac_coords: List[Coords]
+    quantities: List[float] = None
 
 
 @dataclass
-class LocalExtrema(MSONable, ToJsonFileMixIn):
+class VolumetricDataAnalyzeParams(MSONable):
+    threshold_frac: float = None
+    threshold_abs: float = None
+    min_dist: float = 0.5
+    tol: float = 0.5
+    radius: float = 0.4
+
+
+@dataclass
+class VolumetricDataLocalExtrema(MSONable, ToJsonFileMixIn):
     unit_cell: Structure
     is_min: bool
     extrema_points: List[CoordInfo]
     info: str
+    params: VolumetricDataAnalyzeParams
