@@ -34,7 +34,7 @@ def test_calc_charge_state(mocker):
         mock_incar.from_file.return_value)
 
 
-def test_make_defect_entry_from_poscars(mocker):
+def test_make_defect_entry(mocker):
     mock_charge_state = mocker.patch(f"{filepath}.calc_charge_state")
     mock_charge_state.return_value = 0
     mock_structure = mocker.patch(f"{filepath}.Structure")
