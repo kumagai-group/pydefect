@@ -17,8 +17,8 @@ def test_make_parchg_dir():
 
 def test_refine_defect_poscar(mocker, simple_cubic):
     mock_structure = mocker.patch(
-        "pydefect.cli.vasp.utils.main_vasp_util.Structure")
-    mock_loadfn = mocker.patch("pydefect.cli.vasp.utils.main_vasp_util.loadfn")
+        "pydefect.cli.vasp.main_vasp_util.Structure")
+    mock_loadfn = mocker.patch("pydefect.cli.vasp.main_vasp_util.loadfn")
 
     parsed_args = parse_args_main_vasp_util(
         ["rdp", "-p", "POSCAR", "-d", "defect_entry.json", "-n", "refined"])

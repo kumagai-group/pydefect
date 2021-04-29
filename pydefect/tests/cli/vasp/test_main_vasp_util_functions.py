@@ -36,7 +36,7 @@ def test_make_parchg_dir(tmpdir, mocker):
             raise ValueError
 
     mock_loadfn = mocker.patch(
-        "pydefect.cli.vasp.utils.main_vasp_util_functions.loadfn",
+        "pydefect.cli.vasp.main_vasp_util_functions.loadfn",
         side_effect=side_effect)
     args = Namespace(dir=Path(tmpdir))
 
