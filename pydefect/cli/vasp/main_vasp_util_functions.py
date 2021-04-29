@@ -25,9 +25,9 @@ def is_file(filename):
 
 
 def calc_charge_state(args):
-    poscar = Poscar(args.dir / "POSCAR")
-    potcar = Potcar(args.dir / "POTCAR")
-    incar = Incar(args.dir / "INCAR")
+    poscar = Poscar.from_file(args.dir / "POSCAR")
+    potcar = Potcar.from_file(args.dir / "POTCAR")
+    incar = Incar.from_file(args.dir / "INCAR")
     charge_state = get_defect_charge_state(poscar, potcar, incar)
     logger.info(f"Charge state in {args.dir} is {charge_state}.")
 

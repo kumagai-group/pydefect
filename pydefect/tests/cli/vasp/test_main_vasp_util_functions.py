@@ -25,12 +25,13 @@ def test_calc_charge_state(mocker):
     args = Namespace(dir=Path("Va_O1_0"))
     calc_charge_state(args)
 
-    mock_poscar.assert_called_once_with(Path("Va_O1_0/POSCAR"))
-    mock_potcar.assert_called_once_with(Path("Va_O1_0/POTCAR"))
-    mock_incar.assert_called_once_with(Path("Va_O1_0/INCAR"))
-    mock_get_charge_state.assert_called_once_with(mock_poscar.return_value,
-                                                  mock_potcar.return_value,
-                                                  mock_incar.return_value)
+    mock_poscar.from_file.assert_called_once_with(Path("Va_O1_0/POSCAR"))
+    mock_potcar.from_file.assert_called_once_with(Path("Va_O1_0/POTCAR"))
+    mock_incar.from_file.assert_called_once_with(Path("Va_O1_0/INCAR"))
+    mock_get_charge_state.assert_called_once_with(
+        mock_poscar.from_file.return_value,
+        mock_potcar.from_file.return_value,
+        mock_incar.from_file.return_value)
 
 
 def test_make_parchg_dir(tmpdir, mocker):
