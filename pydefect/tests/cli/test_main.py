@@ -98,10 +98,12 @@ def test_pop_interstitial(mocker):
     mock_loadfn.return_value = mock_supercell_info
     parsed_args = parse_args_main(["pi",
                                    "-s", "supercell_info.json",
-                                   "-i", "1000"])
+                                   "-i", "1000",
+                                   "--pop_all"])
     expected = Namespace(
         supercell_info=mock_supercell_info,
         index=1000,
+        pop_all=True,
         func=parsed_args.func)
     assert parsed_args == expected
 

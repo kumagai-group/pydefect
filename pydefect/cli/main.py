@@ -171,8 +171,11 @@ def parse_args_main(args):
         aliases=['pi'])
 
     parser_pop_interstitial.add_argument(
-        "-i", "--index", required=True, type=int,
+        "-i", "--index", type=int,
         help="Popped interstitial index. Note that the indices begin from 1.")
+    parser_pop_interstitial.add_argument(
+        "--pop_all", action="store_true",
+        help="Pop all interstitials. If this is set, index option is ignored.")
 
     parser_pop_interstitial.set_defaults(
         func=pop_interstitial_from_supercell_info)

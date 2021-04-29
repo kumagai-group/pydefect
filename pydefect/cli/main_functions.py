@@ -89,8 +89,16 @@ def append_interstitial_to_supercell_info(args):
 
 def pop_interstitial_from_supercell_info(args):
     supercell_info = args.supercell_info
-    assert args.index > 0
-    supercell_info.interstitials.pop(args.index - 1)
+    if args.pop_all is False:
+        assert args.index > 0
+        supercell_info.interstitials.pop(args.index - 1)
+    else:
+        try:
+            while True:
+                supercell_info.interstitials.pop()
+        except IndexError:
+            pass
+
     supercell_info.to_json_file()
 
 

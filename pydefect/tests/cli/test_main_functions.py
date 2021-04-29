@@ -123,12 +123,22 @@ def test_add_interstitials(mocker):
 
 def test_pop_interstitials(mocker):
     mock_si = mocker.MagicMock()
-    args = Namespace(supercell_info=mock_si, index=1000)
+    args = Namespace(supercell_info=mock_si, index=1000, pop_all=False)
 
     pop_interstitial_from_supercell_info(args)
     assert isinstance(mock_si.interstitials, object)
     mock_si.interstitials.pop.assert_called_once_with(999)
     mock_si.to_json_file.assert_called_once_with()
+
+
+def test_pop_interstitials_pop_all(mocker):
+    mock_si = mocker.MagicMock()
+    mock_si.interstitials = ["a", "b"]
+    args = Namespace(supercell_info=mock_si, index=None, pop_all=True)
+
+    pop_interstitial_from_supercell_info(args)
+    assert isinstance(mock_si.interstitials, object)
+    mock_si.interstitials = []
 
 
 @pytest.mark.parametrize("oxi_states,he_vacancy_charge",
