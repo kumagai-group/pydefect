@@ -23,12 +23,12 @@ def test_get_defect_charge_state(tmpdir):
 
    END of PSCTR-controll parameters
  End of Dataset
-      PAW_PBE He 15Jun2001                    
+      PAW_PBE He_pv 15Jun2001                    
    1.00000000000000     
  parameters from PSCTR are:
    VRHFIN =He: ultrasoft test
    LEXCH  = PE
-   TITEL  = PAW_PBE He 15Jun2001
+   TITEL  = PAW_PBE He_pv 15Jun2001
    POMASS =    1.000; ZVAL   =    1.000    mass and valenz
    ENMAX  =  250.000; ENMIN  =  200.000 eV
 
