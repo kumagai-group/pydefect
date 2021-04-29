@@ -57,7 +57,8 @@ def parse_args_main_vasp_util(args):
     # -- make parchg dir -----------------------------------------------
     parser_make_parchg_dir = subparsers.add_parser(
         name="parchg_dir",
-        description="Make parchg dir.",
+        description="Make parchg directory containing a set of VASP files "
+                    "required for generating PARCHG files.",
         parents=[dir_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pd'])
