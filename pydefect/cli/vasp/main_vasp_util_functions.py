@@ -11,6 +11,8 @@ from pydefect.cli.vasp.make_defect_charge_info import make_spin_charges, \
     make_defect_charge_info
 from pydefect.cli.vasp.make_light_chgcar import make_light_chgcar
 from pydefect.cli.vasp.get_defect_charge_state import get_defect_charge_state
+from pydefect.input_maker.defect_entry import make_defect_entry
+from pymatgen import Structure
 from pymatgen.io.vasp import Chgcar
 from vise.input_set.incar import ViseIncar
 from vise.util.file_transfer import FileLink
@@ -30,6 +32,17 @@ def calc_charge_state(args):
     incar = Incar.from_file(args.dir / "INCAR")
     charge_state = get_defect_charge_state(poscar, potcar, incar)
     logger.info(f"Charge state in {args.dir} is {charge_state}.")
+    return charge_state
+
+
+def make_defect_entry(args):
+    charge_state = calc_charge_state(args)
+    structure = Structure.from_file(args.dir / "POSCAR")
+    defect_entry = make_defect_entry(name=args.name,
+                                     charge=charge_state,
+                                     perfect_structure=args.perfect,
+                                     defect_structure=structure)
+    defect_entry.to_json_file()
 
 
 def make_parchg_dir(args):
