@@ -89,6 +89,7 @@ def append_interstitial_to_supercell_info(args):
 
 def pop_interstitial_from_supercell_info(args):
     supercell_info = args.supercell_info
+    logger.info("Be careful that the interstitials indices are changed.")
     if args.pop_all is False:
         assert args.index > 0
         supercell_info.interstitials.pop(args.index - 1)
