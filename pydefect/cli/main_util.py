@@ -8,7 +8,8 @@ import warnings
 from monty.serialization import loadfn
 from pydefect.cli.main import description, epilog, add_sub_parser
 from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp, \
-    composition_energies_from_mp, add_interstitials_from_local_extrema
+    composition_energies_from_mp, add_interstitials_from_local_extrema, \
+    make_defect_vesta_file
 from pydefect.defaults import defaults
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
@@ -57,6 +58,28 @@ def parse_args_main_util(args):
         "-i", "--indices", required=True, type=int, nargs="+",
         help="Indices to be added to SupercellInfo.")
     parser_ai.set_defaults(func=add_interstitials_from_local_extrema)
+
+    # -- make defect vesta file ------------------------------------------------
+    parser_dvf = subparsers.add_parser(
+        name="defect_vesta_file",
+        description="Generate VESTA file for visualizing defect structure.",
+        parents=[dirs_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['dvf'])
+    parser_dvf.add_argument(
+        "--cutoff", type=float, default=defaults.show_structure_cutoff,
+        help="Cutoff radius in which atoms are shown in VESTA files.")
+    parser_dvf.add_argument(
+        "--min_displace_w_arrows", type=float, default=0.1,
+        help="Minimum displacement that shows arrows to visualize "
+             "displacements.")
+    parser_dvf.add_argument(
+        "--arrow_factor", type=float, default=3.0,
+        help="Factor to enhance the displacements.")
+    parser_dvf.add_argument(
+        "--title", type=str, help="Title to be shown in VESTA files.")
+
+    parser_dvf.set_defaults(func=make_defect_vesta_file)
 
     # -- gkfo correction -------------------------------------------------------
     parser_gkfo = subparsers.add_parser(

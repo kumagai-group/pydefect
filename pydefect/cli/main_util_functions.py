@@ -21,6 +21,10 @@ def add_interstitials_from_local_extrema(args) -> None:
     return
 
 
+def make_defect_vesta_file(args) -> None:
+    return
+
+
 def make_gkfo_correction_from_vasp(args):
     gkfo = make_gkfo_correction(
         efnv_correction=args.initial_efnv_correction,

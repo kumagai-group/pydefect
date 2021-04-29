@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from argparse import Namespace
+from pathlib import Path
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.main_util import parse_args_main_util
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection
+from pydefect.defaults import defaults
 
 
 def test_make_cpd_options():
@@ -37,6 +39,35 @@ def test_add_interstitials_from_local_extrema(mocker):
     assert parsed_args == expected
     mock_loadfn_main.assert_called_once_with("supercell_info.json")
     mock_loadfn_main_util.assert_called_once_with("local_extrema.json")
+
+
+def test_defect_vesta_file_wo_options():
+    parsed_args = parse_args_main_util(["dvf", "-d", "Va_O1_0", "Va_O1_1"])
+    expected = Namespace(
+        dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        cutoff=defaults.show_structure_cutoff,
+        min_displace_w_arrows=0.1,
+        arrow_factor=3.0,
+        title=None,
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
+def test_defect_vesta_file_w_options():
+    parsed_args = parse_args_main_util(["dvf",
+                                        "-d", "Va_O1_0", "Va_O1_1",
+                                        "--cutoff", "1.0",
+                                        "--min_displace_w_arrows", "2.0",
+                                        "--arrow_factor", "10.0",
+                                        "--title", "title"])
+    expected = Namespace(
+        dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        cutoff=1.0,
+        min_displace_w_arrows=2.0,
+        arrow_factor=10.0,
+        title="title",
+        func=parsed_args.func)
+    assert parsed_args == expected
 
 
 def test_gkfo_correction(mocker):
