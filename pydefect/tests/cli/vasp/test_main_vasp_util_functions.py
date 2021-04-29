@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.cli.vasp.utils.main_vasp_util_functions import make_parchg_dir, \
+from pydefect.cli.vasp.main_vasp_util_functions import make_parchg_dir, \
     make_refine_defect_poscar
 from pymatgen import Structure
 from vise.input_set.incar import ViseIncar

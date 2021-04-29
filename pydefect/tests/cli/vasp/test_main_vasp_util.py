@@ -3,7 +3,7 @@
 from argparse import Namespace
 from pathlib import Path
 
-from pydefect.cli.vasp.utils.main_vasp_util import parse_args_main_vasp_util
+from pydefect.cli.vasp.main_vasp_util import parse_args_main_vasp_util
 
 
 def test_make_parchg_dir():

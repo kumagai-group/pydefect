@@ -9,7 +9,7 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect.cli.main import epilog, description
-from pydefect.cli.vasp.utils.main_vasp_util_functions import \
+from pydefect.cli.vasp.main_vasp_util_functions import \
     calc_defect_charge_info, make_parchg_dir, make_refine_defect_poscar
 from pymatgen import Structure
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
