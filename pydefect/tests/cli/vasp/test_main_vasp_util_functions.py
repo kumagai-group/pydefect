@@ -7,10 +7,30 @@ import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.cli.vasp.main_vasp_util_functions import make_parchg_dir, \
-    make_refine_defect_poscar
+    make_refine_defect_poscar, calc_charge_state
 from pymatgen import Structure
 from vise.input_set.incar import ViseIncar
 import numpy as np
+
+filepath = "pydefect.cli.vasp.main_vasp_util_functions"
+
+
+def test_calc_charge_state(mocker):
+    mock_poscar = mocker.patch(f"{filepath}.Poscar")
+    mock_potcar = mocker.patch(f"{filepath}.Potcar")
+    mock_incar = mocker.patch(f"{filepath}.Incar")
+    mock_get_charge_state = mocker.patch(f"{filepath}.get_defect_charge_state")
+    mock_get_charge_state.return_value = 0
+
+    args = Namespace(dir=Path("Va_O1_0"))
+    calc_charge_state(args)
+
+    mock_poscar.assert_called_once_with(Path("Va_O1_0/POSCAR"))
+    mock_potcar.assert_called_once_with(Path("Va_O1_0/POTCAR"))
+    mock_incar.assert_called_once_with(Path("Va_O1_0/INCAR"))
+    mock_get_charge_state.assert_called_once_with(mock_poscar.return_value,
+                                                  mock_potcar.return_value,
+                                                  mock_incar.return_value)
 
 
 def test_make_parchg_dir(tmpdir, mocker):

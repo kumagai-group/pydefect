@@ -4,23 +4,32 @@ import os
 from pathlib import Path
 
 from monty.serialization import loadfn
-from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.grids import Grids
 from pydefect.analyzer.refine_defect_structure import refine_defect_structure
 from pydefect.cli.vasp.make_defect_charge_info import make_spin_charges, \
     make_defect_charge_info
 from pydefect.cli.vasp.make_light_chgcar import make_light_chgcar
+from pydefect.cli.vasp.get_defect_charge_state import get_defect_charge_state
 from pymatgen.io.vasp import Chgcar
 from vise.input_set.incar import ViseIncar
 from vise.util.file_transfer import FileLink
 from vise.util.logger import get_logger
+from pymatgen.io.vasp.inputs import Poscar, Incar, Potcar
 
 logger = get_logger(__name__)
 
 
 def is_file(filename):
     return Path(filename).is_file() and os.stat(filename).st_size != 0
+
+
+def calc_charge_state(args):
+    poscar = Poscar(args.dir / "POSCAR")
+    potcar = Potcar(args.dir / "POTCAR")
+    incar = Incar(args.dir / "INCAR")
+    charge_state = get_defect_charge_state(poscar, potcar, incar)
+    logger.info(f"Charge state in {args.dir} is {charge_state}.")
 
 
 def make_parchg_dir(args):
