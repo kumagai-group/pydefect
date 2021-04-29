@@ -4,7 +4,7 @@ from copy import copy
 
 from pandas import DataFrame
 from pandas._testing import assert_frame_equal
-from pydefect.cli.vasp.create_local_extrema import extrema_coords, \
+from pydefect.cli.vasp.make_local_extrema import extrema_coords, \
     find_inequivalent_coords, \
     make_local_extrema_from_volumetric_data
 from pydefect.input_maker.local_extrema import CoordInfo
