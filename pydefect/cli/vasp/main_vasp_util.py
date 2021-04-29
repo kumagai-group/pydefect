@@ -11,7 +11,7 @@ from monty.serialization import loadfn
 from pydefect.cli.main import epilog, description, add_sub_parser
 from pydefect.cli.vasp.main_vasp_util_functions import \
     calc_defect_charge_info, make_parchg_dir, make_refine_defect_poscar, \
-    calc_charge_state
+    calc_charge_state, make_defect_entry
 from pymatgen import Structure
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
@@ -36,6 +36,23 @@ def parse_args_main_vasp_util(args):
         aliases=['ccs'])
 
     parser_calc_charge_state.set_defaults(func=calc_charge_state)
+
+    # -- make defect entry -----------------------------------------------------
+    parser_make_defect_entry = subparsers.add_parser(
+        name="make_defect_entry",
+        description="Make defect entry from INCAR, POSCAR and POTCAR"
+                    "files.",
+        parents=[dir_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['de'])
+    parser_make_defect_entry.add_argument(
+        "-n", "--name", type=str, required=True,
+        help="Name used for plotting energy diagram.")
+    parser_make_defect_entry.add_argument(
+        "-p", "--perfect", type=Structure.from_file, required=True,
+        help="Perfect supercell POSCAR file name.")
+
+    parser_make_defect_entry.set_defaults(func=make_defect_entry)
 
     # -- make parchg dir -----------------------------------------------
     parser_make_parchg_dir = subparsers.add_parser(
