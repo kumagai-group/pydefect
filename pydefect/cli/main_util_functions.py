@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-
+from monty.serialization import loadfn
+from pydefect.analyzer.calc_results import CalcResults
+from pydefect.cli.make_defect_vesta_file import MakeDefectVestaFile
 from pydefect.cli.vasp.make_composition_energies_from_mp import \
     make_composition_energies_from_mp
 from pydefect.cli.vasp.make_gkfo_correction import make_gkfo_correction
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
-from pydefect.input_maker.supercell_info import SupercellInfo
 from vise.util.logger import get_logger
 
 
@@ -25,7 +26,18 @@ def add_interstitials_from_local_extrema(args) -> None:
 
 
 def make_defect_vesta_file(args) -> None:
-    return
+    for d in args.dirs:
+        logger.info(f"Parsing data in {d} ...")
+        calc_results: CalcResults = loadfn(d / "calc_results.json")
+        defect_str_info = loadfn(d / "defect_structure_info.json")
+        make_vesta_file = MakeDefectVestaFile(calc_results.structure,
+                                              defect_str_info,
+                                              args.cutoff,
+                                              args.min_displace_w_arrows,
+                                              args.arrow_factor,
+                                              args.title)
+        make_vesta_file.initial_vesta.write_file(d / "defect_initial.vesta")
+        make_vesta_file.initial_vesta.write_file(d / "defect.vesta")
 
 
 def make_gkfo_correction_from_vasp(args):
