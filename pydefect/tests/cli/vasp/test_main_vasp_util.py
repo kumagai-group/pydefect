@@ -6,9 +6,9 @@ from pathlib import Path
 from pydefect.cli.vasp.main_vasp_util import parse_args_main_vasp_util
 
 
-def test_make_parchg_dir():
+def test_calc_charge_state():
     parsed_args = parse_args_main_vasp_util(
-        ["pd", "-d", "Va_O1_0"])
+        ["ccs", "-d", "Va_O1_0"])
     expected = Namespace(
         dir=Path("Va_O1_0"),
         func=parsed_args.func)
