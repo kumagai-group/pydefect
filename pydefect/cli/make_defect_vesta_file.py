@@ -2,7 +2,7 @@
 #  Copyright (c) 2020 Kumagai group.
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo, \
     fold_coords_in_structure
-from pydefect.analyzer.vesta.vesta_file import VestaFile
+from vise.analyzer.vesta.vesta_file import VestaFile
 from pydefect.defaults import defaults
 from pymatgen.core import Structure, DummySpecies, Element
 
