@@ -15,6 +15,15 @@ def test_make_parchg_dir():
     assert parsed_args == expected
 
 
+def test_make_parchg_dir():
+    parsed_args = parse_args_main_vasp_util(
+        ["pd", "-d", "Va_O1_0"])
+    expected = Namespace(
+        dir=Path("Va_O1_0"),
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
 def test_refine_defect_poscar(mocker, simple_cubic):
     mock_structure = mocker.patch(
         "pydefect.cli.vasp.main_vasp_util.Structure")

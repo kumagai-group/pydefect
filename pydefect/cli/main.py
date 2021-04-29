@@ -33,7 +33,11 @@ epilog = f"Author: Yu Kumagai Version: {__version__}"
 
 def add_sub_parser(_argparse, name: str):
     result = _argparse.ArgumentParser(description="", add_help=False)
-    if name == "dirs":
+    if name == "dir":
+        result.add_argument(
+            "-d", "--dir", type=Path, required=True,
+            help="Directory path to be parsed.")
+    elif name == "dirs":
         result.add_argument(
             "-d", "--dirs", nargs="+", type=Path, required=True,
             help="Directory paths to be parsed.")

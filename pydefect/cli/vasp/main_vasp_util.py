@@ -8,9 +8,10 @@ import warnings
 from pathlib import Path
 
 from monty.serialization import loadfn
-from pydefect.cli.main import epilog, description
+from pydefect.cli.main import epilog, description, add_sub_parser
 from pydefect.cli.vasp.main_vasp_util_functions import \
-    calc_defect_charge_info, make_parchg_dir, make_refine_defect_poscar
+    calc_defect_charge_info, make_parchg_dir, make_refine_defect_poscar, \
+    calc_charge_state
 from pymatgen import Structure
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
@@ -23,15 +24,27 @@ def parse_args_main_vasp_util(args):
     This command provides some utilities related to the VASP calculations""")
 
     subparsers = parser.add_subparsers()
+    dir_parser = add_sub_parser(argparse, name="dir")
+
+    # -- calc charge state -----------------------------------------------------
+    parser_calc_charge_state = subparsers.add_parser(
+        name="calc_charge_state",
+        description="Calc defect charge states from INCAR, POSCAR and POTCAR"
+                    "files.",
+        parents=[dir_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['ccs'])
+
+    parser_calc_charge_state.set_defaults(func=calc_charge_state)
 
     # -- make parchg dir -----------------------------------------------
     parser_make_parchg_dir = subparsers.add_parser(
         name="parchg_dir",
         description="Make parchg dir.",
+        parents=[dir_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pd'])
 
-    parser_make_parchg_dir.add_argument("-d", "--dir", type=Path)
     parser_make_parchg_dir.set_defaults(func=make_parchg_dir)
 
     # -- make refine defect poscar ---------------------------------------------
