@@ -5,6 +5,7 @@ from pydefect.cli.vasp.make_composition_energies_from_mp import \
     make_composition_energies_from_mp
 from pydefect.cli.vasp.make_gkfo_correction import make_gkfo_correction
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
+from pydefect.input_maker.supercell_info import SupercellInfo
 from vise.util.logger import get_logger
 
 
@@ -18,7 +19,9 @@ def composition_energies_from_mp(args) -> None:
 
 
 def add_interstitials_from_local_extrema(args) -> None:
-    return
+    supercell_info = args.local_extrema.append_sites_to_supercell_info(
+        args.supercell_info, args.indices)
+    supercell_info.to_json_file()
 
 
 def make_defect_vesta_file(args) -> None:

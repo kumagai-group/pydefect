@@ -7,7 +7,7 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergies, \
     CompositionEnergy
 from pydefect.cli.main_util_functions import composition_energies_from_mp, \
-    make_gkfo_correction_from_vasp
+    make_gkfo_correction_from_vasp, add_interstitials_from_local_extrema
 from pydefect.corrections.efnv_correction import ExtendedFnvCorrection
 from pymatgen.core import Composition
 
@@ -27,6 +27,17 @@ def test_composition_energies_from_mp(mocker, tmpdir):
   source: mp-1
 """
     assert actual == expected
+
+
+def test_add_interstitials_from_local_extrema(mocker):
+    mock_supercell_info = mocker.Mock()
+    mock_local_extrema = mocker.Mock()
+    args = Namespace(supercell_info=mock_supercell_info,
+                     local_extrema=mock_local_extrema,
+                     indices=[1, 2])
+    add_interstitials_from_local_extrema(args)
+    mock_local_extrema.append_sites_to_supercell_info.assert_called_once_with(
+        mock_supercell_info, [1, 2])
 
 
 def test_make_gkfo_correction_from_vasp(tmpdir, mocker):
