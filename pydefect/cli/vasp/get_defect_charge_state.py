@@ -2,12 +2,16 @@
 #  Copyright (c) 2020 Kumagai group.
 
 from pymatgen.io.vasp.inputs import Poscar, Incar, Potcar
+from vise.util.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_defect_charge_state(poscar: Poscar, potcar: Potcar, incar: Incar):
     """Get defect charge state from structure, potcar, and NELECT in INCAR. """
     nelect = incar.get("NELECT", None)
     if nelect is None:
+        logger.info("Since NELECT is not written in INCAR, so 0 is returned.")
         return 0
     potcar_elements = [symbol.split("_")[0] for symbol in potcar.symbols]
     if poscar.site_symbols != potcar_elements:
