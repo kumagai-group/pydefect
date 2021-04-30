@@ -8,11 +8,14 @@ import warnings
 from pathlib import Path
 
 from monty.serialization import loadfn
+from pydefect.analyzer.grids import Grids
 from pydefect.cli.main import epilog, description, add_sub_parser
 from pydefect.cli.vasp.main_vasp_util_functions import \
-    calc_defect_charge_info, make_parchg_dir, make_refine_defect_poscar, \
-    calc_charge_state, make_defect_entry
+    make_parchg_dir, make_refine_defect_poscar, \
+    calc_charge_state, make_defect_entry, calc_grids, \
+    make_defect_charge_info_main
 from pymatgen import Structure
+from pymatgen.io.vasp import Chgcar
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
@@ -81,6 +84,17 @@ def parse_args_main_vasp_util(args):
     parser_make_refine_defect_poscar.set_defaults(
         func=make_refine_defect_poscar)
 
+    # -- calc grids ------------------------------------------------------------
+    parser_calc_grids = subparsers.add_parser(
+        name="calc_grids",
+        description="Calc Grids.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['cg'])
+
+    parser_calc_grids.add_argument(
+        "-c", "--chgcar", type=Chgcar.from_file, required=True)
+    parser_calc_grids.set_defaults(func=calc_grids)
+
     # -- calc defect charge info -----------------------------------------------
     parser_calc_def_charge_info = subparsers.add_parser(
         name="calc_defect_charge_info",
@@ -92,13 +106,11 @@ def parse_args_main_vasp_util(args):
         "-p", "--parchgs", type=str, nargs="+", required=True,
         help="PARCHG files.")
     parser_calc_def_charge_info.add_argument(
-        "-v", "--vesta_file", type=Path, help="defect.vesta file")
-    parser_calc_def_charge_info.add_argument(
         "-b", "--bin_interval", type=float, default=0.2)
     parser_calc_def_charge_info.add_argument(
-        "-g", "--grids_dirname", type=Path)
+        "-g", "--grids", type=Grids.from_file, required=True)
 
-    parser_calc_def_charge_info.set_defaults(func=calc_defect_charge_info)
+    parser_calc_def_charge_info.set_defaults(func=make_defect_charge_info_main)
 
     return parser.parse_args(args)
 

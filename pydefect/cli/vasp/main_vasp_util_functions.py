@@ -9,7 +9,6 @@ from pydefect.analyzer.grids import Grids
 from pydefect.analyzer.refine_defect_structure import refine_defect_structure
 from pydefect.cli.vasp.make_defect_charge_info import make_spin_charges, \
     make_defect_charge_info
-from pydefect.cli.vasp.make_light_chgcar import make_light_chgcar
 from pydefect.cli.vasp.get_defect_charge_state import get_defect_charge_state
 from pydefect.input_maker.defect_entry import make_defect_entry
 from pymatgen import Structure
@@ -82,34 +81,17 @@ def make_refine_defect_poscar(args):
         print(structure.to(fmt="poscar", filename=args.poscar_name))
 
 
-def calc_defect_charge_info(args):
-    band_idxs = []
-    parchgs = []
-    for parchg in args.parchgs:
-        band_idx = int(parchg.split(".")[-2])
-        logger.info(f"band index {band_idx} is being parsed.")
-        # Use the band indices used in VASP, where it begins from 1.
-        band_idxs.append(band_idx)
-        p = Chgcar.from_file(parchg)
-        parchgs.append(p)
-        parent = Path(parchg).parent
-        for spin, charge in zip(["up", "down"], make_spin_charges(p)):
-            to_vesta_file = Path(f"defect_{band_idx}_{spin}.vesta")
-            make_light_chgcar(charge,
-                              parent / f"PARCHG_{band_idx}_{spin}",
-                              vesta_file=args.vesta_file,
-                              to_vesta_file=to_vesta_file)
+def calc_grids(args):
+    grids = Grids.from_chgcar(args.chgcar)
+    grids.dump()
 
-    grids = None
-    if args.grids_dirname:
-        if (args.grids_dirname / "grids.npz").is_file():
-            grids = Grids.from_file(args.grids_dirname / "grids.npz")
-        else:
-            grids = Grids.from_chgcar(parchgs[0])
-            grids.dump(args.grids_dirname / "grids.npz")
 
+def make_defect_charge_info_main(args):
+    band_idxs = [int(parchg.split(".")[-2]) for parchg in args.parchgs]
     defect_charge_info = make_defect_charge_info(
-        parchgs, band_idxs, args.bin_interval, grids)
+        args.parchgs, band_idxs, args.bin_interval, args.grids)
     defect_charge_info.to_json_file()
     plt = defect_charge_info.show_dist()
     plt.savefig("dist.pdf")
+
+

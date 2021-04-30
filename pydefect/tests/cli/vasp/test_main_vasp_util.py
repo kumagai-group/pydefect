@@ -54,15 +54,27 @@ def test_refine_defect_poscar(mocker, simple_cubic):
     mock_loadfn.assert_called_once_with("defect_entry.json")
 
 
-def test_calc_defect_charge_info():
+def test_calc_grids(mocker):
+    mock_chgcar = mocker.patch("pydefect.cli.vasp.main_vasp_util.Chgcar")
     parsed_args = parse_args_main_vasp_util(
-        ["cdc", "-p", "a/PARCHG.0001.ALLK", "-v", "x", "-b", "0.3", "-g", "y"])
+        ["cg", "-c", "CHG"])
     expected = Namespace(
-        parchgs=["a/PARCHG.0001.ALLK"],
-        vesta_file=Path("x"),
-        bin_interval=0.3,
-        grids_dirname=Path("y"),
+        chgcar=mock_chgcar.from_file.return_value,
         func=parsed_args.func)
     assert parsed_args == expected
+    mock_chgcar.from_file.assert_called_once_with("CHG")
+
+
+def test_calc_defect_charge_info(mocker):
+    mock_grids = mocker.patch("pydefect.cli.vasp.main_vasp_util.Grids")
+    parsed_args = parse_args_main_vasp_util(
+        ["cdc", "-p", "PARCHG.0001.ALLK", "-b", "0.3", "-g", "Grids.npz"])
+    expected = Namespace(
+        parchgs=["PARCHG.0001.ALLK"],
+        bin_interval=0.3,
+        grids=mock_grids.from_file.return_value,
+        func=parsed_args.func)
+    assert parsed_args == expected
+    mock_grids.from_file.assert_called_once_with("Grids.npz")
 
 

@@ -7,19 +7,20 @@ import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.cli.vasp.main_vasp_util_functions import make_parchg_dir, \
-    make_refine_defect_poscar, calc_charge_state, make_defect_entry
+    make_refine_defect_poscar, calc_charge_state, make_defect_entry, calc_grids, \
+    make_defect_charge_info_main
 from pymatgen import Structure
 from vise.input_set.incar import ViseIncar
 import numpy as np
 
-filepath = "pydefect.cli.vasp.main_vasp_util_functions"
+_filepath = "pydefect.cli.vasp.main_vasp_util_functions"
 
 
 def test_calc_charge_state(mocker):
-    mock_poscar = mocker.patch(f"{filepath}.Poscar")
-    mock_potcar = mocker.patch(f"{filepath}.Potcar")
-    mock_incar = mocker.patch(f"{filepath}.Incar")
-    mock_get_charge_state = mocker.patch(f"{filepath}.get_defect_charge_state")
+    mock_poscar = mocker.patch(f"{_filepath}.Poscar")
+    mock_potcar = mocker.patch(f"{_filepath}.Potcar")
+    mock_incar = mocker.patch(f"{_filepath}.Incar")
+    mock_get_charge_state = mocker.patch(f"{_filepath}.get_defect_charge_state")
     mock_get_charge_state.return_value = 0
 
     args = Namespace(dir=Path("Va_O1_0"))
@@ -35,10 +36,10 @@ def test_calc_charge_state(mocker):
 
 
 def test_make_defect_entry(mocker):
-    mock_charge_state = mocker.patch(f"{filepath}.calc_charge_state")
+    mock_charge_state = mocker.patch(f"{_filepath}.calc_charge_state")
     mock_charge_state.return_value = 0
-    mock_structure = mocker.patch(f"{filepath}.Structure")
-    mock_make_defect_entry = mocker.patch(f"{filepath}.make_defect_entry")
+    mock_structure = mocker.patch(f"{_filepath}.Structure")
+    mock_make_defect_entry = mocker.patch(f"{_filepath}.make_defect_entry")
     mock_perfect = mocker.Mock()
 
     args = Namespace(dir=Path("Va_O1_0"), name="Va_O1", perfect=mock_perfect)
@@ -74,9 +75,7 @@ def test_make_parchg_dir(tmpdir, mocker):
         else:
             raise ValueError
 
-    mock_loadfn = mocker.patch(
-        "pydefect.cli.vasp.main_vasp_util_functions.loadfn",
-        side_effect=side_effect)
+    mock_loadfn = mocker.patch(f"{_filepath}.loadfn", side_effect=side_effect)
     args = Namespace(dir=Path(tmpdir))
 
     with pytest.raises(FileNotFoundError):
@@ -110,3 +109,22 @@ def test_refine_poscar(tmpdir, mocker, before_refine, after_refine):
 
     assert Structure.from_file("refined_POSCAR") == after_refine
 
+
+def test_calc_grids(mocker):
+    mock_grids = mocker.patch(f"{_filepath}.Grids")
+    args = Namespace(chgcar="CHGCAR")
+    calc_grids(args)
+    mock_grids.from_chgcar.assert_called_once_with("CHGCAR")
+    mock_grids.from_chgcar.return_value.dump.assert_called_once_with()
+
+
+def test_make_defect_charge_info_main(mocker):
+    mock_make_charge_info = mocker.patch(f"{_filepath}.make_defect_charge_info")
+    mock_charge_info = mock_make_charge_info.return_value
+    mock_grids = mocker.Mock()
+    args = Namespace(parchgs=["PARCHG.0189.ALLK"],
+                     grids=mock_grids,
+                     bin_interval=0.1)
+    make_defect_charge_info_main(args)
+    mock_make_charge_info.assert_called_once_with(["PARCHG.0189.ALLK"], [189], 0.1, mock_grids)
+    mock_charge_info.to_json_file.assert_called_once_with()
