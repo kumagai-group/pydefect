@@ -3,11 +3,12 @@
 from typing import List, Optional
 
 import numpy as np
-from pydefect.analyzer.defect_charge_info import DefectChargeInfo, AveChargeDensityDist
+from pydefect.analyzer.defect_charge_info import DefectChargeInfo, \
+    AveChargeDensityDist
 from pydefect.analyzer.grids import Grids
 from pydefect.cli.vasp.make_efnv_correction import calc_max_sphere_radius
-from pymatgen import Spin
 from pymatgen.io.vasp import Chgcar
+from vise.analyzer.vasp.handle_volumetric_data import make_spin_charges
 
 
 def center_1d_periodic_quantity(grid_points: List[float]):
@@ -32,14 +33,6 @@ def center_1d_periodic_quantity(grid_points: List[float]):
         moments.append(moment)
 
     return np.nanargmin(moments)
-
-
-def make_spin_charges(parchg: Chgcar) -> List[Chgcar]:
-    result = [Chgcar(parchg.structure, {"total": parchg.spin_data[Spin.up]})]
-    if "diff" in parchg.data:
-        result.append(
-            Chgcar(parchg.structure, {"total": parchg.spin_data[Spin.down]}))
-    return result
 
 
 def make_charge_dist(parchg: Chgcar, grids: Grids, distance_bins: np.ndarray):
