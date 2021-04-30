@@ -119,6 +119,8 @@ def test_calc_grids(mocker):
 
 
 def test_make_defect_charge_info_main(mocker):
+    mock_chgcar = mocker.patch(f"{_filepath}.Chgcar")
+    m_chgcar = mock_chgcar.from_file.return_value
     mock_make_charge_info = mocker.patch(f"{_filepath}.make_defect_charge_info")
     mock_charge_info = mock_make_charge_info.return_value
     mock_grids = mocker.Mock()
@@ -126,5 +128,7 @@ def test_make_defect_charge_info_main(mocker):
                      grids=mock_grids,
                      bin_interval=0.1)
     make_defect_charge_info_main(args)
-    mock_make_charge_info.assert_called_once_with(["PARCHG.0189.ALLK"], [189], 0.1, mock_grids)
+
+    mock_make_charge_info.assert_called_once_with([m_chgcar], [189], 0.1, mock_grids)
+    mock_chgcar.from_file.assert_called_once_with("PARCHG.0189.ALLK")
     mock_charge_info.to_json_file.assert_called_once_with()
