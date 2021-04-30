@@ -45,7 +45,10 @@ def find_inequivalent_coords(structure: Structure,
     end_index = len(added_structure)
 
     symmetrizer = StructureSymmetrizer(added_structure)
-    assert initial_sg == symmetrizer.sg_number
+
+    if initial_sg != symmetrizer.sg_number:
+        logger.warning("The symmetry has changed, meaning all the symmetry "
+                       "equivalent sites do not exist.")
 
     sym_data = symmetrizer.spglib_sym_data
     _indices = [i for i in range(start_index, end_index)]
