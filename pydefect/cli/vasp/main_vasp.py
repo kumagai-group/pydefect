@@ -83,7 +83,7 @@ def parse_args_main_vasp(args):
         help="File names such as CHGCAR or LOCPOT. When multiple files are "
              "provided, the summed data will be parsed.")
     parser_make_local_extrema.add_argument(
-        "--find_min", action="store_false",
+        "--disable_find_min", dest="find_min", action="store_false",
         help="Set when local maxima are searched instead of local minima.")
     parser_make_local_extrema.add_argument(
         "-i", "--info", type=str,
