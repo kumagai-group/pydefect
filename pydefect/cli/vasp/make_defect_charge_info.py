@@ -60,8 +60,7 @@ def make_charge_dist(parchg: Chgcar, grids: Grids, distance_bins: np.ndarray):
 def make_defect_charge_info(parchgs: List[Chgcar],
                             band_idxs: List[int],
                             bin_interval: float,
-                            grids: Optional[Grids] = None):
-    grids = grids or Grids.from_chgcar(parchgs[0])
+                            grids: Grids):
     radius = calc_max_sphere_radius(parchgs[0].structure.lattice.matrix)
     num_bins = int(np.ceil(radius / bin_interval))
     distance_bins = np.array([bin_interval * i for i in range(num_bins)] + [radius])

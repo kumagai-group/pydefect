@@ -47,7 +47,9 @@ def test_make_charge_dist(parchg, charge_dist_list):
 
 
 def test_make_defect_charge_info(parchg, charge_dist_list):
-    actual = make_defect_charge_info([parchg], band_idxs=[1], bin_interval=2.5)
+    grids = Grids.from_chgcar(parchg)
+    actual = make_defect_charge_info([parchg], band_idxs=[1], bin_interval=2.5,
+                                     grids=grids)
     expected = DefectChargeInfo([0.0, 2.5, 5.0],
                                 [1],
                                 [charge_dist_list],
