@@ -74,7 +74,7 @@ def test_make_local_extrema_w_options(mocker):
     mock_chgcar = mocker.patch("pydefect.cli.vasp.main_vasp.Chgcar")
     parsed_args = parse_args_main_vasp(["le",
                                         "-v", "CHGCAR",
-                                        "--find_min",
+                                        "--disable_find_min",
                                         "--info", "a",
                                         "--threshold_frac", "0.1",
                                         "--threshold_abs", "0.2",
