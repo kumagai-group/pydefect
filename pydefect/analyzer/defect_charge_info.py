@@ -42,10 +42,6 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
         return (3 * 0.5 / (4 * np.pi * self.ave_charge_density)) ** (1.0 / 3.0)
 
     @property
-    def pretty_uniform_radius(self):
-        return f"{self.uniform_half_charge_radius:6.3f}"
-
-    @property
     def is_spin_polarized(self):
         return len(self.charge_dists[0]) == 2
 
@@ -61,8 +57,9 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
         raise ValueError("Radius containing 0.5 e- could not be found.")
 
     def __str__(self):
+        uniform_radius = f"{self.uniform_half_charge_radius:6.3f}"
         all_lines = [" -- defect charge info",
-                     f"Uniform charge radius is {self.pretty_uniform_radius}"]
+                     f"Uniform charge radius is {uniform_radius}"]
         lines = [["Band index", "Spin", "Radius", "Center"]]
         for band_idx, c_dist in zip(self.band_idxs, self.charge_dists):
             self._add_band_info(band_idx, c_dist, lines, Spin.up)
