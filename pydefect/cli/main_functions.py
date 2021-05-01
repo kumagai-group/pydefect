@@ -250,11 +250,7 @@ def make_calc_summary_main_func(args):
         return calc_results, defect_entry, str_info
 
     _infos = parse_dirs(args.dirs, _inner)
-    calc_result_list = [i[0] for i in _infos]
-    defect_entries = [i[1] for i in _infos]
-    str_infos = [i[2] for i in _infos]
-    calc_summary = make_calc_summary(defect_entries, calc_result_list, str_infos,
-                                     args.perfect_calc_results)
+    calc_summary = make_calc_summary(_infos, args.perfect_calc_results)
     calc_summary.to_json_file()
 
 
