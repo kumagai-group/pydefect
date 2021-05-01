@@ -47,7 +47,7 @@ def add_sub_parser(_argparse, name: str):
             help="Path to the unitcell.yaml file.")
     elif name == "supercell_info":
         result.add_argument(
-            "-s", "--supercell_info", required=True, type=loadfn,
+            "-s", "--supercell_info", type=loadfn,
             default="supercell_info.json",
             help="Path to the supercell_info.json file.")
     elif name == "perfect_calc_results":
