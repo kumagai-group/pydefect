@@ -36,3 +36,11 @@ energy: {self.energy:10.3f}
 magnetization: {self.magnetization:6.2f}
 electronic convergence: {self.electronic_conv}
 ionic convergence: {self.ionic_conv}"""
+
+
+class NoElectronicConvError(AssertionError):
+    pass
+
+
+class NoIonicConvError(AssertionError):
+    pass
