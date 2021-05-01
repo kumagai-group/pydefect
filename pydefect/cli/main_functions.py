@@ -119,7 +119,7 @@ def make_defect_set(args):
     maker.defect_set.to_yaml()
 
 
-def make_calc_results(d: Path, check: bool) -> CalcResults:
+def get_calc_results(d: Path, check: bool) -> CalcResults:
     if check:
         try:
             calc_results = loadfn(d / "calc_results.json")
@@ -144,7 +144,7 @@ def calc_defect_structure_info(args):
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
 
-        calc_results = make_calc_results(d, args.check_calc_results)
+        calc_results = get_calc_results(d, args.check_calc_results)
         if calc_results is False:
             logger.info(f"Pass parsing {d} ...")
             continue
