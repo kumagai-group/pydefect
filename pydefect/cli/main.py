@@ -58,7 +58,11 @@ def add_sub_parser(_argparse, name: str):
         result.add_argument(
             "-pbes", "--p_state", required=True, type=loadfn,
             help="Path to the perfect_band_edge_state.json.")
-
+    elif name == "no_calc_results_check":
+        result.add_argument(
+            "-nccr", "--no_calc_results_check",
+            action="store_false",  dest="check_calc_results",
+            help="Select this option when not checking calc_results.json.")
     else:
         raise ValueError
     return result
@@ -74,6 +78,8 @@ def parse_args_main(args):
     si_parser = add_sub_parser(argparse, name="supercell_info")
     pcr_parser = add_sub_parser(argparse, name="perfect_calc_results")
     pbes_parser = add_sub_parser(argparse, name="perfect_band_edge_state")
+    no_calc_results = add_sub_parser(argparse, name="no_calc_results_check")
+
     # -- make_standard_and_relative_energies -----------------------------------
     parser_make_standard_and_relative_energies = subparsers.add_parser(
         name="standard_and_relative_energies",
@@ -208,7 +214,7 @@ def parse_args_main(args):
     parser_defect_structure_info = subparsers.add_parser(
         name="defect_structure_info",
         description="Defect structure info.",
-        parents=[dirs_parser, si_parser],
+        parents=[dirs_parser, si_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['dsi'])
 
@@ -228,7 +234,7 @@ def parse_args_main(args):
         name="efnv",
         description="Generate extended FNV-correction related efnv_correction "
                     "files. ",
-        parents=[dirs_parser, pcr_parser, unitcell_parser],
+        parents=[dirs_parser, pcr_parser, unitcell_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['efnv'])
 
@@ -238,7 +244,7 @@ def parse_args_main(args):
     parser_band_edge_states = subparsers.add_parser(
         name="band_edge_states",
         description="Show edge state for each spin channel.",
-        parents=[dirs_parser, pbes_parser],
+        parents=[dirs_parser, pbes_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['bes'])
 
@@ -248,7 +254,7 @@ def parse_args_main(args):
     parser_defect_energy_infos = subparsers.add_parser(
         name="defect_energy_infos",
         description="",
-        parents=[dirs_parser, pcr_parser],
+        parents=[dirs_parser, pcr_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['dei'])
     parser_defect_energy_infos.add_argument(

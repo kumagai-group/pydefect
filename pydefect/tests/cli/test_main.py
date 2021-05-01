@@ -145,10 +145,12 @@ def test_defect_structure_info(mocker):
     parsed_args = parse_args_main(["dsi",
                                    "-s", "supercell_info.json",
                                    "-d", "Va_O1_0",
+                                   "-nccr",
                                    "-dt", "1.0",
                                    "--symprec", "2.0"])
     expected = Namespace(
         supercell_info=mock_supercell_info,
+        check_calc_results=False,
         dirs=[Path("Va_O1_0")],
         dist_tolerance=1.0,
         symprec=2.0,
@@ -169,10 +171,12 @@ def test_efnv_correction(mocker):
     mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
     parsed_args = parse_args_main(["efnv",
                                    "-d", "Va_O1_0", "Va_O1_1",
+                                   "-nccr",
                                    "-pcr", "perfect/calc_results.json",
                                    "-u", "unitcell.json"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        check_calc_results=False,
         perfect_calc_results=mock_calc_results,
         unitcell=mock_unitcell.from_yaml.return_value,
         func=parsed_args.func)
@@ -188,6 +192,7 @@ def test_band_edge_states(mocker):
         "-p", "perfect/perfect_band_edge_state.json"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        check_calc_results=False,
         p_state=mock.return_value,
         func=parsed_args.func)
     assert parsed_args == expected
@@ -200,10 +205,12 @@ def test_defect_energy_infos(mocker):
     parsed_args = parse_args_main([
         "dei",
         "-d", "Va_O1_0", "Va_O1_1",
+        "-nccr",
         "-p", "perfect/perfect_band_edge_state.json",
         "-s", "standard_energies.yaml"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        check_calc_results=False,
         perfect_calc_results=mock_loadfn.return_value,
         std_energies=mock_std_energy.from_yaml.return_value,
         func=parsed_args.func)

@@ -45,6 +45,7 @@ def test_defect_vesta_file_wo_options():
     parsed_args = parse_args_main_util(["dvf", "-d", "Va_O1_0", "Va_O1_1"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        check_calc_results=True,
         cutoff=defaults.show_structure_cutoff,
         min_displace_w_arrows=0.1,
         arrow_factor=3.0,
@@ -56,12 +57,14 @@ def test_defect_vesta_file_wo_options():
 def test_defect_vesta_file_w_options():
     parsed_args = parse_args_main_util(["dvf",
                                         "-d", "Va_O1_0", "Va_O1_1",
+                                        "-nccr",
                                         "--cutoff", "1.0",
                                         "--min_displace_w_arrows", "2.0",
                                         "--arrow_factor", "10.0",
                                         "--title", "title"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        check_calc_results=False,
         cutoff=1.0,
         min_displace_w_arrows=2.0,
         arrow_factor=10.0,
