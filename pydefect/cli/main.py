@@ -254,7 +254,7 @@ def parse_args_main(args):
     parser_defect_energy_infos = subparsers.add_parser(
         name="defect_energy_infos",
         description="",
-        parents=[dirs_parser, pcr_parser, no_calc_results],
+        parents=[unitcell_parser, dirs_parser, pcr_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['dei'])
     parser_defect_energy_infos.add_argument(

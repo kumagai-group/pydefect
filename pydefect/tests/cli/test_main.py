@@ -200,17 +200,20 @@ def test_band_edge_states(mocker):
 
 
 def test_defect_energy_infos(mocker):
+    mock_unitcell = mocker.patch("pydefect.cli.main.Unitcell")
     mock_loadfn = mocker.patch("pydefect.cli.main.loadfn")
     mock_std_energy = mocker.patch("pydefect.cli.main.StandardEnergies")
     parsed_args = parse_args_main([
         "dei",
         "-d", "Va_O1_0", "Va_O1_1",
         "-nccr",
+        "-u", "unitcell.json",
         "-p", "perfect/perfect_band_edge_state.json",
         "-s", "standard_energies.yaml"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         check_calc_results=False,
+        unitcell=mock_unitcell.from_yaml.return_value,
         perfect_calc_results=mock_loadfn.return_value,
         std_energies=mock_std_energy.from_yaml.return_value,
         func=parsed_args.func)

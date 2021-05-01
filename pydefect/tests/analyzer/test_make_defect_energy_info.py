@@ -4,6 +4,7 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import DefectEnergy, DefectEnergyInfo
 from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info, \
     num_atom_differences
+from pydefect.chem_pot_diag.chem_pot_diag import StandardEnergies
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.input_maker.defect_entry import DefectEntry
 from pymatgen import IStructure, Lattice
@@ -27,11 +28,14 @@ def test_make_defect_energy_info(mocker):
                                           ["Mg", "O"], [[0.0]*3]*2)
     p_calc_results.energy = 1.0
 
-    standard_energies = {"Mg": 10.0, "O": 20.0}
+    standard_energies = StandardEnergies({"Mg": 10.0, "O": 20.0})
+
+    unitcell = mocker.Mock()
+    unitcell.vbm = 100.0
 
     actual = make_defect_energy_info(defect_entry, calc_results, correction,
-                                     p_calc_results, standard_energies)
-    energy = DefectEnergy(formation_energy=10.0 - 1.0 + 10,
+                                     p_calc_results, standard_energies, unitcell)
+    energy = DefectEnergy(formation_energy=10.0 - 1.0 + 10 - 100.0,
                           energy_corrections={"a": 10.0},
                           is_shallow=None)
     expected = DefectEnergyInfo(name="Va_Mg1", charge=-1,

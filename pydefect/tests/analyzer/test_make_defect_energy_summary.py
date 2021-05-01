@@ -17,7 +17,12 @@ def test_make_defect_energy_summary(mocker):
         target="MgO", vertices={"A": TargetVertex({"Mg": 5.0})})
 
     unitcell = mocker.Mock()
+    unitcell.vbm = 1.0
+    unitcell.cbm = 11.0
+
     perf_be_state = mocker.Mock()
+    perf_be_state.vbm_info.energy = 0.0
+    perf_be_state.cbm_info.energy = 12.0
 
     actual = make_defect_energy_summary(defect_infos, target_vertices, unitcell,
                                         perf_be_state)
@@ -28,7 +33,7 @@ def test_make_defect_energy_summary(mocker):
     expected = DefectEnergySummary(title=unitcell.system,
                                    defect_energies=defect_energies,
                                    rel_chem_pots={"A": {"Mg": 5.0}},
-                                   cbm=unitcell.cbm,
-                                   supercell_vbm=perf_be_state.vbm_info.energy,
-                                   supercell_cbm=perf_be_state.cbm_info.energy)
+                                   cbm=10.0,
+                                   supercell_vbm=-1.0,
+                                   supercell_cbm=11.0)
     assert actual == expected

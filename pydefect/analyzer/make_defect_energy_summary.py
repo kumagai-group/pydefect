@@ -30,6 +30,6 @@ def make_defect_energy_summary(
     return DefectEnergySummary(title=unitcell.system,
                                defect_energies=defect_energies,
                                rel_chem_pots=target_vertices.chem_pots,
-                               cbm=unitcell.cbm,
-                               supercell_vbm=perfect_band_edge.vbm_info.energy,
-                               supercell_cbm=perfect_band_edge.cbm_info.energy)
+                               cbm=unitcell.cbm - unitcell.vbm,
+                               supercell_vbm=perfect_band_edge.vbm_info.energy - unitcell.vbm,
+                               supercell_cbm=perfect_band_edge.cbm_info.energy - unitcell.vbm)
