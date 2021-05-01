@@ -51,14 +51,18 @@ def test_make_defect_vesta_file(mocker):
         elif str(key) == "Va_O1_0/defect_structure_info.json":
             return mock_defect_structure_info
         else:
+            print(key)
             raise ValueError
 
     mock_loadfn = mocker.patch("pydefect.cli.main_util_functions.loadfn",
                                side_effect=side_effect)
+    mock_loadfn2 = mocker.patch("pydefect.cli.main_functions.loadfn",
+                                side_effect=side_effect)
     mock_make_vesta_file = mocker.patch(
         "pydefect.cli.main_util_functions.MakeDefectVestaFile")
     args = Namespace(
         dirs=[Path("Va_O1_0")],
+        check_calc_results=True,
         cutoff=1.0,
         min_displace_w_arrows=2.0,
         arrow_factor=3.0,
