@@ -36,7 +36,7 @@ def get_calc_results(d: Path, check: bool) -> Union[CalcResults, bool]:
         try:
             calc_results = loadfn(d / "calc_results.json")
         except FileNotFoundError:
-            logger.warning(f"calc_results doesn't exist in {d}.")
+            logger.warning(f"calc_results.json doesn't exist in {d}.")
             raise
 
         if calc_results.electronic_conv is False:
