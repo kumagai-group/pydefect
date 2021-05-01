@@ -56,7 +56,7 @@ def parse_args_main_util(args):
         help="volumetric_data_local_extrema.json file name.")
     parser_ai.add_argument(
         "-i", "--indices", required=True, type=int, nargs="+",
-        help="Indices to be added to SupercellInfo.")
+        help="Indices starting from 1 to be added to SupercellInfo.")
     parser_ai.set_defaults(func=add_interstitials_from_local_extrema)
 
     # -- make defect vesta file ------------------------------------------------

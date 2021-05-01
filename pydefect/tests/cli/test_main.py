@@ -140,7 +140,8 @@ def test_defect_structure_info(mocker):
         else:
             raise ValueError
 
-    mock_loadfn = mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
+    mock_loadfn = mocker.patch("pydefect.cli.main.loadfn",
+                               side_effect=side_effect)
     parsed_args = parse_args_main(["dsi",
                                    "-s", "supercell_info.json",
                                    "-d", "Va_O1_0",
@@ -181,7 +182,9 @@ def test_efnv_correction(mocker):
 def test_band_edge_states(mocker):
     mock = mocker.patch("pydefect.cli.main.loadfn")
     parsed_args = parse_args_main([
-        "bes", "-d", "Va_O1_0", "Va_O1_1",
+        "bes",
+        "-d", "Va_O1_0", "Va_O1_1",
+        "-nccr",
         "-p", "perfect/perfect_band_edge_state.json"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
