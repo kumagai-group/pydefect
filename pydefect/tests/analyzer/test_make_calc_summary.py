@@ -27,10 +27,9 @@ def test_make_calc_summary(mocker):
         IStructure(Lattice.cubic(1.0), ["Mg", "O"], [[0.0]*3]*2)
     p_calc_results.energy = 10.0
 
-    actual = make_calc_summary(defect_entry_list=[defect_entry],
-                               calc_results_list=[calc_results],
-                               structure_list=[structure_info],
-                               p_calc_results=p_calc_results)
+    actual = make_calc_summary(
+        calc_set=[(defect_entry, calc_results, structure_info)],
+        p_calc_results=p_calc_results)
     single_summary = SingleCalcSummary(
         charge=1,
         atom_io={"O": -1},
@@ -45,9 +44,3 @@ def test_make_calc_summary(mocker):
     assert actual == expected
 
 
-"""
-TODO
--
-
-DONE
-"""
