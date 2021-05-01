@@ -149,6 +149,19 @@ def test_defect_energy_summary_charge_energies(
     assert actual == expected
 
 
+def test_cross_points_dicts():
+    charge_energies = ChargeEnergies(
+        charge_energies_dict={"Va_Mg": SingleChargeEnergies([(0, 2.0)]),
+                              "Va_O": SingleChargeEnergies([(1, 1.0)])},
+        e_min=0.0, e_max=2.0)
+    actual = charge_energies.cross_point_dicts
+    expected = {"Va_Mg": CrossPoints(inner_cross_points=[],
+                                     boundary_points=[[0.0, 2.0], [2.0, 2.0]]),
+                "Va_O": CrossPoints(inner_cross_points=[],
+                                    boundary_points=[[0.0, 1.0], [2.0, 3.0]])}
+    assert actual == expected
+
+
 def test_defect_energy_summary_latexified_title(defect_energy_summary):
     actual = defect_energy_summary.latexified_title
     expected = "MgAl$_{2}$O$_{4}$"

@@ -135,6 +135,7 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
 
             if x:
                 result[k] = SingleChargeEnergies(x)
+
         return ChargeEnergies(prettify_names(result, name_style), e_range[0], e_range[1])
 
     @property
@@ -152,8 +153,8 @@ class ChargeEnergies:
     def __post_init__(self):
         self.cross_point_dicts = {}
         large_minus_number = -1e4
-        half_spaces = []
         for name, ce in self.charge_energies_dict.items():
+            half_spaces = []
             for charge, corr_energy in ce.charge_energies:
                 half_spaces.append([-charge, 1, -corr_energy])
 
