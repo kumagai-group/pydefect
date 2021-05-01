@@ -15,7 +15,8 @@ from pydefect.cli.main_functions import make_standard_and_relative_energies, \
     make_cpd_and_vertices, plot_chem_pot_diag, make_supercell, \
     append_interstitial_to_supercell_info, \
     pop_interstitial_from_supercell_info, make_defect_set, \
-    make_band_edge_states_main_func, make_efnv_correction_main_func
+    make_band_edge_states_main_func, make_efnv_correction_main_func, \
+    calc_defect_structure_info
 from pydefect.corrections.efnv_correction import ExtendedFnvCorrection
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
@@ -158,6 +159,40 @@ def test_make_defect_set(oxi_states, he_vacancy_charge, tmpdir, supercell_info):
     actual = Path("defect_in.yaml").read_text()
     expected = Path("expected.yaml").read_text()
     assert actual == expected
+
+
+def test_calc_defect_structure_info(mocker, tmpdir, supercell_info):
+    tmpdir.chdir()
+    supercell_info.to_json_file()
+    mock_calc_results = mocker.Mock()
+    mock_defect_entry = mocker.Mock()
+
+    def side_effect(key):
+        if str(key) == "Va_O1_2/calc_results.json":
+            return mock_calc_results
+        elif str(key) == "Va_O1_2/defect_entry.json":
+            return mock_defect_entry
+        else:
+            raise ValueError
+
+    mock_loadfn = mocker.patch(
+        "pydefect.cli.main_functions.loadfn", side_effect=side_effect)
+    mock_structure_info = mocker.patch(
+        "pydefect.cli.main_functions.make_defect_structure_info")
+    info = loadfn("supercell_info.json")
+
+    args = Namespace(supercell_info=info, dirs=[Path("Va_O1_2")],
+                     dist_tolerance=0.1, symprec=0.2)
+    calc_defect_structure_info(args)
+    mock_structure_info.assert_called_with(
+        supercell_info.structure,
+        mock_defect_entry.structure,
+        mock_calc_results.structure,
+        dist_tol=0.1,
+        symprec=0.2,
+        init_site_sym=mock_defect_entry.site_symmetry)
+    mock_structure_info.return_value.to_json_file.assert_called_once_with(
+        "Va_O1_2/defect_structure_info.json")
 
 
 def test_make_efnv_correction_from_vasp(tmpdir, mocker):
