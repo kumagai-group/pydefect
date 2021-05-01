@@ -6,6 +6,7 @@ from monty.serialization import loadfn
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergy, \
     CompositionEnergies
+from pydefect.cli.main_functions import parse_dirs
 from pydefect.cli.vasp.make_local_extrema import \
     make_local_extrema_from_volumetric_data
 from pydefect.cli.vasp.make_band_edge_orbital_infos import \
@@ -102,12 +103,13 @@ def make_defect_entries(args):
 
 
 def make_calc_results(args):
-    for d in args.dirs:
-        logger.info(f"Parsing data in {d} ...")
+    def _inner(_dir: Path):
         calc_results = make_calc_results_from_vasp(
-            vasprun=Vasprun(d / defaults.vasprun),
-            outcar=Outcar(d / defaults.outcar))
-        calc_results.to_json_file(str(Path(d) / "calc_results.json"))
+            vasprun=Vasprun(_dir / defaults.vasprun),
+            outcar=Outcar(_dir / defaults.outcar))
+        calc_results.to_json_file(str(_dir / "calc_results.json"))
+
+    parse_dirs(args.dirs, _inner)
 
 
 def make_perfect_band_edge_state(args):
@@ -123,22 +125,24 @@ def make_perfect_band_edge_state(args):
 def make_band_edge_orb_infos_and_eigval_plot(args):
     supercell_vbm = args.p_state.vbm_info.energy
     supercell_cbm = args.p_state.cbm_info.energy
-    for d in args.dirs:
-        logger.info(f"Parsing data in {d} ...")
+
+    def _inner(_dir: Path):
         try:
-            defect_entry = loadfn(d / "defect_entry.json")
+            defect_entry = loadfn(_dir / "defect_entry.json")
             title = defect_entry.name
         except FileNotFoundError:
             title = "No name"
-        procar = Procar(d / defaults.procar)
-        vasprun = Vasprun(d / defaults.vasprun)
-        str_info = loadfn(d / "defect_structure_info.json")
+        procar = Procar(_dir / defaults.procar)
+        vasprun = Vasprun(_dir / defaults.vasprun)
+        str_info = loadfn(_dir / "defect_structure_info.json")
         band_edge_orb_chars = make_band_edge_orbital_infos(
             procar, vasprun, supercell_vbm, supercell_cbm, str_info)
-        band_edge_orb_chars.to_json_file(d / "band_edge_orbital_infos.json")
+        band_edge_orb_chars.to_json_file(_dir / "band_edge_orbital_infos.json")
         plotter = EigenvalueMplPlotter(
             title=title, band_edge_orb_infos=band_edge_orb_chars,
             supercell_vbm=supercell_vbm, supercell_cbm=supercell_cbm)
         plotter.construct_plot()
-        plotter.plt.savefig(fname=d / "eigenvalues.pdf")
+        plotter.plt.savefig(fname=_dir / "eigenvalues.pdf")
         plotter.plt.clf()
+
+    parse_dirs(args.dirs, _inner)
