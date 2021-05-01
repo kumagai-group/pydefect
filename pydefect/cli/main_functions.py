@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+from pathlib import Path
+
 from monty.serialization import loadfn
+from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_info import make_defect_structure_info
@@ -116,11 +119,36 @@ def make_defect_set(args):
     maker.defect_set.to_yaml()
 
 
+def make_calc_results(d: Path, check: bool) -> CalcResults:
+    if check:
+        try:
+            calc_results = loadfn(d / "calc_results.json")
+        except FileNotFoundError:
+            logger.warning(f"calc_results doesn't exist in {d}.")
+            return False
+
+        if calc_results.electronic_conv is False:
+            logger.warning(f"SCF in {d} is not reached.")
+            return False
+        elif calc_results.ionic_conv is False:
+            logger.warning(f"Ionic convergence in {d} is not reached.")
+            return False
+    else:
+        calc_results = loadfn(d / "calc_results.json")
+
+    return calc_results
+
+
 def calc_defect_structure_info(args):
     supercell_info = args.supercell_info
     for d in args.dirs:
         logger.info(f"Parsing data in {d} ...")
-        calc_results = loadfn(d / "calc_results.json")
+
+        calc_results = make_calc_results(d, args.check_calc_results)
+        if calc_results is False:
+            logger.info(f"Pass parsing {d} ...")
+            continue
+
         defect_entry = loadfn(d / "defect_entry.json")
         defect_str_info = make_defect_structure_info(
             supercell_info.structure,

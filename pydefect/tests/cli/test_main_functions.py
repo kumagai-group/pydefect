@@ -173,6 +173,7 @@ def test_calc_defect_structure_info(mocker, tmpdir, supercell_info):
         elif str(key) == "Va_O1_2/defect_entry.json":
             return mock_defect_entry
         else:
+            print(key)
             raise ValueError
 
     mock_loadfn = mocker.patch(
@@ -181,8 +182,8 @@ def test_calc_defect_structure_info(mocker, tmpdir, supercell_info):
         "pydefect.cli.main_functions.make_defect_structure_info")
     info = loadfn("supercell_info.json")
 
-    args = Namespace(supercell_info=info, dirs=[Path("Va_O1_2")],
-                     dist_tolerance=0.1, symprec=0.2)
+    args = Namespace(supercell_info=info, check_calc_results=True,
+                     dirs=[Path("Va_O1_2")], dist_tolerance=0.1, symprec=0.2)
     calc_defect_structure_info(args)
     mock_structure_info.assert_called_with(
         supercell_info.structure,
