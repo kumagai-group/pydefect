@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 from pathlib import Path
+from typing import Union
 
 from monty.serialization import loadfn
-from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.calc_results import CalcResults, NoElectronicConvError, \
+    NoIonicConvError
 from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.defect_structure_info import make_defect_structure_info
@@ -27,6 +29,48 @@ from vise.util.logger import get_logger
 
 
 logger = get_logger(__name__)
+
+
+def get_calc_results(d: Path, check: bool) -> Union[CalcResults, bool]:
+    if check:
+        try:
+            calc_results = loadfn(d / "calc_results.json")
+        except FileNotFoundError:
+            logger.warning(f"calc_results doesn't exist in {d}.")
+            raise
+
+        if calc_results.electronic_conv is False:
+            logger.warning(f"SCF in {d} is not reached.")
+            raise NoElectronicConvError
+        elif calc_results.ionic_conv is False:
+            logger.warning(f"Ionic convergence in {d} is not reached.")
+            raise NoIonicConvError
+    else:
+        calc_results = loadfn(d / "calc_results.json")
+
+    return calc_results
+
+
+def parse_dirs(dirs, _inner_function):
+    fail = []
+    _returns = []
+    for d in dirs:
+        logger.info(f"Parsing data in {d} ...")
+        try:
+            _return = _inner_function(d)
+            if _return:
+                _returns.append(_return)
+        except Exception as e:
+            print(e)
+            logger.warning(f"Failing parsing {d} ...")
+            fail.append(str(d))
+            continue
+    if fail:
+        logger.warning(f"Failed directories are:\n{' '.join(fail)}")
+    else:
+        logger.info("Parsing all the directories succeeded.")
+
+    return _returns if _returns else None
 
 
 def make_standard_and_relative_energies(args):
@@ -119,37 +163,12 @@ def make_defect_set(args):
     maker.defect_set.to_yaml()
 
 
-def get_calc_results(d: Path, check: bool) -> CalcResults:
-    if check:
-        try:
-            calc_results = loadfn(d / "calc_results.json")
-        except FileNotFoundError:
-            logger.warning(f"calc_results doesn't exist in {d}.")
-            return False
-
-        if calc_results.electronic_conv is False:
-            logger.warning(f"SCF in {d} is not reached.")
-            return False
-        elif calc_results.ionic_conv is False:
-            logger.warning(f"Ionic convergence in {d} is not reached.")
-            return False
-    else:
-        calc_results = loadfn(d / "calc_results.json")
-
-    return calc_results
-
-
 def calc_defect_structure_info(args):
     supercell_info = args.supercell_info
-    for d in args.dirs:
-        logger.info(f"Parsing data in {d} ...")
 
-        calc_results = get_calc_results(d, args.check_calc_results)
-        if calc_results is False:
-            logger.info(f"Pass parsing {d} ...")
-            continue
-
-        defect_entry = loadfn(d / "defect_entry.json")
+    def _inner(_dir: Path):
+        calc_results = get_calc_results(_dir, args.check_calc_results)
+        defect_entry = loadfn(_dir / "defect_entry.json")
         defect_str_info = make_defect_structure_info(
             supercell_info.structure,
             defect_entry.structure,
@@ -157,47 +176,47 @@ def calc_defect_structure_info(args):
             dist_tol=args.dist_tolerance,
             symprec=args.symprec,
             init_site_sym=defect_entry.site_symmetry)
-        defect_str_info.to_json_file(str(d / "defect_structure_info.json"))
+        defect_str_info.to_json_file(str(_dir / "defect_structure_info.json"))
+
+    parse_dirs(args.dirs, _inner)
 
 
 def make_efnv_correction_main_func(args):
-    for d in args.dirs:
-        logger.info(f"Parsing data in {d} ...")
-        defect_entry = loadfn(d / "defect_entry.json")
-        calc_results = loadfn(d / "calc_results.json")
+    def _inner(_dir: Path):
+        calc_results = get_calc_results(_dir, args.check_calc_results)
+        defect_entry = loadfn(_dir / "defect_entry.json")
         efnv = make_efnv_correction(defect_entry.charge,
                                     calc_results,
                                     args.perfect_calc_results,
                                     args.unitcell.dielectric_constant)
-        efnv.to_json_file(d / "correction.json")
+        efnv.to_json_file(_dir / "correction.json")
 
         title = defect_entry.full_name
         plotter = SitePotentialMplPlotter.from_efnv_corr(
             title=title, efnv_correction=efnv)
         plotter.construct_plot()
-        plotter.plt.savefig(fname=d / "correction.pdf")
+        plotter.plt.savefig(fname=_dir / "correction.pdf")
         plotter.plt.clf()
+
+    parse_dirs(args.dirs, _inner)
 
 
 def make_band_edge_states_main_func(args):
-    for d in args.dirs:
-        try:
-            logger.info(f"Parsing data in {d} ...")
-            orb_infos = loadfn(d / "band_edge_orbital_infos.json")
-            band_edge_states = make_band_edge_states(orb_infos, args.p_state)
-            band_edge_states.to_json_file(d / "band_edge_states.json")
-        except ValueError as e:
-            print(e)
+    def _inner(_dir: Path):
+        orb_infos = loadfn(_dir / "band_edge_orbital_infos.json")
+        band_edge_states = make_band_edge_states(orb_infos, args.p_state)
+        band_edge_states.to_json_file(str(_dir / "band_edge_states.json"))
+
+    parse_dirs(args.dirs, _inner)
 
 
 def make_defect_energy_infos_main_func(args):
-    for d in args.dirs:
-        logger.info(f"Parsing data in {d} ...")
-        defect_entry = loadfn(d / "defect_entry.json")
-        calc_results = loadfn(d / "calc_results.json")
-        correction = loadfn(d / "correction.json")
+    def _inner(_dir: Path):
+        calc_results = get_calc_results(_dir, args.check_calc_results)
+        defect_entry = loadfn(_dir / "defect_entry.json")
+        correction = loadfn(_dir / "correction.json")
         try:
-            band_edge_states = loadfn(d / "band_edge_states.json")
+            band_edge_states = loadfn(_dir / "band_edge_states.json")
         except FileNotFoundError:
             band_edge_states = None
         defect_energy_info = make_defect_energy_info(
@@ -207,13 +226,16 @@ def make_defect_energy_infos_main_func(args):
             perfect_calc_results=args.perfect_calc_results,
             standard_energies=args.std_energies,
             band_edge_states=band_edge_states)
-        defect_energy_info.to_yaml_file(d / "defect_energy_info.yaml")
+        defect_energy_info.to_yaml_file(str(_dir / "defect_energy_info.yaml"))
+
+    parse_dirs(args.dirs, _inner)
 
 
 def make_defect_energy_summary_main_func(args):
-    energy_infos = []
-    for d in args.dirs:
-        energy_infos.append(DefectEnergyInfo.from_yaml(d / "defect_energy_info.yaml"))
+    def _inner(_dir: Path):
+        return DefectEnergyInfo.from_yaml(str(_dir / "defect_energy_info.yaml"))
+
+    energy_infos = parse_dirs(args.dirs, _inner)
     target_vertices = TargetVertices.from_yaml(args.target_vertices_yaml)
     defect_energy_summary = make_defect_energy_summary(
         energy_infos, target_vertices, args.unitcell, args.p_state)
@@ -221,12 +243,17 @@ def make_defect_energy_summary_main_func(args):
 
 
 def make_calc_summary_main_func(args):
-    defect_entries, calc_results, str_infos = [], [], []
-    for d in args.dirs:
-        defect_entries.append(loadfn(d / "defect_entry.json"))
-        calc_results.append(loadfn(d / "calc_results.json"))
-        str_infos.append(loadfn(d / "defect_structure_info.json"))
-    calc_summary = make_calc_summary(defect_entries, calc_results, str_infos,
+    def _inner(_dir: Path):
+        calc_results = get_calc_results(_dir, args.check_calc_results)
+        defect_entry = loadfn(_dir / "defect_entry.json")
+        str_info = loadfn(_dir / "defect_structure_info.json")
+        return calc_results, defect_entry, str_info
+
+    _infos = parse_dirs(args.dirs, _inner)
+    calc_result_list = [i[0] for i in _infos]
+    defect_entries = [i[1] for i in _infos]
+    str_infos = [i[2] for i in _infos]
+    calc_summary = make_calc_summary(defect_entries, calc_result_list, str_infos,
                                      args.perfect_calc_results)
     calc_summary.to_json_file()
 

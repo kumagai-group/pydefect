@@ -223,6 +223,7 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
         "pydefect.cli.main_functions.SitePotentialMplPlotter")
     plotter = mock_site_pot_plotter.from_efnv_corr.return_value
     args = Namespace(dirs=[Path("Va_O1_2")],
+                     check_calc_results=True,
                      perfect_calc_results=mock_perfect_calc_results,
                      unitcell=mock_unitcell)
 
@@ -258,7 +259,9 @@ def test_make_band_edge_states(mocker):
     mocker_make_edge_states = mocker.patch(
         "pydefect.cli.main_functions.make_band_edge_states")
 
-    args = Namespace(dirs=[Path("Va_O1_2")], p_state=mock_perfect_edge_states)
+    args = Namespace(dirs=[Path("Va_O1_2")],
+                     check_calc_results=True,
+                     p_state=mock_perfect_edge_states)
     make_band_edge_states_main_func(args)
     mocker_make_edge_states.assert_called_with(mocker_band_edge_orbital_infos,
                                                mock_perfect_edge_states)
