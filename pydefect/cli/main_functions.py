@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 from pathlib import Path
-from typing import Union
+from typing import Union, List, Callable, Any
 
 from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults, NoElectronicConvError, \
@@ -51,10 +51,13 @@ def get_calc_results(d: Path, check: bool) -> Union[CalcResults, bool]:
     return calc_results
 
 
-def parse_dirs(dirs, _inner_function):
+def parse_dirs(dirs: List[Path], _inner_function: Callable[[Path], Any]):
     fail = []
     _returns = []
     for d in dirs:
+        if d.is_file():
+            logger.info(f"{d} is a file, so skipped.")
+            continue
         logger.info(f"Parsing data in {d} ...")
         try:
             _return = _inner_function(d)
@@ -66,7 +69,8 @@ def parse_dirs(dirs, _inner_function):
             fail.append(str(d))
             continue
     if fail:
-        logger.warning(f"Failed directories are:\n{' '.join(fail)}")
+        failed = '\n'.join(fail)
+        logger.warning(f"Failed directories are:\n{failed}")
     else:
         logger.info("Parsing all the directories succeeded.")
 
@@ -211,6 +215,7 @@ def make_band_edge_states_main_func(args):
 
 
 def make_defect_energy_infos_main_func(args):
+
     def _inner(_dir: Path):
         calc_results = get_calc_results(_dir, args.check_calc_results)
         defect_entry = loadfn(_dir / "defect_entry.json")
@@ -225,6 +230,7 @@ def make_defect_energy_infos_main_func(args):
             correction=correction,
             perfect_calc_results=args.perfect_calc_results,
             standard_energies=args.std_energies,
+            unitcell=args.unitcell,
             band_edge_states=band_edge_states)
         defect_energy_info.to_yaml_file(str(_dir / "defect_energy_info.yaml"))
 
