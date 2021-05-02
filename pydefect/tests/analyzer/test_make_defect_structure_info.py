@@ -30,6 +30,18 @@ def test_make_defect_structure_info(structures, def_str_info):
                                    symprec=0.1,
                                    neighbor_cutoff_factor=1.2)
     actual = info.defect_structure_info
+    print(actual)
     assert_dataclass_almost_equal(actual, def_str_info)
 
+
+def test_make_defect_structure_info2():
+    perf = Structure(Lattice.cubic(1), ["H"], [[0., 0., 0.]])
+    init = Structure(Lattice.cubic(1), ["H"]*2, [[0., 0., 0.], [0.5, 0.0, 0.0]])
+    fin = Structure(Lattice.cubic(1), ["H"]*2, [[0., 0., 0.], [0.4, 0.0, 0.0]])
+
+    info = MakeDefectStructureInfo(perf, init, fin,  dist_tol=0.05,
+                                   symprec=0.1,
+                                   neighbor_cutoff_factor=1.2)
+    actual = info.defect_structure_info
+    print(actual)
 

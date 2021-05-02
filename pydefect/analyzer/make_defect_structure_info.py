@@ -67,7 +67,7 @@ class MakeDefectStructureInfo:
             drift_vector=self._drift_vector,
             drift_dist=self._drift_distance,
             center=self.center,
-            displacements=self.calc_displacements(self.comp_w_init.d_to_p))
+            displacements=self.calc_displacements())
 
     @property
     def _neighbor_atom_indices(self):
@@ -99,37 +99,38 @@ class MakeDefectStructureInfo:
             d_site.distance_and_image_from_frac_coords(p_coords)
         self._drift_vector = tuple(d_site.frac_coords - p_coords - image)
 
-    def calc_displacements(self,
-                           d_to_p: List[int]):
-        defect = self.shifted_final
+    def calc_displacements(self):
         result = []
-        for d, p in enumerate(d_to_p):
-            if p is None:
+        atom_mapping = self.comp_w_init.atom_mapping
+        for d in range(len(self.shifted_final)):
+            if d not in atom_mapping:
                 result.append(None)
             else:
+                p = atom_mapping[d]
                 p_elem = str(self.initial[p].specie)
-                d_elem = str(defect[d].specie)
+                d_elem = str(self.shifted_final[d].specie)
                 if p_elem != d_elem:
                     result.append(None)
                     continue
                 initial_pos = folded_coords(self.initial[p], self.center)
-                final_pos = folded_coords(defect[d], initial_pos)
+                final_pos = folded_coords(self.shifted_final[d], initial_pos)
 
                 initial_pos_vec = self.lattice.get_cartesian_coords(
                     np.array(initial_pos) - self.center)
-                disp_dist, t = self.lattice.get_distance_and_image(
-                    defect.frac_coords[d], self.initial.frac_coords[p])
-                disp_vec = self.lattice.get_cartesian_coords(
-                    defect.frac_coords[d] - self.initial.frac_coords[p] - t)
+                initial_dist = np.linalg.norm(initial_pos_vec)
 
-                ini_dist = np.linalg.norm(initial_pos_vec)
-                angle = self.calc_disp_angle(disp_dist, disp_vec, ini_dist,
+                disp_dist, t = self.lattice.get_distance_and_image(
+                    self.shifted_final.frac_coords[d], self.initial.frac_coords[p])
+                disp_vec = self.lattice.get_cartesian_coords(
+                    self.shifted_final.frac_coords[d] - self.initial.frac_coords[p] - t)
+
+                angle = self.calc_disp_angle(disp_dist, disp_vec, initial_dist,
                                              initial_pos_vec)
 
                 result.append(Displacement(specie=p_elem,
                                            original_pos=initial_pos,
                                            final_pos=final_pos,
-                                           distance_from_defect=ini_dist,
+                                           distance_from_defect=initial_dist,
                                            disp_vector=tuple(disp_vec),
                                            displace_distance=disp_dist,
                                            angle=angle))
