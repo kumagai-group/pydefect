@@ -47,6 +47,21 @@ def judge_defect_type(site_diff: SiteDiff):
     return DefectType.unknown
 
 
+def remove_dot(x):
+    return "".join([s for s in x if s != "."])
+
+
+def unique_point_group(pg):
+    result = remove_dot(pg)
+    if result == "2mm" or result == "m2m":
+        return "mm2"
+    if result == "-4m2":
+        return "-42m"
+    if result == "m3":
+        return "m-3"
+    return result
+
+
 class SymmRelation(MSONable, ExtendedEnum):
     same = "same"
     subgroup = "subgroup"

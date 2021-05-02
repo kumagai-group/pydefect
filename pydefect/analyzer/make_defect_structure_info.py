@@ -8,9 +8,9 @@ import numpy as np
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
 from pydefect.analyzer.defect_structure_info import Displacement, \
-    DefectStructureInfo
+    DefectStructureInfo, unique_point_group
 from pydefect.defaults import defaults
-from pymatgen import PeriodicSite, Structure, Lattice
+from pymatgen import PeriodicSite, Structure
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 from vise.util.typing import GenCoords
 
@@ -20,10 +20,6 @@ def folded_coords(site: PeriodicSite,
                   ) -> GenCoords:
     _, image = site.distance_and_image_from_frac_coords(center)
     return tuple(site.frac_coords - image)
-
-
-def remove_dot(x):
-    return "".join([s for s in x if s != "."])
 
 
 class MakeDefectStructureInfo:
@@ -86,14 +82,7 @@ class MakeDefectStructureInfo:
 
     def _unique_point_group(self, structure):
         symmetrizer = StructureSymmetrizer(structure, self.symprec)
-        result = remove_dot(symmetrizer.point_group)
-        if result == "2mm" or result == "m2m":
-            return "mm2"
-        if result == "-4m2":
-            return "-42m"
-        if result == "m3":
-            return "m-3"
-        return result
+        return unique_point_group(symmetrizer.point_group)
 
     def _calc_drift(self) -> None:
         distances = []
@@ -156,5 +145,4 @@ class MakeDefectStructureInfo:
         if math.isnan(result):
             result = None
         return result
-
 

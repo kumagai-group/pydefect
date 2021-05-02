@@ -6,7 +6,7 @@ import pytest
 from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import \
     Displacement, DefectStructureInfo, symmetry_relation, SymmRelation, \
-    unique_point_group, DefectType, judge_defect_type
+    DefectType, judge_defect_type, unique_point_group
 from pymatgen.core import Structure, Lattice
 from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 from vise.util.enum import ExtendedEnum
