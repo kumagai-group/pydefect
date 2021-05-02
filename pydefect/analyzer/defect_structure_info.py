@@ -19,17 +19,19 @@ from vise.util.enum import ExtendedEnum
 from vise.util.logger import get_logger
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.structure_symmetrizer import StructureSymmetrizer
-from vise.util.typing import Coords
+from vise.util.typing import GenCoords
 
 logger = get_logger(__name__)
 
 
-def folded_coords(site: PeriodicSite, center: List[float]):
+def folded_coords(site: PeriodicSite,
+                  center: GenCoords
+                  ) -> GenCoords:
     _, image = site.distance_and_image_from_frac_coords(center)
     return tuple(site.frac_coords - image)
 
 
-def fold_coords_in_structure(structure: Structure, center: Union[Coords, List[float]]):
+def fold_coords_in_structure(structure: Structure, center: GenCoords) -> None:
     for site in structure:
         _, image = site.distance_and_image_from_frac_coords(center)
         site.frac_coords -= image
@@ -38,7 +40,7 @@ def fold_coords_in_structure(structure: Structure, center: Union[Coords, List[fl
 def calc_drift(perfect: Structure,
                defect: Structure,
                center: List[float],
-               d_to_p: List[int]):
+               d_to_p: List[int]) -> Tuple[int, float, GenCoords]:
     distances = []
     for site in defect:
         distances.append(site.distance_and_image_from_frac_coords(center)[0])
