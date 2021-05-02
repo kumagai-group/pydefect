@@ -171,8 +171,11 @@ class EigenvalueMplPlotter(EigenvaluePlotter):
         self._mpl_defaults = kwargs.get("mpl_defaults", EigenvalueMplSettings())
         self.plt = plt
 
-        num_figure = len(self._energies_and_occupations)
-        self.fig, self.axs = plt.subplots(nrows=1, ncols=num_figure, sharey='all')
+        if len(self._energies_and_occupations) == 2:
+            self.fig, self.axs = plt.subplots(nrows=1, ncols=2, sharey='all')
+        else:
+            self.fig, ax = plt.subplots(nrows=1, ncols=1, sharey='all')
+            self.axs = [ax]
 
     def construct_plot(self):
         self._add_eigenvalues()
