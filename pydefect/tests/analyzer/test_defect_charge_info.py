@@ -65,3 +65,20 @@ Band index  Spin  Radius  Center
 def test_defect_charge_info_show_dist(defect_charge_info):
     plt = defect_charge_info.show_dist()
     plt.show()
+
+
+def test_defect_charge_info_are_localized(defect_charge_info):
+    actual = defect_charge_info.localized_orbitals(radius=0.3, fraction=1.0)
+    expected = [[10], []]
+    assert actual == expected
+
+    actual = defect_charge_info.localized_orbitals(radius=0.4, fraction=1.0)
+    expected = [[10], [10]]
+    assert actual == expected
+
+    actual = defect_charge_info.localized_orbitals(radius=0.4,
+                                                   fraction=0.398/0.62-0.001)
+    expected = [[10], []]
+    assert actual == expected
+
+

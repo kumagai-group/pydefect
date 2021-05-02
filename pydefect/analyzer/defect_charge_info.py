@@ -96,3 +96,18 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
         ax = plt.gca()
         ax.legend(loc='upper right')
         return plt
+
+    def localized_orbitals(self, radius, fraction):
+        result = [[] for i in range(len(self.charge_dists[0]))]
+        for charge_dist, band_idx in zip(self.charge_dists, self.band_idxs):
+            for spin_idx, (dist, spin) in enumerate(zip(charge_dist,
+                                                        [Spin.up, Spin.down])):
+                try:
+                    half_radius = self.half_charge_radius(band_idx, spin)
+                    half_frac = half_radius / self.uniform_half_charge_radius
+                    if half_radius < radius and half_frac < fraction:
+                        result[spin_idx].append(band_idx)
+                except ValueError:
+                    pass
+
+        return result
