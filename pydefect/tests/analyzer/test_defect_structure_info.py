@@ -8,7 +8,7 @@ from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import \
     Displacement, DefectStructureInfo, fold_coords_in_structure, calc_drift, \
     make_defect_structure_info, symmetry_relation, SymmRelation, \
-    unique_point_group, elem_indices_coords, DefectType, judge_defect_type, \
+    unique_point_group, DefectType, judge_defect_type, \
     calc_displacements
 from pymatgen.core import Structure, Lattice
 from vise.tests.helpers.assertion import assert_dataclass_almost_equal, \
@@ -129,11 +129,20 @@ def test_calc_displacements():
                              angle=0.0)]
     assert_dataclass_almost_equal(actual[0], expected[0])
 
-
-def test_elem_indices_coords(structures):
-    actual = elem_indices_coords(structures[0], indices=[1, 2])
-    expected = [("He", 1, (0.75, 0.75, 0.75)), ("Li", 2, (0.5, 0.5, 0.5))]
-    assert actual == expected
+#
+# def test_calc_displacements_w_interstitials():
+#     perf = Structure(Lattice.cubic(10), species=["H"], coords=[[0.0, 0.0, 0.0]])
+#     defect = Structure(Lattice.cubic(10), species=["H", "H"],
+#                        coords=[[0.01, 0.0, 0.0], [0.11, 0.0, 0.0]])
+#     actual = calc_displacements(perf, defect, [0, 0, 0.98], d_to_p=[0, None])
+#     expected = [Displacement(specie="H",
+#                              original_pos=(0.0, 0.0, 0.0),
+#                              final_pos=(0.0, 0.0, 0.01),
+#                              distance_from_defect=0.0,
+#                              disp_vector=(0.01, 0.0, 0.0),
+#                              displace_distance=0.1,
+#                              angle=180.0)]
+#     assert_dataclass_almost_equal(actual[0], expected[0])
 
 
 def test_defect_type():
@@ -223,7 +232,7 @@ def test_repr(def_str_info):
     expected = """ -- defect structure info
 Defect type: unknown
 Site symmetry: 3m -> m (subgroup)
-Is same configuration: False
+Has same configuration from initial structure: False
 Drift distance: 0.001
 Defect center: ( 0.380,  0.375,  0.375)
 Removed atoms:
@@ -232,7 +241,7 @@ Removed atoms:
 Added atoms:
 0  H  ( 0.270,  0.250,  0.250)
 
-Initially removed atoms:
+Removed atoms from initial structure:
 0  H  ( 0.250,  0.250,  0.250)
 
 Displacements

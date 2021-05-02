@@ -28,7 +28,7 @@ def test_make_calc_summary(mocker):
     p_calc_results.energy = 10.0
 
     actual = make_calc_summary(
-        calc_set=[(defect_entry, calc_results, structure_info)],
+        calc_set=[(calc_results, defect_entry, structure_info)],
         p_calc_results=p_calc_results)
     single_summary = SingleCalcSummary(
         charge=1,
