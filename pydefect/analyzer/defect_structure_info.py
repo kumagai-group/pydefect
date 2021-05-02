@@ -8,6 +8,7 @@ from pydefect.analyzer.defect_structure_comparator import \
     SiteDiff, SiteInfo
 from pydefect.defaults import defaults
 from pydefect.util.coords import pretty_coords
+from pymatgen import Structure
 from pymatgen.symmetry.groups import SpaceGroup
 from tabulate import tabulate
 from vise.util.enum import ExtendedEnum
@@ -103,6 +104,7 @@ def symmetry_relation(initial_point_group, final_point_group):
 
 @dataclass
 class DefectStructureInfo(MSONable, ToJsonFileMixIn):
+    shifted_final_structure: Structure
     initial_site_sym: str
     final_site_sym: str
     site_diff: SiteDiff

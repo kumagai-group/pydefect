@@ -43,17 +43,18 @@ class MakeDefectStructureInfo:
         self._orig_center = self._orig_comp.defect_center_coord
         self._calc_drift()
 
-        self.displaced_final = final.copy()
+        self.shifted_final = final.copy()
         self.center = tuple(self._orig_center - self._drift_vector)
-        for site in self.displaced_final:
+        for site in self.shifted_final:
             site.frac_coords -= np.array(self._drift_vector)
 
         self.comp_w_perf = DefectStructureComparator(
-            self.displaced_final, perfect, dist_tol)
+            self.shifted_final, perfect, dist_tol)
         self.comp_w_init = DefectStructureComparator(
-            self.displaced_final, initial, dist_tol)
+            self.shifted_final, initial, dist_tol)
 
         self.defect_structure_info = DefectStructureInfo(
+            shifted_final_structure=self.shifted_final,
             initial_site_sym=self.initial_site_sym,
             final_site_sym=self.final_site_sym,
             site_diff=self.comp_w_perf.make_site_diff(),
@@ -100,7 +101,7 @@ class MakeDefectStructureInfo:
 
     def calc_displacements(self,
                            d_to_p: List[int]):
-        defect = self.displaced_final
+        defect = self.shifted_final
         result = []
         for d, p in enumerate(d_to_p):
             if p is None:
