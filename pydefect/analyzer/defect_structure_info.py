@@ -46,9 +46,10 @@ def calc_drift(perfect: Structure,
         distances.append(site.distance_and_image_from_frac_coords(center)[0])
     anchor_atom_idx = int(np.argmax(distances))
     p_anchor_atom_idx = d_to_p[anchor_atom_idx]
-    distance, image = defect[anchor_atom_idx].distance_and_image_from_frac_coords(perfect[p_anchor_atom_idx].frac_coords)
-    drift_vector = (defect[anchor_atom_idx].frac_coords
-                    - perfect[p_anchor_atom_idx].frac_coords - image)
+    d_site = defect[anchor_atom_idx]
+    p_coords = perfect[p_anchor_atom_idx].frac_coords
+    distance, image = d_site.distance_and_image_from_frac_coords(p_coords)
+    drift_vector = d_site.frac_coords - p_coords - image
     return anchor_atom_idx, distance, drift_vector
 
 
@@ -76,15 +77,9 @@ def calc_displacements(perfect: Structure,
             disp_vec = lattice.get_cartesian_coords(
                 defect.frac_coords[d] - perfect.frac_coords[p] - t)
 
-            inner_prod = sum(initial_pos_vec * disp_vec)
             ini_dist = np.linalg.norm(initial_pos_vec)
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                # ignore "RuntimeWarning: invalid value encountered in double_scalars"
-                cos = round(inner_prod / (ini_dist * disp_dist), 10)
-            angle = float(round(180 * (1 - np.arccos(cos) / np.pi), 1))
-            if math.isnan(angle):
-                angle = None
+            angle = calc_disp_angle(disp_dist, disp_vec, ini_dist,
+                                    initial_pos_vec)
 
             result.append(Displacement(specie=p_elem,
                                        original_pos=initial_pos,
@@ -93,6 +88,18 @@ def calc_displacements(perfect: Structure,
                                        disp_vector=tuple(disp_vec),
                                        displace_distance=disp_dist,
                                        angle=angle))
+    return result
+
+
+def calc_disp_angle(disp_dist, disp_vec, ini_dist, initial_pos_vec):
+    inner_prod = sum(initial_pos_vec * disp_vec)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        # ignore "RuntimeWarning: invalid value encountered in double_scalars"
+        cos = round(inner_prod / (ini_dist * disp_dist), 10)
+    result = float(round(180 * (1 - np.arccos(cos) / np.pi), 1))
+    if math.isnan(result):
+        result = None
     return result
 
 
@@ -267,7 +274,8 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
         lines = [" -- defect structure info",
                  f"Defect type: {self.defect_type}",
                  f"Site symmetry: {sym_transition}",
-                 f"Is same configuration: {self.same_config_from_init}",
+                 f"Has same configuration from initial structure: "
+                 f"{self.same_config_from_init}",
                  f"Drift distance: {self.drift_dist:5.3f}",
                  f"Defect center: {center_coords}"]
 
@@ -283,9 +291,9 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
         lines.extend(_site_info("Added atoms:", self.site_diff.inserted))
 
         if self.same_config_from_init is False:
-            lines.extend(_site_info("Initially removed atoms:",
+            lines.extend(_site_info("Removed atoms from initial structure:",
                                     self.site_diff_from_initial.removed))
-            lines.extend(_site_info("Initially added atoms:",
+            lines.extend(_site_info("Inserted atoms to initial structure:",
                                     self.site_diff_from_initial.inserted))
 
         lines.append("Displacements")
