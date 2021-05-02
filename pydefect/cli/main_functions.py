@@ -9,7 +9,7 @@ from pydefect.analyzer.calc_results import CalcResults, NoElectronicConvError, \
 from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
 from pydefect.analyzer.make_defect_structure_info import \
-    make_defect_structure_info
+    MakeDefectStructureInfo
 from pydefect.analyzer.make_band_edge_states import make_band_edge_states
 from pydefect.analyzer.make_calc_summary import make_calc_summary
 from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info
@@ -174,13 +174,12 @@ def calc_defect_structure_info(args):
     def _inner(_dir: Path):
         calc_results = get_calc_results(_dir, args.check_calc_results)
         defect_entry = loadfn(_dir / "defect_entry.json")
-        defect_str_info = make_defect_structure_info(
+        defect_str_info = MakeDefectStructureInfo(
             supercell_info.structure,
             defect_entry.structure,
             calc_results.structure,
             dist_tol=args.dist_tolerance,
-            symprec=args.symprec,
-            init_site_sym=defect_entry.site_symmetry)
+            symprec=args.symprec).defect_structure_info
         defect_str_info.to_json_file(str(_dir / "defect_structure_info.json"))
 
     parse_dirs(args.dirs, _inner)

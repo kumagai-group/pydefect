@@ -8,7 +8,7 @@ import numpy as np
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
 from pydefect.analyzer.defect_structure_info import Displacement, \
-    DefectStructureInfo, unique_point_group
+    DefectStructureInfo
 from pydefect.defaults import defaults
 from pymatgen import PeriodicSite, Structure, Lattice
 from vise.util.structure_symmetrizer import StructureSymmetrizer
@@ -22,120 +22,139 @@ def folded_coords(site: PeriodicSite,
     return tuple(site.frac_coords - image)
 
 
-def fold_coords_in_structure(structure: Structure, center: GenCoords) -> None:
-    for site in structure:
-        _, image = site.distance_and_image_from_frac_coords(center)
-        site.frac_coords -= image
-
-
-def calc_drift(perfect: Structure,
-               defect: Structure,
-               center: List[float],
-               d_to_p: List[int]) -> Tuple[int, float, GenCoords]:
-    distances = []
-    for site in defect:
-        distances.append(site.distance_and_image_from_frac_coords(center)[0])
-    anchor_atom_idx = int(np.argmax(distances))
-    p_anchor_atom_idx = d_to_p[anchor_atom_idx]
-    d_site = defect[anchor_atom_idx]
-    p_coords = perfect[p_anchor_atom_idx].frac_coords
-    distance, image = d_site.distance_and_image_from_frac_coords(p_coords)
-    drift_vector = d_site.frac_coords - p_coords - image
-    return anchor_atom_idx, distance, drift_vector
-
-
-def calc_displacements(perfect: Structure,
-                       defect: Structure,
-                       center: List[float],
-                       d_to_p: List[int]):
-    result = []
-    lattice: Lattice = defect.lattice
-    for d, p in enumerate(d_to_p):
-        if p is None:
-            result.append(None)
-        else:
-            p_elem = str(perfect[p].specie)
-            d_elem = str(defect[d].specie)
-            if p_elem != d_elem:
-                result.append(None)
-                continue
-            initial_pos = folded_coords(perfect[p], center)
-            final_pos = folded_coords(defect[d], initial_pos)
-
-            initial_pos_vec = lattice.get_cartesian_coords(np.array(initial_pos) - center)
-            disp_dist, t = lattice.get_distance_and_image(
-                defect.frac_coords[d], perfect.frac_coords[p])
-            disp_vec = lattice.get_cartesian_coords(
-                defect.frac_coords[d] - perfect.frac_coords[p] - t)
-
-            ini_dist = np.linalg.norm(initial_pos_vec)
-            angle = calc_disp_angle(disp_dist, disp_vec, ini_dist,
-                                    initial_pos_vec)
-
-            result.append(Displacement(specie=p_elem,
-                                       original_pos=initial_pos,
-                                       final_pos=final_pos,
-                                       distance_from_defect=ini_dist,
-                                       disp_vector=tuple(disp_vec),
-                                       displace_distance=disp_dist,
-                                       angle=angle))
-    return result
-
-
-def calc_disp_angle(disp_dist, disp_vec, ini_dist, initial_pos_vec):
-    inner_prod = sum(initial_pos_vec * disp_vec)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        # ignore "RuntimeWarning: invalid value encountered in double_scalars"
-        cos = round(inner_prod / (ini_dist * disp_dist), 10)
-    result = float(round(180 * (1 - np.arccos(cos) / np.pi), 1))
-    if math.isnan(result):
-        result = None
-    return result
-
-
 def remove_dot(x):
     return "".join([s for s in x if s != "."])
 
 
-def make_defect_structure_info(perfect: Structure,
-                               initial: Structure,
-                               final: Structure,
-                               dist_tol: float,
-                               symprec: float,
-                               init_site_sym: str,
-                               neighbor_cutoff_factor: float = None
-                               ) -> "DefectStructureInfo":
-    cutoff = neighbor_cutoff_factor or defaults.cutoff_distance_factor
+class MakeDefectStructureInfo:
+    def __init__(self,
+                 perfect: Structure,
+                 initial: Structure,
+                 final: Structure,
+                 symprec: float,
+                 dist_tol: float,
+                 neighbor_cutoff_factor: float = None):
 
-    final = final.copy()
-    symmetrizer = StructureSymmetrizer(final, symprec)
-    final_site_sym = symmetrizer.point_group
+        self.cutoff = neighbor_cutoff_factor or defaults.cutoff_distance_factor
+        self.symprec = symprec
+        self.perfect, self.initial, self.final = perfect, initial, final
+        self.dist_tol = dist_tol
 
-    assert perfect.lattice == initial.lattice == final.lattice
-    comp_w_perf = DefectStructureComparator(final, perfect, dist_tol)
-    comp_w_init = DefectStructureComparator(final, initial, dist_tol)
-    d_to_p = comp_w_init.d_to_p
+        assert perfect.lattice == initial.lattice == final.lattice
+        self.lattice = perfect.lattice
 
-    center = comp_w_perf.defect_center_coord
-    anchor_idx, drift_d, drift_vec = calc_drift(initial, final, center, d_to_p)
-    center -= drift_vec
-    for site in final:
-        site.frac_coords -= drift_vec
+        self._orig_comp = DefectStructureComparator(final, perfect, dist_tol)
+        self._orig_center = self._orig_comp.defect_center_coord
+        self._calc_drift()
 
-    displacements = calc_displacements(initial, final, center, d_to_p)
+        self.displaced_final = final.copy()
+        self.center = tuple(self._orig_center - self._drift_vector)
+        for site in self.displaced_final:
+            site.frac_coords -= np.array(self._drift_vector)
 
-    return DefectStructureInfo(
-        initial_site_sym=unique_point_group(remove_dot(init_site_sym)),
-        final_site_sym=unique_point_group(final_site_sym),
-        site_diff=comp_w_perf.make_site_diff(),
-        site_diff_from_initial=comp_w_init.make_site_diff(),
-        symprec=symprec,
-        dist_tol=dist_tol,
-        anchor_atom_idx=anchor_idx,
-        neighbor_atom_indices=comp_w_perf.neighboring_atom_indices(cutoff),
-        neighbor_cutoff_factor=cutoff,
-        drift_vector=tuple(drift_vec),
-        drift_dist=drift_d,
-        center=tuple(center),
-        displacements=displacements)
+        self.comp_w_perf = DefectStructureComparator(
+            self.displaced_final, perfect, dist_tol)
+        self.comp_w_init = DefectStructureComparator(
+            self.displaced_final, initial, dist_tol)
+
+        self.defect_structure_info = DefectStructureInfo(
+            initial_site_sym=self.initial_site_sym,
+            final_site_sym=self.final_site_sym,
+            site_diff=self.comp_w_perf.make_site_diff(),
+            site_diff_from_initial=self.comp_w_init.make_site_diff(),
+            symprec=symprec,
+            dist_tol=dist_tol,
+            anchor_atom_idx=self._anchor_atom_idx,
+            neighbor_atom_indices=self._neighbor_atom_indices,
+            neighbor_cutoff_factor=self.cutoff,
+            drift_vector=self._drift_vector,
+            drift_dist=self._drift_distance,
+            center=self.center,
+            displacements=self.calc_displacements(self.comp_w_init.d_to_p))
+
+    @property
+    def _neighbor_atom_indices(self):
+        return self.comp_w_perf.neighboring_atom_indices(self.cutoff)
+
+    @property
+    def initial_site_sym(self):
+        return self._unique_point_group(self.initial)
+
+    @property
+    def final_site_sym(self):
+        return self._unique_point_group(self.final)
+
+    def _unique_point_group(self, structure):
+        symmetrizer = StructureSymmetrizer(structure, self.symprec)
+        result = remove_dot(symmetrizer.point_group)
+        if result == "2mm" or result == "m2m":
+            return "mm2"
+        if result == "-4m2":
+            return "-42m"
+        if result == "m3":
+            return "m-3"
+        return result
+
+    def _calc_drift(self) -> None:
+        distances = []
+        for site in self.final:
+            distances.append(
+                site.distance_and_image_from_frac_coords(self._orig_center)[0])
+
+        self._anchor_atom_idx = int(np.argmax(distances))
+        p_anchor_atom_idx = self._orig_comp.d_to_p[self._anchor_atom_idx]
+        d_site = self.final[self._anchor_atom_idx]
+        p_coords = self.perfect[p_anchor_atom_idx].frac_coords
+        self._drift_distance, image = \
+            d_site.distance_and_image_from_frac_coords(p_coords)
+        self._drift_vector = tuple(d_site.frac_coords - p_coords - image)
+
+    def calc_displacements(self,
+                           d_to_p: List[int]):
+        defect = self.displaced_final
+        result = []
+        for d, p in enumerate(d_to_p):
+            if p is None:
+                result.append(None)
+            else:
+                p_elem = str(self.initial[p].specie)
+                d_elem = str(defect[d].specie)
+                if p_elem != d_elem:
+                    result.append(None)
+                    continue
+                initial_pos = folded_coords(self.initial[p], self.center)
+                final_pos = folded_coords(defect[d], initial_pos)
+
+                initial_pos_vec = self.lattice.get_cartesian_coords(
+                    np.array(initial_pos) - self.center)
+                disp_dist, t = self.lattice.get_distance_and_image(
+                    defect.frac_coords[d], self.initial.frac_coords[p])
+                disp_vec = self.lattice.get_cartesian_coords(
+                    defect.frac_coords[d] - self.initial.frac_coords[p] - t)
+
+                ini_dist = np.linalg.norm(initial_pos_vec)
+                angle = self.calc_disp_angle(disp_dist, disp_vec, ini_dist,
+                                             initial_pos_vec)
+
+                result.append(Displacement(specie=p_elem,
+                                           original_pos=initial_pos,
+                                           final_pos=final_pos,
+                                           distance_from_defect=ini_dist,
+                                           disp_vector=tuple(disp_vec),
+                                           displace_distance=disp_dist,
+                                           angle=angle))
+        return result
+
+    @staticmethod
+    def calc_disp_angle(disp_dist, disp_vec, ini_dist, initial_pos_vec):
+        inner_prod = sum(initial_pos_vec * disp_vec)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            # ignore "RuntimeWarning: invalid value encountered in double_scalars"
+            cos = round(inner_prod / (ini_dist * disp_dist), 10)
+        result = float(round(180 * (1 - np.arccos(cos) / np.pi), 1))
+        if math.isnan(result):
+            result = None
+        return result
+
+

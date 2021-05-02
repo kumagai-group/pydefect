@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo
-from pydefect.analyzer.make_defect_structure_info import \
-    fold_coords_in_structure
+from pymatgen import Structure
 from vise.analyzer.vesta.vesta_file import VestaFile
 from pydefect.defaults import defaults
 from pymatgen.core import Structure, DummySpecies, Element
+from vise.util.typing import GenCoords
 
 
 class MakeDefectVestaFile:
@@ -98,3 +98,8 @@ class MakeDefectVestaFile:
                 self._site_info.append(info)
                 specie_idx += 1
 
+
+def fold_coords_in_structure(structure: Structure, center: GenCoords) -> None:
+    for site in structure:
+        _, image = site.distance_and_image_from_frac_coords(center)
+        site.frac_coords -= image

@@ -179,7 +179,7 @@ def test_calc_defect_structure_info(mocker, tmpdir, supercell_info):
     mock_loadfn = mocker.patch(
         "pydefect.cli.main_functions.loadfn", side_effect=side_effect)
     mock_structure_info = mocker.patch(
-        "pydefect.cli.main_functions.make_defect_structure_info")
+        "pydefect.cli.main_functions.MakeDefectStructureInfo")
     info = loadfn("supercell_info.json")
 
     args = Namespace(supercell_info=info, check_calc_results=True,
@@ -190,9 +190,8 @@ def test_calc_defect_structure_info(mocker, tmpdir, supercell_info):
         mock_defect_entry.structure,
         mock_calc_results.structure,
         dist_tol=0.1,
-        symprec=0.2,
-        init_site_sym=mock_defect_entry.site_symmetry)
-    mock_structure_info.return_value.to_json_file.assert_called_once_with(
+        symprec=0.2)
+    mock_structure_info.return_value.defect_structure_info.to_json_file.assert_called_once_with(
         "Va_O1_2/defect_structure_info.json")
 
 

@@ -65,16 +65,6 @@ class Displacement(MSONable):
     angle: Optional[float]
 
 
-def unique_point_group(pg):
-    if pg == "2mm" or pg == "m2m":
-        return "mm2"
-    if pg == "-4m2":
-        return "-42m"
-    if pg == "m3":
-        return "m-3"
-    return pg
-
-
 def symmetry_relation(initial_point_group, final_point_group):
     """ Check the point group symmetry relation using the space group relation
     implemented in pymatgen.

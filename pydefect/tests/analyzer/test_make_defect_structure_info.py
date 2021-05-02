@@ -6,8 +6,8 @@ from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import Displacement, \
     DefectStructureInfo
 from pydefect.analyzer.make_defect_structure_info import \
-    fold_coords_in_structure, calc_drift, calc_displacements, \
-    make_defect_structure_info
+    MakeDefectStructureInfo
+from pydefect.cli.make_defect_vesta_file import fold_coords_in_structure
 
 from pymatgen import Structure, Lattice
 from vise.tests.helpers.assertion import assert_dataclass_almost_equal
@@ -103,29 +103,6 @@ def test_fold_coords():
     assert actual == expected
 
 
-def test_calc_drift_dist(structures):
-    perfect, _, final = structures
-    anchor_atom_idx, drift_dist, vector_in_frac = \
-        calc_drift(perfect, final, center=[0.4, 0.4, 0.4], d_to_p=[None, 1, 2, 3])
-    assert anchor_atom_idx == 3
-    assert drift_dist == 0.001
-    np.testing.assert_almost_equal(vector_in_frac, np.array([0.0, 0.0, 0.0001]))
-
-
-def test_calc_displacements():
-    perf = Structure(Lattice.cubic(10), species=["H"], coords=[[0, 0, -0.01]])
-    defect = Structure(Lattice.cubic(10), species=["H"], coords=[[0, 0, 10.98]])
-    actual = calc_displacements(perf, defect, [0, 0, 0.98], d_to_p=[0])
-    expected = [Displacement(specie="H",
-                             original_pos=(0.0, 0.0, 0.99),
-                             final_pos=(0.0, 0.0, 0.98),
-                             distance_from_defect=0.1,
-                             disp_vector=(0.0, 0.0, -0.1),
-                             displace_distance=0.1,
-                             angle=0.0)]
-    assert_dataclass_almost_equal(actual[0], expected[0])
-
-#
 # def test_calc_displacements_w_interstitials():
 #     perf = Structure(Lattice.cubic(10), species=["H"], coords=[[0.0, 0.0, 0.0]])
 #     defect = Structure(Lattice.cubic(10), species=["H", "H"],
@@ -141,9 +118,13 @@ def test_calc_displacements():
 #     assert_dataclass_almost_equal(actual[0], expected[0])
 
 
-def test_make_defect_structure_info(structures, def_str_info):
-    perfect, initial, final = structures
-    actual = make_defect_structure_info(
-         perfect, initial, final, dist_tol=0.2, symprec=0.1, init_site_sym="3m",
-         neighbor_cutoff_factor=1.2)
+def test(structures, def_str_info):
+    perf, initial, final = structures
+    info = MakeDefectStructureInfo(perf, initial, final,  dist_tol=0.2,
+                                   symprec=0.1,
+                                   neighbor_cutoff_factor=1.2)
+    actual = info.defect_structure_info
+    print(actual)
     assert_dataclass_almost_equal(actual, def_str_info)
+
+
