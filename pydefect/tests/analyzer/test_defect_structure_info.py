@@ -2,47 +2,15 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from copy import deepcopy
 
-import numpy as np
 import pytest
 from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import \
-    Displacement, DefectStructureInfo, fold_coords_in_structure, calc_drift, \
-    make_defect_structure_info, symmetry_relation, SymmRelation, \
-    unique_point_group, DefectType, judge_defect_type, \
-    calc_displacements
+    Displacement, DefectStructureInfo, symmetry_relation, SymmRelation, \
+    unique_point_group, DefectType, judge_defect_type
 from pymatgen.core import Structure, Lattice
-from vise.tests.helpers.assertion import assert_dataclass_almost_equal, \
-    assert_msonable, assert_json_roundtrip
+from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 from vise.util.enum import ExtendedEnum
 from vise.util.structure_symmetrizer import num_sym_op
-
-
-@pytest.fixture
-def structures():
-    perfect = Structure(
-        Lattice.cubic(10),
-        species=["H", "He", "Li", "U"],
-        coords=[[0.25, 0.25, 0.25],
-                [0.75, 0.75, 0.75],
-                [0.5, 0.5, 0.5],
-                [0, 0, 0]])
-
-    initial = Structure(
-        Lattice.cubic(10),
-        species=["H", "He", "Be", "U"],
-        coords=[[0.25, 0.25, 0.25],
-                [0.75, 0.75, 0.75],
-                [0.5, 0.5, 0.5],
-                [0.0, 0.0, 0.0]])
-
-    final = Structure(
-        Lattice.cubic(10),
-        species=["H", "He", "Be", "U"],
-        coords=[[0.27, 0.25, 0.2501],
-                [0.76, 0.75, 0.7501],
-                [0.5, 0.5, 0.501],
-                [0.0, 0.0, 0.0001]])
-    return perfect, initial, final
 
 
 @pytest.fixture
@@ -96,55 +64,6 @@ def def_str_info(displacements):
                                displacements=displacements)
 
 
-def test_fold_coords():
-    actual = Structure(Lattice.monoclinic(a=1, b=1, c=1, beta=20),
-                       species=["H"],
-                       coords=[[0.5, 0, 0.49]])
-    fold_coords_in_structure(actual, [0, 0, 0])
-    expected = Structure(Lattice.monoclinic(a=1, b=1, c=1, beta=20),
-                         species=["H"],
-                         coords=[[-0.5, 0, 0.49]])
-    assert actual == expected
-
-
-def test_calc_drift_dist(structures):
-    perfect, _, final = structures
-    anchor_atom_idx, drift_dist, vector_in_frac = \
-        calc_drift(perfect, final, center=[0.4, 0.4, 0.4], d_to_p=[None, 1, 2, 3])
-    assert anchor_atom_idx == 3
-    assert drift_dist == 0.001
-    np.testing.assert_almost_equal(vector_in_frac, np.array([0.0, 0.0, 0.0001]))
-
-
-def test_calc_displacements():
-    perf = Structure(Lattice.cubic(10), species=["H"], coords=[[0, 0, -0.01]])
-    defect = Structure(Lattice.cubic(10), species=["H"], coords=[[0, 0, 10.98]])
-    actual = calc_displacements(perf, defect, [0, 0, 0.98], d_to_p=[0])
-    expected = [Displacement(specie="H",
-                             original_pos=(0.0, 0.0, 0.99),
-                             final_pos=(0.0, 0.0, 0.98),
-                             distance_from_defect=0.1,
-                             disp_vector=(0.0, 0.0, -0.1),
-                             displace_distance=0.1,
-                             angle=0.0)]
-    assert_dataclass_almost_equal(actual[0], expected[0])
-
-#
-# def test_calc_displacements_w_interstitials():
-#     perf = Structure(Lattice.cubic(10), species=["H"], coords=[[0.0, 0.0, 0.0]])
-#     defect = Structure(Lattice.cubic(10), species=["H", "H"],
-#                        coords=[[0.01, 0.0, 0.0], [0.11, 0.0, 0.0]])
-#     actual = calc_displacements(perf, defect, [0, 0, 0.98], d_to_p=[0, None])
-#     expected = [Displacement(specie="H",
-#                              original_pos=(0.0, 0.0, 0.0),
-#                              final_pos=(0.0, 0.0, 0.01),
-#                              distance_from_defect=0.0,
-#                              disp_vector=(0.01, 0.0, 0.0),
-#                              displace_distance=0.1,
-#                              angle=180.0)]
-#     assert_dataclass_almost_equal(actual[0], expected[0])
-
-
 def test_defect_type():
     assert_msonable(DefectType.vacancy)
     assert issubclass(DefectType, ExtendedEnum)
@@ -187,11 +106,7 @@ def test_judge_defect_type():
     assert judge_defect_type(site_diff_3) == DefectType.unknown
 
 
-def test_str_info_msonable(def_str_info):
-    assert_msonable(def_str_info)
-
-
-def test_calc_results_json_roundtrip(def_str_info, tmpdir):
+def test_defect_structure_info_json_roundtrip(def_str_info, tmpdir):
     assert_json_roundtrip(def_str_info, tmpdir)
 
 
@@ -205,19 +120,11 @@ def test_symmetry_relation():
     assert symmetry_relation("4/m", "2") == SymmRelation.subgroup
 
 
-def test_make_defect_structure_info(structures, def_str_info):
-    perfect, initial, final = structures
-    actual = make_defect_structure_info(
-         perfect, initial, final, dist_tol=0.2, symprec=0.1, init_site_sym="3m",
-        neighbor_cutoff_factor=1.2)
-    assert_dataclass_almost_equal(actual, def_str_info)
-
-
-def test_make_def_str_info_symm_rel(structures, def_str_info):
+def test_make_def_str_info_symm_rel(def_str_info):
     assert def_str_info.symm_relation == SymmRelation.subgroup
 
 
-def test_make_def_str_info_same_config_from_init(structures, def_str_info):
+def test_make_def_str_info_same_config_from_init(def_str_info):
     assert def_str_info.same_config_from_init is False
 
 

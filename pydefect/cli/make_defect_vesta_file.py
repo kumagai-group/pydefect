@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from pydefect.analyzer.defect_structure_info import DefectStructureInfo, \
+from pydefect.analyzer.defect_structure_info import DefectStructureInfo
+from pydefect.analyzer.make_defect_structure_info import \
     fold_coords_in_structure
 from vise.analyzer.vesta.vesta_file import VestaFile
 from pydefect.defaults import defaults

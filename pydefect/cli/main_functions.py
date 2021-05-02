@@ -8,7 +8,8 @@ from pydefect.analyzer.calc_results import CalcResults, NoElectronicConvError, \
     NoIonicConvError
 from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
-from pydefect.analyzer.defect_structure_info import make_defect_structure_info
+from pydefect.analyzer.make_defect_structure_info import \
+    make_defect_structure_info
 from pydefect.analyzer.make_band_edge_states import make_band_edge_states
 from pydefect.analyzer.make_calc_summary import make_calc_summary
 from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info
