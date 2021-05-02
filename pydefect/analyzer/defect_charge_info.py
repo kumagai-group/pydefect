@@ -15,6 +15,7 @@ from vise.util.typing import Coords
 
 @dataclass
 class AveChargeDensityDist(MSONable, ToJsonFileMixIn):
+    """Average charge density distribution."""
     charge_center: Coords
     radial_dist: List[float]
 
