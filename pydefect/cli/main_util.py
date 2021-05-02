@@ -64,7 +64,7 @@ def parse_args_main_util(args):
     parser_dvf = subparsers.add_parser(
         name="defect_vesta_file",
         description="Generate VESTA file for visualizing defect structure.",
-        parents=[dirs_parser, no_calc_results],
+        parents=[dirs_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['dvf'])
     parser_dvf.add_argument(

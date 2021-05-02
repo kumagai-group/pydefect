@@ -10,62 +10,10 @@ from pydefect.cli.make_defect_vesta_file import \
 from pymatgen.core import Structure, Lattice
 
 
-def test_defect_vesta_file(tmpdir):
+def test_defect_vesta_file(def_str_info, tmpdir):
     print(tmpdir)
-    site_diff = SiteDiff(removed=[(0, 'H', (0.25, 0.25, 0.25))],
-                         inserted=[(0, 'H', (0.27, 0.25, 0.25))],
-                         removed_by_sub=[(2, 'Li', (0.5, 0.5, 0.5))],
-                         inserted_by_sub=[(2, 'Be', (0.5, 0.5, 0.5009))])
-    site_diff_from_init = SiteDiff(removed=[(0, 'H', (0.25, 0.25, 0.25))],
-                                   inserted=[(0, 'H', (0.27, 0.25, 0.25))],
-                                   removed_by_sub=[(2, 'Li', (0.5, 0.5, 0.5))],
-                                   inserted_by_sub=[(2, 'Be', (0.5, 0.5, 0.5))])
-    displacements = [None,
-                     Displacement(specie="He",
-                                  original_pos=(0.75, 0.75, 0.75),
-                                  final_pos=(0.76, 0.75, 0.75),
-                                  distance_from_defect=6.465437190360757,
-                                  disp_vector=(0.1, 0.0, 0.0),
-                                  displace_distance=0.09999999999999964,
-                                  angle=124.9),
-                     Displacement(specie="Be",
-                                  original_pos=(0.5, 0.5, 0.5),
-                                  final_pos=(0.5, 0.5, 0.5009),
-                                  distance_from_defect=2.1355627039494767,
-                                  disp_vector=(0.0, 0.0, 0.009),
-                                  displace_distance=0.009000000000000341,
-                                  angle=125.8),
-                     Displacement(specie="U",
-                                  original_pos=(0, 0, 0),
-                                  final_pos=(0.0, 0.0, 0.0),
-                                  distance_from_defect=6.525191802736529,
-                                  disp_vector=(0.0, 0.0, 0.0),
-                                  displace_distance=0.0,
-                                  angle=None)]
-
-    def_str_info = DefectStructureInfo(
-        initial_site_sym="3m",
-        final_site_sym="m",
-        site_diff=site_diff,
-        site_diff_from_initial=site_diff_from_init,
-        symprec=0.1,
-        dist_tol=0.2,
-        anchor_atom_idx=3,
-        neighbor_atom_indices=[1],
-        neighbor_cutoff_factor=1.0000,
-        drift_vector=(0.0, 0.0, 0.0001),
-        drift_dist=0.001,
-        center=(0.38, 0.375, 0.37517500000000004),
-        displacements=displacements)
-    structure = Structure(
-        Lattice.cubic(10),
-        species=["H", "He", "Be", "U"],
-        coords=[[0.27, 0.25, 0.2501],
-                [0.76, 0.75, 0.7501],
-                [0.5, 0.5, 0.501],
-                [0.0, 0.0, 0.0001]])
     tmpdir.chdir()
-    x = MakeDefectVestaFile(defect_structure=structure, defect_structure_info=def_str_info, arrow_factor=100)
+    x = MakeDefectVestaFile(defect_structure_info=def_str_info, arrow_factor=100)
     x.initial_vesta.write_file("defect_initial.vesta")
     x.final_vesta.write_file("defect.vesta")
 
@@ -126,7 +74,7 @@ CELLP
 10.000000 10.000000 10.000000 90.000000 90.000000 90.000000
 
 STRUC
-1 Be 2.1 1.0 0.500000 0.500000 0.501000
+1 Be 2.1 1.0 0.500000 0.500000 0.500900
  0.0 0.0 0.0 
 2 H H_i 1.0 0.270000 0.250000 0.250000
  0.0 0.0 0.0 

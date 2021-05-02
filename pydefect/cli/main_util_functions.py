@@ -30,10 +30,8 @@ def add_interstitials_from_local_extrema(args) -> None:
 
 def make_defect_vesta_file(args) -> None:
     def _inner(_dir: Path):
-        calc_results = get_calc_results(_dir, args.check_calc_results)
         defect_str_info = loadfn(_dir / "defect_structure_info.json")
-        make_vesta_file = MakeDefectVestaFile(calc_results.structure,
-                                              defect_str_info,
+        make_vesta_file = MakeDefectVestaFile(defect_str_info,
                                               args.cutoff,
                                               args.min_displace_w_arrows,
                                               args.arrow_factor,

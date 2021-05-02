@@ -42,13 +42,10 @@ def test_add_interstitials_from_local_extrema(mocker):
 
 
 def test_make_defect_vesta_file(mocker):
-    mock_calc_results = mocker.Mock()
     mock_defect_structure_info = mocker.Mock()
 
     def side_effect(key):
-        if str(key) == "Va_O1_0/calc_results.json":
-            return mock_calc_results
-        elif str(key) == "Va_O1_0/defect_structure_info.json":
+        if str(key) == "Va_O1_0/defect_structure_info.json":
             return mock_defect_structure_info
         else:
             print(key)
@@ -68,8 +65,7 @@ def test_make_defect_vesta_file(mocker):
         arrow_factor=3.0,
         title=None)
     make_defect_vesta_file(args)
-    mock_make_vesta_file.assert_called_once_with(mock_calc_results.structure,
-                                                 mock_defect_structure_info,
+    mock_make_vesta_file.assert_called_once_with(mock_defect_structure_info,
                                                  1.0, 2.0, 3.0, None)
 
 
