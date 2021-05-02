@@ -282,7 +282,7 @@ def parse_args_main(args):
     parser_calc_summary = subparsers.add_parser(
         name="calc_summary",
         description="",
-        parents=[dirs_parser, pcr_parser],
+        parents=[dirs_parser, pcr_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cs'])
 

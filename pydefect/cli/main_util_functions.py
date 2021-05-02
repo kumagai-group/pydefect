@@ -39,7 +39,7 @@ def make_defect_vesta_file(args) -> None:
                                               args.arrow_factor,
                                               args.title)
         make_vesta_file.initial_vesta.write_file(_dir / "defect_initial.vesta")
-        make_vesta_file.initial_vesta.write_file(_dir / "defect.vesta")
+        make_vesta_file.final_vesta.write_file(_dir / "defect.vesta")
 
     parse_dirs(args.dirs, _inner)
 

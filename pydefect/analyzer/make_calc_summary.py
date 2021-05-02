@@ -9,11 +9,11 @@ from pydefect.input_maker.defect_entry import DefectEntry
 
 
 def make_calc_summary(
-        calc_set: List[Tuple[DefectEntry, CalcResults, DefectStructureInfo]],
+        calc_set: List[Tuple[CalcResults, DefectEntry, DefectStructureInfo]],
         p_calc_results: CalcResults) -> CalcSummary:
 
     summaries = {}
-    for entry, calc_results, str_info in calc_set:
+    for calc_results, entry, str_info in calc_set:
         atom_io = num_atom_differences(calc_results.structure,
                                        p_calc_results.structure)
         relative_energy = calc_results.energy - p_calc_results.energy
