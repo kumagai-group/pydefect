@@ -86,7 +86,7 @@ def calc_grids(args):
 
 
 def make_defect_charge_info_main(args):
-    band_idxs = [int(parchg.split(".")[-2]) for parchg in args.parchgs]
+    band_idxs = [int(parchg.split(".")[-2]) - 1 for parchg in args.parchgs]
     parchgs = [Chgcar.from_file(parchg) for parchg in args.parchgs]
     defect_charge_info = make_defect_charge_info(
         parchgs, band_idxs, args.bin_interval, args.grids)

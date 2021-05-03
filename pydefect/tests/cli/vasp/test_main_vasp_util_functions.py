@@ -129,6 +129,6 @@ def test_make_defect_charge_info_main(mocker):
                      bin_interval=0.1)
     make_defect_charge_info_main(args)
 
-    mock_make_charge_info.assert_called_once_with([m_chgcar], [189], 0.1, mock_grids)
+    mock_make_charge_info.assert_called_once_with([m_chgcar], [188], 0.1, mock_grids)
     mock_chgcar.from_file.assert_called_once_with("PARCHG.0189.ALLK")
     mock_charge_info.to_json_file.assert_called_once_with()
