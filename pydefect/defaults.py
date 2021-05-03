@@ -26,6 +26,8 @@ class Defaults(DefaultsBase):
              "xkcd:gold", "xkcd:magenta", "xkcd:orange", "xkcd:darkblue",
              "xkcd:navy", "xkcd:red", "xkcd:olive", "xkcd:black", "xkcd:indigo"]
         self._abs_strange_energy = 100.0
+        self._localized_orbital_radius = 3.0
+        self._localized_orbital_fraction_wrt_uniform = 0.7
 
         self.set_user_settings(yaml_filename="pydefect.yaml")
 
@@ -84,6 +86,14 @@ class Defaults(DefaultsBase):
     @property
     def abs_strange_energy(self):
         return self._abs_strange_energy
+
+    @property
+    def localized_orbital_radius(self):
+        return self._localized_orbital_radius
+
+    @property
+    def localized_orbital_fraction_wrt_uniform(self):
+        return self._localized_orbital_fraction_wrt_uniform
 
 
 defaults = Defaults()

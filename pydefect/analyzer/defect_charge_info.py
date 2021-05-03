@@ -6,6 +6,7 @@ from typing import List
 import numpy as np
 from matplotlib import pyplot as plt
 from monty.json import MSONable
+from pydefect.defaults import defaults
 from pydefect.util.coords import pretty_coords
 from pymatgen import Spin
 from tabulate import tabulate
@@ -97,15 +98,18 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
         ax.legend(loc='upper right')
         return plt
 
-    def localized_orbitals(self, radius, fraction):
+    def localized_orbitals(self,
+                           radius: float = defaults.localized_orbital_radius,
+                           fraction_wrt_uniform: float
+                           = defaults.localized_orbital_fraction_wrt_uniform):
         result = [[] for i in range(len(self.charge_dists[0]))]
         for charge_dist, band_idx in zip(self.charge_dists, self.band_idxs):
             for spin_idx, (dist, spin) in enumerate(zip(charge_dist,
                                                         [Spin.up, Spin.down])):
                 try:
                     half_radius = self.half_charge_radius(band_idx, spin)
-                    half_frac = half_radius / self.uniform_half_charge_radius
-                    if half_radius < radius and half_frac < fraction:
+                    half_f = half_radius / self.uniform_half_charge_radius
+                    if half_radius < radius and half_f < fraction_wrt_uniform:
                         result[spin_idx].append(band_idx)
                 except ValueError:
                     pass

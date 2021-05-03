@@ -68,16 +68,15 @@ def test_defect_charge_info_show_dist(defect_charge_info):
 
 
 def test_defect_charge_info_are_localized(defect_charge_info):
-    actual = defect_charge_info.localized_orbitals(radius=0.3, fraction=1.0)
+    actual = defect_charge_info.localized_orbitals(0.3, 1.0)
     expected = [[10], []]
     assert actual == expected
 
-    actual = defect_charge_info.localized_orbitals(radius=0.4, fraction=1.0)
+    actual = defect_charge_info.localized_orbitals(0.4, 1.0)
     expected = [[10], [10]]
     assert actual == expected
 
-    actual = defect_charge_info.localized_orbitals(radius=0.4,
-                                                   fraction=0.398/0.62-0.001)
+    actual = defect_charge_info.localized_orbitals(0.4, 0.398 / 0.62 - 0.001)
     expected = [[10], []]
     assert actual == expected
 
