@@ -251,7 +251,7 @@ def test_make_band_edge_states(mocker):
         if str(key) == "Va_O1_2/band_edge_orbital_infos.json":
             return mocker_band_edge_orbital_infos
         else:
-            raise ValueError
+            raise FileNotFoundError
 
     mocker_loadfn = mocker.patch(
         "pydefect.cli.main_functions.loadfn", side_effect=side_effect)
@@ -263,5 +263,6 @@ def test_make_band_edge_states(mocker):
                      p_state=mock_perfect_edge_states)
     make_band_edge_states_main_func(args)
     mocker_make_edge_states.assert_called_with(mocker_band_edge_orbital_infos,
-                                               mock_perfect_edge_states)
+                                               mock_perfect_edge_states,
+                                               None)
 

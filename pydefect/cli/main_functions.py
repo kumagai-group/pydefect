@@ -208,7 +208,12 @@ def make_efnv_correction_main_func(args):
 def make_band_edge_states_main_func(args):
     def _inner(_dir: Path):
         orb_infos = loadfn(_dir / "band_edge_orbital_infos.json")
-        band_edge_states = make_band_edge_states(orb_infos, args.p_state)
+        try:
+            defect_charge_info = loadfn(_dir / "defect_charge_info.json")
+        except FileNotFoundError:
+            defect_charge_info = None
+        band_edge_states = make_band_edge_states(orb_infos, args.p_state,
+                                                 defect_charge_info)
         band_edge_states.to_json_file(str(_dir / "band_edge_states.json"))
 
     parse_dirs(args.dirs, _inner)
