@@ -57,8 +57,8 @@ def test_defect_charge_info_repr(defect_charge_info):
     expected = """ -- defect charge info
 Uniform charge radius is  0.620
 Band index  Spin  Radius  Center
-10          up    0.298   ( 0.100,  0.100,  0.100)
-10          down  0.398   ( 0.100,  0.100,  0.100)"""
+11          up    0.298   ( 0.100,  0.100,  0.100)
+11          down  0.398   ( 0.100,  0.100,  0.100)"""
     assert defect_charge_info.__str__() == expected
 
 

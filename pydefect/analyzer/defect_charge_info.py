@@ -78,7 +78,7 @@ class DefectChargeInfo(MSONable, ToJsonFileMixIn):
         spin_idx = 0 if spin == Spin.up else 1
         spin_str = "up" if spin == Spin.up else "down"
         center = pretty_coords(c_dist[spin_idx].charge_center)
-        lines.append([band_idx, spin_str, radius, center])
+        lines.append([band_idx + 1, spin_str, radius, center])
 
     @property
     def bins_middle_points(self):
