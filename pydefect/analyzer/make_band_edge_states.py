@@ -100,22 +100,6 @@ def make_band_edge_states(orbital_infos: BandEdgeOrbitalInfos,
     return BandEdgeStates(states=states)
 
 
-def get_cbm_info(orbs, lowest_band_idx, edge_info):
-    idx, diff = get_similar_orb_idx(orbs, edge_info)
-    info = EdgeInfo(band_idx=idx + lowest_band_idx,
-                        kpt_coord=edge_info.kpt_coord,
-                        orbital_info=orbs[idx])
-    return diff, info
-
-
-def get_vbm_info(orbs, lowest_band_idx, edge_info):
-    idx, diff = get_similar_orb_idx(orbs, edge_info, reversed=True)
-    info = EdgeInfo(band_idx=idx + lowest_band_idx,
-                        kpt_coord=edge_info.kpt_coord,
-                        orbital_info=orbs[idx])
-    return diff, info
-
-
 def orbital_diff(orbital_1: dict, orbital_2: dict) -> float:
     element_set = set(list(orbital_1.keys()) + list(orbital_2.keys()))
     orb_1, orb_2 = defaultdict(list, orbital_1), defaultdict(list, orbital_2)
