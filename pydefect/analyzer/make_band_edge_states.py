@@ -14,15 +14,29 @@ from pydefect.defaults import defaults
 
 def get_similar_orb_idx(orbs: List[OrbitalInfo],
                         edge_info: EdgeInfo,
-                        reversed: bool = False) -> Tuple[int, float]:
-    if reversed:
+                        localized_orbs: List[int] = None,
+                        _reversed: bool = False) -> Tuple[int, float]:
+    if _reversed:
         orbs = orbs[::-1]  # by band
 
+    if localized_orbs:
+        if _reversed:
+            localized_orbs = [len(orbs) - i for i in localized_orbs]
+
+        def is_passed(idx):
+            return idx <= max(localized_orbs) - 1
+    else:
+        def is_passed(idx):
+            return False
+
     for i, orb in enumerate(orbs):
+        if is_passed(i):
+            continue
+        print(i)
         if abs(orb.energy - edge_info.energy) < defaults.similar_energy_criterion:
             orb_diff = orbital_diff(orb.orbitals, edge_info.orbitals)
             if orb_diff < defaults.similar_orb_criterion:
-                orb_idx = len(orbs) - i - 1 if reversed else i
+                orb_idx = len(orbs) - i - 1 if _reversed else i
                 return orb_idx, orb_diff
     raise ValueError(f"Similar orbital to the edge are not found. "
                      f"Try to increase the similar criterion.")
@@ -71,16 +85,22 @@ def make_band_edge_states(orbital_infos: BandEdgeOrbitalInfos,
 
     states = []
     lowest_idx = orbital_infos.lowest_band_index
-    for orb_info_by_spin in orbital_infos.orbital_infos:
+    for spin_idx, orb_info_by_spin in enumerate(orbital_infos.orbital_infos):
+        if defect_charge_info:
+            localized_orbs = defect_charge_info.localized_orbitals(10.0, 1.0)[spin_idx]
+            localized_orbs = [i - lowest_idx for i in localized_orbs]
+        else:
+            localized_orbs = None
 
         vbm_idx, vbm_diff = get_similar_orb_idx(orb_info_by_spin[vbm_k_idx],
-                                                vbm_info, reversed=True)
+                                                vbm_info, localized_orbs,
+                                                _reversed=True)
         vbm_info = EdgeInfo(band_idx=vbm_idx + lowest_idx,
                             kpt_coord=vbm_info.kpt_coord,
                             orbital_info=orb_info_by_spin[vbm_k_idx][vbm_idx])
 
         cbm_idx, cbm_diff = get_similar_orb_idx(orb_info_by_spin[cbm_k_idx],
-                                                cbm_info)
+                                                cbm_info, localized_orbs)
         cbm_info = EdgeInfo(band_idx=cbm_idx + lowest_idx,
                             kpt_coord=cbm_info.kpt_coord,
                             orbital_info=orb_info_by_spin[cbm_k_idx][cbm_idx])

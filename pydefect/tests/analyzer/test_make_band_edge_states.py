@@ -75,17 +75,17 @@ def test_make_band_edge_state(p_edge_state, orb_infos):
                                                   localized_orb_2])])
     assert actual == expected
 
-#
-# def test_make_band_edge_state_w_defect_charge_info(p_edge_state, orb_infos, mocker):
-#     defect_charge_info = mocker.Mock()
-#     defect_charge_info.localized_orbitals = [[9]]
-#     actual = make_band_edge_states(orb_infos, p_edge_state, defect_charge_info)
-#     expected = EdgeInfo(band_idx=8, kpt_coord=(0.0, 0.0, 0.0),
-#                         orbital_info=OrbitalInfo(
-#                             energy=-1.1, orbitals={"Mn": [0.5, 0.6, 0.0, 0.0],
-#                                                    "O": [0.0, 0.0, 0.0, 0.0]},
-#                             occupation=1.0, participation_ratio=0.1))
-#     assert actual.states[0].vbm_info == expected
+
+def test_make_band_edge_state_w_defect_charge_info(p_edge_state, orb_infos, mocker):
+    defect_charge_info = mocker.Mock()
+    defect_charge_info.localized_orbitals.return_value = [[9]]
+    actual = make_band_edge_states(orb_infos, p_edge_state, defect_charge_info)
+    expected = EdgeInfo(band_idx=8, kpt_coord=(0.0, 0.0, 0.0),
+                        orbital_info=OrbitalInfo(
+                            energy=-1.1, orbitals={"Mn": [0.5, 0.6, 0.0, 0.0],
+                                                   "O": [0.0, 0.0, 0.0, 0.0]},
+                            occupation=1.0, participation_ratio=0.1))
+    assert actual.states[0].vbm_info == expected
 
 
 def test_orbital_diff(mocker):
