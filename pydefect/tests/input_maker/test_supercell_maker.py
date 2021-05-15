@@ -106,7 +106,9 @@ direct
 0.500000 0.500000 0.500000 Si""", fmt="POSCAR")
 
     matrix_to_conv_cell = [[3, 0, 0], [0, 3, 0], [0, 0, 2]]
-    sm = SupercellMaker(structure, matrix_to_conv_cell=matrix_to_conv_cell)
+    sm = SupercellMaker(structure,
+                        matrix_to_conv_cell=matrix_to_conv_cell,
+                        symprec=0.01)
     actual = structure * sm.transformation_matrix
     expected = conv_structure * matrix_to_conv_cell
     assert actual == expected

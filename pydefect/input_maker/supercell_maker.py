@@ -4,6 +4,7 @@
 from typing import Optional, List
 
 import numpy as np
+from pydefect.defaults import defaults
 from pydefect.input_maker.supercell import Supercell, TetragonalSupercells, \
     Supercells
 from pydefect.input_maker.supercell_info import SupercellInfo
@@ -20,11 +21,20 @@ class SupercellMaker:
     def __init__(self,
                  primitive_structure: IStructure,
                  matrix_to_conv_cell: Optional[List[List[int]]] = None,
+                 symprec: float = defaults.symmetry_length_tolerance,
+                 angle_tolerance: float = defaults.symmetry_angle_tolerance,
+                 raise_error: bool = True,
                  **supercell_kwargs):
 
         self.primitive_structure = primitive_structure
-        symmetrizer = StructureSymmetrizer(primitive_structure)
+        symmetrizer = StructureSymmetrizer(primitive_structure,
+                                           symprec=symprec,
+                                           angle_tolerance=angle_tolerance)
         if primitive_structure != symmetrizer.primitive:
+            logger.warning(
+                "The input structure is different from the primitive one,"
+                "which might be due to the difference of symprec used in"
+                "the pydefect and unitcell conversion.")
             logger.warning("\n".join([
                 "Input lattice:",
                 f"{primitive_structure.lattice}", "",
@@ -34,7 +44,8 @@ class SupercellMaker:
                 f"{primitive_structure}", "",
                 "Primitive structure:",
                 f"{symmetrizer.primitive}"]))
-            raise NotPrimitiveError
+            if raise_error:
+                raise NotPrimitiveError
 
         self.sg = symmetrizer.sg_number
         self.sg_symbol = symmetrizer.spglib_sym_data["international"]
