@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 import numpy as np
 from monty.json import MSONable
+from pydefect.defaults import defaults
 from pydefect.util.structure_tools import Distances
 from pymatgen.core import IStructure, Structure
 from vise.util.typing import Coords
@@ -14,7 +15,7 @@ class DefectStructureComparator:
     def __init__(self,
                  defect_structure: IStructure,
                  perfect_structure: IStructure,
-                 dist_tol: float = None):
+                 dist_tol: float = defaults.dist_tol):
         """
         Atoms in the final structure are shifted such that the farthest atom
         from the defect is placed at the same place with that in the perfect
