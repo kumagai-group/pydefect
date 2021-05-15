@@ -32,7 +32,6 @@ def get_similar_orb_idx(orbs: List[OrbitalInfo],
     for i, orb in enumerate(orbs):
         if is_passed(i):
             continue
-        print(i)
         if abs(orb.energy - edge_info.energy) < defaults.similar_energy_criterion:
             orb_diff = orbital_diff(orb.orbitals, edge_info.orbitals)
             if orb_diff < defaults.similar_orb_criterion:
