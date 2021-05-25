@@ -57,6 +57,12 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     lowest_band_index: int
     fermi_level: float
 
+    def kpt_idx(self, kpt_coord):
+        for i, orig_kpt in enumerate(self.kpt_coords):
+            if sum(abs(k - l) for k, l in zip(orig_kpt, kpt_coord)) < 1e-5:
+                return i
+        raise ValueError(f"{kpt_coord} not in kpt_coords {self.kpt_coords}.")
+
     @property
     def energies_and_occupations(self) -> List[List[List[List[float]]]]:
         result = np.zeros(np.shape(self.orbital_infos) + (2,))

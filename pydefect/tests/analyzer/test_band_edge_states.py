@@ -49,6 +49,10 @@ def band_edge_orbital_infos(orbital_info):
                                 fermi_level=0.5)
 
 
+def test_kpt_idx(band_edge_orbital_infos):
+    assert band_edge_orbital_infos.kpt_idx([0.0, 0.0, 0.0]) == 0
+
+
 def test_band_edge_orbital_info_json_roundtrip(band_edge_orbital_infos, tmpdir):
     assert_json_roundtrip(band_edge_orbital_infos, tmpdir)
 
