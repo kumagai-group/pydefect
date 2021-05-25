@@ -37,8 +37,10 @@ def get_similar_orb_idx(orbs: List[OrbitalInfo],
             if orb_diff < defaults.similar_orb_criterion:
                 orb_idx = len(orbs) - i - 1 if _reversed else i
                 return orb_idx, orb_diff
-    raise ValueError(f"Similar orbital to the edge are not found. "
-                     f"Try to increase the similar criterion.")
+    raise ValueError(f"Similar orbital to the edge are not found.\n"
+                     f"Energy criterion: {defaults.similar_energy_criterion}\n"
+                     f"Orbital criterion: {defaults.similar_orb_criterion}\n"
+                     f"Try to lower the criterion.")
 
 
 def get_localized_orbs(orb_info_by_spin: List[List[OrbitalInfo]],
