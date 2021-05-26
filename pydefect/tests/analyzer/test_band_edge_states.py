@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -156,3 +157,22 @@ Index  Energy  P-ratio  Occupation  Orbitals
     assert band_edge_states.__str__() == expected
 
 
+def test_band_edge_states_str2(band_edge_states):
+    copy = deepcopy(band_edge_states)
+    copy.states[0].localized_orbitals = [LocalizedOrbital(
+        band_idx=11, ave_energy=1.9, occupation=1.0,
+        orbitals={"H": [1.0, 0.0, 0.0, 0.0]}, radius=1.000001,
+        center=[0.1234, 0.0, 0.0])]
+    actual = copy.__str__()
+    print(actual)
+    expected = """ -- band-edge states info
+Spin-up
+     Index  Energy  P-ratio  Occupation  OrbDiff  Orbitals                K-point coords
+VBM  11     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
+CBM  13     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
+---
+Localized Orbital(s)
+Index  Energy  P-ratio  Occupation  Orbitals   Radius  Center
+12     1.900   None     1.00        H-s: 1.00  1.00    ( 0.123,  0.000,  0.000)
+"""
+    assert actual == expected

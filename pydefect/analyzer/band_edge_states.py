@@ -9,8 +9,7 @@ from monty.json import MSONable
 from pydefect.util.coords import pretty_coords
 from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn
-from vise.util.typing import Coords
-
+from vise.util.typing import Coords, GenCoords
 
 printed_orbital_weight_threshold = 0.1
 state_occupied_threshold = 0.3
@@ -134,7 +133,7 @@ class LocalizedOrbital(MSONable):
     orbitals: Dict[str, List[float]]
     participation_ratio: Optional[float] = None
     radius: Optional[float] = None
-    center: Optional[Coords] = None
+    center: Optional[GenCoords] = None
 
 
 @dataclass
@@ -218,14 +217,21 @@ class BandEdgeState(MSONable):
     @property
     def _orbital_info(self):
         inner_table = [["Index", "Energy", "P-ratio", "Occupation", "Orbitals"]]
+        w_radius = self.localized_orbitals and self.localized_orbitals[0].radius
+        if w_radius:
+            inner_table[0].extend(["Radius", "Center"])
         for lo in self.localized_orbitals:
             participation_ratio = f"{lo.participation_ratio:5.2f}" \
                 if lo.participation_ratio else "None"
-            inner_table.append([lo.band_idx + 1,
-                                f"{lo.ave_energy:7.3f}",
+            inner = [lo.band_idx + 1,
+                     f"{lo.ave_energy:7.3f}",
                                 participation_ratio,
                                 f"{lo.occupation:5.2f}",
-                                pretty_orbital(lo.orbitals)])
+                                pretty_orbital(lo.orbitals)]
+            if w_radius:
+                inner.extend([f"{lo.radius:5.2f}", pretty_coords(lo.center)])
+            inner_table.append(inner)
+
         return tabulate(inner_table, tablefmt="plain")
 
     @property
