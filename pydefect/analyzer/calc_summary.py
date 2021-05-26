@@ -17,8 +17,8 @@ class SingleCalcSummary(MSONable):
     ionic_conv: Optional[bool] = None
     is_energy_strange: Optional[bool] = None
     same_config_from_init: Optional[bool] = None
-    defect_type: Optional[DefectType] = None
-    symm_relation: Optional[SymmRelation] = None
+    defect_type: Optional[str] = None
+    symm_relation: Optional[str] = None
     donor_phs: Optional[bool] = None
     acceptor_phs: Optional[bool] = None
     unoccupied_deep_state: Optional[bool] = None

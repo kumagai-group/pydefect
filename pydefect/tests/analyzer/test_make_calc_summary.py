@@ -37,8 +37,8 @@ def test_make_calc_summary(mocker):
         ionic_conv=calc_results.ionic_conv,
         is_energy_strange=False,
         same_config_from_init=structure_info.same_config_from_init,
-        defect_type=structure_info.defect_type,
-        symm_relation=structure_info.symm_relation)
+        defect_type=str(structure_info.defect_type),
+        symm_relation=str(structure_info.symm_relation))
     expected = CalcSummary({"Va_O1_1": single_summary})
 
     assert actual == expected

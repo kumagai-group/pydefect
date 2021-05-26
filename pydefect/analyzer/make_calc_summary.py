@@ -32,6 +32,6 @@ def make_single_calc_summary(calc_results, entry, p_calc_results, str_info):
         ionic_conv=calc_results.ionic_conv,
         is_energy_strange=is_energy_strange,
         same_config_from_init=str_info.same_config_from_init,
-        defect_type=str_info.defect_type,
-        symm_relation=str_info.symm_relation)
+        defect_type=str(str_info.defect_type),
+        symm_relation=str(str_info.symm_relation))
 
