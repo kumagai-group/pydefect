@@ -266,7 +266,7 @@ class ChemPotDiagMaker:
         return ChemPotDiag(vertex_elements=self.elements,
                            polygons=polygons,
                            target=self.target,
-                           target_vertices=vertices)
+                           target_vertices_dict=vertices)
 
 
 @dataclass
@@ -304,13 +304,13 @@ class ChemPotDiag(MSONable, ToJsonFileMixIn):
     vertex_elements: List[str]
     polygons: Dict[str, List[List[float]]]
     target: str = None
-    target_vertices: Dict[str, TargetVertex] = None
+    target_vertices_dict: Dict[str, TargetVertex] = None
 
     @property
     def target_coords(self):
-        if self.target_vertices:
+        if self.target_vertices_dict:
             return {k: [v.chem_pot[e] for e in self.vertex_elements]
-                    for k, v in self.target_vertices.items()}
+                    for k, v in self.target_vertices_dict.items()}
 
     @property
     def min_range(self):
@@ -336,8 +336,8 @@ class ChemPotDiag(MSONable, ToJsonFileMixIn):
 
     @property
     def to_target_vertices(self):
-        if self.target and self.target_vertices:
-            return TargetVertices(self.target, self.target_vertices)
+        if self.target and self.target_vertices_dict:
+            return TargetVertices(self.target, self.target_vertices_dict)
         logger.warning("Need to set target and target_vertices.")
         raise ValueError
 
