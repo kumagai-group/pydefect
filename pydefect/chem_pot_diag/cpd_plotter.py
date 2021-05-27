@@ -183,8 +183,6 @@ class ChemPotDiagPlotlyPlotter(ABC):
         self.cpd = cpd
         self.axes_titles = [f"μ <sub>{el}</sub> (eV)"
                             for el in self.cpd.vertex_elements]
-        print(self.axes_titles)
-        self.hover = "<b>label %{text}</b><br> energy (%{x:.2f}, %{y:.2f})"
         title = f"Chemical potential diagram of {self.cpd.chemical_system}"
         self.range = [self.cpd.min_range * 1.001, -self.cpd.min_range * 0.1]
         self.common_layout = dict(title=title, width=700, height=700,
@@ -196,6 +194,9 @@ class ChemPotDiagPlotlyPlotter(ABC):
 
 
 class ChemPotDiag2DPlotlyPlotter(ChemPotDiagPlotlyPlotter):
+    def __init__(self, cpd: ChemPotDiag):
+        super().__init__(cpd)
+        self.hover = "<b>label %{text}</b><br> energy (%{x:.2f}, %{y:.2f})"
 
     @property
     def figure(self):
@@ -220,7 +221,7 @@ class ChemPotDiag2DPlotlyPlotter(ChemPotDiagPlotlyPlotter):
 
         if self.cpd.target:
             x, y, text = [], [], []
-            for label, cp in self.cpd.polygons.items():
+            for label, cp in self.cpd.target_coords.items():
                 x.append(cp[0])
                 y.append(cp[1])
                 text.append(label)
@@ -235,6 +236,10 @@ class ChemPotDiag2DPlotlyPlotter(ChemPotDiagPlotlyPlotter):
 
 
 class ChemPotDiag3DPlotlyPlotter(ChemPotDiagPlotlyPlotter):
+    def __init__(self, cpd: ChemPotDiag):
+        super().__init__(cpd)
+        self.hover = \
+            "<b>label %{text}</b><br> energy (%{x:.2f}, %{y:.2f}, %{z:.2f})"
 
     @property
     def figure(self):
@@ -258,10 +263,11 @@ class ChemPotDiag3DPlotlyPlotter(ChemPotDiagPlotlyPlotter):
                                      textfont=dict(color=color, size=24),
                                      hoverinfo='skip'))
         if self.cpd.target:
-            x = [cp[0] for cp in self.cpd.polygons.values()]
-            y = [cp[1] for cp in self.cpd.polygons.values()]
-            z = [cp[2] for cp in self.cpd.polygons.values()]
-            label = [key for key in self.cpd.polygons]
+            target_coords = self.cpd.target_coords
+            x = [cp[0] for cp in target_coords.values()]
+            y = [cp[1] for cp in target_coords.values()]
+            z = [cp[2] for cp in target_coords.values()]
+            label = [key for key in target_coords]
             data.append(go.Scatter3d(x=x, y=y, z=z, text=label,
                                      mode='markers+text',
                                      textfont=dict(size=24),
