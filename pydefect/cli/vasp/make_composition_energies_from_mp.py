@@ -39,9 +39,7 @@ def make_composition_energies_from_mp(elements: List[str],
         for k, v in key.as_dict().items():
             energy += diff[k] * v
         comp_es[key] = CompositionEnergy(energy, m["task_id"])
-    print(comp_es)
     comp_es = remove_higher_energy_comp(comp_es)
-    print(comp_es)
     return CompositionEnergies(comp_es)
 
 
