@@ -1,90 +1,60 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-
-from typing import List
-
 import dash_table
 from crystal_toolkit.core.mpcomponent import MPComponent
 from crystal_toolkit.helpers.layouts import Column, dcc, html, Columns
 from dash.dependencies import Input, Output
-from pydefect.analyzer.band_edge_states import IsShallow
-from pydefect.analyzer.calc_results import CalcResults
-from pydefect.analyzer.defect_energy import make_charge_energies
+from pydefect.analyzer.defect_energy import DefectEnergySummary
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyPlotlyPlotter
-from pydefect.chem_pot_diag.chem_pot_diag import CpdPlotInfo
+from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, TargetVertices
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DPlotlyPlotter, \
     ChemPotDiag3DPlotlyPlotter
-from pydefect.corrections.abstract_correction import Correction
-from pydefect.input_maker.defect_entry import DefectEntry
+
+
+def _target_vertices_to_columns_and_data(chem_pot_diag: ChemPotDiag):
+    chem_pots = chem_pot_diag.to_target_vertices.chem_pots
+    columns = [{"name": "label", "id": "label"}]
+    for elem in chem_pot_diag.vertex_elements:
+        columns.append({"name": elem, "id": elem})
+
+    data = []
+    for k, v in chem_pots.items():
+        datum = {"label": k}
+        for elem in chem_pot_diag.vertex_elements:
+            datum[elem] = v[elem]
+        data.append(datum)
+    return columns, data
 
 
 class CpdEnergyComponent(MPComponent):
     def __init__(self,
-                 cpd_plot_info: CpdPlotInfo,
-                 perfect: CalcResults,
-                 defect_calc_results: List[CalcResults],
-                 defect_entries: List[DefectEntry],
-                 corrections: List[Correction],
-                 unitcell_vbm: float,
-                 unitcell_cbm: float,
-                 is_shallows: List[IsShallow] = None,
-                 show_competing_phases: bool = False,
+                 chem_pot_diag: ChemPotDiag,
+                 defect_energy_summary: DefectEnergySummary,
                  *args, **kwargs):
-        self.cpd_plot_info = cpd_plot_info
-        self.perfect = perfect
-        self.defect_calc_results = defect_calc_results
-        self.defect_entries = defect_entries
-        self.corrections = corrections
-        self.unitcell_vbm = unitcell_vbm
-        self.unitcell_cbm = unitcell_cbm
-        self.is_shallows = is_shallows
-        self.dim = cpd_plot_info.dim
+        self.chem_pot_diag = chem_pot_diag
+        self.dim = chem_pot_diag.dim
+        self.defect_energy_summary = defect_energy_summary
         super().__init__(*args, **kwargs)
 
-        df = self.cpd_plot_info.cpd.target_vertex_list_dataframe.copy()
-        df.reset_index(inplace=True)
-
-        def rename(x):
-            if "mu" in x:
-                return x.split("_")[1]
-            return x
-
-        if show_competing_phases:
-            columns = [{"name": rename(i), "id": i} for i in df.columns]
-        else:
-            columns = [{"name": rename(i), "id": i}
-                       for i in df.columns if "competing phase" not in i]
-
-        columns[0]["name"] = "label"
-
+        columns, data = _target_vertices_to_columns_and_data(chem_pot_diag)
         self.vertex_list = dash_table.DataTable(
-            id='table',
+            id=self.id("vertex_list"),
             columns=columns,
-            data=df.to_dict('records'),
-            style_cell={'fontSize': 24,
-                        'font-family': 'sans-serif',
+            data=data,
+            style_cell={'fontSize': 20, 'font-family': 'sans-serif',
                         "width": 700})
 
-    def energy_fig(self, abs_chem_pot, label, allow_shallow):
-        defect_energies = make_charge_energies(self.perfect,
-                                        self.defect_calc_results,
-                                        self.defect_entries,
-                                        self.corrections,
-                                        abs_chem_pot,
-                                        allow_shallow,
-                                        self.is_shallows)
-        plotter = DefectEnergyPlotlyPlotter(title=f"Label {label[0]}",
-                                            defect_energies=defect_energies,
-                                            vbm=self.unitcell_vbm,
-                                            cbm=self.unitcell_cbm,
-                                            supercell_vbm=self.perfect.vbm,
-                                            supercell_cbm=self.perfect.cbm,
-                                            supercell_edge=False)
+    def energy_fig(self, label, allow_shallow):
+        plotter = DefectEnergyPlotlyPlotter(
+            title=f"Label {label[0]}",
+            chem_pot_label=label,
+            defect_energy_summary=self.defect_energy_summary,
+            allow_shallow=allow_shallow,
+            with_corrections=True)
         return plotter.create_figure()
 
     @property
     def _sub_layouts(self):
-
         allow_shallow = self.get_choice_input(
             kwarg_label="allow_shallow",
             state={"label": "True", "value": "True"},
@@ -94,23 +64,24 @@ class CpdEnergyComponent(MPComponent):
                      {"label": "False", "value": "False"}])
 
         if self.dim in [2, 3]:
-            if self.cpd_plot_info.dim == 2:
-                fig = ChemPotDiag2DPlotlyPlotter(self.cpd_plot_info).figure
+            if self.dim == 2:
+                fig = ChemPotDiag2DPlotlyPlotter(self.chem_pot_diag).figure
             else:
-                fig = ChemPotDiag3DPlotlyPlotter(self.cpd_plot_info).figure
+                fig = ChemPotDiag3DPlotlyPlotter(self.chem_pot_diag).figure
             cpd = dcc.Graph(id="cpd", figure=fig)
             energy = dcc.Graph(id=self.id('energy'))
             return {"cpd": cpd, "energy": energy, "allow_shallow": allow_shallow}
         else:
             d = [{"label": v, "value": v}
-                 for v in self.cpd_plot_info.cpd.target_vertices.keys()]
+                 for v in self.chem_pot_diag.target_vertices_dict.keys()]
             cpd_label = self.get_choice_input(
                 kwarg_label="label",
                 state={"label": "A", "value": "A"},
                 label="Equilibrium label",
                 options=d)
             energy = dcc.Graph(id=self.id('energy'))
-            return {"cpd_label": cpd_label, "energy": energy, "allow_shallow": allow_shallow}
+            return {"cpd_label": cpd_label, "energy": energy,
+                    "allow_shallow": allow_shallow}
 
     @property
     def layout(self):
@@ -118,8 +89,7 @@ class CpdEnergyComponent(MPComponent):
             return Columns([Column([html.Div(self._sub_layouts["energy"]),
                                     self._sub_layouts["allow_shallow"]]),
                             Column([self._sub_layouts["cpd"],
-                                    self.vertex_list])
-                            ])
+                                    self.vertex_list])])
 
         else:
             return Columns([Column([self.vertex_list,
@@ -136,8 +106,7 @@ class CpdEnergyComponent(MPComponent):
             def display_cpd(click_data, allow_shallow):
                 allow_shallow = True if allow_shallow[0] == "True" else False
                 label = click_data["points"][0]["text"] if click_data else "A"
-                abs_chem_pot = self.cpd_plot_info.cpd.abs_chem_pot_dict(label)
-                return self.energy_fig(abs_chem_pot, label, allow_shallow)
+                return self.energy_fig(label, allow_shallow)
         else:
             @app.callback(
                 Output(self.id('energy'), 'figure'),
@@ -146,7 +115,6 @@ class CpdEnergyComponent(MPComponent):
             def display_cpd(label, allow_shallow):
                 allow_shallow = True if allow_shallow[0] == "True" else False
                 label = label[0] if label else "A"
-                abs_chem_pot = self.cpd_plot_info.cpd.abs_chem_pot_dict(label)
-                return self.energy_fig(abs_chem_pot, label, allow_shallow)
+                return self.energy_fig(label, allow_shallow)
 
 
