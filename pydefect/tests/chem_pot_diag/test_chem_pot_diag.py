@@ -134,10 +134,11 @@ def cpd():
                   'MgO2': [[0.0, -4.5], [-9.0, 0.0]],
                   'O': [[min_val, 0.0], [-9.0, 0.0]]},
         target="MgO2",
-        target_vertices={"A": TargetVertex({"Mg": 0.0, "O": -4.5, "Al": -1.0},
-                                           ["Mg"], ["MgAlO2"]),
-                         "B": TargetVertex({"Mg": -9.0, "O": 0.0, "Al": -1.0},
-                                           ["O"], ["MgAlO2"])})
+        target_vertices_dict={
+            "A": TargetVertex({"Mg": 0.0, "O": -4.5, "Al": -1.0},
+                              ["Mg"], ["MgAlO2"]),
+            "B": TargetVertex({"Mg": -9.0, "O": 0.0, "Al": -1.0},
+                              ["O"], ["MgAlO2"])})
 
 
 @pytest.fixture

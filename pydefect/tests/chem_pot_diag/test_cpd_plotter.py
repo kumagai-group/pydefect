@@ -28,8 +28,9 @@ def cpd_2d():
         vertex_elements=["H", "O"],
         polygons=polygons,
         target="HO",
-        target_vertices={"A": TargetVertex({"H": 0.0, "O": -3.0}, ["H"], None),
-                         "B": TargetVertex({"H": -3.0, "O": 0.0}, ["O"], None)})
+        target_vertices_dict=
+        {"A": TargetVertex({"H": 0.0, "O": -3.0}, ["H"], None),
+         "B": TargetVertex({"H": -3.0, "O": 0.0}, ["O"], None)})
 
 
 @pytest.mark.skipif(False, reason="")
@@ -48,9 +49,10 @@ def cpd_3d():
         vertex_elements=["H", "O", "N"],
         polygons=polygons,
         target="HON",
-        target_vertices={"A": TargetVertex({"H": 0.0, "O": 0.0, "N": -3.0}, ["H", "O"], None),
-                         "B": TargetVertex({"H": 0.0, "O": -3.0, "N": 0.0}, ["H", "N"], None),
-                         "C": TargetVertex({"H": -3.0, "O": 0.0, "N": 0.0}, ["O", "N"], None)})
+        target_vertices_dict={
+            "A": TargetVertex({"H": 0.0, "O": 0.0, "N": -3.0}, ["H", "O"], None),
+            "B": TargetVertex({"H": 0.0, "O": -3.0, "N": 0.0}, ["H", "N"], None),
+            "C": TargetVertex({"H": -3.0, "O": 0.0, "N": 0.0}, ["O", "N"], None)})
 
 
 @pytest.mark.skipif(False, reason="")
