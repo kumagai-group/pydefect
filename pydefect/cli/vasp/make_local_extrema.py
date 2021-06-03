@@ -54,7 +54,8 @@ def find_inequivalent_coords(structure: Structure,
     _indices = [i for i in range(start_index, end_index)]
     repr_atom_pairs = zip(sym_data["equivalent_atoms"][_indices], _indices)
 
-    for _, equiv_sites in groupby(repr_atom_pairs, key=lambda x: x[0]):
+    key = lambda x: x[0]
+    for _, equiv_sites in groupby(sorted(repr_atom_pairs, key=key), key=key):
         coords, quantity = [], []
         for repr_idx, atom_idx in equiv_sites:
             fcoord = added_structure[atom_idx].frac_coords

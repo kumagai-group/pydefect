@@ -107,7 +107,8 @@ class SitePotentialPlotlyPlotter(SitePotentialPlotter):
         all_potentials = []
         pc_potentials = []
         potential_diffs = []
-        for _, grouped_sites in groupby(self.sites, key=lambda x: x.specie):
+        key = lambda x: x.specie
+        for _, grouped_sites in groupby(sorted(self.sites, key=key), key=key):
             distances = []
             potentials = []
             atom_idxs = []
@@ -178,7 +179,8 @@ class SitePotentialMplPlotter(SitePotentialPlotter):
         pc_pot_distances = []
         pc_potentials = []
         potential_diffs = []
-        for _, grouped_sites in groupby(self.sites, key=lambda x: x.specie):
+        key = lambda x: x.specie
+        for _, grouped_sites in groupby(sorted(self.sites, key=key), key=key):
             distances = []
             potentials = []
             for site in grouped_sites:

@@ -17,7 +17,9 @@ def make_defect_energy_summary(
         perfect_band_edge: PerfectBandEdgeState) -> DefectEnergySummary:
 
     defect_energies = {}
-    for _, grouped_es in groupby(energy_infos, lambda x: x.name):
+    key = lambda x: x.name
+    # MUST NEED SORTED.
+    for _, grouped_es in groupby(sorted(energy_infos, key=key), key=key):
         grouped_es = list(grouped_es)
         name, atom_io = grouped_es[0].name, grouped_es[0].atom_io
         charges, des = [], []

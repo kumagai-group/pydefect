@@ -43,11 +43,13 @@ def make_composition_energies_from_mp(elements: List[str],
     return CompositionEnergies(comp_es)
 
 
-def remove_higher_energy_comp(comp_energies: Dict[Composition, CompositionEnergy]):
-    _l = [[k, v] for k, v in comp_energies.items()]
+def remove_higher_energy_comp(
+        comp_energies: Dict[Composition, CompositionEnergy]):
+    comp_energy_pairs = [[k, v] for k, v in comp_energies.items()]
     result = {}
-    for _, grouped_k_v in groupby(
-            _l, key=lambda x: Composition(x[0]).reduced_formula):
+    key = lambda x: Composition(x[0]).reduced_formula
+    sorted_comp_energy_pairs = sorted(comp_energy_pairs, key=key)
+    for _, grouped_k_v in groupby(sorted_comp_energy_pairs, key=key):
         formula, comp_e = min(list(grouped_k_v),
                               key=lambda y: (y[1].energy
                                              / Composition(y[0]).num_atoms))
