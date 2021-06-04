@@ -17,10 +17,7 @@ class MpQuery:
         default_properties = ["task_id", "full_formula", "final_energy",
                               "structure", "spacegroup", "band_gap",
                               "total_magnetization", "magnetic_type"]
-        self.element_list = element_list
-        self.properties = properties or default_properties
-        self.e_above_hull = e_above_hull
-
+        properties = properties or default_properties
         excluded = list(set(elements) - set(element_list))
         criteria = ({"elements": {"$in": element_list, "$nin": excluded},
                      "e_above_hull": {"$lte": e_above_hull}})
@@ -28,6 +25,19 @@ class MpQuery:
         with MPRester() as m:
             # Due to mp_decode=True by default, class objects are restored.
             self.materials = m.query(criteria=criteria,
-                                     properties=self.properties)
+                                     properties=properties)
+
+
+class MpEntries:
+    def __init__(self,
+                 element_list: List[str],
+                 e_above_hull: float = defaults.e_above_hull,
+                 additional_properties: List[str] = None):
+        excluded = list(set(elements) - set(element_list))
+        criteria = ({"elements": {"$in": element_list, "$nin": excluded},
+                     "e_above_hull": {"$lte": e_above_hull}})
+        with MPRester() as m:
+            self.materials = m.get_entries(
+                criteria, property_data=additional_properties)
 
 

@@ -7,16 +7,17 @@ from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergy, \
 from pydefect.cli.vasp.make_composition_energies_from_mp import \
     make_composition_energies_from_mp, remove_higher_energy_comp
 from pymatgen.core import Composition, Element
+from pymatgen.entries.computed_entries import ComputedEntry
 
 
 @pytest.fixture
 def mp_query_mock(mocker):
     mock = mocker.patch(
-        "pydefect.cli.vasp.make_composition_energies_from_mp.MpQuery")
+        "pydefect.cli.vasp.make_composition_energies_from_mp.MpEntries")
     mock.return_value.materials = \
-        [{"full_formula": "O8", "final_energy": -39.58364375, "task_id": "mp-1"},
-         {"full_formula": "Mg3", "final_energy": -4.79068775, "task_id": "mp-2"},
-         {"full_formula": "Mg1O1", "final_energy": -11.96742144, "task_id": "mp-3"}]
+        [ComputedEntry(Composition("O8"), -39.58364375, entry_id="mp-1"),
+         ComputedEntry(Composition("Mg3"), -4.79068775, entry_id="mp-2"),
+         ComputedEntry(Composition("Mg1O1"), -11.96742144, entry_id="mp-3")]
     return mock
 
 
@@ -44,8 +45,7 @@ def comp_energies_corr():
 
 def test_make_chem_pot_diag_from_mp(mp_query_mock, comp_energies):
     actual = make_composition_energies_from_mp(elements=["Mg", "O"])
-    mp_query_mock.assert_called_once_with(
-        ["Mg", "O"], properties=["task_id", "full_formula", "final_energy"])
+    mp_query_mock.assert_called_once_with(["Mg", "O"])
     assert actual == comp_energies
 
 
