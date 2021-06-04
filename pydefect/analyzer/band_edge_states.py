@@ -6,14 +6,13 @@ from typing import List, Dict, Tuple, Optional, Set
 
 import numpy as np
 from monty.json import MSONable
+from pydefect.defaults import defaults
 from pydefect.util.coords import pretty_coords
 from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.typing import Coords, GenCoords
 
 printed_orbital_weight_threshold = 0.1
-state_occupied_threshold = 0.3
-state_unoccupied_threshold = 1 - state_occupied_threshold
 
 
 @dataclass
@@ -188,25 +187,27 @@ class BandEdgeState(MSONable):
 
     @property
     def is_shallow(self):
-        return self.vbm_info.occupation < state_unoccupied_threshold \
-               or self.cbm_info.occupation > state_occupied_threshold
+        return self.vbm_info.occupation < defaults.state_unoccupied_threshold \
+               or self.cbm_info.occupation > defaults.state_occupied_threshold
 
     @property
     def has_donor_phs(self):
-        return self.cbm_info.orbital_info.occupation > state_occupied_threshold
+        return (self.cbm_info.orbital_info.occupation
+                > defaults.state_occupied_threshold)
 
     @property
     def has_acceptor_phs(self):
-        return self.vbm_info.orbital_info.occupation < state_unoccupied_threshold
+        return (self.vbm_info.orbital_info.occupation
+                < defaults.state_unoccupied_threshold)
 
     @property
     def has_unoccupied_localized_state(self):
-        return any([lo.occupation < state_unoccupied_threshold
+        return any([lo.occupation < defaults.state_unoccupied_threshold
                     for lo in self.localized_orbitals])
 
     @property
     def has_occupied_localized_state(self):
-        return any([lo.occupation > state_occupied_threshold
+        return any([lo.occupation > defaults.state_occupied_threshold
                     for lo in self.localized_orbitals])
 
     def __str__(self):
@@ -225,9 +226,9 @@ class BandEdgeState(MSONable):
                 if lo.participation_ratio else "None"
             inner = [lo.band_idx + 1,
                      f"{lo.ave_energy:7.3f}",
-                                participation_ratio,
-                                f"{lo.occupation:5.2f}",
-                                pretty_orbital(lo.orbitals)]
+                     participation_ratio,
+                     f"{lo.occupation:5.2f}",
+                     pretty_orbital(lo.orbitals)]
             if w_radius:
                 inner.extend([f"{lo.radius:5.2f}", pretty_coords(lo.center)])
             inner_table.append(inner)

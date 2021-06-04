@@ -20,6 +20,7 @@ class Defaults(DefaultsBase):
         self._ele_neg_diff = 2.0
         self._similar_orb_criterion = 0.2
         self._similar_energy_criterion = 0.5  # in eV
+        self._state_occupied_threshold = 0.07
         self._eigval_range = 1.0
         self._defect_energy_colors = \
             ["xkcd:blue", "xkcd:brown", "xkcd:crimson", "xkcd:darkgreen",
@@ -74,6 +75,14 @@ class Defaults(DefaultsBase):
     @property
     def similar_energy_criterion(self):
         return self._similar_energy_criterion
+
+    @property
+    def state_occupied_threshold(self):
+        return self._state_occupied_threshold
+
+    @property
+    def state_unoccupied_threshold(self):
+        return 1 - self._state_occupied_threshold
 
     @property
     def eigval_range(self):

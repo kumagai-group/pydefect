@@ -115,12 +115,12 @@ class EigenvaluePlotlyPlotter(EigenvaluePlotter):
             for kpt_idx, eo_by_k_idx in enumerate(eo_by_spin):
                 for band_idx, (energy, occup) \
                         in enumerate(eo_by_k_idx, self._lowest_band_idx):
-                    if occup > 0.9:
+                    if occup > defaults.state_unoccupied_threshold:
                         occupied[0].append(kpt_idx)
                         occupied[1].append(energy)
                         occupied[2].append(band_idx + 1)
                         occupied[3].append(occup)
-                    elif occup < 0.1:
+                    elif occup < defaults.state_occupied_threshold:
                         unoccupied[0].append(kpt_idx)
                         unoccupied[1].append(energy)
                         unoccupied[2].append(band_idx + 1)
