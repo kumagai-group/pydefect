@@ -46,6 +46,13 @@ O2Cl2:
                           compare_dict=False, compare_items=False)
 
 
+def test_composition_energies_from_dict():
+    actual = CompositionEnergies.from_dict({"Mg": -1.0})
+    expected = CompositionEnergies({Composition("Mg"): CompositionEnergy(-1.0)})
+    assert actual == expected
+    actual = actual.std_rel_energies
+
+
 def test_composition_energies_elements(composition_energies):
     assert composition_energies.elements == ["Cl", "H", "O"]
 

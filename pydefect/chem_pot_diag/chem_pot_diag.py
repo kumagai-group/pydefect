@@ -51,6 +51,11 @@ class CompositionEnergies(ToYamlFileMixIn, dict):
             composition_energies[key] = CompositionEnergy(v["energy"], source)
         return cls(composition_energies)
 
+    @classmethod
+    def from_dict(cls, d: Dict[str, float]):
+        ce = {Composition(k): CompositionEnergy(v) for k, v in d.items()}
+        return cls(ce)
+
     @property
     def elements(self):
         result = set()
