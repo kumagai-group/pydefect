@@ -95,7 +95,11 @@ def make_defect_entries(args):
         try:
             dir_path.mkdir()
             logger.info(f"Making {dir_path} dir...")
-            defect_entry.perturbed_structure.to(filename=dir_path / "POSCAR")
+            if defect_entry.perturbed_structure:
+                defect_entry.perturbed_structure.to(filename=dir_path / "POSCAR")
+            else:
+                defect_entry.structure.to(filename=dir_path / "POSCAR")
+
             defect_entry.to_json_file(filename=dir_path / "defect_entry.json")
             defect_entry.to_prior_info(filename=dir_path / "prior_info.yaml")
         except FileExistsError:
