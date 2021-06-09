@@ -33,7 +33,10 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'pydefect = pydefect.cli.vasp.main:main',
+            'pydefect = pydefect.cli.main:main',
+            'pydefect_util = pydefect.cli.main_util:main',
+            'pydefect_vasp = pydefect.cli.vasp.main_vasp:main'
+            'pydefect_vasp_util = pydefect.cli.vasp.main_vasp_util:main'
         ]
     }
 )
