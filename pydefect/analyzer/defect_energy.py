@@ -36,6 +36,8 @@ class DefectEnergyInfo(MSONable, ToYamlFileMixIn):
     charge: int
     atom_io: Dict[str, int]
     defect_energy: DefectEnergy
+    # This defect formation energy is estimated at the Fermi level locating at
+    # the vbm and references are set to their standard states.
 
     def to_yaml(self) -> str:
         lines = [f"name: {self.name}",
