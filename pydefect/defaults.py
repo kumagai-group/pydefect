@@ -20,7 +20,7 @@ class Defaults(DefaultsBase):
         self._ele_neg_diff = 2.0
         self._similar_orb_criterion = 0.2
         self._similar_energy_criterion = 0.5  # in eV
-        self._state_occupied_threshold = 0.07
+        self._state_occupied_threshold = 0.20
         self._eigval_range = 1.0
         self._defect_energy_colors = \
             ["xkcd:blue", "xkcd:brown", "xkcd:crimson", "xkcd:darkgreen",
