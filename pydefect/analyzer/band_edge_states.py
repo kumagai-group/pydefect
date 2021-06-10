@@ -244,9 +244,9 @@ class BandEdgeState(MSONable):
                            self.cbm_info, self.cbm_orbital_diff)]
         table = tabulate(inner_table, tablefmt="plain")
         vbm_phs = f"vbm has acceptor phs: {self.has_acceptor_phs} " \
-                  f"({self.vbm_hole_occupation:5.3f} > {defaults.state_occupied_threshold})"
+                  f"({self.vbm_hole_occupation:5.3f} vs. {defaults.state_occupied_threshold})"
         cbm_phs = f"cbm has donor phs: {self.has_donor_phs} " \
-                  f"({self.cbm_electron_occupation:5.3f} > {defaults.state_occupied_threshold})"
+                  f"({self.cbm_electron_occupation:5.3f} vs. {defaults.state_occupied_threshold})"
         return "\n".join([table, vbm_phs, cbm_phs])
 
     @staticmethod

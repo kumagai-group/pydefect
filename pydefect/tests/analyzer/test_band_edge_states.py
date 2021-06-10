@@ -152,8 +152,8 @@ Spin-up
      Index  Energy  P-ratio  Occupation  OrbDiff  Orbitals                K-point coords
 VBM  11     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
 CBM  13     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
-vbm has acceptor phs: False (0.070 > 0.07)
-cbm has donor phs: True (0.070 > 0.07)
+vbm has acceptor phs: False (0.070 vs. 0.07)
+cbm has donor phs: True (0.070 vs. 0.07)
 ---
 Localized Orbital(s)
 Index  Energy  P-ratio  Occupation  Orbitals
@@ -176,8 +176,8 @@ Spin-up
      Index  Energy  P-ratio  Occupation  OrbDiff  Orbitals                K-point coords
 VBM  11     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
 CBM  13     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
-vbm has acceptor phs: False (0.070 > 0.07)
-cbm has donor phs: True (0.070 > 0.07)
+vbm has acceptor phs: False (0.070 vs. 0.07)
+cbm has donor phs: True (0.070 vs. 0.07)
 ---
 Localized Orbital(s)
 Index  Energy  P-ratio  Occupation  Orbitals   Radius  Center
