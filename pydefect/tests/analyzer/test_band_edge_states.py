@@ -7,6 +7,7 @@ import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeEigenvalues, \
     BandEdgeStates, OrbitalInfo, BandEdgeOrbitalInfos, PerfectBandEdgeState, \
     EdgeInfo, BandEdgeState, LocalizedOrbital, pretty_orbital
+from pydefect.defaults import defaults
 from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 
 
@@ -123,7 +124,10 @@ def band_edge_states(orbital_info):
     band_edge_state = BandEdgeState(vbm_info=vbm_info, cbm_info=cbm_info,
                                     vbm_orbital_diff=0.5,
                                     cbm_orbital_diff=0.5,
-                                    localized_orbitals=[localized_orbital])
+                                    localized_orbitals=[localized_orbital],
+                                    vbm_hole_occupation=defaults.state_occupied_threshold - 1e-5,
+                                    cbm_electron_occupation=defaults.state_occupied_threshold + 1e-5,
+                                    )
     return BandEdgeStates(states=[band_edge_state])
 
 

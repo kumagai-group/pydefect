@@ -8,7 +8,7 @@ from pydefect.analyzer.band_edge_states import EdgeInfo, BandEdgeOrbitalInfos, \
     LocalizedOrbital
 from pydefect.analyzer.defect_charge_info import DefectChargeInfo
 from pydefect.analyzer.make_band_edge_states import make_band_edge_states, \
-    orbital_diff
+    orbital_diff, num_electron_in_cbm, num_hole_in_vbm
 
 
 @pytest.fixture
@@ -34,15 +34,60 @@ def orb_infos():
                     occupation=1.0, participation_ratio=0.1),  # in-gap
         OrbitalInfo(energy=1.0,  orbitals={"Mn": [0.5, 0.8, 0.0, 0.0],
                                            "O": [0.0, 0.0, 0.0, 0.0]},
-                    occupation=0.0, participation_ratio=0.1),  # in-gap
+                    occupation=0.05, participation_ratio=0.1),  # in-gap
         OrbitalInfo(energy=1.2,  orbitals={"Mn": [0.0, 0.0, 0.0, 0.0],
                                            "O": [0.1, 0.3, 0.0, 0.0]},
-                    occupation=0.0, participation_ratio=0.1)]]]  # cbm
+                    occupation=0.02, participation_ratio=0.1),
+        OrbitalInfo(energy=1.2,  orbitals={"Mn": [0.0, 0.0, 0.0, 0.0],
+                                           "O": [0.1, 0.3, 0.0, 0.0]},
+                    occupation=0.01, participation_ratio=0.1)]]]  # cbm
     return BandEdgeOrbitalInfos(kpt_coords=[(0.0, 0.0, 0.0)],
                                 kpt_weights=[1.0],
                                 orbital_infos=orbital_infos,
                                 lowest_band_index=8,
                                 fermi_level=0.5)
+
+
+def test_num_electron_in_cbm(mocker):
+    mock1 = mocker.Mock()
+    mock2 = mocker.Mock()
+    mock3 = mocker.Mock()
+    mock4 = mocker.Mock()
+    mock1.occupation = 0.1
+    mock2.occupation = 0.2
+    mock3.occupation = 0.3
+    mock4.occupation = 0.4
+    orb_info_by_spin = [[mock1, mock2], [mock3, mock4]]  # k-idx, band-idx
+    actual = num_electron_in_cbm(orb_info_by_spin, cbm_idx=10,
+                                 lowest_band_idx=9, weights=[0.1, 0.9])
+    expected = 0.1 * 0.2 + 0.9 * 0.4
+    assert actual == pytest.approx(expected)
+
+    actual = num_electron_in_cbm(orb_info_by_spin, cbm_idx=20,
+                                 lowest_band_idx=20, weights=[0.1, 0.9])
+    expected = 0.1 * (0.1 + 0.2) + 0.9 * (0.3 + 0.4)
+    assert actual == pytest.approx(expected)
+
+
+def test_num_hole_in_vbm(mocker):
+    mock1 = mocker.Mock()
+    mock2 = mocker.Mock()
+    mock3 = mocker.Mock()
+    mock4 = mocker.Mock()
+    mock1.occupation = 0.1
+    mock2.occupation = 0.2
+    mock3.occupation = 0.3
+    mock4.occupation = 0.4
+    orb_info_by_spin = [[mock1, mock2], [mock3, mock4]]  # k-idx, band-idx
+    actual = num_hole_in_vbm(orb_info_by_spin, vbm_idx=9, lowest_band_idx=9,
+                             weights=[0.1, 0.9])
+    expected = 0.1 * (1 - 0.1) + 0.9 * (1 - 0.3)
+    assert actual == pytest.approx(expected)
+
+    actual = num_hole_in_vbm(orb_info_by_spin, vbm_idx=21, lowest_band_idx=20,
+                             weights=[0.1, 0.9])
+    expected = 0.1 * (2 - 0.1 - 0.2) + 0.9 * (2 - 0.3 - 0.4)
+    assert actual == pytest.approx(expected)
 
 
 def test_make_band_edge_state(p_edge_state, orb_infos):
@@ -57,13 +102,13 @@ def test_make_band_edge_state(p_edge_state, orb_infos):
                         orbital_info=OrbitalInfo(
                             energy=1.2, orbitals={"Mn": [0.0, 0.0, 0.0, 0.0],
                                                   "O": [0.1, 0.3, 0.0, 0.0]},
-                            occupation=0.0, participation_ratio=0.1))
+                            occupation=0.02, participation_ratio=0.1))
     localized_orb_1 = LocalizedOrbital(
         band_idx=10, ave_energy=0.0, occupation=1.0,
         orbitals={"Mn": [0.1, 0.2, 0.0, 0.0], "O": [0.3, 0.4, 0.0, 0.0]},
         participation_ratio=0.1)
     localized_orb_2 = LocalizedOrbital(
-        band_idx=11, ave_energy=1.0, occupation=0.0,
+        band_idx=11, ave_energy=1.0, occupation=0.05,
         orbitals={"Mn": [0.5, 0.8, 0.0, 0.0], "O": [0.0, 0.0, 0.0, 0.0]},
         participation_ratio=0.1)
     expected = BandEdgeStates(
@@ -72,7 +117,10 @@ def test_make_band_edge_state(p_edge_state, orb_infos):
                               vbm_orbital_diff=0.09999999999999998,
                               cbm_orbital_diff=0.09999999999999998,
                               localized_orbitals=[localized_orb_1,
-                                                  localized_orb_2])])
+                                                  localized_orb_2],
+                              vbm_hole_occupation=0.0,
+                              cbm_electron_occupation=0.03
+                              )])
     assert actual == expected
 
 

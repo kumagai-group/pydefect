@@ -184,21 +184,20 @@ class BandEdgeState(MSONable):
     vbm_orbital_diff: float
     cbm_orbital_diff: float
     localized_orbitals: List[LocalizedOrbital]
+    vbm_hole_occupation: float
+    cbm_electron_occupation: float
 
     @property
     def is_shallow(self):
-        return self.vbm_info.occupation < defaults.state_unoccupied_threshold \
-               or self.cbm_info.occupation > defaults.state_occupied_threshold
+        return self.has_donor_phs or self.has_acceptor_phs
 
     @property
     def has_donor_phs(self):
-        return (self.cbm_info.orbital_info.occupation
-                > defaults.state_occupied_threshold)
+        return self.cbm_electron_occupation > defaults.state_occupied_threshold
 
     @property
     def has_acceptor_phs(self):
-        return (self.vbm_info.orbital_info.occupation
-                < defaults.state_unoccupied_threshold)
+        return self.vbm_hole_occupation > defaults.state_occupied_threshold
 
     @property
     def has_unoccupied_localized_state(self):

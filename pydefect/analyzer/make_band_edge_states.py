@@ -75,6 +75,27 @@ def get_localized_orbs(orb_info_by_spin: List[List[OrbitalInfo]],
     return result
 
 
+def num_electron_in_cbm(orb_info_by_spin: List[List[OrbitalInfo]],
+                        cbm_idx: int,
+                        weights: List[float]):
+    result = 0.0
+    orbs_by_band_by_kpt = np.array(orb_info_by_spin)[:, cbm_idx:].T
+    for orbs_by_kpt in orbs_by_band_by_kpt:
+        result += sum([o.occupation * w for o, w in zip(orbs_by_kpt, weights)])
+    return result
+
+
+def num_hole_in_vbm(orb_info_by_spin: List[List[OrbitalInfo]],
+                    vbm_idx: int,
+                    weights: List[float]):
+    result = 0.0
+    orbs_by_band_by_kpt = np.array(orb_info_by_spin)[:, :vbm_idx + 1].T
+    for orbs_by_kpt in orbs_by_band_by_kpt:
+        result += sum([(1 - o.occupation) * w
+                       for o, w in zip(orbs_by_kpt, weights)])
+    return result
+
+
 def make_band_edge_states(orbital_infos: BandEdgeOrbitalInfos,
                           p_edge_state: PerfectBandEdgeState,
                           defect_charge_info: DefectChargeInfo = None
@@ -112,11 +133,20 @@ def make_band_edge_states(orbital_infos: BandEdgeOrbitalInfos,
                                             orbital_infos.lowest_band_index,
                                             orbital_infos.kpt_weights)
 
+        vbm_hole = num_hole_in_vbm(orb_info_by_spin,
+                                   vbm_idx=vbm_idx,
+                                   weights=orbital_infos.kpt_weights)
+        cbm_electron = num_electron_in_cbm(orb_info_by_spin,
+                                           cbm_idx=cbm_idx,
+                                           weights=orbital_infos.kpt_weights)
+
         states.append(BandEdgeState(vbm_info=vbm_info,
                                     cbm_info=cbm_info,
                                     vbm_orbital_diff=vbm_diff,
                                     cbm_orbital_diff=cbm_diff,
-                                    localized_orbitals=localized_orbs))
+                                    localized_orbitals=localized_orbs,
+                                    vbm_hole_occupation=vbm_hole,
+                                    cbm_electron_occupation=cbm_electron))
 
     return BandEdgeStates(states=states)
 
