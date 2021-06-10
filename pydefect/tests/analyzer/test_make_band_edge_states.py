@@ -58,13 +58,11 @@ def test_num_electron_in_cbm(mocker):
     mock3.occupation = 0.3
     mock4.occupation = 0.4
     orb_info_by_spin = [[mock1, mock2], [mock3, mock4]]  # k-idx, band-idx
-    actual = num_electron_in_cbm(orb_info_by_spin, cbm_idx=10,
-                                 lowest_band_idx=9, weights=[0.1, 0.9])
+    actual = num_electron_in_cbm(orb_info_by_spin, cbm_idx=1, weights=[0.1, 0.9])
     expected = 0.1 * 0.2 + 0.9 * 0.4
     assert actual == pytest.approx(expected)
 
-    actual = num_electron_in_cbm(orb_info_by_spin, cbm_idx=20,
-                                 lowest_band_idx=20, weights=[0.1, 0.9])
+    actual = num_electron_in_cbm(orb_info_by_spin, cbm_idx=0, weights=[0.1, 0.9])
     expected = 0.1 * (0.1 + 0.2) + 0.9 * (0.3 + 0.4)
     assert actual == pytest.approx(expected)
 
@@ -79,13 +77,11 @@ def test_num_hole_in_vbm(mocker):
     mock3.occupation = 0.3
     mock4.occupation = 0.4
     orb_info_by_spin = [[mock1, mock2], [mock3, mock4]]  # k-idx, band-idx
-    actual = num_hole_in_vbm(orb_info_by_spin, vbm_idx=9, lowest_band_idx=9,
-                             weights=[0.1, 0.9])
+    actual = num_hole_in_vbm(orb_info_by_spin, vbm_idx=0, weights=[0.1, 0.9])
     expected = 0.1 * (1 - 0.1) + 0.9 * (1 - 0.3)
     assert actual == pytest.approx(expected)
 
-    actual = num_hole_in_vbm(orb_info_by_spin, vbm_idx=21, lowest_band_idx=20,
-                             weights=[0.1, 0.9])
+    actual = num_hole_in_vbm(orb_info_by_spin, vbm_idx=1, weights=[0.1, 0.9])
     expected = 0.1 * (2 - 0.1 - 0.2) + 0.9 * (2 - 0.3 - 0.4)
     assert actual == pytest.approx(expected)
 
