@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from copy import deepcopy
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional, Set
 
@@ -220,6 +219,7 @@ class BandEdgeState(MSONable):
         w_radius = self.localized_orbitals and self.localized_orbitals[0].radius
         if w_radius:
             inner_table[0].extend(["Radius", "Center"])
+
         for lo in self.localized_orbitals:
             participation_ratio = f"{lo.participation_ratio:5.2f}" \
                 if lo.participation_ratio else "None"
@@ -242,7 +242,12 @@ class BandEdgeState(MSONable):
                            self.vbm_info, self.vbm_orbital_diff),
                        ["CBM"] + self._show_edge_info(
                            self.cbm_info, self.cbm_orbital_diff)]
-        return tabulate(inner_table, tablefmt="plain")
+        table = tabulate(inner_table, tablefmt="plain")
+        vbm_phs = f"vbm has acceptor phs: {self.has_acceptor_phs} " \
+                  f"({self.vbm_hole_occupation:5.3f} > {defaults.state_occupied_threshold})"
+        cbm_phs = f"cbm has donor phs: {self.has_donor_phs} " \
+                  f"({self.cbm_electron_occupation:5.3f} > {defaults.state_occupied_threshold})"
+        return "\n".join([table, vbm_phs, cbm_phs])
 
     @staticmethod
     def _show_edge_info(edge_info: EdgeInfo, orb_diff: float):
