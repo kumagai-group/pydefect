@@ -4,6 +4,7 @@
 from typing import Optional, List
 
 import numpy as np
+from numpy.linalg import det
 from pydefect.defaults import defaults
 from pydefect.input_maker.supercell import Supercell, TetragonalSupercells, \
     Supercells
@@ -12,7 +13,7 @@ from pydefect.util.error_classes import NotPrimitiveError, SupercellError
 from pymatgen.core import IStructure
 from vise.util.centering import Centering
 from vise.util.logger import get_logger
-from vise.util.structure_symmetrizer import StructureSymmetrizer
+from vise.util.structure_symmetrizer import StructureSymmetrizer, Site
 
 logger = get_logger(__name__)
 
@@ -27,10 +28,10 @@ class SupercellMaker:
                  **supercell_kwargs):
 
         self.primitive_structure = primitive_structure
-        symmetrizer = StructureSymmetrizer(primitive_structure,
+        self.symmetrizer = StructureSymmetrizer(primitive_structure,
                                            symprec=symprec,
                                            angle_tolerance=angle_tolerance)
-        if primitive_structure != symmetrizer.primitive:
+        if primitive_structure != self.symmetrizer.primitive:
             logger.warning(
                 "The input structure is different from the primitive one,"
                 "which might be due to the difference of symprec used in"
@@ -39,18 +40,17 @@ class SupercellMaker:
                 "Input lattice:",
                 f"{primitive_structure.lattice}", "",
                 "Primitive structure lattice:",
-                f"{symmetrizer.primitive.lattice}", "",
+                f"{self.symmetrizer.primitive.lattice}", "",
                 "Input structure:",
                 f"{primitive_structure}", "",
                 "Primitive structure:",
-                f"{symmetrizer.primitive}"]))
+                f"{self.symmetrizer.primitive}"]))
             if raise_error:
                 raise NotPrimitiveError
 
-        self.sg = symmetrizer.sg_number
-        self.sg_symbol = symmetrizer.spglib_sym_data["international"]
-        self.conv_structure = symmetrizer.conventional
-        crystal_system, center = str(symmetrizer.bravais)
+        self.sg_symbol = self.symmetrizer.spglib_sym_data["international"]
+        self.conv_structure = self.symmetrizer.conventional
+        crystal_system, center = str(self.symmetrizer.bravais)
 
         centering = Centering(center)
         self.conv_multiplicity = centering.conv_multiplicity
@@ -76,18 +76,27 @@ class SupercellMaker:
             self.supercell = supercells.most_isotropic_supercell
 
     def _generate_supercell_info(self):
-        symmetrizer = StructureSymmetrizer(self.supercell.structure)
-        if symmetrizer.sg_number != self.sg:
-            raise SupercellError
+        multiplicity = int(round(det(self.transformation_matrix)))
 
-        self.supercell_info = SupercellInfo(self.supercell.structure,
-                                            self.sg_symbol,
-                                            self.transformation_matrix,
-                                            symmetrizer.sites,
-                                            unitcell_structure=self.primitive_structure)
+        sites = {}
+        for site_name, site in self.symmetrizer.sites.items():
+            atoms = []
+            for i in site.equivalent_atoms:
+                atoms.extend(list(range(i*multiplicity, (i+1)*multiplicity)))
+            sites[site_name] = Site(element=site.element,
+                                    wyckoff_letter=site.wyckoff_letter,
+                                    site_symmetry=site.site_symmetry,
+                                    equivalent_atoms=atoms)
+
+        self.supercell_info = \
+            SupercellInfo(structure=self.supercell.structure,
+                          space_group=self.sg_symbol,
+                          transformation_matrix=self.transformation_matrix,
+                          sites=sites,
+                          unitcell_structure=self.primitive_structure)
 
     @property
-    def transformation_matrix(self):
+    def transformation_matrix(self) -> List[List[int]]:
         """
         Definition of transformation_matrix is different from that in spglib.
         https://spglib.github.io/spglib/definition.html#transformation-matrix-boldsymbol-p-and-origin-shift-boldsymbol-p
