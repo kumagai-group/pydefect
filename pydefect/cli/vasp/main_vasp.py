@@ -24,7 +24,8 @@ def parse_args_main_vasp(args):
 
     parser = argparse.ArgumentParser(epilog=epilog,
                                      description=description + """       
-    The command is used for creating and analyzing VASP IO files.""")
+    The command is used for creating and analyzing VASP input and output 
+    files.""")
 
     subparsers = parser.add_subparsers()
     dirs_parser = add_sub_parser(argparse, name="dirs")
@@ -33,7 +34,8 @@ def parse_args_main_vasp(args):
     # -- unitcell ------------------------------------------------
     parser_unitcell = subparsers.add_parser(
         name="unitcell",
-        description="Parse unitcell info and create unitcell.yaml",
+        description="Parse unitcell info from vasp output files and create "
+                    "unitcell.yaml.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['u'])
 
@@ -45,28 +47,30 @@ def parse_args_main_vasp(args):
         help="OUTCAR file of band structure calculation.")
     parser_unitcell.add_argument(
         "-odc", "--outcar_dielectric_clamped", required=True, type=Outcar,
-        help="OUTCAR file for ion-clamped dielectric constant.")
+        help="OUTCAR file of ion-clamped dielectric constant calculation.")
     parser_unitcell.add_argument(
         "-odi", "--outcar_dielectric_ionic", required=True, type=Outcar,
-        help="OUTCAR file for dielectric constant of ionic contribution.")
+        help="OUTCAR file for calculating dielectric constant of ionic "
+             "contribution.")
     parser_unitcell.add_argument(
-        "-n", "--name", type=str, help="System name.")
+        "-n", "--name", type=str,
+        help="System name used for plotting defect formation energies.")
     parser_unitcell.set_defaults(func=make_unitcell)
 
     # -- make_poscars ------------------------------------------------
     parser_make_poscars = subparsers.add_parser(
         name="make_poscars",
-        description="Make poscar files in directories retrieved from "
-                    "the Materials Project.",
+        description="Make directories and poscar files in these that are "
+                    "retrieved via the Materials Project API.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['mp'])
 
     parser_make_poscars.add_argument(
         "-e", "--elements", required=True, nargs="+", type=str,
-        help="Element names considered in chemical potential diagram. ")
+        help="Element names involved. ")
     parser_make_poscars.add_argument(
         "--e_above_hull", default=defaults.e_above_hull, type=float,
-        help="Energy above hull in eV/atom.")
+        help="Allowed energy above hull in eV/atom.")
 
     parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
 

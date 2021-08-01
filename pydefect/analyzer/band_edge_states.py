@@ -183,8 +183,8 @@ class BandEdgeState(MSONable):
     vbm_orbital_diff: float
     cbm_orbital_diff: float
     localized_orbitals: List[LocalizedOrbital]
-    vbm_hole_occupation: float
-    cbm_electron_occupation: float
+    vbm_hole_occupation: float = None
+    cbm_electron_occupation: float = None
 
     @property
     def is_shallow(self):
