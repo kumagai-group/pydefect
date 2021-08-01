@@ -19,6 +19,8 @@ def get_similar_orb_idx(orbs: List[OrbitalInfo],
     if _reversed:
         orbs = orbs[::-1]  # by band
 
+    de = defaults.similar_energy_criterion
+
     if localized_orbs:
         if _reversed:
             localized_orbs = [len(orbs) - i for i in localized_orbs]
@@ -32,7 +34,10 @@ def get_similar_orb_idx(orbs: List[OrbitalInfo],
     for i, orb in enumerate(orbs):
         if is_passed(i):
             continue
-        if abs(orb.energy - edge_info.energy) < defaults.similar_energy_criterion:
+
+        if ((_reversed is False and orb.energy > edge_info.energy - de) or
+                (_reversed and orb.energy - de < edge_info.energy)):
+
             orb_diff = orbital_diff(orb.orbitals, edge_info.orbitals)
             if orb_diff < defaults.similar_orb_criterion:
                 orb_idx = len(orbs) - i - 1 if _reversed else i
