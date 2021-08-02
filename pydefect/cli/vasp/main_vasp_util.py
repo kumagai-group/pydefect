@@ -12,7 +12,7 @@ from pydefect.analyzer.grids import Grids
 from pydefect.cli.main import epilog, description, add_sub_parser
 from pydefect.cli.vasp.main_vasp_util_functions import \
     make_parchg_dir, make_refine_defect_poscar, \
-    calc_charge_state, make_defect_entry, calc_grids, \
+    calc_charge_state, make_defect_entry_main, calc_grids, \
     make_defect_charge_info_main
 from pymatgen import Structure
 from pymatgen.io.vasp import Chgcar
@@ -55,7 +55,7 @@ def parse_args_main_vasp_util(args):
         "-p", "--perfect", type=Structure.from_file, required=True,
         help="Perfect supercell POSCAR file name.")
 
-    parser_make_defect_entry.set_defaults(func=make_defect_entry)
+    parser_make_defect_entry.set_defaults(func=make_defect_entry_main)
 
     # -- make parchg dir -----------------------------------------------
     parser_make_parchg_dir = subparsers.add_parser(

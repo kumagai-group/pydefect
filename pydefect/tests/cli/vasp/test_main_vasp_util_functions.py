@@ -7,8 +7,8 @@ import pytest
 from pydefect.analyzer.band_edge_states import BandEdgeStates
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.cli.vasp.main_vasp_util_functions import make_parchg_dir, \
-    make_refine_defect_poscar, calc_charge_state, make_defect_entry, calc_grids, \
-    make_defect_charge_info_main
+    make_refine_defect_poscar, calc_charge_state, \
+    calc_grids, make_defect_charge_info_main, make_defect_entry_main
 from pymatgen import Structure
 from vise.input_set.incar import ViseIncar
 import numpy as np
@@ -35,7 +35,7 @@ def test_calc_charge_state(mocker):
         mock_incar.from_file.return_value)
 
 
-def test_make_defect_entry(mocker):
+def test_make_defect_entry_main(mocker):
     mock_charge_state = mocker.patch(f"{_filepath}.calc_charge_state")
     mock_charge_state.return_value = 0
     mock_structure = mocker.patch(f"{_filepath}.Structure")
@@ -43,7 +43,7 @@ def test_make_defect_entry(mocker):
     mock_perfect = mocker.Mock()
 
     args = Namespace(dir=Path("Va_O1_0"), name="Va_O1", perfect=mock_perfect)
-    make_defect_entry(args)
+    make_defect_entry_main(args)
     mock_charge_state.assert_called_once_with(args)
     mock_structure.from_file.assert_called_once_with(Path("Va_O1_0/POSCAR"))
     mock_make_defect_entry.assert_called_once_with(

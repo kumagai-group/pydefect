@@ -33,7 +33,7 @@ def calc_charge_state(args):
     return charge_state
 
 
-def make_defect_entry(args):
+def make_defect_entry_main(args):
     charge_state = calc_charge_state(args)
     structure = Structure.from_file(args.dir / "POSCAR")
     defect_entry = make_defect_entry(name=args.name,
