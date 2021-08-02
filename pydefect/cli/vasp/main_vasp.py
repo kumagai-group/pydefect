@@ -12,7 +12,7 @@ from pydefect.cli.vasp.main_vasp_functions import make_defect_entries, \
     make_unitcell, make_competing_phase_dirs, \
     make_calc_results, \
     make_band_edge_orb_infos_and_eigval_plot, make_perfect_band_edge_state, \
-    make_local_extrema
+    make_local_extrema, make_composition_energies
 from pydefect.defaults import defaults
 from pymatgen.io.vasp import Vasprun, Outcar, Chgcar
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
@@ -29,7 +29,8 @@ def parse_args_main_vasp(args):
 
     subparsers = parser.add_subparsers()
     dirs_parser = add_sub_parser(argparse, name="dirs")
-    pbes_parser = add_sub_parser(argparse, name="perfect_band_edge_state")
+    perfect_band_edge_parser = add_sub_parser(argparse,
+                                              name="perfect_band_edge_state")
 
     # -- unitcell ------------------------------------------------
     parser_unitcell = subparsers.add_parser(
@@ -74,6 +75,22 @@ def parse_args_main_vasp(args):
 
     parser_make_poscars.set_defaults(func=make_competing_phase_dirs)
 
+    # -- make_composition_energies ---------------------------------------------
+    parser_make_composition_energies = subparsers.add_parser(
+        name="make_composition_energies",
+        description="Make composition energies from the directories in which "
+                    "competing phases are calculated. ",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        parents=[dirs_parser],
+        aliases=['mce'])
+
+    parser_make_composition_energies.add_argument(
+        "-y", "--yaml_file", type=str,
+        help="composition_energies.yaml to be overwritten.")
+
+    parser_make_composition_energies.set_defaults(
+        func=make_composition_energies)
+
     # -- make_local_extrema ----------------------------------------------------
     parser_make_local_extrema = subparsers.add_parser(
         name="local_extrema",
@@ -85,7 +102,8 @@ def parse_args_main_vasp(args):
         "-v", "--volumetric_data", type=Chgcar.from_file, required=True,
         nargs="+",
         help="File names such as CHGCAR or LOCPOT. When multiple files are "
-             "provided, the summed data will be parsed.")
+             "provided, the summed data (e.g., AECCAR0 + AECCAR2) will be "
+             "parsed.")
     parser_make_local_extrema.add_argument(
         "--disable_find_min", dest="find_min", action="store_false",
         help="Set when local maxima are searched instead of local minima.")
@@ -159,7 +177,7 @@ def parse_args_main_vasp(args):
         name="band_edge_orbital_infos",
         description="Generate band_edge_orbital_infos.json and "
                     "eigenvalues.pdf.",
-        parents=[dirs_parser, pbes_parser],
+        parents=[dirs_parser, perfect_band_edge_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['beoi'])
 
