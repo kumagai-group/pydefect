@@ -164,7 +164,7 @@ def make_defect_set(args):
     maker = DefectSetMaker(supercell_info,
                            oxi_states,
                            args.dopants,
-                           keywords=args.kwargs)
+                           keywords=args.keywords)
     maker.defect_set.to_yaml()
 
 

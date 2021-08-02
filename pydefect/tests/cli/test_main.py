@@ -113,7 +113,7 @@ def test_defect_set_wo_options():
     expected = Namespace(
         oxi_states=None,
         dopants=None,
-        kwargs=None,
+        keywords=None,
         func=parsed_args.func)
     assert parsed_args == expected
 
@@ -126,7 +126,7 @@ def test_defect_set_w_options():
     expected = Namespace(
         oxi_states=["He", 1],
         dopants=["Li"],
-        kwargs=["Li_H1", "Va_H1_0"],
+        keywords=["Li_H1", "Va_H1_0"],
         func=parsed_args.func)
     assert parsed_args == expected
 

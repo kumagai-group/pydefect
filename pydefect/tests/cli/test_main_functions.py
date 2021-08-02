@@ -148,7 +148,7 @@ def test_make_defect_set(oxi_states, he_vacancy_charge, tmpdir, supercell_info):
     tmpdir.chdir()
     supercell_info.to_json_file()
     args = Namespace(oxi_states=oxi_states, dopants=["Li"],
-                     kwargs=["Li_H1", "Va_He1", "Va_H1_-1"])
+                     keywords=["Li_H1", "Va_He1", "Va_H1_-1"])
     make_defect_set(args)
 
     simple_defects = {SimpleDefect(None, "He1", he_vacancy_charge),

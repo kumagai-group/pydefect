@@ -204,7 +204,7 @@ def parse_args_main(args):
         "-d", "--dopants", nargs="+", type=str,
         help="Names of dopant element, e.g., Al Ga.")
     parser_defect_set.add_argument(
-        "-k", "--kwargs", nargs="+", type=str,
+        "-k", "--keywords", nargs="+", type=str,
         help="Keywords used to screen the target defects. "
              "Regular expression can be used.")
 
