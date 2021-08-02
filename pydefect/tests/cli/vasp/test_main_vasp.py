@@ -58,7 +58,7 @@ def test_make_local_extrema_wo_options(mocker):
     parsed_args = parse_args_main_vasp(["le", "-v", "CHGCAR"])
     expected = Namespace(
         volumetric_data=[mock_chgcar.from_file.return_value],
-        find_min=True,
+        find_max=False,
         info=None,
         threshold_frac=None,
         threshold_abs=None,
@@ -74,7 +74,7 @@ def test_make_local_extrema_w_options(mocker):
     mock_chgcar = mocker.patch("pydefect.cli.vasp.main_vasp.Chgcar")
     parsed_args = parse_args_main_vasp(["le",
                                         "-v", "CHGCAR",
-                                        "--disable_find_min",
+                                        "--find_max",
                                         "--info", "a",
                                         "--threshold_frac", "0.1",
                                         "--threshold_abs", "0.2",
@@ -83,7 +83,7 @@ def test_make_local_extrema_w_options(mocker):
                                         "--radius", "0.5"])
     expected = Namespace(
         volumetric_data=[mock_chgcar.from_file.return_value],
-        find_min=False,
+        find_max=True,
         info="a",
         threshold_frac=0.1,
         threshold_abs=0.2,

@@ -105,7 +105,7 @@ def parse_args_main_vasp(args):
              "provided, the summed data (e.g., AECCAR0 + AECCAR2) will be "
              "parsed.")
     parser_make_local_extrema.add_argument(
-        "--disable_find_min", dest="find_min", action="store_false",
+        "--find_max", dest="find_max", action="store_true",
         help="Set when local maxima are searched instead of local minima.")
     parser_make_local_extrema.add_argument(
         "-i", "--info", type=str,

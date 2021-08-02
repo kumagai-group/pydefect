@@ -72,7 +72,7 @@ def make_local_extrema(args):
         volumetric_data=volumetric_data,
         params=params,
         info=args.info,
-        find_min=args.find_min)
+        find_min=not args.find_max)
     local_extrema.to_json_file()
 
 

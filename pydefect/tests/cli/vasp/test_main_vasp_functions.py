@@ -98,7 +98,7 @@ def test_make_local_extrema(tmpdir, mocker, simple_cubic):
     volumetric_data = VolumetricData(simple_cubic,
                                      data={"total": np.array([[[0.0]]])})
     args = Namespace(volumetric_data=[volumetric_data],
-                     find_min=True,
+                     find_max=True,
                      info="a",
                      threshold_frac=None,
                      threshold_abs=None,
@@ -110,7 +110,7 @@ def test_make_local_extrema(tmpdir, mocker, simple_cubic):
     mock_make_extrema.assert_called_once_with(volumetric_data=volumetric_data,
                                               params=mock_params.return_value,
                                               info="a",
-                                              find_min=True)
+                                              find_min=False)
     mock_make_extrema.return_value.to_json_file.assert_called_once_with()
 
 
