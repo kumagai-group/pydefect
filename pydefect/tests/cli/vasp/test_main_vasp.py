@@ -109,6 +109,14 @@ def test_calc_results():
     assert parsed_args == expected
 
 
+def test_perfect_band_edge_state():
+    parsed_args = parse_args_main_vasp(["pbes", "-d", "Va_O1_0"])
+    expected = Namespace(
+        dir=Path("Va_O1_0"),
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
 def test_band_edge_orbital_infos(mocker):
     mock_p_edge_state = mocker.Mock(spec=PerfectBandEdgeState, autospec=True)
 
@@ -122,19 +130,11 @@ def test_band_edge_orbital_infos(mocker):
     parsed_args = parse_args_main_vasp([
         "beoi",
         "-d", "Va_O1_0", "Va_O1_1",
-        "-pbes", "perfect_band_edge_state.json"])
+        "-pbes", "perfect_band_edge_state.json",
+        "-y", "0.0", "1.0"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         p_state=mock_p_edge_state,
+        y_range=[0.0, 1.0],
         func=parsed_args.func)
     assert parsed_args == expected
-
-
-def test_perfect_band_edge_state():
-    parsed_args = parse_args_main_vasp(["pbes", "-d", "Va_O1_0"])
-    expected = Namespace(
-        dir=Path("Va_O1_0"),
-        func=parsed_args.func)
-    assert parsed_args == expected
-
-

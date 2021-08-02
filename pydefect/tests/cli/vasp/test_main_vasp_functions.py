@@ -155,6 +155,24 @@ def test_make_calc_results(tmpdir, mocker):
     mock_calc_results.to_json_file.assert_called_with("a/calc_results.json")
 
 
+def test_make_perfect_band_edge_state(mocker):
+    mock_vasprun = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Vasprun")
+    mock_procar = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Procar")
+    mock_outcar = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Outcar")
+    mock_make_perf_be_state = mocker.patch(
+        "pydefect.cli.vasp.main_vasp_functions.make_perfect_band_edge_state_from_vasp")
+
+    args = Namespace(dir=Path("perfect"))
+    make_perfect_band_edge_state(args)
+
+    mock_vasprun.assert_called_with(Path("perfect") / defaults.vasprun)
+    mock_procar.assert_called_with(Path("perfect") / defaults.procar)
+    mock_outcar.assert_called_with(Path("perfect") / defaults.outcar)
+    mock_make_perf_be_state.assert_called_with(mock_procar.return_value,
+                                               mock_vasprun.return_value,
+                                               mock_outcar.return_value)
+
+
 def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
     mock_procar = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Procar")
     mock_vasprun = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Vasprun")
@@ -186,7 +204,8 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
                                side_effect=side_effect)
 
     args = Namespace(dirs=[Path("Va_O1_2")],
-                     p_state=mock_p_state)
+                     p_state=mock_p_state,
+                     y_range=[0.0, 1.0])
     make_band_edge_orb_infos_and_eigval_plot(args)
 
     mock_procar.assert_called_with(Path("Va_O1_2") / defaults.procar)
@@ -202,22 +221,5 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
         title="Va_O1",
         band_edge_orb_infos=mock_make_orbital_infos.return_value,
         supercell_vbm=10,
-        supercell_cbm=20)
-
-
-def test_make_perfect_band_edge_state(mocker):
-    mock_vasprun = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Vasprun")
-    mock_procar = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Procar")
-    mock_outcar = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Outcar")
-    mock_make_perf_be_state = mocker.patch(
-        "pydefect.cli.vasp.main_vasp_functions.make_perfect_band_edge_state_from_vasp")
-
-    args = Namespace(dir=Path("perfect"))
-    make_perfect_band_edge_state(args)
-
-    mock_vasprun.assert_called_with(Path("perfect") / defaults.vasprun)
-    mock_procar.assert_called_with(Path("perfect") / defaults.procar)
-    mock_outcar.assert_called_with(Path("perfect") / defaults.outcar)
-    mock_make_perf_be_state.assert_called_with(mock_procar.return_value,
-                                               mock_vasprun.return_value,
-                                               mock_outcar.return_value)
+        supercell_cbm=20,
+        y_range=[0.0, 1.0])

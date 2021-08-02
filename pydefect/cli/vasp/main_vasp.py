@@ -109,21 +109,24 @@ def parse_args_main_vasp(args):
         help="Set when local maxima are searched instead of local minima.")
     parser_make_local_extrema.add_argument(
         "-i", "--info", type=str,
-        help="Information related to the parsed volumetric data.")
+        help="Information related to the parsed volumetric data written"
+             "as the name in volumetric_data_local_extrema.json.")
     parser_make_local_extrema.add_argument(
         "--threshold_frac", default=None, type=float,
         help="""Optional fraction of extrema shown, which returns 
         `threshold_frac * tot_num_extrema` extrema fractional coordinates 
-         based on highest/lowest intensity. It takes from 0 to 1.,
-         If not set, 1 will be set.""")
+         based on highest/lowest intensity. 
+         For example, there are 3 extrema with 0.1, 0.2, 0.3, and if 
+         threshold_frac is set to 0.5, then those with 0.2 and 0.3 are shown 
+         as the threshold is now 0.3 * 0.5 = 0.15.
+         It takes from 0 to 1, and default is 1.""")
     parser_make_local_extrema.add_argument(
         "--threshold_abs", default=None, type=float,
         help="""Optional filter. When searching for local
         minima, intensity <= threshold_abs returns; when searching for
         local maxima, intensity >= threshold_abs returns.
 
-        Note that threshold_abs and threshold_frac should not set in the
-        same time.""")
+        Caveat: threshold_abs and threshold_frac should be set exclusively.""")
     parser_make_local_extrema.add_argument(
         "--min_dist", type=float, metavar="Angstrom", default=0.5,
         help="""Used to remove the predicted sites that are too close to 
@@ -180,6 +183,9 @@ def parse_args_main_vasp(args):
         parents=[dirs_parser, perfect_band_edge_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['beoi'])
+    parser_band_edge_orb_infos.add_argument(
+        "-y", "--y_range", nargs=2, type=float,
+        help="Energy range in y-axis for eigenvalue.pdf")
 
     parser_band_edge_orb_infos.set_defaults(
         func=make_band_edge_orb_infos_and_eigval_plot)

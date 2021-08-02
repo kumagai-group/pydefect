@@ -136,15 +136,18 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
             title = defect_entry.name
         except FileNotFoundError:
             title = "No name"
+        beoi = _dir / "band_edge_orbital_infos.json"
         procar = Procar(_dir / defaults.procar)
         vasprun = Vasprun(_dir / defaults.vasprun)
         str_info = loadfn(_dir / "defect_structure_info.json")
         band_edge_orb_chars = make_band_edge_orbital_infos(
             procar, vasprun, supercell_vbm, supercell_cbm, str_info)
-        band_edge_orb_chars.to_json_file(_dir / "band_edge_orbital_infos.json")
+        band_edge_orb_chars.to_json_file(beoi)
+
         plotter = EigenvalueMplPlotter(
             title=title, band_edge_orb_infos=band_edge_orb_chars,
-            supercell_vbm=supercell_vbm, supercell_cbm=supercell_cbm)
+            supercell_vbm=supercell_vbm, supercell_cbm=supercell_cbm,
+            y_range=args.y_range)
         plotter.construct_plot()
         plotter.plt.savefig(fname=_dir / "eigenvalues.pdf")
         plotter.plt.clf()
