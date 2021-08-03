@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8">
   
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Tips for first-principles calculations for point defects &mdash; pydefect  documentation</title>
   
 
   
-  <link href="_static/css/theme.css" rel="stylesheet" type="text/css" />
-  <link href="_static/pygments.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -25,19 +25,19 @@
   <![endif]-->
   
     
-      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js" type="text/javascript"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
     
-    <script src="_static/js/theme.js" type="text/javascript"></script>
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-    <link href="genindex.html" rel="index" title="Index" />
-    <link href="search.html" rel="search" title="Search" />
-    <link href="vertical_transition_level.html" rel="next" title="Tutorial for calculation of vertical transition level" />
-    <link href="tutorial.html" rel="prev" title="Tutorial of pydefect" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorial for calculation of vertical transition level" href="vertical_transition_level.html" />
+    <link rel="prev" title="Tutorial of pydefect" href="tutorial.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -45,13 +45,13 @@
    
   <div class="wy-grid-for-nav">
     
-    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
           
 
           
-            <a alt="Documentation Home" class="icon icon-home" href="index.html"> pydefect
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pydefect
           
 
           
@@ -64,10 +64,10 @@
 
           
 <div role="search">
-  <form action="search.html" class="wy-form" id="rtd-search-form" method="get">
-    <input name="q" placeholder="Search docs" type="text" />
-    <input name="check_keywords" type="hidden" value="yes" />
-    <input name="area" type="hidden" value="default" />
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
   </form>
 </div>
 
@@ -75,7 +75,7 @@
         </div>
 
         
-        <div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
             
@@ -90,6 +90,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="vertical_transition_level.html">Tutorial for calculation of vertical transition level</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vertical_transition_level.html#id2">レベル2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change log</a></li>
 </ul>
 
@@ -100,12 +101,12 @@
       </div>
     </nav>
 
-    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav aria-label="top navigation" class="wy-nav-top">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
-          <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pydefect</a>
         
       </nav>
@@ -131,11 +132,11 @@
 
 
 
-<div aria-label="breadcrumbs navigation" role="navigation">
+<div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a class="icon icon-home" href="index.html"></a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Tips for first-principles calculations for point defects</li>
     
@@ -153,7 +154,7 @@
   
   <hr/>
 </div>
-          <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
   <div class="section" id="tips-for-first-principles-calculations-for-point-defects">
@@ -165,25 +166,75 @@ initially slightly perturbed to break the symmetry.
 However, some defects tend to move back to the symmetric atomic configuration
 or recover a part of symmetry operations during the structure optimization.</p>
 <p>Even in these cases, it is not apparent that the final structures are symmetric.
-<code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> provides a script that allows for symmetrizing the defect structure,
+<code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> provides a sub-command that allows for symmetrizing the defect structure,
 which is used as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>python $PYDEFECT_PATH/pydefect/cli/vasp/util_commands/make_refined_poscar.py
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect_vasp_util</span> <span class="n">rdp</span> <span class="o">-</span><span class="n">p</span> <span class="n">Va_Mg1_0</span><span class="o">/</span><span class="n">CONTCAR</span><span class="o">-</span><span class="n">finish</span> <span class="o">-</span><span class="n">d</span> <span class="n">Va_Mg1_0</span><span class="o">/</span><span class="n">defect_entry</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">n</span> <span class="n">POSCAR_new</span>
 </pre></div>
 </div>
-<p>This command creates the symmetrized <code class="code docutils literal notranslate"><span class="pre">POSCAR</span></code> file if the structure is not the P1 symmetry.
-Then, the previous <code class="code docutils literal notranslate"><span class="pre">OUTCAR</span></code> and <code class="code docutils literal notranslate"><span class="pre">CONTCAR</span></code> are renamed to
-<code class="code docutils literal notranslate"><span class="pre">OUTCAR.sym_1</span></code> and <code class="code docutils literal notranslate"><span class="pre">CONTCAR.sym_1</span></code>, respectively.</p>
-<p>It is also possible to include this command in the runshell script, e.g.,</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$VASP_cmd
-
-hostname &gt; host
-name=`basename &quot;$PWD&quot;`
-if [ $name != &quot;perfect&quot; ]; then
-    python $PYDEFECT_PATH/pydefect/cli/vasp/util_commands/make_refined_poscar.py
-    if [ -e CONTCAR.sym_1 ]; then
-        $VASP_cmd
-    fi
-fi
+<p>which create the POSCAR_new as follows.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Mg7</span> <span class="n">Al16</span> <span class="n">O32</span>
+<span class="mf">1.0</span>
+<span class="mf">8.105607</span> <span class="mf">0.000000</span> <span class="mf">0.000000</span>
+<span class="mf">0.000000</span> <span class="mf">8.105607</span> <span class="mf">0.000000</span>
+<span class="mf">0.000000</span> <span class="mf">0.000000</span> <span class="mf">8.105607</span>
+<span class="n">Mg</span> <span class="n">Al</span> <span class="n">O</span>
+<span class="mi">7</span> <span class="mi">16</span> <span class="mi">32</span>
+<span class="n">direct</span>
+<span class="mf">0.749726</span> <span class="mf">0.749738</span> <span class="mf">0.249693</span> <span class="n">Mg</span>
+<span class="mf">0.749726</span> <span class="mf">0.249738</span> <span class="mf">0.749693</span> <span class="n">Mg</span>
+<span class="mf">0.249726</span> <span class="mf">0.749738</span> <span class="mf">0.749693</span> <span class="n">Mg</span>
+<span class="mf">0.003191</span> <span class="mf">0.003203</span> <span class="mf">0.003158</span> <span class="n">Mg</span>
+<span class="mf">0.496261</span> <span class="mf">0.496273</span> <span class="mf">0.003158</span> <span class="n">Mg</span>
+<span class="mf">0.496261</span> <span class="mf">0.003203</span> <span class="mf">0.496228</span> <span class="n">Mg</span>
+<span class="mf">0.003191</span> <span class="mf">0.496273</span> <span class="mf">0.496228</span> <span class="n">Mg</span>
+<span class="mf">0.625112</span> <span class="mf">0.373467</span> <span class="mf">0.373422</span> <span class="n">Al</span>
+<span class="mf">0.125997</span> <span class="mf">0.874352</span> <span class="mf">0.373422</span> <span class="n">Al</span>
+<span class="mf">0.125997</span> <span class="mf">0.373467</span> <span class="mf">0.874307</span> <span class="n">Al</span>
+<span class="mf">0.624659</span> <span class="mf">0.874804</span> <span class="mf">0.874760</span> <span class="n">Al</span>
+<span class="mf">0.624659</span> <span class="mf">0.624671</span> <span class="mf">0.624626</span> <span class="n">Al</span>
+<span class="mf">0.125997</span> <span class="mf">0.126009</span> <span class="mf">0.625079</span> <span class="n">Al</span>
+<span class="mf">0.125997</span> <span class="mf">0.625124</span> <span class="mf">0.125964</span> <span class="n">Al</span>
+<span class="mf">0.625112</span> <span class="mf">0.126009</span> <span class="mf">0.125964</span> <span class="n">Al</span>
+<span class="mf">0.373455</span> <span class="mf">0.625124</span> <span class="mf">0.373422</span> <span class="n">Al</span>
+<span class="mf">0.874340</span> <span class="mf">0.126009</span> <span class="mf">0.373422</span> <span class="n">Al</span>
+<span class="mf">0.874792</span> <span class="mf">0.624671</span> <span class="mf">0.874760</span> <span class="n">Al</span>
+<span class="mf">0.373455</span> <span class="mf">0.126009</span> <span class="mf">0.874307</span> <span class="n">Al</span>
+<span class="mf">0.373455</span> <span class="mf">0.373467</span> <span class="mf">0.625079</span> <span class="n">Al</span>
+<span class="mf">0.874792</span> <span class="mf">0.874804</span> <span class="mf">0.624626</span> <span class="n">Al</span>
+<span class="mf">0.874340</span> <span class="mf">0.373467</span> <span class="mf">0.125964</span> <span class="n">Al</span>
+<span class="mf">0.373455</span> <span class="mf">0.874352</span> <span class="mf">0.125964</span> <span class="n">Al</span>
+<span class="mf">0.862178</span> <span class="mf">0.862190</span> <span class="mf">0.862145</span> <span class="n">O</span>
+<span class="mf">0.361441</span> <span class="mf">0.361453</span> <span class="mf">0.859833</span> <span class="n">O</span>
+<span class="mf">0.361441</span> <span class="mf">0.859878</span> <span class="mf">0.361408</span> <span class="n">O</span>
+<span class="mf">0.859866</span> <span class="mf">0.361453</span> <span class="mf">0.361408</span> <span class="n">O</span>
+<span class="mf">0.388922</span> <span class="mf">0.611788</span> <span class="mf">0.611743</span> <span class="n">O</span>
+<span class="mf">0.887676</span> <span class="mf">0.110542</span> <span class="mf">0.611743</span> <span class="n">O</span>
+<span class="mf">0.887676</span> <span class="mf">0.611788</span> <span class="mf">0.110497</span> <span class="n">O</span>
+<span class="mf">0.393711</span> <span class="mf">0.105752</span> <span class="mf">0.105707</span> <span class="n">O</span>
+<span class="mf">0.611776</span> <span class="mf">0.611788</span> <span class="mf">0.388889</span> <span class="n">O</span>
+<span class="mf">0.105740</span> <span class="mf">0.105752</span> <span class="mf">0.393678</span> <span class="n">O</span>
+<span class="mf">0.110530</span> <span class="mf">0.611788</span> <span class="mf">0.887643</span> <span class="n">O</span>
+<span class="mf">0.611776</span> <span class="mf">0.110542</span> <span class="mf">0.887643</span> <span class="n">O</span>
+<span class="mf">0.611776</span> <span class="mf">0.388934</span> <span class="mf">0.611743</span> <span class="n">O</span>
+<span class="mf">0.110530</span> <span class="mf">0.887688</span> <span class="mf">0.611743</span> <span class="n">O</span>
+<span class="mf">0.105740</span> <span class="mf">0.393723</span> <span class="mf">0.105707</span> <span class="n">O</span>
+<span class="mf">0.611776</span> <span class="mf">0.887688</span> <span class="mf">0.110497</span> <span class="n">O</span>
+<span class="mf">0.637273</span> <span class="mf">0.637285</span> <span class="mf">0.862145</span> <span class="n">O</span>
+<span class="mf">0.138011</span> <span class="mf">0.138023</span> <span class="mf">0.859833</span> <span class="n">O</span>
+<span class="mf">0.138011</span> <span class="mf">0.639597</span> <span class="mf">0.361408</span> <span class="n">O</span>
+<span class="mf">0.639585</span> <span class="mf">0.138023</span> <span class="mf">0.361408</span> <span class="n">O</span>
+<span class="mf">0.637273</span> <span class="mf">0.862190</span> <span class="mf">0.637241</span> <span class="n">O</span>
+<span class="mf">0.138011</span> <span class="mf">0.361453</span> <span class="mf">0.639552</span> <span class="n">O</span>
+<span class="mf">0.138011</span> <span class="mf">0.859878</span> <span class="mf">0.137978</span> <span class="n">O</span>
+<span class="mf">0.639585</span> <span class="mf">0.361453</span> <span class="mf">0.137978</span> <span class="n">O</span>
+<span class="mf">0.393711</span> <span class="mf">0.393723</span> <span class="mf">0.393678</span> <span class="n">O</span>
+<span class="mf">0.887676</span> <span class="mf">0.887688</span> <span class="mf">0.388889</span> <span class="n">O</span>
+<span class="mf">0.887676</span> <span class="mf">0.388934</span> <span class="mf">0.887643</span> <span class="n">O</span>
+<span class="mf">0.388922</span> <span class="mf">0.887688</span> <span class="mf">0.887643</span> <span class="n">O</span>
+<span class="mf">0.862178</span> <span class="mf">0.637285</span> <span class="mf">0.637241</span> <span class="n">O</span>
+<span class="mf">0.361441</span> <span class="mf">0.138023</span> <span class="mf">0.639552</span> <span class="n">O</span>
+<span class="mf">0.361441</span> <span class="mf">0.639597</span> <span class="mf">0.137978</span> <span class="n">O</span>
+<span class="mf">0.859866</span> <span class="mf">0.138023</span> <span class="mf">0.137978</span> <span class="n">O</span>
 </pre></div>
 </div>
 </div>
@@ -212,12 +263,12 @@ because site symmetry of a defect calculated by GGA could be different from that
           </div>
           <footer>
   
-    <div aria-label="footer navigation" class="rst-footer-buttons" role="navigation">
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a accesskey="n" class="btn btn-neutral float-right" href="vertical_transition_level.html" rel="next" title="Tutorial for calculation of vertical transition level">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="vertical_transition_level.html" class="btn btn-neutral float-right" title="Tutorial for calculation of vertical transition level" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a accesskey="p" class="btn btn-neutral float-left" href="tutorial.html" rel="prev" title="Tutorial of pydefect"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="tutorial.html" class="btn btn-neutral float-left" title="Tutorial of pydefect" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -30,8 +30,12 @@ author = 'Yu Kumagai'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.githubpages"
-]
+extensions = ["sphinx.ext.githubpages",
+              'sphinxcontrib.seqdiag']
+
+# Fontpath for seqdiag (truetype font)
+seqdiag_fontpath = '/usr/share/fonts/truetype/ipafont/ipagp.ttf'
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

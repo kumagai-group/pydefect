@@ -51,6 +51,21 @@ We recommend the users to follow the same directory structure if possible.
 Details of the processes are examined step by step
 with an example of MgSe calculated using the PBEsol functional.
 
+In pydefect, the command is split into four so that we can support other DFT codes in the future.
+Pydefect_vasp and pydefect_vasp_util are related to VASP, while
+pydefect and pydefect_util are independent of the DFT code and called with pydefect.
+The latter two are not essentially needed for point-defect calculations,
+but are useful in some cases.
+
+There are also many arguments for each sub-command.
+One can always refer its help with the :code:`-h` argument, e.g.,
+
+::
+
+    pydefect s -h
+
+for details.
+
 ===============================
 1. Relaxation of the unit cell
 ===============================
@@ -100,15 +115,6 @@ in :code:`pydefect` and :code:`vise`.
 Here, the PBE functional is a default in :code:`vise`,
 so we use the :code:`-x` argument to switch the XC functional to PBEsol.
 
-There are also many arguments for each sub-command.
-One can always refer its help with the :code:`-h` argument,
-
-::
-
-    pydefect vs -h
-
-for details.
-
 Note that the structure optimization must be generally iterated with 1.3 times larger
 cutoff energy until the forces and stresses converge at the first ionic step.
 See, `vasp manual <https://www.vasp.at/wiki/index.php/Energy_vs_volume_Volume_relaxations_and_Pulay_stress>`_ for details.
@@ -135,8 +141,12 @@ and type the following command in each directory,
 
 ::
 
-    vise vs -x pbesol -t <band, dos or dielectric_dfpt>
+    vise vs -x pbesol -t band -d ../structure_opt
+    vise vs -x pbesol -t dos -d ../structure_opt -uis LVTOT True LAECHG True KPAR 1
+    vise vs -x pbesol -t dielectric_dfpt -d ../structure_opt
 
+The additional user_incar_settings in the dos directory are for creating volumetric
+data of electrostatic potential, electron localized function, and all electron charge density.
 
 :code:`Vise` also provides the plotters for BS and DOS.
 See the `document of vise <https://kumagai-group.github.io/vise/>`_ for details.
@@ -150,36 +160,42 @@ using the :code:`unitcell` (= :code:`u`) sub-command.
 
 ::
 
-    pydefect u --vasprun_band band/vasprun.xml --outcar_band band/OUTCAR --outcar_dielectric_clamped dielectric/OUTCAR --outcar_dielectric_ionic dielectric/OUTCAR
+    pydefect_vasp u -vb band/vasprun-finish.xml -ob band/OUTCAR-finish -odc dielectric/OUTCAR-finish -odi dielectric/OUTCAR-finish -n MgAl2O4
 
 Here, the ion-clamped and ionic dielectric constants can be set
 with different :code:`OUTCAR` files.
-Then, :code:`unitcell.json` is generated, which will be used for analyzing defect calculations later.
+Then, :code:`unitcell.yaml` shown eg is generated, which will be used for analyzing defect calculations later.
+
+::
+
+system: MgAl2O4
+vbm: 4.0183
+cbm: 9.2376
+ele_dielectric_const:
+- - 3.075988
+  - 0.0
+  - -0.0
+- - 0.0
+  - 3.075988
+  - 0.0
+- - -0.0
+  - -0.0
+  - 3.075988
+ion_dielectric_const:
+- - 5.042937
+  - -0.0
+  - -0.0
+- - -0.0
+  - 5.042937
+  - 0.0
+- - -0.0
+  - 0.0
+  - 5.042937
+
+Since it is a yaml file, so the user can also create it by hand.
+
 Generally, json files are less readable, so we implement :code:`print` (= :code:`p`)
 sub-command to generate readable command line output from json files, which can be used as follows,
-
-::
-
-    pydefect p -f unitcell.json
-
-where the unitcell information is shown as follows:
-
-::
-
-    Unitcell(vbm=0.5461, cbm=3.0807, ele_dielectric_const=[[4.645306, 0.0, 0.0], [0.0, 4.645306, -0.0], [0.0, -0.0, 4.645306]], ion_dielectric_const=[[2.584237, -0.0, -0.0], [-0.0, 2.584192, -0.0], [-0.0, -0.0, 2.584151]])
-
-Users sometimes want to set the unitcell parameters by hands.
-In such cases, set parameters using the python script or ipython, and dump the yaml file as follows:
-
-::
-
-    In [1]: from pydefect.analyzer.unitcell import Unitcell
-
-    In [2]: u = Unitcell(vbm=3.0675,cbm=7.7262, ele_dielectric_const=[[3.157296,0,0],[0,3.157296,0],[0,0,3.157296]], ion_dielectric_const=[[6.811496,0,0]
-       ...: , [0, 6.811496,0], [0,0,6.811496]])
-
-    In [3]: u.to_json_file()
-
 
 ==================================
 4. Calculation of competing phases
@@ -198,30 +214,30 @@ We can retrieve POSCARs of the stable or slightly unstable competing phases
 from `the Materials Project (MP) <https://materialsproject.org>`_.
 For this purpose, one needs `the API keys <https://materialsproject.org/open>`_
 of the MP as mentioned above.
-Here, we obtain the competing materials with MgSe
+Here, we obtain the competing materials with MgAl2O4
 whose energies above hull are less than 0.5 meV/atom using
 
 ::
 
-    pydefect mp -e Mg Se --e_above_hull 0.0005
+    pydefect_vasp mp -e Mg Al O --e_above_hull 0.0005
 
 This command creates the following directories:
 
 ::
 
-    Mg149Se_mp-1185632/ MgSe_mp-13031/ Mg_mp-1094122/ Se_mp-570481/
+    Al2O3_mp-1143/  Al_mp-134/  Mg149Al_mp-1185596/  Mg17Al12_mp-2151/  MgAl2O4_mp-3536/  MgAl2_mp-1094116/  MgO_mp-1265/  Mg_mp-1056702/  mol_O2/
 
+We here to remove Mg149Al_mp-1185596/ to reduce computational time as it is a tutorial.
 In each directory, there are :code:`POSCAR` and :code:`prior_info.yaml`.
 The :code:`prior_info.yaml` contains some information in the Materials Project database,
 which is useful for determining the first-principles calculation conditions.
 
-For example, :code:`Mg_mp-1094122/prior_info.yaml` is
+For example, :code:`Mg_mp-1056702/prior_info.yaml` is
 
 ::
-
     band_gap: 0.0
-    data_source: mp-1094122
-    total_magnetization: 0.00010333333333333333
+    data_source: mp-1056702
+    total_magnetization: 0.0007357
 
 which means Mg is a non-magnetic metallic system.
 :code:`Vise` parses the :code:`prior_info.yaml`
@@ -235,19 +251,20 @@ which could be inadequate for competing phases for the defect calculations.
 
 We then generate :code:`INCAR`, :code:`POTCAR`, :code:`KPOINTS`
 files for competing solids and molecules.
-Note, we need to use the **common cutoff energy**, :code:`ENCUT`, for comparing the total energies,
+We need to use the **common cutoff energy**, :code:`ENCUT`, for comparing the total energies,
 which is increased to 1.3 times of **max** :code:`ENMAX` between the constituent POTCARs.
-In case of MgSe, :code:`ENMAX` of Mg and O are 200.0 and 211.555 eV,
-so we need to set :code:`ENCUT = 275.022`, using the :code:`vise`
+In case of MgAl2O4, :code:`ENMAX` of Mg, Al, and O are 200.0, 240.3 and 400.0 eV,
+so we need to set :code:`ENCUT = 520.0`, using the :code:`vise`.
+This is also written in the INCAR file in unitcell/structure_opt directory.
 
 ::
 
-    for i in *_*/;do cd $i; vise vs -uis ENCUT 275.022 -x pbesol ; cd ../;done
+    for i in *_*/;do cd $i; vise vs -uis ENCUT 520.0 -x pbesol ; cd ../;done
 
-The target material, namely MgSe in this example, has already been calculated,
+The target material, namely MgAl2O4 in this example, has already been calculated,
 so we do not have to iterate the same calculations;
-instead make a symbolic link by :code:`ln -s ../unitcell/structure_opt MgSe`
-after removing :code:`MgSe_mp-13031/`.
+instead make a symbolic link by :code:`ln -s ../unitcell/structure_opt MgAl2O4`
+and remove :code:`MgAl2O4_mp-3536/`.
 However, if we calculate it with different :code:`ENMAX` to be
 consistent with larger :code:`ENMAX` of dopant atoms,
 we need to calculate it again.
@@ -259,16 +276,17 @@ and :code:`KPOINTS` to the Gamma point sampling.
 This is, however, automatically tuned with :code:`vise` via :code:`prior_info.yaml`.
 
 After finishing the vasp calculations,
-we can generate the json file for the chemical potential diagram with
-the :code:`make_cpd` (= :code:`mcpd`) sub-command:
+we can generate the composition_energies.yaml file including the total energies per formula
+with :code:`make_composition_energies` (= :code:`mce`) sub-command.
 
 ::
 
-    pydefect mcpd -d *_*/
+    pydefect_vasp mce  -d *_*/
+
 
 When renaming the :code:`vasprun.xml` and :code:`OUTCAR` files to e.g.,
 :code:`vasprun-finish.xml` and :code:`OUTCAR-finish`,
-one needs to write the following in the :code:`pydefect.yaml` file:
+one needs to write the following in the :code:`vise.yaml` file:
 
 ::
 
@@ -276,12 +294,25 @@ one needs to write the following in the :code:`pydefect.yaml` file:
     outcar: OUTCAR-finish
     vasprun: vasprun-finish.xml
 
-To plot the chemical potential diagram,
-use the :code:`plot_cpd` (= :code:`pcpd`) sub-command:
+We next create the relative_energies.yaml and standard_energies.yaml
+with :code:`standard_and_relative_energies` (= :code:`sre`) sub-command.
 
 ::
 
-    pydefect pcpd -y cpd.yaml
+    pydefect sre
+
+and then
+
+::
+
+    pydefect cv -t MgAl2O4
+
+
+To plot the chemical potential diagram, use the :code:`plot_cpd` (= :code:`pc`) sub-command:
+
+::
+
+    pydefect pc
 
 which depicts the Mg-O chemical potential diagram that is also saved as :code:`cpd.pdf`.
 The binary and ternary chemical potential diagrams look like
@@ -290,39 +321,64 @@ The binary and ternary chemical potential diagrams look like
 
 .. image:: cpd_BaSnO3.png
 
-Here, relative chemical potentials at the vertices are also shown as follows:
+Here, the vertices surrounding the target compounds are also shown as follows:
 
 ::
 
-    +----+---------+--------+---------+
-    |    |   mu_Ba |   mu_O |   mu_Sn |
-    |----+---------+--------+---------|
-    | A  |  -5.927 |  0     |  -4.966 |
-    | B  |  -5.581 |  0     |  -5.312 |
-    | C  |  -3.124 | -2.59  |   0     |
-    | D  |  -5.352 | -0.114 |  -5.198 |
-    | E  |  -2.753 | -2.713 |   0     |
-    | F  |  -3.558 | -2.37  |  -0.226 |
-    | G  |  -3.503 | -2.4   |  -0.189 |
-    +----+---------+--------+---------+
-
+    target: MgAl2O4
+    A:
+      chem_pot:
+        Al: 0.0
+        Mg: -0.68785
+        O: -5.24907
+      competing_phases:
+      - Al2O3
+      - Al
+      impurity_phases: []
+    B:
+      chem_pot:
+        Al: 0.0
+        Mg: -0.32348
+        O: -5.34016
+      competing_phases:
+      - MgO
+      - Al
+      impurity_phases: []
+    C:
+      chem_pot:
+        Al: -7.8736
+        Mg: -5.93692
+        O: 0.0
+      competing_phases:
+      - Al2O3
+      - O
+      impurity_phases: []
+    D:
+      chem_pot:
+        Al: -8.01024
+        Mg: -5.66364
+        O: 0.0
+      competing_phases:
+      - MgO
+      - O
+      impurity_phases: []
 
 If one needs to modify the energies for the chemical potential diagram,
-one can directly modify the :code:`vertices_MgO.yaml` file.
+one can directly modify the :code:`relative_energies.yaml` file.
 
 Calculations of the competing phases are often laborious,
 and sometimes we wants to roughly check the defect formation energies as soon as possible.
 :code:`Pydefect` supports to create the chemical potential diagram
 from the Materials Project database.
 To do this, however, one needs to prepare atom energies
-that are needed to align the element energy standards.
+that are needed for aligning the element energy standards.
 
 With :code:`vise`, we can easily prepare atom calculation directories.
-Here, we show an example of BaSnO\ :sub:`3`:
+Here, we show an example of MgAl2O\ :sub:`4`:
 
 ::
 
-    vise map -e Ba Sn O
+    vise_util map -e Mg Al O
 
 Then, create the vasp input files
 
@@ -334,9 +390,6 @@ and run the vasp.
 The atomic energies are collected to yaml file using the following python script.
 
 ::
-
-    # -*- coding: utf-8 -*-
-    #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
     from pymatgen.core import Element
     from pymatgen.io.vasp import Outcar
@@ -354,14 +407,13 @@ The cpd.yaml file is then generated using the following command.
 
 ::
 
-    pydefect mcpd -e Ba Sn O -t BaSnO3 -a atom_energies.yaml
-
+    pydefect_util cefm -a atom_energies.yaml -e Mg Al O
 
 ===============================================================
 5. Construction of a supercell and defect initial setting file
 ===============================================================
 We have finished the calculations of the unit cell and competing phases,
-and are eventually ready for point-defect calculations.
+and now are ready for point-defect calculations.
 Let's create :code:`defect/` directory and copy unitcell :code:`POSCAR` file from
 e.g. :code:`unitcell/dos/` to :code:`defect/`
 
@@ -373,7 +425,7 @@ With the following command, one can create :code:`SPOSCAR` file
 
 ::
 
-    pydefect s
+    pydefect s -p ../unitcell/structure_opt/CONTCAR-finish
 
 If the input structure is different from the standardized primitive cell, :code:`NotPrimitiveError` is raised.
 
@@ -390,18 +442,22 @@ In :code:`pydefect`, users can also specify the cell matrix, e.g.,
 
 ::
 
-    pydefect s --matrix 2 1 1
+    pydefect s -p ../unitcell/structure_opt/CONTCAR-finish --matrix 2 1 1
 
 The matrix is applied to the conventional cell. If one wants to know the conventional cell, type
 
 ::
 
-    pydefect s --matrix 1
+    pydefect s -p ../unitcell/structure_opt/CONTCAR-finish --matrix 1
 
 See the help for more details.
 
 The :code:`supercell_info.json` file contains the full information on the supercell,
-which can be seen by using the :code:`-p` option.
+which can be seen by using the :code:`pydefect_print` command,
+
+::
+
+    pydefect_print supercell_info.json
 
 ::
 
@@ -434,13 +490,18 @@ An example of :code:`defect_in.yaml` for MgSe looks as follows,
 
 ::
 
-    Mg_Se1: [0, 1, 2, 3, 4]
-    Se_Mg1: [-4, -3, -2, -1, 0]
+    Al_Mg1: [-1, 0, 1]
+    Al_O1: [-1, 0, 1, 2, 3, 4, 5]
+    Mg_Al1: [-1, 0, 1]
+    O_Al1: [-5, -4, -3, -2, -1, 0, 1]
+    Va_Al1: [-3, -2, -1, 0, 1]
     Va_Mg1: [-2, -1, 0]
-    Va_Se1: [0, 1, 2]
+    Va_O1: [0, 1, 2]
+
+
 
 where the combination of defect types and their charges are shown.
-We can modify this using an editor if necessary.
+We can modify this file using an editor if necessary or --keywords option (see below).
 If we want to add dopants, we can type as follows:
 
 ::
@@ -477,7 +538,7 @@ Users have to add these outliers by themselves.
 
 
 3. By default, positions of atoms neighboring a defect are perturbed
-such that the symmetry is lowered to P1.
+such that the symmetry is lowered to the P1 symmetry.
 This is, however, unwanted in some cases because it increases the number of irreducible k-points
 Then, :code:`displace_distance` needs to be set to 0 via :code:`pydefect.yaml`.
 
@@ -512,55 +573,55 @@ to form the strong O-H or N-H bonding.
 Conversely, a hydride ion (H\ :sup:`-`) should prefer to locate at very much different places.
 Therefore, we need to carefully determine the interstitial sites.
 
-:code:`pydefect` holds a utility that recommends the interstitial sites based on
-the all electron charge density in the unitcell
+:code:`Pydefect` holds a utility that recommends the interstitial sites based on
+volumetric data such as all electron charge density in the unitcell
 using the :code:`ChargeDensityAnalyzer` class implemented in :code:`pymatgen`.
-To use this, we need to generate :code:`AECCAR0` and :code:`AECCAR2`
+To use this, we need to generate volumetric data, e.g., :code:`AECCAR` and :code:`LOCPOT`,
 based on the standardized primitive cell.
 
-It is also fine to add this task at the DOS calculations.
-The command of :code:`vise` for this is
+This should not be done in general at the band structure calculations,
+because the primitive cells may be different from the standardized primitive cell.
+
+After running the vasp calculation, run the following command in the directory including AECCAR{0,2}.
 
 ::
 
-    vise vs -uis LAECHG True -t dos
-
-This should not be done at the BS calculations, because the primitive cells
-may be different from the standardized primitive cell in particular space groups.
-
-After running the vasp calculation, run the recommend_interstitials.py in pydefect
-
-::
-
-    python pydefect/cli/vasp/util_commands/recommend_interstitials.py AECCAR0 AECCAR2
+    pydefect_vasp le -v AECCAR{0,2} -i all_electron_charge
 
 , which shows the local minimum points of the charge density as follows.
 
 ::
 
-              a         b         c  Charge Density
-    0  0.750000  0.750000  0.750000        0.527096
-    1  0.500000  0.500000  0.500000        0.669109
-    2  0.611111  0.611111  0.166667        1.020380
-    3  0.166667  0.611111  0.611111        1.020382
-    4  0.611111  0.166667  0.611111        1.020382
-    Host symmetry R3m
-    ++ Inequivalent indices and site symmetries ++
-      0   0.7500   0.7500   0.7500 3m
-      1   0.5000   0.5000   0.5000 3m
-      2   0.6111   0.6111   0.1667 .m
+           a      b      c      value  ave_value
+    0  0.125  0.125  0.125   3.387930   0.029844
+    1  0.625  0.125  0.125   3.383668   0.029845
+    2  0.125  0.625  0.125   3.383668   0.029845
+    3  0.125  0.125  0.625   3.383445   0.029845
+    4  0.500  0.500  0.500  16.501119   0.155178
+    5  0.750  0.750  0.750  16.501119   0.155178
+
+More details are shown in volumetric_data_local_extrema.json, which can be checked with pydefect_print command.
+
+::
+
+    info: all_electron_charge
+    min_or_max: min
+    extrema_points:
+    #  site_sym  coordination                                                     frac_coords               quantity
+    1  -3m       {'Mg': [1.75, 1.75], 'O': [2.14, 2.14, 2.14, 2.14, 2.14, 2.14]}  ( 0.125,  0.125,  0.125)  0.03
+    2  -43m      {'Al': [1.75, 1.75, 1.75, 1.75], 'O': [1.57, 1.57, 1.57, 1.57]}  ( 0.500,  0.500,  0.500)  0.16
 
 Note, again, that the local minima may not be the best initial points
 for some particular interstitials,
 so users must need to recognize the limit of this procedure.
 
-To add the interstitial site at e.g., 0.75  0.75  0.75,
+To add these two interstitial sites,
 where the fractional coordinates are based on the standardized primitive cell,
-we use the :code:`interstitial` (= :code:`i`) sub-command like
+we use the :code:`add_interstitials_from_local_extrema` (= :code:`ai`) sub-command like
 
 ::
 
-    pydefect ai -s supercell_info.json -p ../unitcell/structure_opt/POSCAR -c 0.75 0.75 0.75
+    pydefect_util ai --local_extrema ../unitcell/dos/volumetric_data_local_extrema.json -i 1 2
 
 
 :code:`supercell_info.json` is then updated,
@@ -571,13 +632,16 @@ which includes the information of the interstitial sites.
     ...
     -- interstitials
     #1
-    Fractional coordinates: 0.3750000  0.3750000  0.3750000
-            Wyckoff letter: c
-             Site symmetry: -43m
-              Coordination: {'Mg': [2.59, 2.59, 2.59, 2.59], 'Se': [3.0, 3.0, 3.0, 3.0, 3.0, 3.0]}
+                      Info: None #1
+    Fractional coordinates: 0.1250000  0.1250000  0.1250000
+             Site symmetry: -3m
+              Coordination: {'Mg': [1.75, 1.75], 'O': [2.14, 2.14, 2.14, 2.14, 2.14, 2.14]}
 
-If we want to add another site at e.g. 0.5 0.5 0.5 ,
-:code:`supercell_info.json` is again updated.
+    #2
+                      Info: None #2
+    Fractional coordinates: 0.5000000  0.5000000  0.5000000
+             Site symmetry: -43m
+              Coordination: {'Al': [1.75, 1.75, 1.75, 1.75], 'O': [1.57, 1.57, 1.57, 1.57]}
 
 To pop the interstitial sites, use
 
@@ -585,7 +649,19 @@ To pop the interstitial sites, use
 
     pydefect pi -i 1 -s supercell_info.json
 
-The first interstitial locating at (0.75, 0.75, 0.75) is removed from :code:`supercell_info.json`.
+::
+
+    ...
+    -- interstitials
+    #1
+                      Info: None #2
+    Fractional coordinates: 0.5000000  0.5000000  0.5000000
+             Site symmetry: -43m
+              Coordination: {'Al': [1.75, 1.75, 1.75, 1.75], 'O': [1.57, 1.57, 1.57, 1.57]}
+
+The first interstitial site is removed from :code:`supercell_info.json`.
+
+To consider these interstitials, run defect_set sub-command again.
 
 ===============================================
 7. Creation of defect calculation directories
@@ -603,15 +679,29 @@ If you again type the same command, the following information appears,
 
 ::
 
-    2020/11/24 20:40:27    INFO pydefect.cli.vasp.main_function
-     --> perfect dir exists, so skipped...
-    2020/11/24 20:40:27    INFO pydefect.cli.vasp.main_function
-     --> Va_Se1_1 dir exists, so skipped...
-    2020/11/24 20:40:27    INFO pydefect.cli.vasp.main_function
-     --> Va_Se1_2 dir exists, so skipped...
-    2020/11/24 20:40:27    INFO pydefect.cli.vasp.main_function
-     --> Va_Se1_0 dir exists, so skipped...
-    ...
+   INFO: perfect dir exists, so skipped...
+   INFO: Al_i1_1 dir exists, so skipped...
+   INFO: O_i1_0 dir exists, so skipped...
+   INFO: Mg_i1_1 dir exists, so skipped...
+   INFO: Mg_i1_2 dir exists, so skipped...
+   INFO: Al_i1_3 dir exists, so skipped...
+   INFO: Mg_i1_0 dir exists, so skipped...
+   INFO: Al_i1_-1 dir exists, so skipped...
+   INFO: Al_i1_2 dir exists, so skipped...
+   INFO: Va_O1_1 dir exists, so skipped...
+   INFO: Va_Al1_-3 dir exists, so skipped...
+   INFO: Va_O1_0 dir exists, so skipped...
+   INFO: Va_Al1_0 dir exists, so skipped...
+   INFO: Va_O1_2 dir exists, so skipped...
+   INFO: O_i1_-2 dir exists, so skipped...
+   INFO: O_i1_-1 dir exists, so skipped...
+   INFO: Va_Mg1_0 dir exists, so skipped...
+   INFO: Va_Al1_-1 dir exists, so skipped...
+   INFO: Va_Al1_-2 dir exists, so skipped...
+   INFO: Va_Mg1_-2 dir exists, so skipped...
+   INFO: Va_Mg1_-1 dir exists, so skipped...
+   INFO: Al_i1_0 dir exists, so skipped...
+   INFO: Va_Al1_1 dir exists, so skipped...
 
 and no directories are newly created.
 This is a fail-safe treatment so as not to delete the calculated directories by mistake.
@@ -640,26 +730,21 @@ In these cases, one needs to prepare the input files and runs the vasp calculati
 However, :code:`pydefect` necessitates the :code:`defect_entry.json` file for the postprocess,
 which cannot be easily generated by the users.
 
-In aid of this, :code:`pydefect` provides the :code:`create_defect_entry.py`,
-which parses the :code:`POSCAR` files and defect name as follows.
+In aid of this, :code:`pydefect` provides the sub-command to create defect_entry.json,
+which parses the :code:`POSCAR` files.
 
 ::
 
-    python $PATH_TO_FILE/create_defect_entry.py complex_2 perfect/POSCAR complex_2/POSCAR
+    pydefect_vasp_util de -d . -p ../perfect/POSCAR -n complex_defect
 
-which creates the :code:`defect_entry.json` file. The directory name is then parsed as
 
-::
-
-    A_B -> name='A', charge=B
-
-This script can be used when one wants to use :code:`pydefect`
+This script can also be used when one wants to use :code:`pydefect`
 for analyzing the defect calculations in progress.
 
 ==========================================
 9. Parsing supercell calculation results
 ==========================================
-Then, let's run the vasp calculations.
+Let's run the vasp calculations.
 
 To create the vasp input files, type
 
@@ -683,13 +768,6 @@ we can generate :code:`calc_results.json` in all the calculated directories.
 
     pydefect cr -d *_*/ perfect
 
-When one wants to generate :code:`calc_results.json`
-for some particular directories, e.g., Va_O1_0, type
-
-::
-
-    pydefect cr -d Va_O1_0
-
 ============================================================================
 10. Corrections of defect formation energies in finite-size supercells
 ============================================================================
@@ -704,11 +782,11 @@ The corrections are performed using the
 
 ::
 
-    pydefect efnv -d *_*/ -pcr perfect/calc_results.json -u ../unitcell/unitcell.json
+    pydefect efnv -d *_*/ -pcr perfect/calc_results.json -u ../unitcell/unitcell.yaml
 
 For the corrections, we need the static dielectric constants
 and atomic site potentials in the perfect supercell.
-Therefore, the paths to :code:`unitcell.json` and :code:`calc_results.json` of
+Therefore, the paths to :code:`unitcell.yaml` and :code:`calc_results.json` of
 :code:`perfect` must be assigned.
 Bear also in mind that this command takes some time.
 
@@ -737,8 +815,50 @@ When performing the corrections, I strongly recommend you to check
 all the :code:`correction.pdf` files for the calculated defects
 so as to reduce careless mistakes as much as possible.
 
+===========================
+11. Check defect structures
+===========================
+
+We then analyze the defect local structures using the defect_structure_info(=dsi) sub-command.
+
+::
+
+    pydefect dsi -d *_*/
+
+Then, the defect_structure_info.json files are created.
+Using pydefect_print command, the file shows, e.g.,
+
+::
+
+     -- defect structure info
+    Defect type: vacancy
+    Site symmetry: -43m -> -43m (same)
+    Has same configuration from initial structure: True
+    Drift distance: 0.003
+    Defect center: ( 0.250,  0.250,  0.250)
+    Removed atoms:
+    0  Mg  ( 0.250,  0.250,  0.250)
+
+    Displacements
+    Elem  Dist  Displace  Angle  Index  Initial site                  Final site
+    O     1.94  0.08      180    47     ( 0.389,  0.389,  0.389)  ->  ( 0.394,  0.394,  0.394)
+    O     1.94  0.08      180    37     ( 0.111,  0.389,  0.111)  ->  ( 0.106,  0.393,  0.106)
+    O     1.95  0.07      180    32     ( 0.111,  0.111,  0.389)  ->  ( 0.106,  0.106,  0.393)
+    O     1.95  0.08      180    30     ( 0.389,  0.111,  0.111)  ->  ( 0.394,  0.106,  0.106)
+
+We can also create `VESTA <https://jp-minerals.org/vesta/en/>`_ file for analyzing the defect structure
+using the defect_vesta_file(=dvf) sub-command in pydefect_util.
+
+::
+
+    pydefect_util dvf -d *_*
+
+
+which creates defect.vesta files.
+
+
 ============================================================================
-11. Check defect eigenvalues and band-edge states in supercell calculations
+12. Check defect eigenvalues and band-edge states in supercell calculations
 ============================================================================
 Generally, point defects are categorized into three types.
 
@@ -781,16 +901,25 @@ and judge if the defects create the PHS and/or defect localized states.
 
 :code:`Pydefect` shows the eigenvalues and band-edge states by the following steps.
 
-Firstly, one can generate the :code:`band_edge_eigenvalues.json`
-and :code:`eigenvalues.pdf` files with the following command.
+Firstly, one can generate the :code:`perfect_band_edge_state.json` files using the perfect_band_edge_state sub-command,
+which shows the information on the eigenvalues and orbital information of VBM and CBM.
 
 ::
 
-    pydefect eig -d *_*/ -pcr perfect/calc_results.json
+    pydefect_vasp pbes -d perfect
 
-The :code:`eigenvalues.pdf` file looks like,
+And, the :code:`band_edge_orbital_infos.json` files are created at each defect directory using
+the band_edge_orbital_infos(=beoi) sub-command.
 
-.. image:: eigenvalues_MgSe_Va_Mg_0.png
+::
+
+    pydefect_vasp beoi -d *_* -pbes perfect/perfect_band_edge_state.json
+
+Then, the :code:`eigenvalues.pdf` files that looks like,
+
+.. image:: eigenvalues.pdf
+
+are created.
 
 Here, one can see single-particle levels and their occupation in the spin-up and -down channels.
 The x-axis is fractional coordinates of the calculated k points,
@@ -803,43 +932,46 @@ The discrete numbers in the figures mean the band indices starting from 1,
 and the filled red, green, and blue circles mean the occupied,
 partially occupied (from 0.1 to 0.9), and unoccupied eigenstates, respectively.
 
-We then generate the :code:`edge_characters.json` file with the following command.
+We then generate the :code:`edge_characters.json` file with the band_edge_states (=bes) sub-command.
 
 ::
 
-    pydefect make_edge_characters -d *_*/ -pcr perfect/calc_results.json
+    pydefect bes -d *_*/ -pbes perfect/perfect_band_edge_state.json
 
-and analyze the files and show the edge states with this command
 
-::
-
-    pydefect edge_states -d *_*/ -p perfect/edge_characters.json
-
-which shows as follows:
+Using the pydefect_print command, the file shows
 
 ::
 
-    -- Mg_i1_0
-    spin up   Donor PHS
-    spin down Donor PHS
-    -- Mg_i1_1
-    spin up   Donor PHS
-    spin down No in-gap state
-    -- Mg_i1_2
-    spin up   No in-gap state
-    spin down No in-gap state
-    -- Va_Mg1_-1
-    spin up   No in-gap state
-    spin down In-gap state
-    -- Va_Mg1_-2
-    spin up   In-gap state
-    spin down In-gap state
-    -- Va_Mg1_0
-    spin up   No in-gap state
-    spin down In-gap state
+     -- band-edge states info
+    Spin-up
+         Index  Energy  P-ratio  Occupation  OrbDiff  Orbitals                          K-point coords
+    VBM  128    3.727   0.33     1.00        0.02     O-p: 0.76                         ( 0.250,  0.250,  0.250)
+    CBM  129    9.980   0.06     0.00        0.03     Al-s: 0.11, O-s: 0.21, O-p: 0.11  ( 0.250,  0.250,  0.250)
+    vbm has acceptor phs: False (0.000 vs. 0.2)
+    cbm has donor phs: False (0.000 vs. 0.2)
+    ---
+    Localized Orbital(s)
+    Index  Energy  P-ratio  Occupation  Orbitals
 
-There are four states :code:`donor_phs`, :code:`acceptor_phs`, :code:`localized_state`, :code:`no_in_gap`,
-the former two are considered as shallow states, and should be omitted for energy plot.
+    Spin-down
+         Index  Energy  P-ratio  Occupation  OrbDiff  Orbitals              K-point coords
+    VBM  126    4.083   0.67     0.88        0.06     O-p: 0.72             ( 0.250,  0.250,  0.250)
+    CBM  129    10.010  0.06     0.00        0.01     O-s: 0.21, O-p: 0.11  ( 0.250,  0.250,  0.250)
+    vbm has acceptor phs: False (0.120 vs. 0.2)
+    cbm has donor phs: False (0.000 vs. 0.2)
+    ---
+    Localized Orbital(s)
+    Index  Energy  P-ratio  Occupation  Orbitals
+    127    4.277   0.62     0.06        O-p: 2.98
+    128    4.278   0.62     0.06        O-p: 2.98
+
+The orbital information at each spin channel is shown.
+Here, P-ratio means the participation ratio.
+
+Important are :code:`donor phs` and :code:`acceptor phs`,
+which are considered as shallow states, and should be omitted for energy plot,
+if :code:`donor phs` is occupied or :code:`acceptor phs` is unoccupied.
 
 In :code:`pydefect`, these states are determined from the highest occupied and lowest unoccupied eigenvalues
 and the similarity of wavefunction of the highest occupied (lowest unoccupied) state and that of the VBM (CBM).
@@ -848,10 +980,6 @@ We emphasize that the automatically determined band-edge states could be incorre
 as it is generally difficult to determine them automatically.
 Therefore, please carefully check the band-edge states,
 and draw their band-decomposed charge density if the band-edge states are not obvious.
-
-The band-edge states can be modified via the :code:`band_edge_states.yaml` file
-in each defect directory, which will be parsed when plotting the defect
-formation energies.
 
 =====================================
 12. Plot defect formation energies
@@ -862,21 +990,105 @@ The plot of the defect formation energies requires multiple information,
 namely band edges, chemical potentials of competing phases,
 and total energies of perfect and defective supercells.
 
-The defect formation energies are plotted as a function of the Fermi level
-with the :code:`plot_energy` (= :code:`pe`) sub-command
+Firstly, we prepare defect_energy_info.yaml files using the defect_energy_infos (=dei) sub-command,
 
 ::
 
-    pydefect e --unitcell ../unitcell/unitcell.json --perfect perfect/calc_results.json -d Va*_* -c ../competing_phases/cpd.yaml -l A
+    pydefect dei -d *_*/ -pcr perfect/calc_results.json -u ../unitcell/unitcell.yaml -s ../cpd/standard_energies.yaml
+
+which creates defect_energy_info.yaml files.
+
+We then create defect_energy_summary.json file with the defect_energy_summary(=des) sub-command.
+
+::
+
+    pydefect des -d *_*/ -u ../unitcell/unitcell.yaml -pbes perfect/perfect_band_edge_state.json -t ../cpd/target_vertices.yaml
+
+which shows,
+
+::
+
+    title: MgAl₂O₄
+    rel_chem_pots:
+     -A Al: 0.00 Mg: -0.69 O: -5.25
+     -B Al: 0.00 Mg: -0.32 O: -5.34
+     -C Al: -7.87 Mg: -5.94 O: 0.00
+     -D Al: -8.01 Mg: -5.66 O: 0.00
+    vbm: 0.00, cbm: 5.22, supercell vbm: -0.03, supercell_cbm: 6.14
+
+    name    atom_io         charge    energy    correction  is_shallow
+    ------  ------------  --------  --------  ------------  ------------
+    Al_i1   Al: 1               -1    14.958        -0.049  False
+                                 0     9.896         0.000  True
+                                 1     3.376         0.527  False
+                                 2    -0.872         1.814  True
+                                 3    -6.994         3.370  False
+    Mg_i1   Mg: 1                0     8.208         0.000  True
+                                 1     2.015         0.555  True
+                                 2    -4.117         1.534  False
+    O_i1    O: 1                -2     8.122         0.721  False
+                                -1     7.055         0.149  False
+                                 0     4.566         0.000  False
+    Va_Al1  Al: -1              -3    13.527         3.402  False
+                                -2    12.968         1.789  True
+                                -1    12.672         0.660  True
+                                 0    12.595         0.000  True
+                                 1    12.710        -0.232  True
+    Va_Mg1  Mg: -1              -2    10.093         1.524  False
+                                -1     9.580         0.578  True
+                                 0     9.311         0.000  False
+    Va_MgO  O: -1 Mg: -1         0     9.887         0.000  False
+    Va_O1   O: -1                0     6.804         0.000  False
+                                 1     3.808         0.166  False
+                                 2     0.883         0.845  False
+
+We can also create calc_summary.json file with the calc_summary(=cs) sub-command.
+
+::
+
+    pydefect cs -d *_*/ -pcr perfect/calc_results.json
+
+::
+
+    |:---------:|:----------:|:-----------:|:-----------------:|:------------:|:------------------:|:--------------:|
+    |   name    | Ele. conv. | Ionic conv. | Is energy strange | Same config. |    Defect type     | Symm. Relation |
+    | Al_i1_-1  |     .      |      .      |         .         |    False     |      unknown       |    subgroup    |
+    |  Al_i1_0  |     .      |      .      |         .         |    False     |      unknown       |    subgroup    |
+    |  Al_i1_1  |     .      |      .      |         .         |    False     |      unknown       |    subgroup    |
+    |  Al_i1_2  |     .      |      .      |         .         |      .       |         .          |       .        |
+    |  Al_i1_3  |     .      |      .      |         .         |      .       |         .          |       .        |
+    |  Mg_i1_0  |     .      |      .      |         .         |      .       |         .          |       .        |
+    |  Mg_i1_1  |     .      |      .      |         .         |      .       |         .          |       .        |
+    |  Mg_i1_2  |     .      |      .      |         .         |      .       |         .          |       .        |
+    |  O_i1_-1  |     .      |      .      |         .         |      .       |         .          |       .        |
+    |  O_i1_-2  |     .      |      .      |         .         |    False     | interstitial_split |    subgroup    |
+    |  O_i1_0   |     .      |      .      |         .         |      .       |         .          |       .        |
+    | Va_Al1_-1 |     .      |      .      |         .         |      .       |         .          |       .        |
+    | Va_Al1_-2 |     .      |      .      |         .         |      .       |         .          |       .        |
+    | Va_Al1_-3 |     .      |      .      |         .         |      .       |         .          |       .        |
+    | Va_Al1_0  |     .      |      .      |         .         |      .       |         .          |       .        |
+    | Va_Al1_1  |     .      |      .      |         .         |      .       |         .          |       .        |
+    | Va_Mg1_-1 |     .      |      .      |         .         |      .       |         .          |       .        |
+    | Va_Mg1_-2 |     .      |      .      |         .         |      .       |         .          |       .        |
+    | Va_Mg1_0  |     .      |      .      |         .         |      .       |         .          |       .        |
+    | Va_MgO_0  |     .      |      .      |         .         |    False     |      unknown       |      same      |
+    |  Va_O1_0  |     .      |      .      |         .         |      .       |         .          |       .        |
+    |  Va_O1_1  |     .      |      .      |         .         |      .       |         .          |       .        |
+    |  Va_O1_2  |     .      |      .      |         .         |      .       |         .          |       .        |
+
+When one wants to modify the calculation results such as shallow states manually,
+modify the defect_energy_info.yaml file for each defect.
+
+Finally, the defect formation energies are plotted as a function of the Fermi level
+with the :code:`plot_defect_formation_energy` (= :code:`pe`) sub-command
+
+::
+
+    pydefect pe -d defect_energy_summary.json -l A
 
 which shows like,
 
-.. image:: energy_MgSe_A.png
+.. image:: energy_A.pdf
 
 When changing the condition for chemical potential, namely the position of the vertex in the chemical potential diagram,
 use the :code:`-l` option.
-
-If the calculation data exists locally, the web GUI may be used with the :code:`-wg` option.
-
-
-

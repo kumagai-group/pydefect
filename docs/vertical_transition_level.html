@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8">
   
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Tutorial for calculation of vertical transition level &mdash; pydefect  documentation</title>
   
 
   
-  <link href="_static/css/theme.css" rel="stylesheet" type="text/css" />
-  <link href="_static/pygments.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -25,19 +25,19 @@
   <![endif]-->
   
     
-      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js" type="text/javascript"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
     
-    <script src="_static/js/theme.js" type="text/javascript"></script>
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-    <link href="genindex.html" rel="index" title="Index" />
-    <link href="search.html" rel="search" title="Search" />
-    <link href="change_log.html" rel="next" title="Change log" />
-    <link href="first_principles_calc.html" rel="prev" title="Tips for first-principles calculations for point defects" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Change log" href="change_log.html" />
+    <link rel="prev" title="Tips for first-principles calculations for point defects" href="first_principles_calc.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -45,13 +45,13 @@
    
   <div class="wy-grid-for-nav">
     
-    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
           
 
           
-            <a alt="Documentation Home" class="icon icon-home" href="index.html"> pydefect
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pydefect
           
 
           
@@ -64,10 +64,10 @@
 
           
 <div role="search">
-  <form action="search.html" class="wy-form" id="rtd-search-form" method="get">
-    <input name="q" placeholder="Search docs" type="text" />
-    <input name="check_keywords" type="hidden" value="yes" />
-    <input name="area" type="hidden" value="default" />
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
   </form>
 </div>
 
@@ -75,7 +75,7 @@
         </div>
 
         
-        <div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
             
@@ -96,12 +96,12 @@
       </div>
     </nav>
 
-    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav aria-label="top navigation" class="wy-nav-top">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
-          <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pydefect</a>
         
       </nav>
@@ -127,11 +127,11 @@
 
 
 
-<div aria-label="breadcrumbs navigation" role="navigation">
+<div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a class="icon icon-home" href="index.html"></a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Tutorial for calculation of vertical transition level</li>
     
@@ -149,32 +149,32 @@
   
   <hr/>
 </div>
-          <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
   <div class="section" id="tutorial-for-calculation-of-vertical-transition-level">
 <h1>Tutorial for calculation of vertical transition level<a class="headerlink" href="#tutorial-for-calculation-of-vertical-transition-level" title="Permalink to this headline">¶</a></h1>
 <p>We here illustrate how to calculate the vertical transition level (VTL)
-with an example of NaCl.
+with an example of an oxygen vacancy in MgAl2O4.
 For the calculation of the VTL, we need to apply special correction scheme,
 here we call it the GKFO correction.
 Please read
 <a class="reference external" href="link.aps.org/doi/10.1103/PhysRevB.101.020102">T. Gake, Y. Kumagai*, C. Freysoldt, and F. Oba, Phys. Rev. B, 101, 020102(R) (2020).</a>
 for details.</p>
-<p>Assuming that the typical defect calculations in NaCl based on the PBEsol functional
+<p>Assuming that the typical defect calculations in MgAl2O4 based on the PBEsol functional
 have been done already as introduced in the tutorial
-and one further wants to calculate the photo-absorption energy
-via Cl vacancy in the neutral charge state.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>NaCl
+and one further wants to calculate the photo-absorption energy via excitation
+of an oxygen vacancy localized state in the neutral charge state to the CBM.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>MgAl2O4
  │
  ├ unitcell/ ── unitcell.json
  │
  └ defects/ ── perfect/
-             └ Va_Cl_0/ ── absorption/
+             └ Va_O1_0/ ── absorption/
 </pre></div>
 </div>
-<p>Firstly, create the <code class="code docutils literal notranslate"><span class="pre">absorption/</span></code> directory at the <code class="code docutils literal notranslate"><span class="pre">Va_Cl_0/</span></code>
-and copy the vasp input files from <code class="code docutils literal notranslate"><span class="pre">Va_Cl_0/</span></code>.
+<p>Firstly, create the <code class="code docutils literal notranslate"><span class="pre">absorption/</span></code> directory at the <code class="code docutils literal notranslate"><span class="pre">Va_O1_0/</span></code>
+and copy the vasp input files from <code class="code docutils literal notranslate"><span class="pre">Va_O1_0/</span></code>.
 Then, edit <code class="code docutils literal notranslate"><span class="pre">INCAR</span></code> to change <code class="code docutils literal notranslate"><span class="pre">NSW</span></code> to 1 and add the <code class="code docutils literal notranslate"><span class="pre">NELECT</span></code> tag with
 reducing it by 1 from the neutral one.
 Or one can type:</p>
@@ -187,7 +187,7 @@ using the following command in the <code class="code docutils literal notranslat
 </pre></div>
 </div>
 <p>Then, type</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">gkfo</span> <span class="o">-</span><span class="n">u</span> <span class="o">../../../</span><span class="n">unitcell</span><span class="o">/</span><span class="n">unitcell</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">iefnv</span> <span class="o">../</span><span class="n">correction</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">icr</span> <span class="o">../</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">fcr</span> <span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">cd</span> <span class="mi">1</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect_util</span> <span class="n">gkfo</span> <span class="o">-</span><span class="n">u</span> <span class="o">../../../</span><span class="n">unitcell</span><span class="o">/</span><span class="n">unitcell</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">iefnv</span> <span class="o">../</span><span class="n">correction</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">icr</span> <span class="o">../</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">fcr</span> <span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">cd</span> <span class="mi">1</span>
 </pre></div>
 </div>
 <p>With this command, one can obtain <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.pdf</span></code> and <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.json</span></code> files,
@@ -196,33 +196,29 @@ and the correction energy is shown as follows:</p>
 <span class="o">|</span> <span class="n">charge</span>             <span class="o">|</span>  <span class="mi">0</span>         <span class="o">|</span>
 <span class="o">|</span> <span class="n">additional</span> <span class="n">charge</span>  <span class="o">|</span>  <span class="mi">1</span>         <span class="o">|</span>
 <span class="o">|</span> <span class="n">pc</span> <span class="mi">1</span><span class="n">st</span> <span class="n">term</span>        <span class="o">|</span>  <span class="mi">0</span>         <span class="o">|</span>
-<span class="o">|</span> <span class="n">pc</span> <span class="mi">2</span><span class="n">nd</span> <span class="n">term</span>        <span class="o">|</span>  <span class="mf">0.731247</span>  <span class="o">|</span>
-<span class="o">|</span> <span class="n">alignment</span> <span class="mi">1</span><span class="n">st</span> <span class="n">term</span> <span class="o">|</span> <span class="o">-</span><span class="mf">0.0338952</span> <span class="o">|</span>
-<span class="o">|</span> <span class="n">alignment</span> <span class="mi">2</span><span class="n">nd</span> <span class="n">term</span> <span class="o">|</span> <span class="o">-</span><span class="mf">0.113709</span>  <span class="o">|</span>
+<span class="o">|</span> <span class="n">pc</span> <span class="mi">2</span><span class="n">nd</span> <span class="n">term</span>        <span class="o">|</span>  <span class="mf">0.819326</span>  <span class="o">|</span>
+<span class="o">|</span> <span class="n">alignment</span> <span class="mi">1</span><span class="n">st</span> <span class="n">term</span> <span class="o">|</span> <span class="o">-</span><span class="mf">0.0953654</span> <span class="o">|</span>
+<span class="o">|</span> <span class="n">alignment</span> <span class="mi">2</span><span class="n">nd</span> <span class="n">term</span> <span class="o">|</span> <span class="o">-</span><span class="mf">0.10711</span>   <span class="o">|</span>
 <span class="o">|</span> <span class="n">alignment</span> <span class="mi">3</span><span class="n">rd</span> <span class="n">term</span> <span class="o">|</span> <span class="o">-</span><span class="mi">0</span>         <span class="o">|</span>
-<span class="o">|</span> <span class="n">correction</span> <span class="n">energy</span>  <span class="o">|</span>  <span class="mf">0.583643</span>  <span class="o">|</span>
+<span class="o">|</span> <span class="n">correction</span> <span class="n">energy</span>  <span class="o">|</span>  <span class="mf">0.61685</span>   <span class="o">|</span>
 <span class="o">+--------------------+------------+</span>
 </pre></div>
 </div>
 <p>The <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.pdf</span></code> shows the potential profile caused by addition/removal
 of the electron and its alignment term.</p>
-<img alt="_images/gkfo_correction.png" src="_images/gkfo_correction.png" />
+<img alt="_images/gkfo_correction.pdf" src="_images/gkfo_correction.pdf" />
 <p>For the absorption energy, one needs to know the conduction band minimum position,
-which is now 4.7777 eV. And the total energies of initial and final states are
--219.02114546 eV and -222.32750506 eV.
+which is now 9.2376 eV in MgAl2O4. And, the total energies of initial and final states are
+-405.739 and -411.920 eV, respectively.
 Therefore, the absorption energy is</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">222.32750506</span><span class="o">+</span><span class="mf">219.02114546</span><span class="o">+</span><span class="mf">4.7777</span><span class="o">+</span><span class="mf">0.583643</span> <span class="o">=</span> <span class="mf">2.0549834</span> <span class="n">eV</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">411.920</span> <span class="o">+</span> <span class="mf">405.739</span> <span class="o">+</span> <span class="mf">9.2376</span> <span class="o">+</span> <span class="mf">0.61685</span> <span class="o">=</span>  <span class="mf">3.67345</span> <span class="n">eV</span>
 </pre></div>
 </div>
-<p>It is also worthwhile to check the eigenvalues of initial and final states.
-Using the <code class="code docutils literal notranslate"><span class="pre">eig</span></code> sub-parser as follows,</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="o">-</span><span class="n">d</span> <span class="o">.</span> <span class="o">-</span><span class="n">pcr</span> <span class="o">../../</span><span class="n">perfect</span><span class="o">/</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span>
-</pre></div>
-</div>
-<p>we can obtain the <code class="code docutils literal notranslate"><span class="pre">eigenvalues.pdf</span></code>, which looks as</p>
-<img alt="_images/NaCl_final_eigenvalues.png" src="_images/NaCl_final_eigenvalues.png" />
+<p>It is also worthwhile to check the eigenvalues of initial and final states.</p>
+<p>We can obtain the <code class="code docutils literal notranslate"><span class="pre">eigenvalues.pdf</span></code>, which looks as</p>
+<img alt="_images/eigenvalues_final.pdf" src="_images/eigenvalues_final.pdf" />
 <p>and the initial <code class="code docutils literal notranslate"><span class="pre">eigenvalues.pdf</span></code> looks as</p>
-<img alt="_images/NaCl_initial_eigenvalues.png" src="_images/NaCl_initial_eigenvalues.png" />
+<img alt="_images/eigenvalues_initial.pdf" src="_images/eigenvalues_initial.pdf" />
 </div>
 
 
@@ -231,12 +227,12 @@ Using the <code class="code docutils literal notranslate"><span class="pre">eig<
           </div>
           <footer>
   
-    <div aria-label="footer navigation" class="rst-footer-buttons" role="navigation">
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a accesskey="n" class="btn btn-neutral float-right" href="change_log.html" rel="next" title="Change log">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="change_log.html" class="btn btn-neutral float-right" title="Change log" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a accesskey="p" class="btn btn-neutral float-left" href="first_principles_calc.html" rel="prev" title="Tips for first-principles calculations for point defects"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="first_principles_calc.html" class="btn btn-neutral float-left" title="Tips for first-principles calculations for point defects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
