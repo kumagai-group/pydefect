@@ -37,6 +37,7 @@ setup(
             'pydefect_util = pydefect.cli.main_util:main',
             'pydefect_vasp = pydefect.cli.vasp.main_vasp:main',
             'pydefect_vasp_util = pydefect.cli.vasp.main_vasp_util:main'
+            'pydefect_print = pydefect.cli.vasp.main_print_json:main'
         ]
     }
 )
