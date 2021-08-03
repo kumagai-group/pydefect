@@ -147,13 +147,13 @@ def test_band_edge_states_has_donor_phs(band_edge_states):
 
 
 def test_band_edge_states_str(band_edge_states):
-    expected = """ -- band-edge states info
+    expected = f""" -- band-edge states info
 Spin-up
      Index  Energy  P-ratio  Occupation  OrbDiff  Orbitals                K-point coords
 VBM  11     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
 CBM  13     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
-vbm has acceptor phs: False (0.070 vs. 0.07)
-cbm has donor phs: True (0.070 vs. 0.07)
+vbm has acceptor phs: False ({defaults.state_occupied_threshold:.3f} vs. {defaults.state_occupied_threshold})
+cbm has donor phs: True ({defaults.state_occupied_threshold:.3f} vs. {defaults.state_occupied_threshold})
 ---
 Localized Orbital(s)
 Index  Energy  P-ratio  Occupation  Orbitals
@@ -171,13 +171,13 @@ def test_band_edge_states_str2(band_edge_states):
         center=[0.1234, 0.0, 0.0])]
     actual = copy.__str__()
     print(actual)
-    expected = """ -- band-edge states info
+    expected = f""" -- band-edge states info
 Spin-up
      Index  Energy  P-ratio  Occupation  OrbDiff  Orbitals                K-point coords
 VBM  11     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
 CBM  13     1.000   0.10     1.00        0.50     Mn-s: 0.50, Mn-p: 0.40  ( 0.000,  0.000,  0.000)
-vbm has acceptor phs: False (0.070 vs. 0.07)
-cbm has donor phs: True (0.070 vs. 0.07)
+vbm has acceptor phs: False ({defaults.state_occupied_threshold:.3f} vs. {defaults.state_occupied_threshold})
+cbm has donor phs: True ({defaults.state_occupied_threshold:.3f} vs. {defaults.state_occupied_threshold})
 ---
 Localized Orbital(s)
 Index  Energy  P-ratio  Occupation  Orbitals   Radius  Center
