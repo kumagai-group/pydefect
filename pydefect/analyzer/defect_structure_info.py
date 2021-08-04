@@ -172,7 +172,7 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
         print(self.neighbor_atom_indices)
         for final_idx, d in sorted(idxs,
                                    key=lambda y: y[1].distance_from_defect):
-            is_neighbor = final_idx in self.neighbor_atom_indices
+            is_neighbor = "T" if final_idx in self.neighbor_atom_indices else ""
             if d.distance_from_defect > defaults.show_structure_cutoff:
                 break
             i_pos = pretty_coords(d.original_pos)
