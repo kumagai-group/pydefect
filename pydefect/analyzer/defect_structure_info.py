@@ -167,8 +167,8 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
         lines.append("Displacements")
         idxs = [[i, d] for i, d in enumerate(self.displacements)
                 if d is not None]
-        table = [["Elem", "Dist", "Neighbor", "Displace", "Angle", "Index",
-                  "Initial site", "", "Final site"]]
+        table = [["Elem", "Dist", "Displace", "Angle", "Index",
+                  "Initial site", "", "Final site", "Neighbor"]]
         print(self.neighbor_atom_indices)
         for final_idx, d in sorted(idxs,
                                    key=lambda y: y[1].distance_from_defect):
@@ -178,9 +178,9 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
             i_pos = pretty_coords(d.original_pos)
             f_pos = pretty_coords(d.final_pos)
             angle = int(round(d.angle, -1)) if d.angle else ""
-            table.append([d.specie, round(d.distance_from_defect, 2), is_neighbor,
+            table.append([d.specie, round(d.distance_from_defect, 2),
                           round(d.displace_distance, 2), angle, final_idx,
-                          i_pos, "->", f_pos])
+                          i_pos, "->", f_pos, is_neighbor])
         lines.append(tabulate(table, tablefmt="plain"))
 
         return "\n".join(lines)
