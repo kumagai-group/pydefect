@@ -160,19 +160,25 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
             lines.extend(_site_info("Inserted atoms to initial structure:",
                                     self.site_diff_from_initial.inserted))
 
+        min_d = min([d.distance_from_defect for d in self.displacements if d])
+        cutoff = min_d * self.neighbor_cutoff_factor
+        lines.append(f"Neighbor max distance {cutoff:5.3f}")
+
         lines.append("Displacements")
         idxs = [[i, d] for i, d in enumerate(self.displacements)
                 if d is not None]
-        table = [["Elem", "Dist", "Displace", "Angle", "Index",
+        table = [["Elem", "Dist", "Neighbor", "Displace", "Angle", "Index",
                   "Initial site", "", "Final site"]]
+        print(self.neighbor_atom_indices)
         for final_idx, d in sorted(idxs,
                                    key=lambda y: y[1].distance_from_defect):
+            is_neighbor = final_idx in self.neighbor_atom_indices
             if d.distance_from_defect > defaults.show_structure_cutoff:
                 break
             i_pos = pretty_coords(d.original_pos)
             f_pos = pretty_coords(d.final_pos)
             angle = int(round(d.angle, -1)) if d.angle else ""
-            table.append([d.specie, round(d.distance_from_defect, 2),
+            table.append([d.specie, round(d.distance_from_defect, 2), is_neighbor,
                           round(d.displace_distance, 2), angle, final_idx,
                           i_pos, "->", f_pos])
         lines.append(tabulate(table, tablefmt="plain"))

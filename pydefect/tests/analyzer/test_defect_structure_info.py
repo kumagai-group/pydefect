@@ -99,9 +99,10 @@ Added atoms:
 Removed atoms from initial structure:
 0  H  ( 0.250,  0.250,  0.250)
 
+Neighbor max distance 2.563
 Displacements
-Elem  Dist  Displace  Angle  Index  Initial site                  Final site
-Be    2.14  0.01      130    2      ( 0.500,  0.500,  0.500)  ->  ( 0.500,  0.500,  0.501)"""
+Elem  Dist  Neighbor  Displace  Angle  Index  Initial site                  Final site
+Be    2.14  False     0.01      130    2      ( 0.500,  0.500,  0.500)  ->  ( 0.500,  0.500,  0.501)"""
     assert actual == expected
 
 
