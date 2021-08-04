@@ -61,21 +61,31 @@ def test_make_competing_phase_dirs(mocker):
 
 def test_make_composition_energies(mocker, tmpdir):
     def side_effect(key):
-        mock_vasprun = mocker.Mock()
-        if key == Path("Mg") / defaults.vasprun:
-            mock_vasprun.final_structure.composition = Composition("Mg2")
-            mock_vasprun.final_energy = -10
-        elif key == Path("O") / defaults.vasprun:
-            mock_vasprun.final_structure.composition = Composition("O2")
-            mock_vasprun.final_energy = -20
+        mock_outcar = mocker.Mock()
+        if key == Path("Mg") / defaults.outcar:
+            mock_outcar.final_energy = -10
+        elif key == Path("O") / defaults.outcar:
+            mock_outcar.final_energy = -20
         else:
             raise ValueError
-        return mock_vasprun
+        return mock_outcar
+
+    def side_effect_structure(key):
+        mock_structure = mocker.Mock()
+        if key == Path("Mg") / defaults.contcar:
+            mock_structure.composition = Composition("Mg2")
+        elif key == Path("O") / defaults.contcar:
+            mock_structure.composition = Composition("O2")
+        else:
+            raise ValueError
+        return mock_structure
 
     tmpdir.chdir()
     print(tmpdir)
-    mock = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Vasprun",
+    mock = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Outcar",
                         side_effect=side_effect)
+    mock_str = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Structure.from_file",
+                            side_effect=side_effect_structure)
     args = Namespace(yaml_file=None, dirs=[Path("Mg"), Path("O")])
     make_composition_energies(args)
     actual = Path("composition_energies.yaml").read_text()

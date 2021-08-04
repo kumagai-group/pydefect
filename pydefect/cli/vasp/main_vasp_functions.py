@@ -21,6 +21,7 @@ from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.local_extrema import VolumetricDataAnalyzeParams
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.util.mp_tools import MpQuery
+from pymatgen import Structure
 from pymatgen.io.vasp import Vasprun, Outcar, Procar
 from vise.defaults import defaults
 from vise.util.logger import get_logger
@@ -50,9 +51,9 @@ def make_composition_energies(args):
         composition_energies = CompositionEnergies()
 
     for d in args.dirs:
-        vasprun = Vasprun(d / defaults.vasprun)
-        composition = vasprun.final_structure.composition
-        energy = float(vasprun.final_energy)  # original type is FloatWithUnit
+        outcar = Outcar(d / defaults.outcar)
+        composition = Structure.from_file(d / defaults.contcar).composition
+        energy = float(outcar.final_energy)  # original type is FloatWithUnit
         composition_energies[composition] = CompositionEnergy(energy, "local")
     composition_energies.to_yaml_file()
 
