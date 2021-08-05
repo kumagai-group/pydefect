@@ -10,10 +10,12 @@ Please read
 <link.aps.org/doi/10.1103/PhysRevB.101.020102>`_
 for details.
 
-Assuming that the typical defect calculations in MgAl2O4 based on the PBEsol functional
+Assuming that the defect calculations in MgAl2O4 based on the PBEsol functional
 have been done already as introduced in the tutorial
-and one further wants to calculate the photo-absorption energy via excitation
+and one further wants to calculate the photo-absorption energy caused by excitation
 of an oxygen vacancy localized state in the neutral charge state to the CBM.
+
+We here assume the following directory structure.
 
 ::
 
@@ -24,7 +26,7 @@ of an oxygen vacancy localized state in the neutral charge state to the CBM.
      └ defects/ ── perfect/
                  └ Va_O1_0/ ── absorption/
 
-Firstly, create the :code:`absorption/` directory at the :code:`Va_O1_0/`
+Firstly, we create the :code:`absorption/` directory at the :code:`Va_O1_0/`
 and copy the vasp input files from :code:`Va_O1_0/`.
 Then, edit :code:`INCAR` to change :code:`NSW` to 1 and add the :code:`NELECT` tag with
 reducing it by 1 from the neutral one.
@@ -32,7 +34,7 @@ Or one can type:
 
 ::
 
-    vise vs -uis NSW 1 --options charge -1 -d ../ -t defect
+    vise vs -uis NSW 1 --options charge 1 -d ../ -t defect
 
 After running vasp, we then create :code:`calc_results.json`
 using the following command in the :code:`absorption/` directory.
@@ -42,14 +44,13 @@ using the following command in the :code:`absorption/` directory.
     pydefect cr -d .
 
 
-Then, type
+And, wee obtain :code:`gkfo_correction.pdf` and :code:`gkfo_correction.json` files with the following command.
 
 ::
 
     pydefect_util gkfo -u ../../../unitcell/unitcell.yaml -iefnv ../correction.json -icr ../calc_results.json -fcr calc_results.json -cd 1
 
-With this command, one can obtain :code:`gkfo_correction.pdf` and :code:`gkfo_correction.json` files,
-and the correction energy is shown as follows:
+With the :code:`pydefect_print` command, the correction energy is shown as follows:
 
 
 ::

@@ -161,10 +161,11 @@ here we call it the GKFO correction.
 Please read
 <a class="reference external" href="link.aps.org/doi/10.1103/PhysRevB.101.020102">T. Gake, Y. Kumagai*, C. Freysoldt, and F. Oba, Phys. Rev. B, 101, 020102(R) (2020).</a>
 for details.</p>
-<p>Assuming that the typical defect calculations in MgAl2O4 based on the PBEsol functional
+<p>Assuming that the defect calculations in MgAl2O4 based on the PBEsol functional
 have been done already as introduced in the tutorial
-and one further wants to calculate the photo-absorption energy via excitation
+and one further wants to calculate the photo-absorption energy caused by excitation
 of an oxygen vacancy localized state in the neutral charge state to the CBM.</p>
+<p>We here assume the following directory structure.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>MgAl2O4
  │
  ├ unitcell/ ── unitcell.json
@@ -173,12 +174,12 @@ of an oxygen vacancy localized state in the neutral charge state to the CBM.</p>
              └ Va_O1_0/ ── absorption/
 </pre></div>
 </div>
-<p>Firstly, create the <code class="code docutils literal notranslate"><span class="pre">absorption/</span></code> directory at the <code class="code docutils literal notranslate"><span class="pre">Va_O1_0/</span></code>
+<p>Firstly, we create the <code class="code docutils literal notranslate"><span class="pre">absorption/</span></code> directory at the <code class="code docutils literal notranslate"><span class="pre">Va_O1_0/</span></code>
 and copy the vasp input files from <code class="code docutils literal notranslate"><span class="pre">Va_O1_0/</span></code>.
 Then, edit <code class="code docutils literal notranslate"><span class="pre">INCAR</span></code> to change <code class="code docutils literal notranslate"><span class="pre">NSW</span></code> to 1 and add the <code class="code docutils literal notranslate"><span class="pre">NELECT</span></code> tag with
 reducing it by 1 from the neutral one.
 Or one can type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vise</span> <span class="n">vs</span> <span class="o">-</span><span class="n">uis</span> <span class="n">NSW</span> <span class="mi">1</span> <span class="o">--</span><span class="n">options</span> <span class="n">charge</span> <span class="o">-</span><span class="mi">1</span> <span class="o">-</span><span class="n">d</span> <span class="o">../</span> <span class="o">-</span><span class="n">t</span> <span class="n">defect</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vise</span> <span class="n">vs</span> <span class="o">-</span><span class="n">uis</span> <span class="n">NSW</span> <span class="mi">1</span> <span class="o">--</span><span class="n">options</span> <span class="n">charge</span> <span class="mi">1</span> <span class="o">-</span><span class="n">d</span> <span class="o">../</span> <span class="o">-</span><span class="n">t</span> <span class="n">defect</span>
 </pre></div>
 </div>
 <p>After running vasp, we then create <code class="code docutils literal notranslate"><span class="pre">calc_results.json</span></code>
@@ -186,12 +187,11 @@ using the following command in the <code class="code docutils literal notranslat
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">cr</span> <span class="o">-</span><span class="n">d</span> <span class="o">.</span>
 </pre></div>
 </div>
-<p>Then, type</p>
+<p>And, wee obtain <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.pdf</span></code> and <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.json</span></code> files with the following command.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect_util</span> <span class="n">gkfo</span> <span class="o">-</span><span class="n">u</span> <span class="o">../../../</span><span class="n">unitcell</span><span class="o">/</span><span class="n">unitcell</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">iefnv</span> <span class="o">../</span><span class="n">correction</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">icr</span> <span class="o">../</span><span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">fcr</span> <span class="n">calc_results</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">cd</span> <span class="mi">1</span>
 </pre></div>
 </div>
-<p>With this command, one can obtain <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.pdf</span></code> and <code class="code docutils literal notranslate"><span class="pre">gkfo_correction.json</span></code> files,
-and the correction energy is shown as follows:</p>
+<p>With the <code class="code docutils literal notranslate"><span class="pre">pydefect_print</span></code> command, the correction energy is shown as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+--------------------+------------+</span>
 <span class="o">|</span> <span class="n">charge</span>             <span class="o">|</span>  <span class="mi">0</span>         <span class="o">|</span>
 <span class="o">|</span> <span class="n">additional</span> <span class="n">charge</span>  <span class="o">|</span>  <span class="mi">1</span>         <span class="o">|</span>

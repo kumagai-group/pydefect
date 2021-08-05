@@ -1,23 +1,24 @@
 Tips for first-principles calculations for point defects
 --------------------------------------------------------
 
------------------------------------------
-1. How to treat symmetry of point defects
------------------------------------------
+----------------------------------
+1. Symmetrization of point defects
+----------------------------------
 As mentioned in the :doc:`tutorial`, the neighboring atoms near the defect are
 initially slightly perturbed to break the symmetry.
-However, some defects tend to move back to the symmetric atomic configuration
+However, some defects tend to move back to the symmetric configuration
 or recover a part of symmetry operations during the structure optimization.
 
-Even in these cases, it is not apparent that the final structures are symmetric.
-:code:`Pydefect` provides a sub-command that allows for symmetrizing the defect structure,
-which is used as:
+Even in these cases, the relaxed structures are not obviously symmetric.
+:code:`Pydefect` provides the :code:`refine_defect_poscar` (= :code:`rdp`) sub-command
+that allows for symmetrizing the defect structure.
+It is used as:
 
 ::
 
      pydefect_vasp_util rdp -p Va_Mg1_0/CONTCAR-finish -d Va_Mg1_0/defect_entry.json -n POSCAR_new
 
-which create the POSCAR_new as follows.
+which creates the POSCAR_new file as follows.
 
 ::
 
@@ -88,23 +89,24 @@ which create the POSCAR_new as follows.
 ------------------------------------------
 2. Tips for hybrid functional calculations
 ------------------------------------------
-Hybrid functionals, especially the HSE06 functional,
+Hybrid functionals, namely the HSE06 functional,
 and those with different exchange mixing parameters and/or screening distances,
 have been regularly used for point-defect calculations recently.
 
-Usually, hybrid functional calculations are a few tens more expensive
-than those with a functional based on the local or semilocal density approximation.
+Usually, their calculations are a few tens more expensive
+than those with a functional based on the local or semilocal density approximations.
 Therefore, we need to take a little ingenuity to reduce their computational costs.
 
 For this purpose, we regularly prepare the WAVECAR files obtained using a GGA functional.
-(Although we can also relax the atomic positions using GGA beforehand,
-it could be inappropriate for point-defect calculations,
-because site symmetry of a defect calculated by GGA could be different from that by hybrid functionals.)
+(Relaxation of the atomic positions using GGA beforehand could be inappropriate for point-defect calculations,
+because site symmetry of a defect calculated by GGA could be different from that by hybrid functionals,
+and once the symmetry is increased by GGA, it never be decreased by hybrid functionals.)
 
-One can create the INCAR file for generating WAVECAR files using the GGA with the following command, for instance.
+One can create the INCAR file for generating WAVECAR files using the GGA with the following command, for instance,
 
 ::
 
     grep -v LHFCALC INCAR | grep -v ALGO | sed s/"NSW     =  50"/"NSW     =   1"/ > INCAR-pre
 
 
+and, then, move the WAVECAR file to the director for the hybrid functional calculation.

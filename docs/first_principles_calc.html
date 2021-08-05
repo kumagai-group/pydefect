@@ -85,12 +85,11 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial of pydefect</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tips for first-principles calculations for point defects</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#how-to-treat-symmetry-of-point-defects">1. How to treat symmetry of point defects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#symmetrization-of-point-defects">1. Symmetrization of point defects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tips-for-hybrid-functional-calculations">2. Tips for hybrid functional calculations</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="vertical_transition_level.html">Tutorial for calculation of vertical transition level</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vertical_transition_level.html#id2">レベル2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change log</a></li>
 </ul>
 
@@ -159,19 +158,20 @@
             
   <div class="section" id="tips-for-first-principles-calculations-for-point-defects">
 <h1>Tips for first-principles calculations for point defects<a class="headerlink" href="#tips-for-first-principles-calculations-for-point-defects" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="how-to-treat-symmetry-of-point-defects">
-<h2>1. How to treat symmetry of point defects<a class="headerlink" href="#how-to-treat-symmetry-of-point-defects" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="symmetrization-of-point-defects">
+<h2>1. Symmetrization of point defects<a class="headerlink" href="#symmetrization-of-point-defects" title="Permalink to this headline">¶</a></h2>
 <p>As mentioned in the <a class="reference internal" href="tutorial.html"><span class="doc">Tutorial of pydefect</span></a>, the neighboring atoms near the defect are
 initially slightly perturbed to break the symmetry.
-However, some defects tend to move back to the symmetric atomic configuration
+However, some defects tend to move back to the symmetric configuration
 or recover a part of symmetry operations during the structure optimization.</p>
-<p>Even in these cases, it is not apparent that the final structures are symmetric.
-<code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> provides a sub-command that allows for symmetrizing the defect structure,
-which is used as:</p>
+<p>Even in these cases, the relaxed structures are not obviously symmetric.
+<code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> provides the <code class="code docutils literal notranslate"><span class="pre">refine_defect_poscar</span></code> (= <code class="code docutils literal notranslate"><span class="pre">rdp</span></code>) sub-command
+that allows for symmetrizing the defect structure.
+It is used as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect_vasp_util</span> <span class="n">rdp</span> <span class="o">-</span><span class="n">p</span> <span class="n">Va_Mg1_0</span><span class="o">/</span><span class="n">CONTCAR</span><span class="o">-</span><span class="n">finish</span> <span class="o">-</span><span class="n">d</span> <span class="n">Va_Mg1_0</span><span class="o">/</span><span class="n">defect_entry</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">n</span> <span class="n">POSCAR_new</span>
 </pre></div>
 </div>
-<p>which create the POSCAR_new as follows.</p>
+<p>which creates the POSCAR_new file as follows.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Mg7</span> <span class="n">Al16</span> <span class="n">O32</span>
 <span class="mf">1.0</span>
 <span class="mf">8.105607</span> <span class="mf">0.000000</span> <span class="mf">0.000000</span>
@@ -240,20 +240,21 @@ which is used as:</p>
 </div>
 <div class="section" id="tips-for-hybrid-functional-calculations">
 <h2>2. Tips for hybrid functional calculations<a class="headerlink" href="#tips-for-hybrid-functional-calculations" title="Permalink to this headline">¶</a></h2>
-<p>Hybrid functionals, especially the HSE06 functional,
+<p>Hybrid functionals, namely the HSE06 functional,
 and those with different exchange mixing parameters and/or screening distances,
 have been regularly used for point-defect calculations recently.</p>
-<p>Usually, hybrid functional calculations are a few tens more expensive
-than those with a functional based on the local or semilocal density approximation.
+<p>Usually, their calculations are a few tens more expensive
+than those with a functional based on the local or semilocal density approximations.
 Therefore, we need to take a little ingenuity to reduce their computational costs.</p>
 <p>For this purpose, we regularly prepare the WAVECAR files obtained using a GGA functional.
-(Although we can also relax the atomic positions using GGA beforehand,
-it could be inappropriate for point-defect calculations,
-because site symmetry of a defect calculated by GGA could be different from that by hybrid functionals.)</p>
-<p>One can create the INCAR file for generating WAVECAR files using the GGA with the following command, for instance.</p>
+(Relaxation of the atomic positions using GGA beforehand could be inappropriate for point-defect calculations,
+because site symmetry of a defect calculated by GGA could be different from that by hybrid functionals,
+and once the symmetry is increased by GGA, it never be decreased by hybrid functionals.)</p>
+<p>One can create the INCAR file for generating WAVECAR files using the GGA with the following command, for instance,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">LHFCALC</span> <span class="n">INCAR</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">ALGO</span> <span class="o">|</span> <span class="n">sed</span> <span class="n">s</span><span class="o">/</span><span class="s2">&quot;NSW     =  50&quot;</span><span class="o">/</span><span class="s2">&quot;NSW     =   1&quot;</span><span class="o">/</span> <span class="o">&gt;</span> <span class="n">INCAR</span><span class="o">-</span><span class="n">pre</span>
 </pre></div>
 </div>
+<p>and, then, move the WAVECAR file to the director for the hybrid functional calculation.</p>
 </div>
 </div>
 
