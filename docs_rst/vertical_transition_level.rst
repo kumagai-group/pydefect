@@ -70,7 +70,7 @@ With the :code:`pydefect_print` command, the correction energy is shown as follo
 The :code:`gkfo_correction.pdf` shows the potential profile caused by addition/removal
 of the electron and its alignment term.
 
-.. image:: gkfo_correction.pdf
+.. image:: gkfo_correction.png
 
 
 For the absorption energy, one needs to know the conduction band minimum position,
@@ -86,10 +86,10 @@ It is also worthwhile to check the eigenvalues of initial and final states.
 
 We can obtain the :code:`eigenvalues.pdf`, which looks as
 
-.. image:: eigenvalues_final.pdf
+.. image:: eigenvalues_final.png
 
 and the initial :code:`eigenvalues.pdf` looks as
 
-.. image:: eigenvalues_initial.pdf
+.. image:: eigenvalues_initial.png
 
 

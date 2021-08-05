@@ -19,7 +19,7 @@ The main purpose of :code:`pydefect` is to provide the researchers
 with the automation system for the point-defect calculations in non-metallic materials
 so that they save time and reduce human errors.
 
-.. image:: pydefect.pdf
+.. image:: pydefect.png
 
 This cheat sheet is divided into three parts, namely unitcell, cpd, and defect,
 which correspond to the working directories as shown below.
@@ -343,7 +343,7 @@ The binary and ternary CPDs look like
 
 .. image:: cpd_MgO.png
 
-.. image:: cpd_MgAl2O4.pdf
+.. image:: cpd_MgAl2O4.png
 
 Here, the vertices surrounding the target compounds are also shown as follows:
 
@@ -847,7 +847,7 @@ One obtains :code:`correction.pdf` file, which contains information
 about defect-induced and point-charge potential,
 and their differences at atomic sites as shown below.
 
-.. image:: correction.pdf
+.. image:: correction.png
 
 The height of the horizontal line indicates the averaged potential difference
 between the point-charge potential and that caused by the defect,
@@ -966,7 +966,7 @@ the :code:`band_edge_orbital_infos` (= :code:`beoi`) sub-command.
 
 The :code:`eigenvalues.pdf` files  are also created.
 
-.. image:: eigenvalues.pdf
+.. image:: eigenvalues.png
 
 
 Here, one can see single-particle levels and their occupation in the spin-up and -down channels.
@@ -1159,7 +1159,7 @@ with the :code:`plot_defect_formation_energy` (= :code:`pe`) sub-command
 
 which shows like,
 
-.. image:: energy_A.pdf
+.. image:: energy_A.png
 
 When changing the condition of the chemical potential,
 namely the position of the vertex in the chemical potential diagram,
