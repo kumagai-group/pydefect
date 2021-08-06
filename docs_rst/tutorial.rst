@@ -705,7 +705,7 @@ with the :code:`defect_entries` (= :code:`de`) sub-command,
 
 ::
 
-    pydefect de
+    pydefect_vasp de
 
 
 With this command, the directories with defect names are created, including :code:`perfect/`.
@@ -810,7 +810,7 @@ we can generate :code:`calc_results.json` in all the calculated directories.
 
 ::
 
-    pydefect cr -d *_*/ perfect
+    pydefect_vasp cr -d *_*/ perfect
 
 When the calculations are in-progress, parsing of their directories are skipped automatically.
 

@@ -733,7 +733,7 @@ we use the <code class="code docutils literal notranslate"><span class="pre">add
 <h2>7. Creation of defect calculation directories<a class="headerlink" href="#creation-of-defect-calculation-directories" title="Permalink to this headline">¶</a></h2>
 <p>We next create directories for the point-defect calculations
 with the <code class="code docutils literal notranslate"><span class="pre">defect_entries</span></code> (= <code class="code docutils literal notranslate"><span class="pre">de</span></code>) sub-command,</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">de</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect_vasp</span> <span class="n">de</span>
 </pre></div>
 </div>
 <p>With this command, the directories with defect names are created, including <code class="code docutils literal notranslate"><span class="pre">perfect/</span></code>.
@@ -818,7 +818,7 @@ we can generate the <code class="code docutils literal notranslate"><span class=
 the first-principles calculation results related to the defect properties.</p>
 <p>By using the <code class="code docutils literal notranslate"><span class="pre">calc_results</span></code> (= <code class="code docutils literal notranslate"><span class="pre">cr</span></code>) sub-command,
 we can generate <code class="code docutils literal notranslate"><span class="pre">calc_results.json</span></code> in all the calculated directories.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect</span> <span class="n">cr</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*/</span> <span class="n">perfect</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect_vasp</span> <span class="n">cr</span> <span class="o">-</span><span class="n">d</span> <span class="o">*</span><span class="n">_</span><span class="o">*/</span> <span class="n">perfect</span>
 </pre></div>
 </div>
 <p>When the calculations are in-progress, parsing of their directories are skipped automatically.</p>
