@@ -216,7 +216,8 @@ class ChemPotDiagMaker:
                                  energy: float) -> bool:
         atom_frac = atomic_fractions(composition, self.elements)
         diff = sum([x * y for x, y in zip(atom_frac, coord)]) - energy
-        return abs(diff) < 1e-8
+        # If this is too small, the creation of cpd may fail.
+        return abs(diff) < 1e-3
 
     def _min_energy_range(self, mul: float = 1.1):
         vertex_values = [x for x in sum(self.vertices, [])
