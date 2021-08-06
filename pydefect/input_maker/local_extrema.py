@@ -7,7 +7,7 @@ from monty.json import MSONable
 from pydefect.input_maker.append_interstitial import append_interstitial
 from pydefect.util.coords import pretty_coords
 from pydefect.util.structure_tools import Coordination
-from pymatgen import Structure
+from pymatgen.core import Structure
 from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.typing import Coords

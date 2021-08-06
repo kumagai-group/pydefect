@@ -9,7 +9,7 @@ from pydefect.analyzer.calc_results import CalcResults
 from pydefect.cli.vasp.main_vasp_util_functions import make_parchg_dir, \
     make_refine_defect_poscar, calc_charge_state, \
     calc_grids, make_defect_charge_info_main, make_defect_entry_main
-from pymatgen import Structure
+from pymatgen.core import Structure
 from vise.input_set.incar import ViseIncar
 import numpy as np
 

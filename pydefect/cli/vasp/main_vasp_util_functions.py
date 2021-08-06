@@ -10,7 +10,7 @@ from pydefect.analyzer.refine_defect_structure import refine_defect_structure
 from pydefect.cli.vasp.make_defect_charge_info import make_defect_charge_info
 from pydefect.cli.vasp.get_defect_charge_state import get_defect_charge_state
 from pydefect.input_maker.defect_entry import make_defect_entry
-from pymatgen import Structure
+from pymatgen.core import Structure
 from pymatgen.io.vasp import Chgcar
 from vise.input_set.incar import ViseIncar
 from vise.util.file_transfer import FileLink

@@ -2,11 +2,9 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import pytest
 from pydefect.analyzer.calc_results import CalcResults
-from pymatgen import IStructure, Lattice
-from pymatgen.io.vasp import Vasprun, Outcar
+from pymatgen.core import IStructure, Lattice
 
-from pydefect.cli.vasp.make_calc_results import make_calc_results_from_vasp
-from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
+from vise.tests.helpers.assertion import assert_json_roundtrip
 
 
 @pytest.fixture

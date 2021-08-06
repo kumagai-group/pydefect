@@ -3,7 +3,7 @@
 import re
 from typing import Dict, Any
 
-from pymatgen import Element
+from pymatgen.core import Element
 
 
 def remove_digits(name: str) -> str:

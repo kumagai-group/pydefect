@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-from copy import deepcopy
 
 import pytest
 from pydefect.input_maker.local_extrema import VolumetricDataLocalExtrema, \
-    CoordInfo, VolumetricDataAnalyzeParams
+    CoordInfo
 from pydefect.input_maker.supercell_info import Interstitial, SupercellInfo
 from pydefect.util.structure_tools import Coordination
-from pymatgen import Structure
+from pymatgen.core import Structure
 from vise.tests.helpers.assertion import assert_json_roundtrip
 from vise.util.structure_symmetrizer import Site
 

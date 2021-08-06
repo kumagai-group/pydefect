@@ -7,7 +7,8 @@ from pydefect.analyzer.band_edge_states import OrbitalInfo, \
     BandEdgeOrbitalInfos
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo
 from pydefect.defaults import defaults
-from pymatgen import Spin, Structure
+from pymatgen.core import Structure
+from pymatgen.electronic_structure.core import Spin
 from pymatgen.io.vasp import Procar, Vasprun
 
 

@@ -4,8 +4,8 @@ from pydefect.analyzer.band_edge_states import PerfectBandEdgeState, EdgeInfo, \
     OrbitalInfo
 from pydefect.cli.vasp.make_band_edge_orbital_infos import \
     calc_orbital_character
+from pymatgen.electronic_structure.core import Spin
 from vise.defaults import defaults as v_defaults
-from pymatgen import Spin
 from pymatgen.io.vasp import Procar, Vasprun, Outcar
 from vise.analyzer.vasp.band_edge_properties import VaspBandEdgeProperties
 

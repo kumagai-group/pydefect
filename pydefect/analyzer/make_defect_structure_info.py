@@ -10,7 +10,7 @@ from pydefect.analyzer.defect_structure_comparator import \
 from pydefect.analyzer.defect_structure_info import Displacement, \
     DefectStructureInfo, unique_point_group
 from pydefect.defaults import defaults
-from pymatgen import PeriodicSite, Structure
+from pymatgen.core import PeriodicSite, Structure
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 from vise.util.typing import GenCoords
 

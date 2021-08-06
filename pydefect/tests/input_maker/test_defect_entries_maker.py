@@ -12,7 +12,6 @@ from pydefect.input_maker.defect_entry import DefectEntry, PerturbedSite
 from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.supercell_info import SupercellInfo, Site, \
     Interstitial
-from pymatgen import PeriodicSite
 from vise.tests.helpers.assertion import assert_dataclass_almost_equal
 
 

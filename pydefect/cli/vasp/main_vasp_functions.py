@@ -21,7 +21,7 @@ from pydefect.input_maker.defect_set import DefectSet
 from pydefect.input_maker.local_extrema import VolumetricDataAnalyzeParams
 from pydefect.input_maker.supercell_info import SupercellInfo
 from pydefect.util.mp_tools import MpQuery
-from pymatgen import Structure
+from pymatgen.core import Structure
 from pymatgen.io.vasp import Vasprun, Outcar, Procar
 from vise.defaults import defaults
 from vise.util.logger import get_logger

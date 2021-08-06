@@ -5,7 +5,6 @@
 import argparse
 import sys
 import warnings
-from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect.analyzer.grids import Grids
@@ -14,7 +13,7 @@ from pydefect.cli.vasp.main_vasp_util_functions import \
     make_parchg_dir, make_refine_defect_poscar, \
     calc_charge_state, make_defect_entry_main, calc_grids, \
     make_defect_charge_info_main
-from pymatgen import Structure
+from pymatgen.core import Structure
 from pymatgen.io.vasp import Chgcar
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 

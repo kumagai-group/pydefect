@@ -8,7 +8,7 @@ from pydefect.analyzer.defect_charge_info import AveChargeDensityDist, \
 from pydefect.analyzer.grids import Grids
 from pydefect.cli.vasp.make_defect_charge_info import \
     center_1d_periodic_quantity, make_charge_dist, make_defect_charge_info
-from pymatgen import Structure, Lattice
+from pymatgen.core import Structure, Lattice
 from pymatgen.io.vasp import Chgcar
 
 

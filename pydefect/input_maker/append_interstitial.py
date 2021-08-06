@@ -6,8 +6,7 @@ import numpy as np
 from numpy.linalg import inv
 from pydefect.input_maker.supercell_info import SupercellInfo, Interstitial
 from pydefect.util.error_classes import NotPrimitiveError
-from pymatgen import IStructure
-from pymatgen.core import Structure, Element
+from pymatgen.core import Structure, Element, IStructure
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 from vise.util.typing import Coords
 

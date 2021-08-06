@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from pydefect.cli.vasp.get_defect_charge_state import \
     get_defect_charge_state
-from pymatgen import Structure, Lattice
+from pymatgen.core import Structure, Lattice
 from pymatgen.io.vasp import Poscar, Potcar, Incar
 
 

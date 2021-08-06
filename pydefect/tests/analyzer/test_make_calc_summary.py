@@ -6,7 +6,7 @@ from pydefect.analyzer.defect_structure_info import DefectStructureInfo
 from pydefect.analyzer.make_calc_summary import make_calc_summary
 from pydefect.defaults import defaults
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import IStructure, Lattice
+from pymatgen.core import IStructure, Lattice
 
 
 def test_make_calc_summary(mocker):

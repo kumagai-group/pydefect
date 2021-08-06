@@ -7,7 +7,7 @@ from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info, \
 from pydefect.chem_pot_diag.chem_pot_diag import StandardEnergies
 from pydefect.corrections.abstract_correction import Correction
 from pydefect.input_maker.defect_entry import DefectEntry
-from pymatgen import IStructure, Lattice
+from pymatgen.core import IStructure, Lattice
 
 
 def test_make_defect_energy_info(mocker):

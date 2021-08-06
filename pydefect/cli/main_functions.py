@@ -25,7 +25,7 @@ from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
 from pydefect.input_maker.append_interstitial import append_interstitial
 from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_maker import SupercellMaker
-from pymatgen import Composition
+from pymatgen.core import Composition
 from vise.util.logger import get_logger
 
 

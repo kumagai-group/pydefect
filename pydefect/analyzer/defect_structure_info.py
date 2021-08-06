@@ -8,7 +8,7 @@ from pydefect.analyzer.defect_structure_comparator import \
     SiteDiff, SiteInfo
 from pydefect.defaults import defaults
 from pydefect.util.coords import pretty_coords
-from pymatgen import Structure
+from pymatgen.core import Structure
 from pymatgen.symmetry.groups import SpaceGroup
 from tabulate import tabulate
 from vise.util.enum import ExtendedEnum

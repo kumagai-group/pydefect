@@ -6,7 +6,7 @@ from typing import Tuple, List
 
 import numpy as np
 from pydefect.cli.vasp.make_efnv_correction import calc_max_sphere_radius
-from pymatgen import Lattice
+from pymatgen.core import Lattice
 from pymatgen.io.vasp import Chgcar
 
 

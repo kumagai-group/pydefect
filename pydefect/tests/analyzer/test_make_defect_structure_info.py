@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-import numpy as np
-import pytest
-from pydefect.analyzer.defect_structure_comparator import SiteDiff
-from pydefect.analyzer.defect_structure_info import Displacement, \
-    DefectStructureInfo
 from pydefect.analyzer.make_defect_structure_info import \
     MakeDefectStructureInfo
 from pydefect.cli.make_defect_vesta_file import fold_coords_in_structure
 
-from pymatgen import Structure, Lattice
+from pymatgen.core import Structure, Lattice
 from vise.tests.helpers.assertion import assert_dataclass_almost_equal
 
 

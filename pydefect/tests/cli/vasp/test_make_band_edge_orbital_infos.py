@@ -6,7 +6,8 @@ from pydefect.analyzer.band_edge_states import OrbitalInfo, \
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo
 from pydefect.cli.vasp.make_band_edge_orbital_infos import \
     make_band_edge_orbital_infos
-from pymatgen import Spin, Structure, Lattice
+from pymatgen.core import Structure, Lattice
+from pymatgen.electronic_structure.core import Spin
 from pymatgen.io.vasp import Procar, Vasprun
 from vise.tests.helpers.assertion import assert_dataclass_almost_equal
 

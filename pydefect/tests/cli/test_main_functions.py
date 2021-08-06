@@ -21,9 +21,7 @@ from pydefect.corrections.efnv_correction import ExtendedFnvCorrection
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
-from pymatgen import IStructure
-from pymatgen.core import Composition
-
+from pymatgen.core import Composition, IStructure
 
 def test_make_standard_and_relative_energies(mocker, tmpdir):
     tmpdir.chdir()

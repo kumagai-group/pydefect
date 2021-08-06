@@ -1,7 +1,7 @@
 import joblib
 import pytest
 from pydefect.analyzer.grids import Grids
-from pymatgen import Lattice, Structure
+from pymatgen.core import Lattice, Structure
 import numpy as np
 from pymatgen.io.vasp import Chgcar
 from vise.tests.helpers.assertion import assert_dataclass_almost_equal
