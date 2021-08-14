@@ -389,7 +389,7 @@ so we need to set <code class="code docutils literal notranslate"><span class="p
 </div>
 <p>The target material, namely MgAl2O4 in this example, has already been calculated in the same condition,
 so we do not have to iterate the same calculation;
-instead make a symbolic link by <code class="code docutils literal notranslate"><span class="pre">ln</span> <span class="pre">-s</span> <span class="pre">../unitcell/structure_opt</span> <span class="pre">MgAl2O4</span></code>
+instead make a symbolic link by <code class="code docutils literal notranslate"><span class="pre">ln</span> <span class="pre">-s</span> <span class="pre">../unitcell/structure_opt</span> <span class="pre">MgAl2O4_unitcell</span></code>
 and remove the <code class="code docutils literal notranslate"><span class="pre">MgAl2O4_mp-3536/</span></code> directory.
 However, we need to calculate it, when we adopt different <code class="code docutils literal notranslate"><span class="pre">ENMAX</span></code>
 to keep consistency with larger <code class="code docutils literal notranslate"><span class="pre">ENMAX</span></code> for dopant atoms.</p>
@@ -587,7 +587,7 @@ from json files, which can be used as follows,</p>
 </pre></div>
 </div>
 <p>With the <code class="code docutils literal notranslate"><span class="pre">defect_set</span></code> (= <code class="code docutils literal notranslate"><span class="pre">ds</span></code>) sub-command, we can build the <code class="code docutils literal notranslate"><span class="pre">defect_in.yaml</span></code> file.
-An example of <code class="code docutils literal notranslate"><span class="pre">defect_in.yaml</span></code> for MgSe looks as follows,</p>
+An example of <code class="code docutils literal notranslate"><span class="pre">defect_in.yaml</span></code> for MgAl2O4 looks as follows,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Al_Mg1</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="n">Al_O1</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
 <span class="n">Mg_Al1</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>

@@ -267,7 +267,7 @@ so we need to set :code:`ENCUT = 520.0`, using the :code:`vise`.
 
 The target material, namely MgAl2O4 in this example, has already been calculated in the same condition,
 so we do not have to iterate the same calculation;
-instead make a symbolic link by :code:`ln -s ../unitcell/structure_opt MgAl2O4`
+instead make a symbolic link by :code:`ln -s ../unitcell/structure_opt MgAl2O4_unitcell`
 and remove the :code:`MgAl2O4_mp-3536/` directory.
 However, we need to calculate it, when we adopt different :code:`ENMAX`
 to keep consistency with larger :code:`ENMAX` for dopant atoms.
@@ -516,7 +516,7 @@ The :code:`supercell_info.json` file is then shown as follows:
            Oxidation state: -2
 
 With the :code:`defect_set` (= :code:`ds`) sub-command, we can build the :code:`defect_in.yaml` file.
-An example of :code:`defect_in.yaml` for MgSe looks as follows,
+An example of :code:`defect_in.yaml` for MgAl2O4 looks as follows,
 
 ::
 
