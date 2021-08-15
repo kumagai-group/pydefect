@@ -58,7 +58,7 @@ class CpdEnergyComponent(MPComponent):
         allow_shallow = self.get_choice_input(
             kwarg_label="allow_shallow",
             state={"label": "True", "value": "True"},
-            label="Allow shallow states",
+            label="Allow defects with perturbed host states",
             # Only string values are allowed.
             options=[{"label": "True", "value": "True"},
                      {"label": "False", "value": "False"}])
