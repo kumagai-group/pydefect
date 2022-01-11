@@ -90,8 +90,12 @@ We also use integrated testing on Github via circleCI.
 
 Citing pydefect
 ---------------
-If pydefect has been used in your research, please cite our Github repo
-until we have a publication!
+If pydefect has been used in your research, please cite the following paper.
+
+["Insights into oxygen vacancies from high-throughput first-principles calculations"](https://journals.aps.org/prmaterials/abstract/10.1103/PhysRevMaterials.5.123803)<br>
+Yu Kumagai, Naoki Tsunoda, Akira Takahashi, and Fumiyasu Oba<br>
+Phys. Rev. Materials 5, 123803 (2021)
+
 
 Contact info
 --------------
