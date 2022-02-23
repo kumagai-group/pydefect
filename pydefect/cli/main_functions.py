@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+import traceback
 from pathlib import Path
 from typing import Union, List, Callable, Any
 
@@ -53,29 +54,29 @@ def get_calc_results(d: Path, check: bool) -> Union[CalcResults, bool]:
 
 
 def parse_dirs(dirs: List[Path], _inner_function: Callable[[Path], Any]):
-    fail = []
-    _returns = []
-    for d in dirs:
-        if d.is_file():
-            logger.info(f"{d} is a file, so skipped.")
+    failed_directories = []
+    parsed_results = []
+    for dir in dirs:
+        if dir.is_file():
+            logger.info(f"{dir} is a file, so skipped.")
             continue
-        logger.info(f"Parsing data in {d} ...")
+        logger.info(f"Parsing data in {dir} ...")
         try:
-            _return = _inner_function(d)
+            _return = _inner_function(dir)
             if _return:
-                _returns.append(_return)
-        except Exception as e:
-            print(e)
-            logger.warning(f"Failing parsing {d} ...")
-            fail.append(str(d))
+                parsed_results.append(_return)
+        except Exception:
+            print(traceback.print_exc())
+            logger.warning(f"Failing parsing {dir} ...")
+            failed_directories.append(str(dir))
             continue
-    if fail:
-        failed = '\n'.join(fail)
-        logger.warning(f"Failed directories are:\n{failed}")
+    if failed_directories:
+        failed_dir_string = '\n'.join(failed_directories)
+        logger.warning(f"Failed directories are:\n{failed_dir_string}")
     else:
         logger.info("Parsing all the directories succeeded.")
 
-    return _returns if _returns else None
+    return parsed_results or None
 
 
 def make_standard_and_relative_energies(args):
