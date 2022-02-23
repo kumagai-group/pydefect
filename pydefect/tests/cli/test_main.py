@@ -154,6 +154,7 @@ def test_defect_structure_info(mocker):
         dirs=[Path("Va_O1_0")],
         dist_tolerance=1.0,
         symprec=2.0,
+        verbose=False,
         func=parsed_args.func)
     assert parsed_args == expected
 
@@ -179,6 +180,7 @@ def test_efnv_correction(mocker):
         check_calc_results=False,
         perfect_calc_results=mock_calc_results,
         unitcell=mock_unitcell.from_yaml.return_value,
+        verbose=False,
         func=parsed_args.func)
     assert parsed_args == expected
 
@@ -194,6 +196,7 @@ def test_band_edge_states(mocker):
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         check_calc_results=False,
         p_state=mock.return_value,
+        verbose=False,
         func=parsed_args.func)
     assert parsed_args == expected
     mock.assert_any_call("perfect/perfect_band_edge_state.json")
@@ -216,6 +219,7 @@ def test_defect_energy_infos(mocker):
         unitcell=mock_unitcell.from_yaml.return_value,
         perfect_calc_results=mock_loadfn.return_value,
         std_energies=mock_std_energy.from_yaml.return_value,
+        verbose=False,
         func=parsed_args.func)
     assert parsed_args == expected
     mock_loadfn.assert_called_once_with("perfect/perfect_band_edge_state.json")
@@ -244,6 +248,7 @@ def test_defect_energy_summary(mocker):
         p_state=mock_pbes,
         unitcell=mock_unitcell.from_yaml.return_value,
         target_vertices_yaml="target_vertices.yaml",
+        verbose=False,
         func=parsed_args.func)
     assert parsed_args == expected
 
