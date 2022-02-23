@@ -109,4 +109,4 @@ One can create the INCAR file for generating WAVECAR files using the GGA with th
     grep -v LHFCALC INCAR | grep -v ALGO | sed s/"NSW     =  50"/"NSW     =   1"/ > INCAR-pre
 
 
-and, then, move the WAVECAR file to the director for the hybrid functional calculation.
+and, then, move the WAVECAR file to the directory for the hybrid functional calculation.

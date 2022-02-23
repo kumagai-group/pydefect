@@ -491,29 +491,39 @@ The :code:`supercell_info.json` file is then shown as follows:
 
 ::
 
-    Space group: F-43m
-    Transformation matrix: [-2, 2, 2]  [2, -2, 2]  [2, 2, -2]
-    Cell multiplicity: 32
+Space group: Fd-3m
+Transformation matrix: [-1, 1, 1]  [1, -1, 1]  [1, 1, -1]
+Cell multiplicity: 4
 
-       Irreducible element: Mg1
-            Wyckoff letter: a
-             Site symmetry: -43m
-             Cutoff radius: 3.373
-              Coordination: {'Se': [2.59, 2.59, 2.59, 2.59]}
-          Equivalent atoms: 0..31
-    Fractional coordinates: 0.0000000  0.0000000  0.0000000
-         Electronegativity: 1.31
-           Oxidation state: 2
+   Irreducible element: Mg1
+        Wyckoff letter: b
+         Site symmetry: -43m
+         Cutoff radius: 2.528
+          Coordination: {'O': [1.94, 1.94, 1.94, 1.94]}
+      Equivalent atoms: 0..7
+Fractional coordinates: 0.2500000  0.2500000  0.2500000
+     Electronegativity: 1.31
+       Oxidation state: 2
 
-       Irreducible element: Se1
-            Wyckoff letter: c
-             Site symmetry: -43m
-             Cutoff radius: 3.373
-              Coordination: {'Mg': [2.59, 2.59, 2.59, 2.59]}
-          Equivalent atoms: 32..63
-    Fractional coordinates: 0.1250000  0.1250000  0.1250000
-         Electronegativity: 2.55
-           Oxidation state: -2
+   Irreducible element: Al1
+        Wyckoff letter: c
+         Site symmetry: .-3m
+         Cutoff radius: 2.5
+          Coordination: {'O': [1.92, 1.92, 1.92, 1.92, 1.92, 1.92]}
+      Equivalent atoms: 8..23
+Fractional coordinates: 0.6250000  0.3750000  0.3750000
+     Electronegativity: 1.61
+       Oxidation state: 3
+
+   Irreducible element: O1
+        Wyckoff letter: e
+         Site symmetry: .3m
+         Cutoff radius: 2.5
+          Coordination: {'Mg': [1.94], 'Al': [1.92, 1.92, 1.92]}
+      Equivalent atoms: 24..55
+Fractional coordinates: 0.8614957  0.8614957  0.8614957
+     Electronegativity: 3.44
+       Oxidation state: -2
 
 With the :code:`defect_set` (= :code:`ds`) sub-command, we can build the :code:`defect_in.yaml` file.
 An example of :code:`defect_in.yaml` for MgAl2O4 looks as follows,
@@ -980,7 +990,7 @@ The discrete numbers in the figures mean the band indices starting from 1,
 and the filled red, green, and blue circles mean the occupied,
 partially occupied (from 0.2 to 0.8), and unoccupied eigenstates, respectively.
 
-We then generate the :code:`edge_characters.json` files
+We then generate the :code:`band_edge_states.json` files
 with the :code:`band_edge_states` (= :code:`bes`) sub-command.
 
 ::
@@ -1066,7 +1076,7 @@ Caveats:
 where elements' chemical potentials are set at their standard states and the Fermi level is located at energy zero.
 (2) Two energy_corrections are written but one can add their original correction if needed.
 (3) is_shallow is empty when the previous section is skipped.
-One can modify the calculation results such as shallow states manually by hand.
+Here, shallow means it has the PHS. One can modify the calculation results such as shallow states manually by hand.
 
 We then create a :code:`defect_energy_summary.json` file with the :code:`defect_energy_summary` (= :code:`des`) sub-command.
 
@@ -1159,7 +1169,7 @@ with the :code:`plot_defect_formation_energy` (= :code:`pe`) sub-command
 
 which shows like,
 
-.. image:: energy_A.png
+.. image:: energy_A.pdf
 
 When changing the condition of the chemical potential,
 namely the position of the vertex in the chemical potential diagram,
