@@ -45,13 +45,7 @@ For more information on how dependencies are managed in this branch see this [bl
 Executing this software
 --------------------------
 
-1. Command line method
-  - execute ***pydefect -h*** for detailed description of available options
-
-2. Usage as a module
-  - pydefect can be imported as a python module
-
-More information in the online manual at: https://kumagai-group.github.io/pydefect/
+Detailed information is provided in the online manual at: https://kumagai-group.github.io/pydefect/
 
 Files and directories included in pydefect distribution
 --------------------------------------------------------
@@ -94,10 +88,14 @@ Please use the ["Fork and Pull"](https://guides.github.com/activities/forking/) 
 Run the tests using `pytest pydefect`.
 We also use integrated testing on Github via circleCI.
 
-Citing vise
--------------
-If pydefect has been used in your research, please cite our Github repo
-until we have a publication!
+Citing pydefect
+---------------
+If pydefect has been used in your research, please cite the following paper.
+
+["Insights into oxygen vacancies from high-throughput first-principles calculations"](https://journals.aps.org/prmaterials/abstract/10.1103/PhysRevMaterials.5.123803)<br>
+Yu Kumagai, Naoki Tsunoda, Akira Takahashi, and Fumiyasu Oba<br>
+Phys. Rev. Materials 5, 123803 (2021)
+
 
 Contact info
 --------------
