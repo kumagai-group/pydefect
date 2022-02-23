@@ -12,6 +12,11 @@ from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.ewald import Ewald
 from pydefect.defaults import defaults
+from pydefect.util.error_classes import SupercellError
+from vise.util.logger import get_logger
+
+
+logger = get_logger(__name__)
 
 
 def make_efnv_correction(charge: int,
@@ -28,7 +33,9 @@ def make_efnv_correction(charge: int,
         elementary_charge * 1e10 / epsilon_0 = 180.95128169876497
         to make potential in V.
     """
-    assert calc_results.structure.lattice == perfect_calc_results.structure.lattice
+    if calc_results.structure.lattice == perfect_calc_results.structure.lattice:
+        raise SupercellError("The lattice constants for defect and perfect "
+                             "models are different")
 
     structure_analyzer = DefectStructureComparator(
         calc_results.structure, perfect_calc_results.structure)
