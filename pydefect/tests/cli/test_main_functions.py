@@ -205,7 +205,8 @@ def test_calc_defect_structure_info(mocker, tmpdir, supercell_info):
     info = loadfn("supercell_info.json")
 
     args = Namespace(supercell_info=info, check_calc_results=True,
-                     dirs=[Path("Va_O1_2")], dist_tolerance=0.1, symprec=0.2)
+                     dirs=[Path("Va_O1_2")], dist_tolerance=0.1, symprec=0.2,
+                     verbose=False)
     calc_defect_structure_info(args)
     mock_structure_info.assert_called_with(
         supercell_info.structure,
@@ -246,7 +247,8 @@ def test_make_efnv_correction_from_vasp(tmpdir, mocker):
     args = Namespace(dirs=[Path("Va_O1_2")],
                      check_calc_results=True,
                      perfect_calc_results=mock_perfect_calc_results,
-                     unitcell=mock_unitcell)
+                     unitcell=mock_unitcell,
+                     verbose=False)
 
     make_efnv_correction_main_func(args)
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
@@ -282,7 +284,8 @@ def test_make_band_edge_states(mocker):
 
     args = Namespace(dirs=[Path("Va_O1_2")],
                      check_calc_results=True,
-                     p_state=mock_perfect_edge_states)
+                     p_state=mock_perfect_edge_states,
+                     verbose=False)
     make_band_edge_states_main_func(args)
     mocker_make_edge_states.assert_called_with(mocker_band_edge_orbital_infos,
                                                mock_perfect_edge_states,

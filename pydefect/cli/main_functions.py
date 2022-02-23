@@ -53,7 +53,9 @@ def get_calc_results(d: Path, check: bool) -> Union[CalcResults, bool]:
     return calc_results
 
 
-def parse_dirs(dirs: List[Path], _inner_function: Callable[[Path], Any]):
+def parse_dirs(dirs: List[Path],
+               _inner_function: Callable[[Path], Any],
+               verbose: bool = False):
     failed_directories = []
     parsed_results = []
     for dir in dirs:
@@ -65,8 +67,11 @@ def parse_dirs(dirs: List[Path], _inner_function: Callable[[Path], Any]):
             _return = _inner_function(dir)
             if _return:
                 parsed_results.append(_return)
-        except Exception:
-            print(traceback.print_exc())
+        except Exception as e:
+            if verbose:
+                print(traceback.print_exc())
+            else:
+                print(e.args)
             logger.warning(f"Failing parsing {dir} ...")
             failed_directories.append(str(dir))
             continue
@@ -183,7 +188,7 @@ def calc_defect_structure_info(args):
             symprec=args.symprec).defect_structure_info
         defect_str_info.to_json_file(str(_dir / "defect_structure_info.json"))
 
-    parse_dirs(args.dirs, _inner)
+    parse_dirs(args.dirs, _inner, args.verbose)
 
 
 def make_efnv_correction_main_func(args):
@@ -203,7 +208,7 @@ def make_efnv_correction_main_func(args):
         plotter.plt.savefig(fname=_dir / "correction.pdf")
         plotter.plt.clf()
 
-    parse_dirs(args.dirs, _inner)
+    parse_dirs(args.dirs, _inner, args.verbose)
 
 
 def make_band_edge_states_main_func(args):
@@ -217,7 +222,7 @@ def make_band_edge_states_main_func(args):
                                                  defect_charge_info)
         band_edge_states.to_json_file(str(_dir / "band_edge_states.json"))
 
-    parse_dirs(args.dirs, _inner)
+    parse_dirs(args.dirs, _inner, args.verbose)
 
 
 def make_defect_energy_infos_main_func(args):
@@ -240,14 +245,14 @@ def make_defect_energy_infos_main_func(args):
             band_edge_states=band_edge_states)
         defect_energy_info.to_yaml_file(str(_dir / "defect_energy_info.yaml"))
 
-    parse_dirs(args.dirs, _inner)
+    parse_dirs(args.dirs, _inner, args.verbose)
 
 
 def make_defect_energy_summary_main_func(args):
     def _inner(_dir: Path):
         return DefectEnergyInfo.from_yaml(str(_dir / "defect_energy_info.yaml"))
 
-    energy_infos = parse_dirs(args.dirs, _inner)
+    energy_infos = parse_dirs(args.dirs, _inner, args.verbose)
     target_vertices = TargetVertices.from_yaml(args.target_vertices_yaml)
     defect_energy_summary = make_defect_energy_summary(
         energy_infos, target_vertices, args.unitcell, args.p_state)
@@ -261,7 +266,7 @@ def make_calc_summary_main_func(args):
         str_info = loadfn(_dir / "defect_structure_info.json")
         return calc_results, defect_entry, str_info
 
-    _infos = parse_dirs(args.dirs, _inner)
+    _infos = parse_dirs(args.dirs, _inner, args.verbose)
     calc_summary = make_calc_summary(_infos, args.perfect_calc_results)
     calc_summary.to_json_file()
 
