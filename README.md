@@ -101,7 +101,6 @@ Contact info
 --------------
 Yu Kumagai<br>
 yuuukuma@gmail.com<br>
-kumagai@msl.titech.ac.jp
 
 Tokyo Institute of Technology (Japan)
 
