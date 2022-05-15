@@ -1,5 +1,5 @@
 numpy
-monty
+monty==2021.7.8
 pymatgen
 fire
 vise
