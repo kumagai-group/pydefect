@@ -33,7 +33,7 @@ def make_efnv_correction(charge: int,
         elementary_charge * 1e10 / epsilon_0 = 180.95128169876497
         to make potential in V.
     """
-    if calc_results.structure.lattice == perfect_calc_results.structure.lattice:
+    if calc_results.structure.lattice != perfect_calc_results.structure.lattice:
         raise SupercellError("The lattice constants for defect and perfect "
                              "models are different")
 
