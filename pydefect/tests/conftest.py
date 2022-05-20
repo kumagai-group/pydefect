@@ -286,7 +286,7 @@ def efnv_correction():
 
 @pytest.fixture(scope="session")
 def before_refine():
-    return Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
+    return Structure.from_str(fmt="poscar", input_string="""Mg4 O3
 1.00000000000000
 5 0 0
 0 5 0
@@ -306,7 +306,7 @@ Direct
 # refine with anchor_atom_index=1, anchor_atom_coords=np.array([0.0, 0.5, 0.5])
 @pytest.fixture(scope="session")
 def after_refine():
-    return Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
+    return Structure.from_str(fmt="poscar", input_string="""Mg4 O3
 1.00000000000000
 5 0 0
 0 5 0

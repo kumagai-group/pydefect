@@ -13,7 +13,7 @@ def test_symmetrize_defect_structure(before_refine, after_refine):
 
 
 def test_symmetrize_defect_structure_2():
-    structure = Structure.from_str(fmt="POSCAR", input_string="""Mg48 N31
+    structure = Structure.from_str(fmt="poscar", input_string="""Mg48 N31
    1.00000000000000
     10.00    0.00    0.00
      0.00   10.00    0.00
@@ -56,7 +56,7 @@ Direct
         structure, anchor_atom_index=15,
         anchor_atom_coords=np.array([0.5, 0.5, 0.0]))
 
-    expected = Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
+    expected = Structure.from_str(fmt="poscar", input_string="""Mg4 O3
 1.00000000000000
 10 0 0
 0 10 0
@@ -99,7 +99,7 @@ Direct
 
 
 def test_symmetrize_defect_structure_wo_anchor():
-    structure = Structure.from_str(fmt="POSCAR", input_string="""Mg4 O3
+    structure = Structure.from_str(fmt="poscar", input_string="""Mg4 O3
 1.00000000000000
 5 0 0
 0 5 0
