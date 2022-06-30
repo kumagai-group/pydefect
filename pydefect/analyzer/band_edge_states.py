@@ -37,7 +37,7 @@ def pretty_orbital(orbitals: Dict[str, List[float]]):
 
 @dataclass
 class OrbitalInfo(MSONable):
-    """Note that this is code and its version dependent quantities. """
+    """Note that this is the code- and version-dependent quantities. """
     energy: float  # max eigenvalue
     # {"Mn": [0.01, ..], "O": [0.03, 0.5]},
     # where lists contain s, p, d, (f) orbital components.
@@ -136,6 +136,7 @@ class LocalizedOrbital(MSONable):
 
 @dataclass
 class EdgeInfo(MSONable):
+    """Information for a particular band edge, namely VBM or CBM."""
     band_idx: int
     kpt_coord: Coords
     orbital_info: "OrbitalInfo"
@@ -178,9 +179,18 @@ class PerfectBandEdgeState(MSONable, ToJsonFileMixIn):
 
 @dataclass
 class BandEdgeState(MSONable):
+    """Information related to the band edge in a defect supercell.
+
+    E.g.,
+    # 124   --   <- CBM
+    # 123   --   <- localized orbital
+    # 122   --   <- localized orbital
+    # 121   --   <- VBM
+    """
+
     vbm_info: EdgeInfo
     cbm_info: EdgeInfo
-    vbm_orbital_diff: float
+    vbm_orbital_diff: float  # Difference from those of perfect supercell.
     cbm_orbital_diff: float
     localized_orbitals: List[LocalizedOrbital]
     vbm_hole_occupation: float = None

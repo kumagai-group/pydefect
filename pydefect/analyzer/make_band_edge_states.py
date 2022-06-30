@@ -105,6 +105,8 @@ def make_band_edge_states(orbital_infos: BandEdgeOrbitalInfos,
                           p_edge_state: PerfectBandEdgeState,
                           defect_charge_info: DefectChargeInfo = None
                           ) -> BandEdgeStates:
+    """Make BandEdgeStates by comparing orbital infos from perfect supercell.
+    """
     vbm_k_idx = orbital_infos.kpt_idx(p_edge_state.vbm_info.kpt_coord)
     cbm_k_idx = orbital_infos.kpt_idx(p_edge_state.cbm_info.kpt_coord)
     vbm_info = p_edge_state.vbm_info
