@@ -109,8 +109,8 @@ def make_band_edge_states(orbital_infos: BandEdgeOrbitalInfos,
     """
     vbm_k_idx = orbital_infos.kpt_idx(p_edge_state.vbm_info.kpt_coord)
     cbm_k_idx = orbital_infos.kpt_idx(p_edge_state.cbm_info.kpt_coord)
-    vbm_info = p_edge_state.vbm_info
-    cbm_info = p_edge_state.cbm_info
+    p_vbm_info = p_edge_state.vbm_info
+    p_cbm_info = p_edge_state.cbm_info
 
     states = []
     lowest_idx = orbital_infos.lowest_band_index
@@ -122,16 +122,16 @@ def make_band_edge_states(orbital_infos: BandEdgeOrbitalInfos,
             localized_orbs = None
 
         vbm_idx, vbm_diff = get_similar_orb_idx(orb_info_by_spin[vbm_k_idx],
-                                                vbm_info, localized_orbs,
+                                                p_vbm_info, localized_orbs,
                                                 _reversed=True)
         vbm_info = EdgeInfo(band_idx=vbm_idx + lowest_idx,
-                            kpt_coord=vbm_info.kpt_coord,
+                            kpt_coord=p_vbm_info.kpt_coord,
                             orbital_info=orb_info_by_spin[vbm_k_idx][vbm_idx])
 
         cbm_idx, cbm_diff = get_similar_orb_idx(orb_info_by_spin[cbm_k_idx],
-                                                cbm_info, localized_orbs)
+                                                p_cbm_info, localized_orbs)
         cbm_info = EdgeInfo(band_idx=cbm_idx + lowest_idx,
-                            kpt_coord=cbm_info.kpt_coord,
+                            kpt_coord=p_cbm_info.kpt_coord,
                             orbital_info=orb_info_by_spin[cbm_k_idx][cbm_idx])
 
         loc_idx_range = [vbm_info.band_idx + 1, cbm_info.band_idx - 1]
