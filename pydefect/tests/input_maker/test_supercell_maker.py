@@ -5,6 +5,7 @@ import pytest
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pydefect.util.error_classes import NotPrimitiveError
 from pymatgen.core import Lattice, Structure
+from vise.tests.helpers.assertion import assert_structure_almost_same
 
 
 def test_create_supercell_tetragonal(tetra_close_to_cubic):
@@ -111,7 +112,7 @@ direct
                         symprec=0.01)
     actual = structure * sm.transformation_matrix
     expected = conv_structure * matrix_to_conv_cell
-    assert actual == expected
+    assert_structure_almost_same(actual, expected)
 
 
 def test_rhombohedral_supercell_info():
