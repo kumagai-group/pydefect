@@ -33,7 +33,7 @@ Va_O1: [1]
     assert tmpdir.join("tmp.yaml").read() == expected
 
 
-def test_from_file(defect_set, tmpdir):
+def test_from_file(tmpdir):
     tmpdir.chdir()
     tmpdir.join("tmp.yaml").write("""N_O1: [0, 1]
 Va_O1: [1] 
