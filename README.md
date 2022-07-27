@@ -102,5 +102,5 @@ Contact info
 Yu Kumagai<br>
 yuuukuma@gmail.com<br>
 
-Tokyo Institute of Technology (Japan)
+Tohoku University (Japan)
 
