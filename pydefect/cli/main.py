@@ -73,18 +73,20 @@ def add_sub_parser(_argparse, name: str):
     return result
 
 
+dirs_parsers = [add_sub_parser(argparse, name="dirs"),
+                add_sub_parser(argparse, name="verbose")]
+
+
 def parse_args_main(args):
 
     parser = argparse.ArgumentParser(description=description, epilog=epilog)
     subparsers = parser.add_subparsers()
 
-    dirs_parser = add_sub_parser(argparse, name="dirs")
     unitcell_parser = add_sub_parser(argparse, name="unitcell")
     si_parser = add_sub_parser(argparse, name="supercell_info")
     pcr_parser = add_sub_parser(argparse, name="perfect_calc_results")
     pbes_parser = add_sub_parser(argparse, name="perfect_band_edge_state")
     no_calc_results = add_sub_parser(argparse, name="no_calc_results_check")
-    verbose = add_sub_parser(argparse, name="verbose")
 
     # -- make_standard_and_relative_energies -----------------------------------
     parser_make_standard_and_relative_energies = subparsers.add_parser(
@@ -220,7 +222,7 @@ def parse_args_main(args):
     parser_defect_structure_info = subparsers.add_parser(
         name="defect_structure_info",
         description="Defect structure info.",
-        parents=[dirs_parser, si_parser, no_calc_results, verbose],
+        parents=dirs_parsers + [si_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['dsi'])
 
@@ -240,8 +242,7 @@ def parse_args_main(args):
         name="efnv",
         description="Generate extended FNV-correction related efnv_correction "
                     "files. ",
-        parents=[dirs_parser, pcr_parser, unitcell_parser, no_calc_results,
-                 verbose],
+        parents=dirs_parsers + [pcr_parser, unitcell_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['efnv'])
 
@@ -251,7 +252,7 @@ def parse_args_main(args):
     parser_band_edge_states = subparsers.add_parser(
         name="band_edge_states",
         description="Show edge state for each spin channel.",
-        parents=[dirs_parser, pbes_parser, no_calc_results, verbose],
+        parents=dirs_parsers + [pbes_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['bes'])
 
@@ -261,8 +262,7 @@ def parse_args_main(args):
     parser_defect_energy_infos = subparsers.add_parser(
         name="defect_energy_infos",
         description="",
-        parents=[unitcell_parser, dirs_parser, pcr_parser, no_calc_results,
-                 verbose],
+        parents=dirs_parsers + [unitcell_parser, pcr_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['dei'])
     parser_defect_energy_infos.add_argument(
@@ -276,7 +276,7 @@ def parse_args_main(args):
     parser_defect_energy_summary = subparsers.add_parser(
         name="defect_energy_summary",
         description="",
-        parents=[dirs_parser, unitcell_parser, pbes_parser, verbose],
+        parents=dirs_parsers + [unitcell_parser, pbes_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['des'])
     parser_defect_energy_summary.add_argument(
@@ -290,7 +290,7 @@ def parse_args_main(args):
     parser_calc_summary = subparsers.add_parser(
         name="calc_summary",
         description="",
-        parents=[dirs_parser, pcr_parser, no_calc_results, verbose],
+        parents=dirs_parsers + [pcr_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cs'])
 

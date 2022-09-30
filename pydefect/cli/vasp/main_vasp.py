@@ -7,7 +7,7 @@ import sys
 import warnings
 from pathlib import Path
 
-from pydefect.cli.main import epilog, description, add_sub_parser
+from pydefect.cli.main import epilog, description, add_sub_parser, dirs_parsers
 from pydefect.cli.vasp.main_vasp_functions import make_defect_entries, \
     make_unitcell, make_competing_phase_dirs, \
     make_calc_results, \
@@ -28,8 +28,6 @@ def parse_args_main_vasp(args):
     files.""")
 
     subparsers = parser.add_subparsers()
-    dirs_parsers = [add_sub_parser(argparse, name="dirs"),
-                    add_sub_parser(argparse, name="verbose")]
     perfect_band_edge_parser = add_sub_parser(argparse,
                                               name="perfect_band_edge_state")
 

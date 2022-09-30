@@ -6,7 +6,6 @@ from pathlib import Path
 from pydefect.analyzer.band_edge_states import PerfectBandEdgeState
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import DefectEnergySummary
-from pydefect.chem_pot_diag.chem_pot_diag import TargetVertices
 from pydefect.cli.main import parse_args_main
 from pydefect.input_maker.supercell_info import SupercellInfo
 
