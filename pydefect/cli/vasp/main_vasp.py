@@ -28,7 +28,8 @@ def parse_args_main_vasp(args):
     files.""")
 
     subparsers = parser.add_subparsers()
-    dirs_parser = add_sub_parser(argparse, name="dirs")
+    dirs_parsers = [add_sub_parser(argparse, name="dirs"),
+                    add_sub_parser(argparse, name="verbose")]
     perfect_band_edge_parser = add_sub_parser(argparse,
                                               name="perfect_band_edge_state")
 
@@ -81,7 +82,7 @@ def parse_args_main_vasp(args):
         description="Make composition energies from the directories in which "
                     "competing phases are calculated. ",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        parents=[dirs_parser],
+        parents=dirs_parsers,
         aliases=['mce'])
 
     parser_make_composition_energies.add_argument(
@@ -157,7 +158,7 @@ def parse_args_main_vasp(args):
         name="calc_results",
         description="Generate calc_results.json files. "
                     "Run after VASP calculations.",
-        parents=[dirs_parser],
+        parents=dirs_parsers,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cr'])
     parser_calc_results.set_defaults(func=make_calc_results)
@@ -180,7 +181,7 @@ def parse_args_main_vasp(args):
         name="band_edge_orbital_infos",
         description="Generate band_edge_orbital_infos.json and "
                     "eigenvalues.pdf.",
-        parents=[dirs_parser, perfect_band_edge_parser],
+        parents=dirs_parsers + [perfect_band_edge_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['beoi'])
     parser_band_edge_orb_infos.add_argument(
