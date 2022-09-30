@@ -112,13 +112,15 @@ def make_defect_entries(args):
 
 
 def make_calc_results(args):
+    file_name = "calc_results.json"
+
     def _inner(_dir: Path):
         calc_results = make_calc_results_from_vasp(
             vasprun=Vasprun(_dir / defaults.vasprun),
             outcar=Outcar(_dir / defaults.outcar))
-        calc_results.to_json_file(str(_dir / "calc_results.json"))
+        calc_results.to_json_file(str(_dir / file_name))
 
-    parse_dirs(args.dirs, _inner, args.verbose)
+    parse_dirs(args.dirs, _inner, args.verbose, file_name)
 
 
 def make_perfect_band_edge_state(args):
@@ -135,19 +137,19 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
     supercell_vbm = args.p_state.vbm_info.energy
     supercell_cbm = args.p_state.cbm_info.energy
 
+    file_name = "band_edge_orbital_infos.json"
     def _inner(_dir: Path):
         try:
             defect_entry = loadfn(_dir / "defect_entry.json")
             title = defect_entry.name
         except FileNotFoundError:
             title = "No name"
-        beoi = _dir / "band_edge_orbital_infos.json"
         procar = Procar(_dir / defaults.procar)
         vasprun = Vasprun(_dir / defaults.vasprun)
         str_info = loadfn(_dir / "defect_structure_info.json")
         band_edge_orb_chars = make_band_edge_orbital_infos(
             procar, vasprun, supercell_vbm, supercell_cbm, str_info)
-        band_edge_orb_chars.to_json_file(beoi)
+        band_edge_orb_chars.to_json_file(_dir / file_name)
 
         plotter = EigenvalueMplPlotter(
             title=title, band_edge_orb_infos=band_edge_orb_chars,
@@ -157,4 +159,4 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
         plotter.plt.savefig(fname=_dir / "eigenvalues.pdf")
         plotter.plt.clf()
 
-    parse_dirs(args.dirs, _inner, args.verbose)
+    parse_dirs(args.dirs, _inner, args.verbose, file_name)

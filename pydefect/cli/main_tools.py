@@ -37,13 +37,18 @@ def str_int_to_int(x):
 
 def parse_dirs(dirs: List[Path],
                _inner_function: Callable[[Path], Any],
-               verbose: bool = False):
+               verbose: bool = False,
+               output_filename: str = None):
     failed_directories = []
     parsed_results = []
     for _dir in dirs:
         if _dir.is_file():
             logger.info(f"{_dir} is a file, so skipped.")
             continue
+        if output_filename and (_dir / output_filename).exists():
+            print(f"{output_filename} already exists.")
+            continue
+
         logger.info(f"Parsing data in {_dir} ...")
         try:
             _return = _inner_function(_dir)
@@ -53,7 +58,7 @@ def parse_dirs(dirs: List[Path],
             if verbose:
                 print(traceback.print_exc())
             else:
-                print(e.args)
+                print(e.args[1])
             logger.warning(f"Failing parsing {_dir} ...")
             failed_directories.append(str(_dir))
             continue

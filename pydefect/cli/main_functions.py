@@ -143,6 +143,7 @@ def make_defect_set(args):
 
 def calc_defect_structure_info(args):
     supercell_info = args.supercell_info
+    file_name = "defect_structure_info.json"
 
     def _inner(_dir: Path):
         calc_results = get_calc_results(_dir, args.check_calc_results)
@@ -153,12 +154,13 @@ def calc_defect_structure_info(args):
             calc_results.structure,
             dist_tol=args.dist_tolerance,
             symprec=args.symprec).defect_structure_info
-        defect_str_info.to_json_file(str(_dir / "defect_structure_info.json"))
+        defect_str_info.to_json_file(str(_dir / file_name))
 
-    parse_dirs(args.dirs, _inner, args.verbose)
+    parse_dirs(args.dirs, _inner, args.verbose, file_name)
 
 
 def make_efnv_correction_main_func(args):
+    file_name = "correction.json"
     def _inner(_dir: Path):
         calc_results = get_calc_results(_dir, args.check_calc_results)
         defect_entry = loadfn(_dir / "defect_entry.json")
@@ -166,7 +168,7 @@ def make_efnv_correction_main_func(args):
                                     calc_results,
                                     args.perfect_calc_results,
                                     args.unitcell.dielectric_constant)
-        efnv.to_json_file(_dir / "correction.json")
+        efnv.to_json_file(_dir / file_name)
 
         title = defect_entry.full_name
         plotter = SitePotentialMplPlotter.from_efnv_corr(
@@ -175,10 +177,11 @@ def make_efnv_correction_main_func(args):
         plotter.plt.savefig(fname=_dir / "correction.pdf")
         plotter.plt.clf()
 
-    parse_dirs(args.dirs, _inner, args.verbose)
+    parse_dirs(args.dirs, _inner, args.verbose, file_name)
 
 
 def make_band_edge_states_main_func(args):
+    file_name = "band_edge_states.json"
     def _inner(_dir: Path):
         orb_infos = loadfn(_dir / "band_edge_orbital_infos.json")
         try:
@@ -187,13 +190,13 @@ def make_band_edge_states_main_func(args):
             defect_charge_info = None
         band_edge_states = make_band_edge_states(orb_infos, args.p_state,
                                                  defect_charge_info)
-        band_edge_states.to_json_file(str(_dir / "band_edge_states.json"))
+        band_edge_states.to_json_file(str(_dir / file_name))
 
-    parse_dirs(args.dirs, _inner, args.verbose)
+    parse_dirs(args.dirs, _inner, args.verbose, file_name)
 
 
 def make_defect_energy_infos_main_func(args):
-
+    file_name = "defect_energy_info.yaml"
     def _inner(_dir: Path):
         calc_results = get_calc_results(_dir, args.check_calc_results)
         defect_entry = loadfn(_dir / "defect_entry.json")
@@ -210,9 +213,9 @@ def make_defect_energy_infos_main_func(args):
             standard_energies=args.std_energies,
             unitcell=args.unitcell,
             band_edge_states=band_edge_states)
-        defect_energy_info.to_yaml_file(str(_dir / "defect_energy_info.yaml"))
+        defect_energy_info.to_yaml_file(str(_dir / file_name))
 
-    parse_dirs(args.dirs, _inner, args.verbose)
+    parse_dirs(args.dirs, _inner, args.verbose, file_name)
 
 
 def make_defect_energy_summary_main_func(args):

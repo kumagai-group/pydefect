@@ -63,5 +63,15 @@ def test_parse_dirs_file(tmpdir):
     parse_dirs([tmpfile], _inner_function=print_a_to_file_x)
 
 
-def test_parse_dirs_fail(tmpdir):
+def test_parse_dirs_fail(tmpdir, capsys):
     parse_dirs([Path(tmpdir) / "y"], _inner_function=print_a_to_file_x)
+    captured = capsys.readouterr()
+    assert captured.out == "No such file or directory\n"
+
+
+def test_parse_dirs_skip_when_output_file_exist(tmpdir, capsys):
+    (Path(tmpdir) / "x").touch()
+    parse_dirs([Path(tmpdir)], _inner_function=print_a_to_file_x,
+               output_filename="x")
+    captured = capsys.readouterr()
+    assert captured.out == "x already exists.\n"
