@@ -9,13 +9,13 @@ from pydefect.analyzer.calc_results import CalcResults, NoElectronicConvError, \
     NoIonicConvError
 from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter
-from pydefect.analyzer.make_defect_structure_info import \
-    MakeDefectStructureInfo
 from pydefect.analyzer.make_band_edge_states import make_band_edge_states
 from pydefect.analyzer.make_calc_summary import make_calc_summary
 from pydefect.analyzer.make_defect_energy_info import make_defect_energy_info
 from pydefect.analyzer.make_defect_energy_summary import \
     make_defect_energy_summary
+from pydefect.analyzer.make_defect_structure_info import \
+    MakeDefectStructureInfo
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergies, \
     RelativeEnergies, ChemPotDiagMaker, TargetVertices
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DMplPlotter, \
@@ -28,7 +28,6 @@ from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pymatgen.core import Composition
 from vise.util.logger import get_logger
-
 
 logger = get_logger(__name__)
 
@@ -58,13 +57,13 @@ def parse_dirs(dirs: List[Path],
                verbose: bool = False):
     failed_directories = []
     parsed_results = []
-    for dir in dirs:
-        if dir.is_file():
-            logger.info(f"{dir} is a file, so skipped.")
+    for _dir in dirs:
+        if _dir.is_file():
+            logger.info(f"{_dir} is a file, so skipped.")
             continue
-        logger.info(f"Parsing data in {dir} ...")
+        logger.info(f"Parsing data in {_dir} ...")
         try:
-            _return = _inner_function(dir)
+            _return = _inner_function(_dir)
             if _return:
                 parsed_results.append(_return)
         except Exception as e:
@@ -72,12 +71,13 @@ def parse_dirs(dirs: List[Path],
                 print(traceback.print_exc())
             else:
                 print(e.args)
-            logger.warning(f"Failing parsing {dir} ...")
-            failed_directories.append(str(dir))
+            logger.warning(f"Failing parsing {_dir} ...")
+            failed_directories.append(str(_dir))
             continue
     if failed_directories:
         failed_dir_string = '\n'.join(failed_directories)
         logger.warning(f"Failed directories are:\n{failed_dir_string}")
+        logger.warning(f"To see details, try to run with --verbose")
     else:
         logger.info("Parsing all the directories succeeded.")
 
