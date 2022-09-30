@@ -92,5 +92,5 @@ def test_make_band_edge_orbital_infos(mocker):
              OrbitalInfo(energy=10.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0, participation_ratio=1.0)]]],
         kpt_coords=[(0.0, 0.0, 0.0)], kpt_weights=[1.0], lowest_band_index=1,
     fermi_level=20.0)
-    assert_dataclass_almost_equal(actual, expected)
+    assert_dataclass_almost_equal(actual, expected, check_is_subclass=True)
 

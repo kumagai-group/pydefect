@@ -6,7 +6,7 @@ from typing import Tuple, Optional
 
 import numpy as np
 import yaml
-from monty.json import MSONable
+from monty.json import MSONable, MontyDecoder
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
 from pydefect.util.coords import pretty_coords
@@ -23,6 +23,14 @@ class PerturbedSite(MSONable):
     initial_coords: Coords
     perturbed_coords: Coords
     displacement: float
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(element=d["element"],
+                   distance=d["distance"],
+                   initial_coords=tuple(d["initial_coords"]),
+                   perturbed_coords=tuple(d["perturbed_coords"]),
+                   displacement=d["displacement"])
 
     def __str__(self):
         elem = f"{self.element:>4}"
@@ -43,6 +51,14 @@ class DefectEntry(MSONable, ToJsonFileMixIn):
     perturbed_structure: Optional[IStructure] = None
     perturbed_sites: Optional[Tuple[PerturbedSite, ...]] = None
     perturbed_site_symmetry: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, d):
+        d = {k: MontyDecoder().process_decoded(v) for k, v in d.items() if not k.startswith("@")}
+        if d["perturbed_sites"]:
+            d["perturbed_sites"] = tuple([MontyDecoder().process_decoded(d) for d in d["perturbed_sites"]])
+        d["defect_center"] = tuple(d["defect_center"])
+        return cls(**d)
 
     @property
     def anchor_atom_index(self) -> int:

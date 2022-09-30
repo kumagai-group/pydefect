@@ -13,6 +13,10 @@ class Defect(MSONable):
     name: str
     charges: tuple
 
+    @classmethod
+    def from_dict(cls, d):
+        return cls(name=d["name"], charges=tuple(d["charges"]))
+
     @property
     def str_list(self):
         return ["_".join([self.name, str(charge)]) for charge in self.charges]

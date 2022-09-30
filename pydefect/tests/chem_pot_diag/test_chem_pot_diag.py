@@ -168,7 +168,6 @@ def test_cpd_maker_chem_pot_diag_with_target(cpd_maker, cpd, target_vertices):
 
 
 def test_target_vertices(target_vertices, tmpdir):
-    print(tmpdir)
     tmpdir.chdir()
     expected_text = """target: MgO2
 A:

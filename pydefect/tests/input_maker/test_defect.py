@@ -11,11 +11,6 @@ def test_defect_msonable():
     assert_msonable(defect)
 
 
-def test_simple_defect_msonable():
-    defect = SimpleDefect("Va", "O1", [1, 2])
-    assert_msonable(defect)
-
-
 def test_defect_hashable():
     defect = Defect("Va_O1", (1, 2))
     d = {defect: 1}

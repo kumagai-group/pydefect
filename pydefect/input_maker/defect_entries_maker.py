@@ -114,9 +114,9 @@ def perturb_structure(structure: Structure, center: List[float], cutoff: float
         p_structure.translate_sites(p_neighbor.index, vector, frac_coords=False)
         s = PerturbedSite(
              element=str(p_neighbor.specie),
-             distance=p_neighbor.nn_distance,
-             initial_coords=tuple(p_neighbor.frac_coords),
-             perturbed_coords=tuple(p_structure[p_neighbor.index].frac_coords),
+             distance=float(p_neighbor.nn_distance),
+             initial_coords=tuple([float(f) for f in p_neighbor.frac_coords]),
+             perturbed_coords=tuple([float(f) for f in p_structure[p_neighbor.index].frac_coords]),
              displacement=distance)
         perturbed_sites.append(s)
 
