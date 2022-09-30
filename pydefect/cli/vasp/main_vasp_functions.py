@@ -56,7 +56,7 @@ def make_composition_energies(args):
         energy = float(outcar.final_energy)  # original type is FloatWithUnit
         return composition, CompositionEnergy(energy, "local")
 
-    for c, ce in parse_dirs(args.dirs, _inner):
+    for c, ce in parse_dirs(args.dirs, _inner, args.verbose):
         composition_energies[c] = ce
 
     composition_energies.to_yaml_file()
@@ -118,7 +118,7 @@ def make_calc_results(args):
             outcar=Outcar(_dir / defaults.outcar))
         calc_results.to_json_file(str(_dir / "calc_results.json"))
 
-    parse_dirs(args.dirs, _inner)
+    parse_dirs(args.dirs, _inner, args.verbose)
 
 
 def make_perfect_band_edge_state(args):
@@ -157,4 +157,4 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
         plotter.plt.savefig(fname=_dir / "eigenvalues.pdf")
         plotter.plt.clf()
 
-    parse_dirs(args.dirs, _inner)
+    parse_dirs(args.dirs, _inner, args.verbose)

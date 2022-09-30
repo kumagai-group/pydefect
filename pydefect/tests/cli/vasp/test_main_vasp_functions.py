@@ -86,7 +86,7 @@ def test_make_composition_energies(mocker, tmpdir):
                         side_effect=side_effect)
     mock_str = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Structure.from_file",
                             side_effect=side_effect_structure)
-    args = Namespace(yaml_file=None, dirs=[Path("Mg"), Path("O")])
+    args = Namespace(yaml_file=None, dirs=[Path("Mg"), Path("O")], verbose=False)
     make_composition_energies(args)
     actual = Path("composition_energies.yaml").read_text()
     expected = """Mg2:
@@ -155,7 +155,7 @@ def test_make_calc_results(tmpdir, mocker):
     mock_outcar = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Outcar")
     mock_calc_results = mocker.Mock(spec=CalcResults)
     mock.return_value = mock_calc_results
-    args = Namespace(dirs=[Path("a")])
+    args = Namespace(dirs=[Path("a")], verbose=False)
     make_calc_results(args)
 
     mock_vasprun.assert_called_with(Path("a") / defaults.vasprun)
@@ -215,7 +215,8 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
 
     args = Namespace(dirs=[Path("Va_O1_2")],
                      p_state=mock_p_state,
-                     y_range=[0.0, 1.0])
+                     y_range=[0.0, 1.0],
+                     verbose=False)
     make_band_edge_orb_infos_and_eigval_plot(args)
 
     mock_procar.assert_called_with(Path("Va_O1_2") / defaults.procar)
