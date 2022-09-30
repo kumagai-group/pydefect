@@ -104,6 +104,7 @@ def test_calc_results():
     parsed_args = parse_args_main_vasp(["cr", "-d", "Va_O1_0", "Va_O1_1"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
+        verbose=False,
         func=parsed_args.func,
     )
     assert parsed_args == expected
@@ -131,10 +132,12 @@ def test_band_edge_orbital_infos(mocker):
         "beoi",
         "-d", "Va_O1_0", "Va_O1_1",
         "-pbes", "perfect_band_edge_state.json",
-        "-y", "0.0", "1.0"])
+        "-y", "0.0", "1.0",
+        "-v"])
     expected = Namespace(
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         p_state=mock_p_edge_state,
         y_range=[0.0, 1.0],
+        verbose=True,
         func=parsed_args.func)
     assert parsed_args == expected
