@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
-import traceback
 from pathlib import Path
-from typing import Union, List, Callable, Any
+from typing import Union
 
 from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults, NoElectronicConvError, \
@@ -20,7 +19,7 @@ from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergies, \
     RelativeEnergies, ChemPotDiagMaker, TargetVertices
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DMplPlotter, \
     ChemPotDiag3DMplPlotter
-from pydefect.cli.main_tools import sanitize_matrix
+from pydefect.cli.main_tools import sanitize_matrix, parse_dirs
 from pydefect.cli.vasp.make_efnv_correction import make_efnv_correction
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
 from pydefect.input_maker.append_interstitial import append_interstitial
@@ -50,38 +49,6 @@ def get_calc_results(d: Path, check: bool) -> Union[CalcResults, bool]:
         calc_results = loadfn(d / "calc_results.json")
 
     return calc_results
-
-
-def parse_dirs(dirs: List[Path],
-               _inner_function: Callable[[Path], Any],
-               verbose: bool = False):
-    failed_directories = []
-    parsed_results = []
-    for _dir in dirs:
-        if _dir.is_file():
-            logger.info(f"{_dir} is a file, so skipped.")
-            continue
-        logger.info(f"Parsing data in {_dir} ...")
-        try:
-            _return = _inner_function(_dir)
-            if _return:
-                parsed_results.append(_return)
-        except Exception as e:
-            if verbose:
-                print(traceback.print_exc())
-            else:
-                print(e.args)
-            logger.warning(f"Failing parsing {_dir} ...")
-            failed_directories.append(str(_dir))
-            continue
-    if failed_directories:
-        failed_dir_string = '\n'.join(failed_directories)
-        logger.warning(f"Failed directories are:\n{failed_dir_string}")
-        logger.warning(f"To see details, try to run with --verbose")
-    else:
-        logger.info("Parsing all the directories succeeded.")
-
-    return parsed_results or None
 
 
 def make_standard_and_relative_energies(args):

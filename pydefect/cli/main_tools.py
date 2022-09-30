@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from typing import List
+import traceback
+from pathlib import Path
+from typing import List, Callable, Any
 
 import numpy as np
+from pydefect.cli.main_functions import logger
 
 
 def sanitize_matrix(matrix: List[int]) -> List[List[int]]:
@@ -28,3 +31,35 @@ def str_int_to_int(x):
         return int(x)
     except ValueError:
         return x
+
+
+def parse_dirs(dirs: List[Path],
+               _inner_function: Callable[[Path], Any],
+               verbose: bool = False):
+    failed_directories = []
+    parsed_results = []
+    for _dir in dirs:
+        if _dir.is_file():
+            logger.info(f"{_dir} is a file, so skipped.")
+            continue
+        logger.info(f"Parsing data in {_dir} ...")
+        try:
+            _return = _inner_function(_dir)
+            if _return:
+                parsed_results.append(_return)
+        except Exception as e:
+            if verbose:
+                print(traceback.print_exc())
+            else:
+                print(e.args)
+            logger.warning(f"Failing parsing {_dir} ...")
+            failed_directories.append(str(_dir))
+            continue
+    if failed_directories:
+        failed_dir_string = '\n'.join(failed_directories)
+        logger.warning(f"Failed directories are:\n{failed_dir_string}")
+        logger.warning(f"To see details, try to run with --verbose")
+    else:
+        logger.info("Parsing all the directories succeeded.")
+
+    return parsed_results or None

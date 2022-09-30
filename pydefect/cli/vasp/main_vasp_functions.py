@@ -6,7 +6,7 @@ from monty.serialization import loadfn
 from pydefect.analyzer.eigenvalue_plotter import EigenvalueMplPlotter
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergy, \
     CompositionEnergies
-from pydefect.cli.main_functions import parse_dirs
+from pydefect.cli.main_tools import parse_dirs
 from pydefect.cli.vasp.make_local_extrema import \
     make_local_extrema_from_volumetric_data
 from pydefect.cli.vasp.make_band_edge_orbital_infos import \

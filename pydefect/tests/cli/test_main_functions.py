@@ -16,35 +16,12 @@ from pydefect.cli.main_functions import make_standard_and_relative_energies, \
     append_interstitial_to_supercell_info, \
     pop_interstitial_from_supercell_info, make_defect_set, \
     make_band_edge_states_main_func, make_efnv_correction_main_func, \
-    calc_defect_structure_info, parse_dirs
+    calc_defect_structure_info
 from pydefect.corrections.efnv_correction import ExtendedFnvCorrection
 from pydefect.input_maker.defect import SimpleDefect
 from pydefect.input_maker.defect_entry import DefectEntry
 from pydefect.input_maker.defect_set import DefectSet
 from pymatgen.core import Composition, IStructure
-
-
-def print_a_to_file_x(path: Path):
-    filename = path / "x"
-    filename.write_text("a")
-
-
-def test_parse_dirs(tmpdir):
-    pathlib_tmpdir = Path(tmpdir)
-    parse_dirs([Path(tmpdir)], _inner_function=print_a_to_file_x)
-
-    actual = pathlib_tmpdir / "x"
-    assert actual.read_text() == "a"
-
-
-def test_parse_dirs_file(tmpdir):
-    tmpfile = Path(tmpdir) / "file"
-    tmpfile.touch()
-    parse_dirs([tmpfile], _inner_function=print_a_to_file_x)
-
-
-def test_parse_dirs_fail(tmpdir):
-    parse_dirs([Path(tmpdir) / "y"], _inner_function=print_a_to_file_x)
 
 
 def test_make_standard_and_relative_energies(mocker, tmpdir):

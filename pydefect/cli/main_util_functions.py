@@ -4,7 +4,8 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults
-from pydefect.cli.main_functions import get_calc_results, parse_dirs
+from pydefect.cli.main_functions import get_calc_results
+from pydefect.cli.main_tools import parse_dirs
 from pydefect.cli.make_defect_vesta_file import MakeDefectVestaFile
 from pydefect.cli.vasp.make_composition_energies_from_mp import \
     make_composition_energies_from_mp

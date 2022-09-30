@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from pathlib import Path
 
 import pytest
 
-from pydefect.cli.main_tools import sanitize_matrix, str_int_to_int
+from pydefect.cli.main_tools import sanitize_matrix, str_int_to_int, parse_dirs
 
 
 def test_sanitize_matrix_9_input_values():
@@ -41,3 +42,26 @@ TODO
 
 DONE
 """
+
+
+def print_a_to_file_x(path: Path):
+    filename = path / "x"
+    filename.write_text("a")
+
+
+def test_parse_dirs(tmpdir):
+    pathlib_tmpdir = Path(tmpdir)
+    parse_dirs([Path(tmpdir)], _inner_function=print_a_to_file_x)
+
+    actual = pathlib_tmpdir / "x"
+    assert actual.read_text() == "a"
+
+
+def test_parse_dirs_file(tmpdir):
+    tmpfile = Path(tmpdir) / "file"
+    tmpfile.touch()
+    parse_dirs([tmpfile], _inner_function=print_a_to_file_x)
+
+
+def test_parse_dirs_fail(tmpdir):
+    parse_dirs([Path(tmpdir) / "y"], _inner_function=print_a_to_file_x)
