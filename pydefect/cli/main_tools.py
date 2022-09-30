@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import List, Callable, Any
 
 import numpy as np
-from pydefect.cli.main_functions import logger
+from vise.util.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def sanitize_matrix(matrix: List[int]) -> List[List[int]]:
