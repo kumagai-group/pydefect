@@ -25,8 +25,7 @@ def test_make_defect_structure_info(structures, def_str_info):
                                    symprec=0.1,
                                    neighbor_cutoff_factor=1.2)
     actual = info.defect_structure_info
-    print(actual)
-    assert_dataclass_almost_equal(actual, def_str_info)
+    assert_dataclass_almost_equal(actual, def_str_info, check_is_subclass=True)
 
 
 def test_make_defect_structure_info2():

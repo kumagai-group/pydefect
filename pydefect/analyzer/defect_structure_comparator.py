@@ -137,7 +137,8 @@ class DefectStructureComparator:
         removed, removed_by_sub = [], []
         for idx in self.removed_indices:
             site = self._perfect_structure[idx]
-            val = idx, site.species_string, tuple(site.frac_coords)
+            frac_coords = tuple([float(fc) for fc in site.frac_coords])
+            val = idx, site.species_string, frac_coords
             if idx in removed_mapping:
                 removed_by_sub.append(val)
             else:
@@ -146,7 +147,8 @@ class DefectStructureComparator:
         inserted, inserted_by_sub = [], []
         for idx in self.inserted_indices:
             site = self._defect_structure[idx]
-            val = idx, site.species_string, tuple(site.frac_coords)
+            frac_coords = tuple([float(fc) for fc in site.frac_coords])
+            val = idx, site.species_string, frac_coords
             if idx in inserted_mapping:
                 inserted_by_sub.append(val)
             else:
