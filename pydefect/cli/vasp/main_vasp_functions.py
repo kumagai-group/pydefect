@@ -50,11 +50,15 @@ def make_composition_energies(args):
     else:
         composition_energies = CompositionEnergies()
 
-    for d in args.dirs:
-        outcar = Outcar(d / defaults.outcar)
-        composition = Structure.from_file(d / defaults.contcar).composition
+    def _inner(_dir: Path):
+        outcar = Outcar(_dir / defaults.outcar)
+        composition = Structure.from_file(_dir / defaults.contcar).composition
         energy = float(outcar.final_energy)  # original type is FloatWithUnit
-        composition_energies[composition] = CompositionEnergy(energy, "local")
+        return composition, CompositionEnergy(energy, "local")
+
+    for c, ce in parse_dirs(args.dirs, _inner):
+        composition_energies[c] = ce
+
     composition_energies.to_yaml_file()
 
 
