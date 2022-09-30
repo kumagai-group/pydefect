@@ -168,6 +168,22 @@ class SiteDiff(MSONable):
     removed_by_sub: List[SiteInfo]
     inserted_by_sub: List[SiteInfo]
 
+    @classmethod
+    def from_dict(cls, d):
+        result = super().from_dict(d)
+        removed, inserted, removed_by_sub, inserted_by_sub = [], [], [], []
+
+        for i in result.removed:
+            removed.append((i[0], i[1], tuple(i[2])))
+        for i in result.inserted:
+            inserted.append((i[0], i[1], tuple(i[2])))
+        for i in result.removed_by_sub:
+            removed_by_sub.append((i[0], i[1], tuple(i[2])))
+        for i in result.inserted_by_sub:
+            inserted_by_sub.append((i[0], i[1], tuple(i[2])))
+
+        return cls(removed, inserted, removed_by_sub, inserted_by_sub)
+
     @property
     def is_complex_defect(self):
         return (len(self.removed) + len(self.inserted)
