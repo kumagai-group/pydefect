@@ -14,7 +14,7 @@ from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 @pytest.fixture
 def band_edge_eigenvalues():
     return BandEdgeEigenvalues(energies_and_occupations=[[[[0.0, 1.0]]]],
-                               kpt_coords=[(0.0, 0.0, 0.0)],
+                               kpt_coords=[[0.0, 0.0, 0.0]],
                                lowest_band_index=10)
 
 

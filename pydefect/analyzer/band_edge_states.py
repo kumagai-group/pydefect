@@ -18,7 +18,7 @@ printed_orbital_weight_threshold = 0.1
 class BandEdgeEigenvalues(MSONable, ToJsonFileMixIn):
     # [spin, k-idx, band-idx] = energy, occupation
     energies_and_occupations: List[List[List[List[float]]]]
-    kpt_coords: List[Tuple[float, float, float]]
+    kpt_coords: List[List[float]]
     lowest_band_index: int
 
 
