@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import string
+from copy import deepcopy
 from dataclasses import dataclass, asdict
 from itertools import product
 from typing import Dict, Optional, Union, List, Set, Tuple
@@ -346,6 +347,26 @@ class ChemPotDiag(MSONable, ToJsonFileMixIn):
             return TargetVertices(self.target, self.target_vertices_dict)
         logger.warning("Need to set target and target_vertices.")
         raise ValueError
+
+
+def change_element_sequence(cpd: ChemPotDiag,
+                            element_sequence: List[str] = None) -> ChemPotDiag:
+    result = deepcopy(cpd)
+
+    if element_sequence:
+        if (set(cpd.vertex_elements) != set(element_sequence)
+                or len(cpd.vertex_elements) != len(element_sequence)):
+            raise ValueError(f"Original elements {cpd.vertex_elements}. "
+                             f"Input elements {element_sequence}")
+    else:
+        element_sequence = [str(e) for e in Composition(cpd.target).elements]
+
+    element_indices = [cpd.vertex_elements.index(e) for e in element_sequence]
+    for k, v in cpd.polygons.items():
+        result.polygons[k] = [[vv[x] for x in element_indices] for vv in v]
+
+    result.vertex_elements = element_sequence
+    return result
 
 
 class NoElementEnergyError(PydefectError):

@@ -6,7 +6,7 @@ import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
     CompositionEnergy, CompositionEnergies, StandardEnergies, \
     RelativeEnergies, ChemPotDiagMaker, TargetVertices, TargetVertex, \
-    target_element_chem_pot
+    target_element_chem_pot, change_element_sequence
 from pymatgen.core import Composition
 from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
@@ -200,3 +200,15 @@ def test_cpd(cpd):
                                 "O": [(-9.9 - 9.0) / 2, 0.0]}
     assert cpd.min_range == -9.9
     assert cpd.chemical_system == "Mg-O"
+
+
+def test_cpd_change_element_sequence(cpd):
+    min_val = -9.0 * 1.1
+    actual = change_element_sequence(cpd, element_sequence=["O", "Mg"])
+    assert actual.vertex_elements == ["O", "Mg"]
+    assert actual.polygons == {'Mg': [[min_val, 0.0], [-4.5, 0.0]],
+                               'MgO2': [[-4.5, 0.0], [0.0, -9.0]],
+                               'O': [[0.0, min_val], [0.0, -9.0]]}
+
+    actual = change_element_sequence(actual)
+    assert actual == cpd
