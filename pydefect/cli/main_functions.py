@@ -16,7 +16,7 @@ from pydefect.analyzer.make_defect_energy_summary import \
 from pydefect.analyzer.make_defect_structure_info import \
     MakeDefectStructureInfo
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergies, \
-    RelativeEnergies, ChemPotDiagMaker, TargetVertices
+    RelativeEnergies, ChemPotDiagMaker, TargetVertices, change_element_sequence
 from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DMplPlotter, \
     ChemPotDiag3DMplPlotter
 from pydefect.cli.main_tools import sanitize_matrix, parse_dirs
@@ -75,6 +75,7 @@ def make_cpd_and_vertices(args):
 
 def plot_chem_pot_diag(args):
     cpd = args.chem_pot_diag
+    cpd = change_element_sequence(cpd)
     if cpd.dim == 2:
         plotter = ChemPotDiag2DMplPlotter(cpd)
     elif cpd.dim == 3:
