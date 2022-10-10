@@ -48,7 +48,7 @@ def cpd_3d():
     return ChemPotDiag(
         vertex_elements=["H", "O", "N"],
         polygons=polygons,
-        target="HNO",
+        target="HON",
         target_vertices_dict={
             "A": TargetVertex({"H": 0.0, "O": 0.0, "N": -3.0}, ["H", "O"], None),
             "B": TargetVertex({"H": 0.0, "O": -3.0, "N": 0.0}, ["H", "N"], None),
@@ -59,11 +59,6 @@ def cpd_3d():
 def test_cpd_3d_draw(cpd_3d):
     plotter = ChemPotDiag3DMplPlotter(cpd_3d)
     plotter.draw_diagram().show()
-
-
-def test_cpd_change_element_sequence(cpd_3d):
-    plotter = ChemPotDiag3DMplPlotter(cpd_3d)
-    assert plotter.cpd.vertex_elements == ["H", "N", "O"]
 
 
 def test_transpose():

@@ -44,15 +44,8 @@ class CpdMplSettings:
 class ChemPotDiagMplPlotter(ABC):
     def __init__(self,
                  cpd: ChemPotDiag,
-                 mpl_defaults: Optional[CpdMplSettings] = CpdMplSettings(),
-                 element_sequence: List[str] = None):
+                 mpl_defaults: Optional[CpdMplSettings] = CpdMplSettings()):
         self.cpd = cpd
-
-        if not element_sequence:
-            element_sequence = \
-                [str(e) for e in Composition(self.cpd.target).elements]
-        if len(self.cpd.vertex_elements) == len(element_sequence):
-            self.cpd.vertex_elements = element_sequence
 
         self._mpl_defaults = mpl_defaults
         self._add_ax()
