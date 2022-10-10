@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+import logging
 from pathlib import Path
 
 import pytest
@@ -69,9 +70,9 @@ def test_parse_dirs_fail(tmpdir, capsys):
     assert captured.out == "No such file or directory\n"
 
 
-def test_parse_dirs_skip_when_output_file_exist(tmpdir, capsys):
+def test_parse_dirs_skip_when_output_file_exist(tmpdir):
+    LOGGER = logging.getLogger(__name__)
+    LOGGER.info('Testing now.')
     (Path(tmpdir) / "x").touch()
     parse_dirs([Path(tmpdir)], _inner_function=print_a_to_file_x,
                output_filename="x")
-    captured = capsys.readouterr()
-    assert captured.out == "x already exists.\n"

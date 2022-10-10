@@ -46,7 +46,7 @@ def parse_dirs(dirs: List[Path],
             logger.info(f"{_dir} is a file, so skipped.")
             continue
         if output_filename and (_dir / output_filename).exists():
-            print(f"{output_filename} already exists.")
+            logger.info(f"In {_dir}, {output_filename} already exists.")
             continue
 
         logger.info(f"Parsing data in {_dir} ...")
