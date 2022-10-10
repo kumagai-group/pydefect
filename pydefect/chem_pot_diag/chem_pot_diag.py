@@ -359,7 +359,10 @@ def change_element_sequence(cpd: ChemPotDiag,
             raise ValueError(f"Original elements {cpd.vertex_elements}. "
                              f"Input elements {element_sequence}")
     else:
-        element_sequence = [str(e) for e in Composition(cpd.target).elements]
+        if cpd.target:
+            element_sequence = [str(e) for e in Composition(cpd.target).elements]
+        else:
+            return result
 
     element_indices = [cpd.vertex_elements.index(e) for e in element_sequence]
     for k, v in cpd.polygons.items():

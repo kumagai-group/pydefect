@@ -212,3 +212,6 @@ def test_cpd_change_element_sequence(cpd):
 
     actual = change_element_sequence(actual)
     assert actual == cpd
+
+    actual.target = None
+    assert change_element_sequence(actual).polygons == cpd.polygons
