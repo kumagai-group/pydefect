@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
+from pymatgen.core import Composition
 from vise.util.plotly_util import sort_coords, make_triangles
 from vise.util.string import latexify
 
@@ -43,8 +44,16 @@ class CpdMplSettings:
 class ChemPotDiagMplPlotter(ABC):
     def __init__(self,
                  cpd: ChemPotDiag,
-                 mpl_defaults: Optional[CpdMplSettings] = CpdMplSettings()):
+                 mpl_defaults: Optional[CpdMplSettings] = CpdMplSettings(),
+                 element_sequence: List[str] = None):
         self.cpd = cpd
+
+        if not element_sequence:
+            element_sequence = \
+                [str(e) for e in Composition(self.cpd.target).elements]
+        if len(self.cpd.vertex_elements) == len(element_sequence):
+            self.cpd.vertex_elements = element_sequence
+
         self._mpl_defaults = mpl_defaults
         self._add_ax()
 
