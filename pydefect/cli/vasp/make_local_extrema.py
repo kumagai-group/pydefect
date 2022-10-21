@@ -8,7 +8,6 @@ from pydefect.analyzer.defect_structure_info import remove_dot
 from pydefect.input_maker.local_extrema import VolumetricDataLocalExtrema, \
     CoordInfo, VolumetricDataAnalyzeParams
 from pydefect.util.structure_tools import Distances
-from pymatgen.analysis.defects.utils import ChargeDensityAnalyzer
 from pymatgen.core import Element, Structure
 from pymatgen.io.vasp import VolumetricData
 from vise.util.logger import get_logger
@@ -78,6 +77,13 @@ def find_inequivalent_coords(structure: Structure,
 def extrema_coords(volumetric_data: VolumetricData,
                    find_min: bool,
                    params: VolumetricDataAnalyzeParams) -> DataFrame:
+    try:
+        from pymatgen.analysis.defects.utils import ChargeDensityAnalyzer
+    except ImportError:
+        logger.warning("To find the extrema of the coordinates, "
+                       "install pymatgen-analysis-defects code.")
+        raise
+
     result = ChargeDensityAnalyzer(chgcar=volumetric_data)
     result.get_local_extrema(threshold_frac=params.threshold_frac,
                              threshold_abs=params.threshold_abs,
