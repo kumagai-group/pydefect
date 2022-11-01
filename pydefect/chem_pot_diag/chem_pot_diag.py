@@ -243,7 +243,16 @@ class ChemPotDiagMaker:
                 polygons[comp] = vertices
 
         vertices = None
+
         if self.target:
+            if self.target not in polygons:
+
+                raise UnstableTargetError(f"""
+                    The target compound is unstable with respect to the 
+                    competing phases, and do not appear in the chemical 
+                    potential diagram. Currently, pydefect can be used only
+                    for stable compounds.""")
+
             target_vertices = []
             for coord in polygons[self.target]:
                 competing_phases = []
@@ -373,4 +382,8 @@ def change_element_sequence(cpd: ChemPotDiag,
 
 
 class NoElementEnergyError(PydefectError):
+    pass
+
+
+class UnstableTargetError(PydefectError):
     pass

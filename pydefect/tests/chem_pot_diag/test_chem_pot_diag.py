@@ -6,7 +6,7 @@ import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
     CompositionEnergy, CompositionEnergies, StandardEnergies, \
     RelativeEnergies, ChemPotDiagMaker, TargetVertices, TargetVertex, \
-    target_element_chem_pot, change_element_sequence
+    target_element_chem_pot, change_element_sequence, UnstableTargetError
 from pymatgen.core import Composition
 from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
@@ -130,6 +130,14 @@ def test_cpd_maker_chem_pot_diag(cpd_maker):
                                      'MgO2': [[0.0, -4.5], [-9.0, 0.0]],
                                      'O': [[min_val, 0.0], [-9.0, 0.0]]})
     assert actual == expected
+
+
+def test_chem_pot_diag_maker_for_unstable_target_compound():
+    cpd_maker = ChemPotDiagMaker(RelativeEnergies({"MgO": 0.1}),
+                                 elements=["Mg", "O"],
+                                 target="MgO")
+    with pytest.raises(UnstableTargetError):
+        cpd_maker.chem_pot_diag
 
 
 @pytest.fixture
