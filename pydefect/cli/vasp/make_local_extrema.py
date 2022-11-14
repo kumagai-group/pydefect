@@ -15,7 +15,6 @@ from pymatgen.core import Element, Structure
 from pymatgen.io.vasp import VolumetricData, Chgcar
 from scipy.cluster.hierarchy import linkage, fcluster
 from scipy.spatial.distance import squareform
-from skimage.feature import peak_local_max
 from vise.util.logger import get_logger
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
