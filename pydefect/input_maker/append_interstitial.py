@@ -28,6 +28,11 @@ def append_interstitial(supercell_info: SupercellInfo,
     """
     if supercell_info.unitcell_structure and \
             supercell_info.unitcell_structure != unitcell_structure:
+        print(f"""Unitcell in the supercell_info.json
+{supercell_info.unitcell_structure}
+"-----------------------------------"
+"The given unitcell"
+{unitcell_structure}""")
         raise NotPrimitiveError
 
     if isinstance(frac_coords[0], float):
