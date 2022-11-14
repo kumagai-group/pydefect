@@ -109,7 +109,7 @@ def append_interstitial_to_supercell_info(args):
     supercell_info = append_interstitial(args.supercell_info,
                                          args.base_structure,
                                          [args.frac_coords],
-                                         args.info)
+                                         [args.info])
     supercell_info.to_json_file()
 
 
