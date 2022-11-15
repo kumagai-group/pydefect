@@ -124,10 +124,9 @@ def test_relative_energies_phase_diagram():
                       PDEntry(Composition("O"), 0.0): 0.5},
                      4.0)}
     assert rel_energies.unstable_compounds == expected
-
     expected = """|        |   composition | E above hull   | decompose to (ratio)   |
 |--------+---------------+----------------+------------------------|
-| Mg1 O3 |             4 | Mg1 O1 (0.5)   | O1 (0.5)               |"""
+| Mg1 O3 |             4 | Mg1 O1 (0.500) | O1 (0.500)             |"""
     assert rel_energies.unstable_comp_info == expected
 
 

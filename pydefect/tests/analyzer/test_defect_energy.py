@@ -61,31 +61,12 @@ is_shallow: """
     assert_yaml_roundtrip(defect_energy_info2, tmpdir, expected_text)
 
 
-@pytest.fixture
-def defect_energies():
-    return DefectEnergies(
-        atom_io={"O": -1},
-        charges=[0, 1, 2],
-        defect_energies=[DefectEnergy(1.0, {"corr": 2.0}, is_shallow=False),
-                         DefectEnergy(2.0, {"corr": 2.0}, is_shallow=False),
-                         DefectEnergy(3.0, {"corr": 2.0}, is_shallow=True)])
-
-
 def test_defect_energies_charge_energy_pairs(defect_energies):
     actual = defect_energies.charge_energy_pairs
     expected = [(0, DefectEnergy(1.0, {"corr": 2.0}, is_shallow=False)),
                 (1, DefectEnergy(2.0, {"corr": 2.0}, is_shallow=False)),
                 (2, DefectEnergy(3.0, {"corr": 2.0}, is_shallow=True))]
     assert actual == expected
-
-
-@pytest.fixture
-def defect_energy_summary(defect_energies):
-    return DefectEnergySummary(
-        title="MgAl2O4",
-        defect_energies={"Va_O1": defect_energies},
-        rel_chem_pots={"A": {"O": -1.0}, "B": {"O": -2.0}},
-        cbm=2.0, supercell_vbm=-1.0, supercell_cbm=3.0)
 
 
 def test_defect_energy_summary_json_roundtrip(defect_energy_summary, tmpdir):

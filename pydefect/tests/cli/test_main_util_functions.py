@@ -3,12 +3,15 @@
 from argparse import Namespace
 from pathlib import Path
 
+import pytest
 from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.defect_energy import DefectEnergySummary, DefectEnergies, \
+    DefectEnergy
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergies, \
     CompositionEnergy
 from pydefect.cli.main_util_functions import composition_energies_from_mp, \
     make_gkfo_correction_from_vasp, add_interstitials_from_local_extrema, \
-    make_defect_vesta_file
+    make_defect_vesta_file, show_u_values
 from pydefect.corrections.efnv_correction import ExtendedFnvCorrection
 from pymatgen.core import Composition
 
@@ -28,6 +31,15 @@ def test_composition_energies_from_mp(mocker, tmpdir):
   source: mp-1
 """
     assert actual == expected
+
+
+#TODO: refactor fixture
+
+
+def test_show_u_values(defect_energy_summary):
+    args = Namespace(defect_energy_summary=defect_energy_summary,
+                     correction=True)
+    show_u_values(args)
 
 
 def test_add_interstitials_from_local_extrema(mocker):

@@ -6,6 +6,8 @@ from math import sqrt
 from pathlib import Path
 
 import pytest
+from pydefect.analyzer.defect_energy import DefectEnergies, DefectEnergy, \
+    DefectEnergySummary
 from pydefect.analyzer.defect_structure_comparator import SiteDiff
 from pydefect.analyzer.defect_structure_info import Displacement, \
     DefectStructureInfo
@@ -413,3 +415,22 @@ def def_str_info(displacements):
                                drift_dist=0.001,
                                center=(0.38, 0.375, 0.375175),
                                displacements=displacements)
+
+
+@pytest.fixture
+def defect_energies():
+    return DefectEnergies(
+        atom_io={"O": -1},
+        charges=[0, 1, 2],
+        defect_energies=[DefectEnergy(1.0, {"corr": 2.0}, is_shallow=False),
+                         DefectEnergy(2.0, {"corr": 2.0}, is_shallow=False),
+                         DefectEnergy(3.0, {"corr": 2.0}, is_shallow=True)])
+
+
+@pytest.fixture
+def defect_energy_summary(defect_energies):
+    return DefectEnergySummary(
+        title="MgAl2O4",
+        defect_energies={"Va_O1": defect_energies},
+        rel_chem_pots={"A": {"O": -1.0}, "B": {"O": -2.0}},
+        cbm=2.0, supercell_vbm=-1.0, supercell_cbm=3.0)
