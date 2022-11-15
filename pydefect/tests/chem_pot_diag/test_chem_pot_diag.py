@@ -7,6 +7,7 @@ from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
     CompositionEnergy, CompositionEnergies, StandardEnergies, \
     RelativeEnergies, ChemPotDiagMaker, TargetVertices, TargetVertex, \
     target_element_chem_pot, change_element_sequence, UnstableTargetError
+from pymatgen.analysis.phase_diagram import PhaseDiagram, PDEntry
 from pymatgen.core import Composition
 from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
@@ -50,7 +51,7 @@ def test_composition_energies_from_dict():
     actual = CompositionEnergies.from_dict({"Mg": -1.0})
     expected = CompositionEnergies({Composition("Mg"): CompositionEnergy(-1.0)})
     assert actual == expected
-    actual = actual.std_rel_energies
+    assert actual.std_rel_energies == ({'Mg': -1.0}, {})
 
 
 def test_composition_energies_elements(composition_energies):
@@ -114,6 +115,20 @@ def test_relative_energies_comp_energies_w_element(relative_energies):
     actual = relative_energies.comp_energies_with_element(element="Al")
     expected = {"MgAlO2": -1.0}
     assert actual == expected
+
+
+def test_relative_energies_phase_diagram():
+    rel_energies = RelativeEnergies({"MgO": -20.0, "MgO3": -4.0})
+    expected = {PDEntry(Composition("MgO3"), energy=-4.0):
+                    ({PDEntry(Composition("MgO"), -20.0): 0.5,
+                      PDEntry(Composition("O"), 0.0): 0.5},
+                     4.0)}
+    assert rel_energies.unstable_compounds == expected
+
+    expected = """|        |   composition | E above hull   | decompose to (ratio)   |
+|--------+---------------+----------------+------------------------|
+| Mg1 O3 |             4 | Mg1 O1 (0.5)   | O1 (0.5)               |"""
+    assert rel_energies.unstable_comp_info == expected
 
 
 @pytest.fixture

@@ -11,8 +11,10 @@ import yaml
 from monty.json import MSONable
 from monty.serialization import loadfn
 from pydefect.error import PydefectError
+from pymatgen.analysis.phase_diagram import PhaseDiagram, PDEntry
 from pymatgen.core import Composition
 from scipy.spatial.qhull import HalfspaceIntersection
+from tabulate import tabulate
 from vise.util.logger import get_logger
 from vise.util.mix_in import ToYamlFileMixIn, ToJsonFileMixIn
 
@@ -138,7 +140,30 @@ def target_element_chem_pot(comp: Union[Composition, str],
 
 
 class RelativeEnergies(CpdAbstractEnergies):
-    #TODO: add stability
+    @property
+    def phase_diagram(self) -> PhaseDiagram:
+        entries = [PDEntry(Composition(e), 0.0) for e in self.all_element_set]
+        for comp_name, e in self.items():
+            entries.append(PDEntry(Composition(comp_name), e))
+        return PhaseDiagram(entries=entries)
+
+    @property
+    def unstable_compounds(self):
+        result = {}
+        phase_diagram = self.phase_diagram
+        for uc in phase_diagram.unstable_entries:
+            result[uc] = phase_diagram.get_decomp_and_e_above_hull(uc)
+        return result
+
+    @property
+    def unstable_comp_info(self):
+        result = []
+        for comp, (decomp, e_above_hull) in self.unstable_compounds.items():
+            decomp_list = [f"{d.composition} ({ratio})" for d, ratio in decomp.items()]
+            result.append([comp.composition, e_above_hull] + decomp_list)
+        headers = ["composition", "E above hull", "decompose to (ratio)"]
+        return tabulate(result, headers, "orgtbl")
+
     @property
     def all_element_set(self) -> Set[str]:
         return set().union(*[comp_to_element_set(c) for c in self])
@@ -211,10 +236,10 @@ class ChemPotDiagMaker:
         hs = HalfspaceIntersection(np.array(half_spaces), feasible_point)
         self.vertices: List[List[float]] = hs.intersections.tolist()
 
-    def _is_composition_involved(self,
-                                 coord: List[float],
-                                 composition: str,
-                                 energy: float) -> bool:
+    def _does_composition_exist_in_cpd(self,
+                                       coord: List[float],
+                                       composition: str,
+                                       energy: float) -> bool:
         atom_frac = atomic_fractions(composition, self.elements)
         diff = sum([x * y for x, y in zip(atom_frac, coord)]) - energy
         # If this is too small, the creation of cpd may fail.
@@ -235,7 +260,7 @@ class ChemPotDiagMaker:
         for comp, energy in host_energies.items():
             vertices = []
             for coord in self.vertices:
-                if self._is_composition_involved(coord, comp, energy):
+                if self._does_composition_exist_in_cpd(coord, comp, energy):
                     vertex = [round(c, ndigits=5) if c != LargeMinusNumber
                               else self._min_energy_range() for c in coord]
                     vertices.append(vertex)
