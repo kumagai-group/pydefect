@@ -4,6 +4,7 @@ from argparse import Namespace
 from pathlib import Path
 
 from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.defect_energy import DefectEnergySummary
 from pydefect.analyzer.unitcell import Unitcell
 from pydefect.cli.main_util import parse_args_main_util
 from pydefect.corrections.efnv_correction import \
@@ -18,6 +19,31 @@ def test_make_cpd_options():
     expected = Namespace(
         elements=["Mg", "O"],
         atom_energy_yaml="atom_energies.yaml",
+        func=parsed_args.func)
+    assert parsed_args == expected
+
+
+def test_show_u_values(mocker):
+    mock_summary = mocker.Mock(spec=DefectEnergySummary, autospec=True)
+
+    def side_effect(filename):
+        if filename == "defect_energy_summary.json":
+            return mock_summary
+        else:
+            raise ValueError
+
+    # because add_sub_parser is imported from main, patch to loadfn should be
+    # done in main.
+    mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
+    parsed_args = parse_args_main_util(["u",
+                                        "-d", "defect_energy_summary.json",
+                                        "--allow_shallow",
+                                        "--no_corrections"])
+
+    expected = Namespace(
+        defect_energy_summary=mock_summary,
+        allow_shallow=True,
+        with_corrections=False,
         func=parsed_args.func)
     assert parsed_args == expected
 

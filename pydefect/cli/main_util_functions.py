@@ -3,9 +3,7 @@
 from pathlib import Path
 
 from monty.serialization import loadfn
-from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy_util import u_values_from_defect_energies
-from pydefect.cli.main_functions import get_calc_results
 from pydefect.cli.main_tools import parse_dirs
 from pydefect.cli.make_defect_vesta_file import MakeDefectVestaFile
 from pydefect.cli.vasp.make_composition_energies_from_mp import \
@@ -27,13 +25,17 @@ def composition_energies_from_mp(args) -> None:
 
 def show_u_values(args) -> None:
     defect_energies = args.defect_energy_summary.defect_energies
-    u_values = u_values_from_defect_energies(defect_energies, args.correction)
+    u_values = u_values_from_defect_energies(defect_energies,
+                                             args.with_corrections)
     result = []
     for name, u_vas in u_values.items():
         for charges, u_val in u_vas.items():
             result.append([name, charges, u_val])
-    logger.info("The U values are as follows:")
-    print(tabulate(result))
+    if result:
+        logger.info("The U values are as follows:")
+        print(tabulate(result))
+    else:
+        logger.info("No U values are obtained.")
 
 
 def add_interstitials_from_local_extrema(args) -> None:

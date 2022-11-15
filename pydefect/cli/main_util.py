@@ -9,7 +9,7 @@ from monty.serialization import loadfn
 from pydefect.cli.main import description, epilog, add_sub_parser
 from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp, \
     composition_energies_from_mp, add_interstitials_from_local_extrema, \
-    make_defect_vesta_file
+    make_defect_vesta_file, show_u_values
 from pydefect.defaults import defaults
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
@@ -42,6 +42,16 @@ def parse_args_main_util(args):
         help="Yaml file storing atom energies for energy alignment.")
 
     parser_comp_es_from_mp.set_defaults(func=composition_energies_from_mp)
+
+    # -- show u values ------------------------------------------
+    parser_show_u_values = subparsers.add_parser(
+        name="show_u_values",
+        description="Show U values for defects.",
+        parents=[add_sub_parser(argparse, "defect_energy_summary")],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['u'])
+
+    parser_show_u_values.set_defaults(func=show_u_values)
 
     # -- add interstitials from local extrema ----------------------------------
     parser_ai = subparsers.add_parser(

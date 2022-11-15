@@ -38,7 +38,8 @@ def test_composition_energies_from_mp(mocker, tmpdir):
 
 def test_show_u_values(defect_energy_summary):
     args = Namespace(defect_energy_summary=defect_energy_summary,
-                     correction=True)
+                     with_corrections=True,
+                     allow_shallow=True)
     show_u_values(args)
 
 

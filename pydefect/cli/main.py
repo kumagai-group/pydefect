@@ -68,6 +68,16 @@ def add_sub_parser(_argparse, name: str):
             "-v", "--verbose",
             action="store_true",  dest="verbose",
             help="Select if one wants to show traceback.")
+    elif name == "defect_energy_summary":
+        result.add_argument(
+            "-d", "--defect_energy_summary", required=True, type=loadfn,
+            help="defect_energy_summary.json file path.")
+        result.add_argument(
+            "--allow_shallow", action="store_true",
+            help="Set when the energies of shallow defects are allowed.")
+        result.add_argument(
+            "--no_corrections", dest="with_corrections", action="store_false",
+            help="Set when corrections are switched off.")
     else:
         raise ValueError
     return result
@@ -87,6 +97,7 @@ def parse_args_main(args):
     pcr_parser = add_sub_parser(argparse, name="perfect_calc_results")
     pbes_parser = add_sub_parser(argparse, name="perfect_band_edge_state")
     no_calc_results = add_sub_parser(argparse, name="no_calc_results_check")
+    defect_e_sum_parser = add_sub_parser(argparse, "defect_energy_summary")
 
     # -- make_standard_and_relative_energies -----------------------------------
     parser_make_standard_and_relative_energies = subparsers.add_parser(
@@ -301,23 +312,15 @@ def parse_args_main(args):
     parser_plot_energy = subparsers.add_parser(
         name="plot_defect_formation_energy",
         description="Show and plot defect formation energies.",
+        parents=[defect_e_sum_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pe'])
 
-    parser_plot_energy.add_argument(
-        "-d", "--defect_energy_summary", required=True, type=loadfn,
-        help="defect_energy_summary.json file path.")
     parser_plot_energy.add_argument(
         "-l", "--label", type=str, help="Label")
     parser_plot_energy.add_argument(
         "-y", "--y_range", nargs=2, type=float,
         help="Energy range in y-axis")
-    parser_plot_energy.add_argument(
-        "--allow_shallow", action="store_true",
-        help="Set when the energies of shallow defects are allowed.")
-    parser_plot_energy.add_argument(
-        "--no_corrections", dest="with_corrections", action="store_false",
-        help="Set when corrections are switched off.")
     parser_plot_energy.add_argument(
         "--no_label_line", dest="label_line", action="store_false",
         help="Set the labels not to locate on the lines.")
