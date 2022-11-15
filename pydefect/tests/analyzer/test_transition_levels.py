@@ -22,7 +22,14 @@ def test_make_transition_levels(cross_points):
 
 def test_show_transition_levels():
     tl1 = TransitionLevel("Va_O1", [[2, 1], [1, 0]],
-                         [1.23456789, 2.23456789], [3.23456789, 4.23456789])
+                          [1.23456789, 2.23456789], [3.23456789, 4.23456789])
     tl2 = TransitionLevel("Va_Mg1", [[-2, -1], [-1, 0]],
-                         [10.23456789, 20.23456789], [30.23456789, 40.23456789])
-    print(show_transition_levels([tl1, tl2]))
+                          [10.2345678, 20.2345678], [30.2345678, 40.2345678])
+    actual = show_transition_levels([tl1, tl2])
+    expected = """name    charges      Fermi level    Formation energy
+------  ---------  -------------  ------------------
+Va_O1   2 | 1            3.23457             1.23457
+        1 | 0            4.23457             2.23457
+Va_Mg1  -2 | -1         30.2346             10.2346
+        -1 | 0          40.2346             20.2346"""
+    assert actual == expected
