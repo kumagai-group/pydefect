@@ -195,7 +195,7 @@ def test_calc_defect_structure_info(mocker, tmpdir, supercell_info):
         "Va_O1_2/defect_structure_info.json")
 
 
-def test_make_efnv_correction_from_vasp(tmpdir, mocker):
+def test_make_efnv_correction_from_vasp(mocker):
     mock_defect_entry = mocker.Mock(spec=DefectEntry, autospec=True)
     mock_calc_results = mocker.Mock(spec=CalcResults, autospec=True)
 

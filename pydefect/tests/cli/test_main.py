@@ -265,7 +265,7 @@ def test_plot_defect_formation_energy(mocker):
     parsed_args = parse_args_main([
         "pe", "-d", "defect_energy_summary.json", "-l", "A", "-y", "-5", "5",
         "--allow_shallow", "--no_corrections", "--no_label_line",
-        "--no_add_charges"])
+        "--no_add_charges", "--plot_all_energies"])
 
     expected = Namespace(
         defect_energy_summary=mock_summary,
@@ -275,6 +275,7 @@ def test_plot_defect_formation_energy(mocker):
         with_corrections=False,
         label_line=False,
         add_charges=False,
+        plot_all_energies=True,
         func=parsed_args.func)
     assert parsed_args == expected
 

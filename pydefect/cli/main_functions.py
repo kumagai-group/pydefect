@@ -253,6 +253,7 @@ def plot_defect_energy(args):
         allow_shallow=args.allow_shallow,
         with_corrections=args.with_corrections,
         label_line=args.label_line,
-        add_charges=args.add_charges)
+        add_charges=args.add_charges,
+        add_thin_lines=args.plot_all_energies)
     plotter.construct_plot()
     plotter.plt.savefig(f"energy_{args.label}.pdf")

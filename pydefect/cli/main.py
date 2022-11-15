@@ -317,7 +317,7 @@ def parse_args_main(args):
         aliases=['pe'])
 
     parser_plot_energy.add_argument(
-        "-l", "--label", type=str, help="Label")
+        "-l", "--label", type=str, help="Label", required=True)
     parser_plot_energy.add_argument(
         "-y", "--y_range", nargs=2, type=float,
         help="Energy range in y-axis")
@@ -326,6 +326,9 @@ def parse_args_main(args):
         help="Set the labels not to locate on the lines.")
     parser_plot_energy.add_argument(
         "--no_add_charges", dest="add_charges", action="store_false",
+        help="Set the charges not to appear.")
+    parser_plot_energy.add_argument(
+        "--plot_all_energies", dest="plot_all_energies", action="store_true",
         help="Set the charges not to appear.")
     parser_plot_energy.set_defaults(func=plot_defect_energy)
     # ------------------------------------------------------------------------
