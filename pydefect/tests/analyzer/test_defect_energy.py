@@ -96,8 +96,7 @@ Va_O1   O: -1             0     1.000         2.000  False
     assert actual == expected
 
 
-def test_defect_energy_summary_charge_energies(
-        defect_energy_summary, defect_energies):
+def test_defect_energy_summary_charge_energies(defect_energy_summary):
     actual = defect_energy_summary.charge_energies(
         chem_pot_label="A", allow_shallow=True, with_corrections=False, e_range=(0.0, 2.0))
     expected = ChargeEnergies(
@@ -130,7 +129,7 @@ def test_defect_energy_summary_charge_energies(
     assert actual == expected
 
 
-def test_cross_points_dicts():
+def test_cross_points_e_max_energies_dicts():
     charge_energies = ChargeEnergies(
         charge_energies_dict={"Va_Mg": SingleChargeEnergies([(0, 2.0)]),
                               "Va_O": SingleChargeEnergies([(1, 1.0)])},
@@ -140,6 +139,10 @@ def test_cross_points_dicts():
                                      boundary_points=[[0.0, 2.0], [2.0, 2.0]]),
                 "Va_O": CrossPoints(inner_cross_points=[],
                                     boundary_points=[[0.0, 1.0], [2.0, 3.0]])}
+    assert actual == expected
+
+    actual = charge_energies.e_min_max_energies_dict
+    expected = {"Va_Mg": [[2.0, 2.0]], "Va_O": [[1.0, 3.0]]}
     assert actual == expected
 
 

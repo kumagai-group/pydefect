@@ -16,6 +16,7 @@ class DefectEnergiesMplSettings:
     def __init__(self,
                  colors: Optional[List[str]] = None,
                  line_width: float = 1.0,
+                 thin_line_width: float = 0.3,
                  vline_width: float = 0.5,
                  vline_color: str = "black",
                  vline_style: str = "-.",
@@ -28,6 +29,7 @@ class DefectEnergiesMplSettings:
                  charge_size: Optional[int] = 12):
         self.colors = cycle(colors) if colors else defaults.defect_energy_colors
         self.line_width = line_width
+        self.thin_line_width = thin_line_width
         self.circle_size = circle_size
         self.tick_label_size = tick_label_size
         self.title_font_size = title_font_size
@@ -64,11 +66,14 @@ class DefectEnergyPlotter:
         charge_energies = defect_energy_summary.charge_energies(
             chem_pot_label, allow_shallow, with_corrections, self._x_range,
             name_style)
+        self.with_corrections = with_corrections
         self._cross_points = charge_energies.cross_point_dicts
+        self._e_min_max_energies_dict = charge_energies.e_min_max_energies_dict
         self._y_range = y_range or charge_energies.energy_range(space=0.2)
         self._vline_threshold = vline_threshold
         self._x_unit = x_unit
         self._y_unit = y_unit
+        self._defect_energies = defect_energy_summary.screened_defect_energies(allow_shallow)
 
 
 class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
@@ -127,12 +132,14 @@ class DefectEnergyMplPlotter(DefectEnergyPlotter):
     def __init__(self,
                  label_line: bool = True,
                  add_charges: bool = True,
+                 add_thin_lines: bool = True,
                  **kwargs):
         super().__init__(name_style="mpl", **kwargs)
         self._mpl_defaults = \
             kwargs.get("mpl_defaults", DefectEnergiesMplSettings())
         self._label_line = label_line
         self._add_charges = add_charges
+        self._add_thin_lines = add_thin_lines
         self.plt = plt
         self._texts = []
 
@@ -172,6 +179,11 @@ class DefectEnergyMplPlotter(DefectEnergyPlotter):
                     [self.plt.text(x, y, charge, color=color,
                                    fontsize=self._mpl_defaults.charge_size)
                      for charge, (x, y) in cp.annotated_charge_positions.items()])
+
+            if self._add_thin_lines:
+                for es in self._e_min_max_energies_dict[name]:
+                    self.plt.plot(self._x_range, es, color=color,
+                                  linewidth=self._mpl_defaults.thin_line_width)
 
     def _set_x_range(self):
         self.plt.xlim(self._x_range)

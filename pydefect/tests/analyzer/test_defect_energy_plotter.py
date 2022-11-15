@@ -45,7 +45,8 @@ def test_defect_energies_mpl_plot(defect_energy_summary):
         defect_energy_summary=defect_energy_summary,
         chem_pot_label="A",
         allow_shallow=True,
-        with_corrections=True)
+        with_corrections=True,
+        add_thin_lines=True)
     plotter.construct_plot()
     plotter.plt.show()
 

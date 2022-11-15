@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from copy import copy
 from dataclasses import dataclass
 from itertools import combinations
 from typing import List, Dict, Optional, Tuple
@@ -85,6 +86,18 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
     supercell_cbm: float
     """ The base Fermi level is set at the VBM."""
 
+    def screened_defect_energies(self, allow_shallow: bool):
+        result = {}
+        for name, des in self.defect_energies.items():
+            charges, defect_energies = [], []
+            for c, de in zip(des.charges, des.defect_energies):
+                if allow_shallow or \
+                        (allow_shallow is False and de.is_shallow is False):
+                    charges.append(c)
+                    defect_energies.append(de)
+            result[name] = DefectEnergies(des.atom_io, charges, defect_energies)
+        return result
+
     def __str__(self):
         lines = [f"title: {numbers_to_lowercases(self.title)}",
                  "rel_chem_pots:"]
@@ -127,11 +140,9 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
         #TODO: generate logger.info when e_min < supercell_vbm.
         rel_chem_pot = self.rel_chem_pots[chem_pot_label]
         result = {}
-        for k, v in self.defect_energies.items():
+        for k, v in self.screened_defect_energies(allow_shallow).items():
             x = []
             for c, e in zip(v.charges, v.defect_energies):
-                if allow_shallow is False and e.is_shallow is True:
-                    continue
                 reservoir_e = sum([-diff * rel_chem_pot[elem]
                                   for elem, diff in v.atom_io.items()])
                 x.append((c, e.energy(with_corrections) + reservoir_e))
@@ -139,7 +150,8 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
             if x:
                 result[k] = SingleChargeEnergies(x)
 
-        return ChargeEnergies(prettify_names(result, name_style), e_range[0], e_range[1])
+        return ChargeEnergies(prettify_names(result, name_style),
+                              e_range[0], e_range[1])
 
     @property
     def latexified_title(self):
@@ -155,11 +167,15 @@ class ChargeEnergies:
     # change to lazy evaluation?
     def __post_init__(self):
         self.cross_point_dicts = {}
+        self.e_min_max_energies_dict = {}
         large_minus_number = -1e4
         for name, ce in self.charge_energies_dict.items():
             half_spaces = []
-            for charge, corr_energy in ce.charge_energies:
-                half_spaces.append([-charge, 1, -corr_energy])
+            e_min_max_energies = []
+            for charge, energy in ce.charge_energies:
+                half_spaces.append([-charge, 1, -energy])
+                e_min_max_energies.append([energy,
+                                           energy + self.e_max * charge])
 
             half_spaces.append([-1, 0, self.e_min])
             half_spaces.append([1, 0, -self.e_max])
@@ -179,6 +195,7 @@ class ChargeEnergies:
 
             self.cross_point_dicts[name] = CrossPoints(inner_cross_points,
                                                        boundary_points)
+            self.e_min_max_energies_dict[name] = e_min_max_energies
 
     def energy_range(self, space: float) -> List[float]:
         candidates = []
