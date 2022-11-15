@@ -175,12 +175,6 @@ def test_charge_energies_energy_range(charge_energies):
     assert actual == expected
 
 
-def test_charge_energies_transition_levels(single_charge_energies):
-    actual = single_charge_energies.transition_levels
-    expected = {(0, 1): 3.0}
-    assert actual == expected
-
-
 def test_charge_energies_pinning_level(single_charge_energies):
     assert single_charge_energies.pinning_level(1.0, 6.0) == (None, None)
     ce = SingleChargeEnergies(charge_energies=[(0, 6.0), (1, 3.0)])

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from copy import copy
 from dataclasses import dataclass
-from itertools import combinations
 from typing import List, Dict, Optional, Tuple
 
 import numpy as np
@@ -207,13 +205,6 @@ class ChargeEnergies:
 @dataclass
 class SingleChargeEnergies:
     charge_energies: List[Tuple[int, float]]
-
-    @property
-    def transition_levels(self) -> Dict[Tuple[int, int], float]:
-        result = {}
-        for (c1, e1), (c2, e2) in combinations(self.charge_energies, 2):
-            result[(c1, c2)] = - (e1 - e2) / (c1 - c2)
-        return result
 
     def pinning_level(self, e_min, e_max
                       ) -> Tuple[Tuple[float, Optional[int]],
