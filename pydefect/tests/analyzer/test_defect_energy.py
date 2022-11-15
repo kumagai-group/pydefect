@@ -71,6 +71,14 @@ def defect_energies():
                          DefectEnergy(3.0, {"corr": 2.0}, is_shallow=True)])
 
 
+def test_defect_energies_charge_energy_pairs(defect_energies):
+    actual = defect_energies.charge_energy_pairs
+    expected = [(0, DefectEnergy(1.0, {"corr": 2.0}, is_shallow=False)),
+                (1, DefectEnergy(2.0, {"corr": 2.0}, is_shallow=False)),
+                (2, DefectEnergy(3.0, {"corr": 2.0}, is_shallow=True))]
+    assert actual == expected
+
+
 @pytest.fixture
 def defect_energy_summary(defect_energies):
     return DefectEnergySummary(

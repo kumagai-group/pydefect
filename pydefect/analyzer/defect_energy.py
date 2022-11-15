@@ -73,6 +73,10 @@ class DefectEnergies(MSONable):
     def to_yaml(self):
         pass
 
+    @property
+    def charge_energy_pairs(self):
+        return list(zip(self.charges, self.defect_energies))
+
 
 @dataclass
 class DefectEnergySummary(MSONable, ToJsonFileMixIn):
