@@ -9,8 +9,12 @@ from monty.serialization import loadfn
 from pydefect.util.prepare_names import prettify_names
 from scipy.spatial import HalfspaceIntersection
 from tabulate import tabulate
+from vise.util.logger import get_logger
 from vise.util.mix_in import ToJsonFileMixIn, ToYamlFileMixIn
 from vise.util.string import latexify, numbers_to_lowercases
+
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -84,6 +88,11 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
     supercell_cbm: float
     """ The base Fermi level is set at the VBM."""
 
+    def __post_init__(self):
+        if self.supercell_cbm < self.cbm - 0.01:
+            logger.warning(f"Supercell CBM {self.supercell_cbm} is lower in "
+                           f"energy than the unitcell CBM {self.cbm}")
+
     def screened_defect_energies(self, allow_shallow: bool):
         result = {}
         for name, des in self.defect_energies.items():
@@ -126,8 +135,6 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
 
         return "\n".join(lines)
 
-    # TODO: when making this class, if all the defect charges show shallow
-    # show warning.
     def charge_energies(self,
                         chem_pot_label: str,
                         allow_shallow: bool,
@@ -139,6 +146,9 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
         rel_chem_pot = self.rel_chem_pots[chem_pot_label]
         result = {}
         for k, v in self.screened_defect_energies(allow_shallow).items():
+            if not v:
+                logger.info(f"defect {k} has no energy data.")
+                continue
             x = []
             for c, e in zip(v.charges, v.defect_energies):
                 reservoir_e = sum([-diff * rel_chem_pot[elem]
