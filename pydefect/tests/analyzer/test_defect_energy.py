@@ -61,14 +61,6 @@ is_shallow: """
     assert_yaml_roundtrip(defect_energy_info2, tmpdir, expected_text)
 
 
-def test_defect_energies_charge_energy_pairs(defect_energies):
-    actual = defect_energies.charge_energy_pairs
-    expected = [(0, DefectEnergy(1.0, {"corr": 2.0}, is_shallow=False)),
-                (1, DefectEnergy(2.0, {"corr": 2.0}, is_shallow=False)),
-                (2, DefectEnergy(3.0, {"corr": 2.0}, is_shallow=True))]
-    assert actual == expected
-
-
 def test_defect_energy_summary_json_roundtrip(defect_energy_summary, tmpdir):
     assert_json_roundtrip(defect_energy_summary, tmpdir)
 
