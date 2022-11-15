@@ -57,6 +57,9 @@ def make_standard_and_relative_energies(args):
     std_energies, rel_energies = comp_energies.std_rel_energies
     std_energies.to_yaml_file()
     rel_energies.to_yaml_file()
+    if rel_energies.unstable_compounds:
+        logger.info("The unstable compound information is shown below.")
+        print(rel_energies.unstable_comp_info)
 
 
 def make_cpd_and_vertices(args):

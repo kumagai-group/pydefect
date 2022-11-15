@@ -159,7 +159,8 @@ class RelativeEnergies(CpdAbstractEnergies):
     def unstable_comp_info(self):
         result = []
         for comp, (decomp, e_above_hull) in self.unstable_compounds.items():
-            decomp_list = [f"{d.composition} ({ratio})" for d, ratio in decomp.items()]
+            decomp_list = [f"{d.composition} ({ratio:.3f})"
+                           for d, ratio in decomp.items()]
             result.append([comp.composition, e_above_hull] + decomp_list)
         headers = ["composition", "E above hull", "decompose to (ratio)"]
         return tabulate(result, headers, "orgtbl")
