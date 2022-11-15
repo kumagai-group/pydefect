@@ -16,19 +16,33 @@ class TransitionLevel:
     fermi_levels: List[float]
 
 
-def make_transition_levels(cross_point_dicts: Dict[str, CrossPoints]):
-    result = []
+@dataclass
+class TransitionLevels:
+    transition_levels: List[TransitionLevel]
+    cbm: float
+    supercell_vbm: float
+    supercell_cbm: float
+
+
+def make_transition_levels(cross_point_dicts: Dict[str, CrossPoints],
+                           cbm: float,
+                           supercell_vbm: float,
+                           supercell_cbm: float) -> TransitionLevels:
+    transition_levels = []
     for name, cross_point in cross_point_dicts.items():
-        charges = cross_point.charge_list[1:-1]
+        charges = [list(i) for i in cross_point.charge_list[1:-1]]
         energies = cross_point.t_inner_cross_points[1]
         fermi_levels = cross_point.t_inner_cross_points[0]
-        result.append(TransitionLevel(name, charges, energies, fermi_levels))
-    return result
+        transition_levels.append(
+            TransitionLevel(name, charges, energies, fermi_levels))
+
+    return TransitionLevels(
+        transition_levels, cbm, supercell_vbm, supercell_cbm)
 
 
-def show_transition_levels(transition_levels: List[TransitionLevel]):
+def show_transition_levels(transition_levels: TransitionLevels):
     result = []
-    for tl in transition_levels:
+    for tl in transition_levels.transition_levels:
         for name, charge, energy, fermi in zip_longest(
                 [tl.name], tl.charges, tl.energies, tl.fermi_levels,
                 fillvalue=""):
