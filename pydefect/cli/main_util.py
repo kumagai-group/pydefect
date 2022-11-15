@@ -25,7 +25,6 @@ def parse_args_main_util(args):
     dirs_parser = add_sub_parser(argparse, name="dirs")
     unitcell_parser = add_sub_parser(argparse, name="unitcell")
     si_parser = add_sub_parser(argparse, name="supercell_info")
-    no_calc_results = add_sub_parser(argparse, name="no_calc_results_check")
 
     # -- composition energies from mp ------------------------------------------
     parser_comp_es_from_mp = subparsers.add_parser(

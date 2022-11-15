@@ -81,6 +81,7 @@ class DefectEnergies(MSONable):
 @dataclass
 class DefectEnergySummary(MSONable, ToJsonFileMixIn):
     title: str
+    # key is a defect name such as "Va_O1".
     defect_energies: Dict[str, "DefectEnergies"]
     rel_chem_pots: Dict[str, Dict[str, float]]
     cbm: float
