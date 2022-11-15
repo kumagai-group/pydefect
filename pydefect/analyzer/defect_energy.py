@@ -304,10 +304,4 @@ class CrossPoints:
             result[charge] = [(x1 + x2) / 2, (y1 + y2) / 2]
         return result
 
-    def __str__(self):
-        lines = []
-        for point in self.all_sorted_points:
-            lines.append(f"{point[0]:12.4f} {point[1]:12.4f}")
-        return "\n".join(lines)
-
 

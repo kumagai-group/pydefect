@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from copy import deepcopy
 
 import pytest
 
@@ -203,11 +202,4 @@ def test_cross_points(cross_points):
     assert cross_points.annotated_charge_positions == \
            {20: [1.5, 20], 10: [2.5, 35], 0: [3.5, 40]}
 
-
-def test_cross_points_str(cross_points):
-    expected = """      1.0000      10.0000
-      2.0000      30.0000
-      3.0000      40.0000
-      4.0000      40.0000"""
-    assert str(cross_points) == expected
 
