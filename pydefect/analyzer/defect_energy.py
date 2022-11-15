@@ -93,7 +93,8 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
             logger.warning(f"Supercell CBM {self.supercell_cbm} is lower in "
                            f"energy than the unitcell CBM {self.cbm}")
 
-    def screened_defect_energies(self, allow_shallow: bool):
+    def screened_defect_energies(self, allow_shallow: bool
+                                 ) -> Dict[str, DefectEnergies]:
         result = {}
         for name, des in self.defect_energies.items():
             charges, defect_energies = [], []
@@ -140,25 +141,26 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
                         allow_shallow: bool,
                         with_corrections: bool,
                         e_range: Tuple[float, float],
-                        name_style: Optional[str] = None,
+                        name_style: Optional[str] = None
                         ) -> "ChargeEnergies":
-        #TODO: generate logger.info when e_min < supercell_vbm.
+
         rel_chem_pot = self.rel_chem_pots[chem_pot_label]
-        result = {}
+        charge_energies_dict = {}
         for k, v in self.screened_defect_energies(allow_shallow).items():
             if not v:
                 logger.info(f"defect {k} has no energy data.")
                 continue
-            x = []
-            for c, e in zip(v.charges, v.defect_energies):
+            charge_energies = []
+            for charge, defect_energy in zip(v.charges, v.defect_energies):
                 reservoir_e = sum([-diff * rel_chem_pot[elem]
                                   for elem, diff in v.atom_io.items()])
-                x.append((c, e.energy(with_corrections) + reservoir_e))
+                energy = defect_energy.energy(with_corrections) + reservoir_e
+                charge_energies.append((charge, energy))
 
-            if x:
-                result[k] = SingleChargeEnergies(x)
+            if charge_energies:
+                charge_energies_dict[k] = SingleChargeEnergies(charge_energies)
 
-        return ChargeEnergies(prettify_names(result, name_style),
+        return ChargeEnergies(prettify_names(charge_energies_dict, name_style),
                               e_range[0], e_range[1])
 
     @property
