@@ -3,7 +3,9 @@
 from pathlib import Path
 
 from monty.serialization import loadfn
+from pydefect.analyzer.defect_energy import DefectEnergySummary
 from pydefect.analyzer.defect_energy_util import u_values_from_defect_energies
+from pydefect.analyzer.transition_levels import make_transition_levels
 from pydefect.cli.main_tools import parse_dirs
 from pydefect.cli.make_defect_vesta_file import MakeDefectVestaFile
 from pydefect.cli.vasp.make_composition_energies_from_mp import \
@@ -36,6 +38,12 @@ def show_u_values(args) -> None:
         print(tabulate(result))
     else:
         logger.info("No U values are obtained.")
+
+
+def show_transition_levels(args) -> None:
+    de: DefectEnergySummary = args.defect_energy_summary
+    cpd = de.charge_energies.cross_point_dicts
+    make_transition_levels(cpd, )
 
 
 def add_interstitials_from_local_extrema(args) -> None:

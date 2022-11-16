@@ -41,8 +41,9 @@ def test_show_transition_levels():
     expected = """vbm: 0.00, cbm: 3.00, supercell vbm: -0.10, supercell_cbm: 3.00
 name    charges      Fermi level    Formation energy
 ------  ---------  -------------  ------------------
-Va_O1   2 | 1            3.23457             1.23457
-        1 | 0            4.23457             2.23457
-Va_Mg1  -2 | -1         30.2346             10.2346
-        -1 | 0          40.2346             20.2346"""
+Va_O1   2 | 1              3.235               1.235
+        1 | 0              4.235               2.235
+Va_Mg1  -2 | -1           30.235              10.235
+        -1 | 0            40.235              20.235"""
+
     assert actual == expected

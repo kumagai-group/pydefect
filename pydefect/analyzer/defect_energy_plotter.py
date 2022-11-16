@@ -8,7 +8,9 @@ from adjustText import adjust_text
 from labellines import labelLines
 from matplotlib import pyplot as plt
 from pydefect.analyzer.defect_energy import DefectEnergySummary
+from pydefect.analyzer.transition_levels import make_transition_levels
 from pydefect.defaults import defaults
+from pydefect.util.prepare_names import prettify_names
 from vise.util.matplotlib import float_to_int_formatter
 
 
@@ -63,6 +65,17 @@ class DefectEnergyPlotter:
         self._x_range = x_range or (0, defect_energy_summary.cbm)
         defect_energy_summary.e_min = self._x_range[0]
         defect_energy_summary.e_max = self._x_range[1]
+
+        charge_energies = defect_energy_summary.charge_energies(
+            chem_pot_label, allow_shallow, with_corrections, self._x_range)
+        tls = make_transition_levels(charge_energies.cross_point_dicts,
+                                     defect_energy_summary.cbm,
+                                     self._supercell_vbm,
+                                     self._supercell_cbm)
+        tls.to_json_file()
+
+        # charge_energies needs to be run again to change name to mpl style.
+        # Need refactoring in the future.
         charge_energies = defect_energy_summary.charge_energies(
             chem_pot_label, allow_shallow, with_corrections, self._x_range,
             name_style)
@@ -73,7 +86,8 @@ class DefectEnergyPlotter:
         self._vline_threshold = vline_threshold
         self._x_unit = x_unit
         self._y_unit = y_unit
-        self._defect_energies = defect_energy_summary.screened_defect_energies(allow_shallow)
+        self._defect_energies \
+            = defect_energy_summary.screened_defect_energies(allow_shallow)
 
 
 class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
