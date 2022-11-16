@@ -173,11 +173,26 @@ class ChargeEnergies:
     charge_energies_dict: Dict[str, "SingleChargeEnergies"]
     e_min: float
     e_max: float
+    _cross_point_dicts: dict = None
+    _e_min_max_energies_dict: dict = None
 
-    # change to lazy evaluation?
-    def __post_init__(self):
-        self.cross_point_dicts = {}
-        self.e_min_max_energies_dict = {}
+    @property
+    def cross_point_dicts(self):
+        if self._cross_point_dicts:
+            return self._cross_point_dicts
+        self.calc_cross_points()
+        return self._cross_point_dicts
+
+    @property
+    def e_min_max_energies_dict(self):
+        if self._e_min_max_energies_dict:
+            return self._e_min_max_energies_dict
+        self.calc_cross_points()
+        return self._e_min_max_energies_dict
+
+    def calc_cross_points(self):
+        self._cross_point_dicts = {}
+        self._e_min_max_energies_dict = {}
         large_minus_number = -1e4
         for name, ce in self.charge_energies_dict.items():
             half_spaces = []
@@ -203,9 +218,9 @@ class ChargeEnergies:
                 elif y > large_minus_number + 1:
                     boundary_points.append([x, y])
 
-            self.cross_point_dicts[name] = CrossPoints(inner_cross_points,
-                                                       boundary_points)
-            self.e_min_max_energies_dict[name] = e_min_max_energies
+            self._cross_point_dicts[name] = CrossPoints(inner_cross_points,
+                                                        boundary_points)
+            self._e_min_max_energies_dict[name] = e_min_max_energies
 
     def energy_range(self, space: float) -> List[float]:
         candidates = []
@@ -215,7 +230,7 @@ class ChargeEnergies:
 
 
 @dataclass
-class SingleChargeEnergies:
+class SingleChargeEnergies(MSONable):
     charge_energies: List[Tuple[int, float]]
 
     def pinning_level(self, e_min, e_max
