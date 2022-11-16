@@ -3,7 +3,8 @@
 import pytest
 from pydefect.analyzer.defect_energy import CrossPoints
 from pydefect.analyzer.transition_levels import make_transition_levels, \
-    show_transition_levels, TransitionLevel, TransitionLevels
+    TransitionLevel, TransitionLevels
+from vise.tests.helpers.assertion import assert_msonable
 
 
 @pytest.fixture
@@ -13,13 +14,21 @@ def cross_points():
     return CrossPoints(inner_cross_points, boundary_points)
 
 
-def test_make_transition_levels(cross_points):
-    cross_point_dicts = {"Va_O1": cross_points}
-    actual = make_transition_levels(cross_point_dicts, 3.0, -0.1, 3.0)
-    expected = TransitionLevels(
+@pytest.fixture
+def transition_levels():
+    return TransitionLevels(
         [TransitionLevel("Va_O1", [[20, 10], [10, 0]], [30, 40], [2, 3])],
         3.0, -0.1, 3.0)
-    assert actual == expected
+
+
+def test_transition_levels_msonable(transition_levels):
+    assert_msonable(transition_levels)
+
+
+def test_make_transition_levels(cross_points, transition_levels):
+    cross_point_dicts = {"Va_O1": cross_points}
+    actual = make_transition_levels(cross_point_dicts, 3.0, -0.1, 3.0)
+    assert actual == transition_levels
 
 
 def test_show_transition_levels():
@@ -28,8 +37,9 @@ def test_show_transition_levels():
     tl2 = TransitionLevel("Va_Mg1", [[-2, -1], [-1, 0]],
                           [10.2345678, 20.2345678], [30.2345678, 40.2345678])
     tls = TransitionLevels([tl1, tl2],  3.0, -0.1, 3.0)
-    actual = show_transition_levels(tls)
-    expected = """name    charges      Fermi level    Formation energy
+    actual = tls.__str__()
+    expected = """vbm: 0.00, cbm: 3.00, supercell vbm: -0.10, supercell_cbm: 3.00
+name    charges      Fermi level    Formation energy
 ------  ---------  -------------  ------------------
 Va_O1   2 | 1            3.23457             1.23457
         1 | 0            4.23457             2.23457
