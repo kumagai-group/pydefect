@@ -7,7 +7,7 @@ from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
     CompositionEnergy, CompositionEnergies, StandardEnergies, \
     RelativeEnergies, ChemPotDiagMaker, TargetVertices, TargetVertex, \
     target_element_chem_pot, change_element_sequence, UnstableTargetError
-from pymatgen.analysis.phase_diagram import PhaseDiagram, PDEntry
+from pymatgen.analysis.phase_diagram import PDEntry
 from pymatgen.core import Composition
 from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
@@ -51,7 +51,7 @@ def test_composition_energies_from_dict():
     actual = CompositionEnergies.from_dict({"Mg": -1.0})
     expected = CompositionEnergies({Composition("Mg"): CompositionEnergy(-1.0)})
     assert actual == expected
-    assert actual.std_rel_energies == ({'Mg': -1.0}, {})
+    assert actual.std_rel_energies == ({'Mg': -1.0}, {"Mg": 0.0})
 
 
 def test_composition_energies_elements(composition_energies):
@@ -61,7 +61,8 @@ def test_composition_energies_elements(composition_energies):
 def test_std_rel_energies(composition_energies):
     actual = composition_energies.std_rel_energies
     expected_ref = StandardEnergies({"H": 0.0, "O": 1.0, "Cl": 12.0})
-    expected_rel = RelativeEnergies({'ClO': -5.0, 'ClO2': -3.666666666666667,
+    expected_rel = RelativeEnergies({"H": 0.0, "O": 0.0, "Cl": 0.0,
+                                     'ClO': -5.0, 'ClO2': -3.666666666666667,
                                      'H2O': -1.0})
     assert actual[0] == expected_ref
     assert actual[1] == expected_rel
@@ -90,12 +91,16 @@ def test_target_element_chem_pot():
 
 @pytest.fixture
 def relative_energies():
-    return RelativeEnergies({"MgO2": -3.0, "MgAlO2": -1.0})
+    return RelativeEnergies({"Mg": 0.0, "MgO2": -3.0, "MgAlO2": -1.0,
+                             "Al": 0.0, "O": 0.0})
 
 
 def test_relative_energies_yaml(relative_energies, tmpdir):
-    expected_text = """MgAlO2: -1.0
+    expected_text = """Al: 0.0
+Mg: 0.0
+MgAlO2: -1.0
 MgO2: -3.0
+O: 0.0
 """
     assert_yaml_roundtrip(relative_energies, tmpdir, expected_text,
                           compare_dict=False, compare_items=False)
@@ -107,18 +112,19 @@ def test_relative_energies_element_set(relative_energies):
 
 def test_relative_energies_related_comp_energies(relative_energies):
     actual = relative_energies.host_composition_energies(elements=["Mg", "O"])
-    expected = {"MgO2": -3.0}
+    expected = {"Mg": 0.0, "MgO2": -3.0, "O": 0.0}
     assert actual == expected
 
 
 def test_relative_energies_comp_energies_w_element(relative_energies):
     actual = relative_energies.comp_energies_with_element(element="Al")
-    expected = {"MgAlO2": -1.0}
+    expected = {"Al": 0.0, "MgAlO2": -1.0}
     assert actual == expected
 
 
 def test_relative_energies_phase_diagram():
-    rel_energies = RelativeEnergies({"MgO": -20.0, "MgO3": -4.0})
+    rel_energies = RelativeEnergies({"Mg": 0.0, "MgO": -20.0, "MgO3": -4.0,
+                                     "O": 0.0})
     expected = {PDEntry(Composition("MgO3"), energy=-4.0):
                     ({PDEntry(Composition("MgO"), -20.0): 0.5,
                       PDEntry(Composition("O"), 0.0): 0.5},

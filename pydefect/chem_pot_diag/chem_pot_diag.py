@@ -68,7 +68,7 @@ class CompositionEnergies(ToYamlFileMixIn, dict):
 
     @property
     def std_rel_energies(self) -> Tuple["StandardEnergies", "RelativeEnergies"]:
-        std, rel = StandardEnergies(), RelativeEnergies()
+        std = StandardEnergies()
         abs_energies_per_atom = {k.reduced_formula: v.energy / k.num_atoms
                                  for k, v in self.items()}
         std_energies_list = []
@@ -88,6 +88,7 @@ class CompositionEnergies(ToYamlFileMixIn, dict):
             std[vertex_element] = min_abs_energy
             std_energies_list.append(min_abs_energy)
 
+        rel = RelativeEnergies(**{e: 0.0 for e in self.elements})
         for formula, abs_energy_per_atom in abs_energies_per_atom.items():
             if Composition(formula).is_element:
                 continue
@@ -142,9 +143,8 @@ def target_element_chem_pot(comp: Union[Composition, str],
 class RelativeEnergies(CpdAbstractEnergies):
     @property
     def phase_diagram(self) -> PhaseDiagram:
-        entries = [PDEntry(Composition(e), 0.0) for e in self.all_element_set]
-        for comp_name, e in self.items():
-            entries.append(PDEntry(Composition(comp_name), e))
+        entries = [PDEntry(Composition(comp_name), e)
+                   for comp_name, e in self.items()]
         return PhaseDiagram(entries=entries)
 
     @property
