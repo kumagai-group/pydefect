@@ -160,6 +160,10 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
             if charge_energies:
                 charge_energies_dict[k] = SingleChargeEnergies(charge_energies)
 
+        if not charge_energies_dict:
+            logger.warning(f"No defect data is available. Try to switch on "
+                           f"allow_shallow flag.")
+
         return ChargeEnergies(prettify_names(charge_energies_dict, name_style),
                               e_range[0], e_range[1])
 
