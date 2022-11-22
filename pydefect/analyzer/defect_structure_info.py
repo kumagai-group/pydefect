@@ -135,12 +135,13 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
         sym_transition = f"{self.initial_site_sym} " \
                          f"-> {self.final_site_sym} ({self.symm_relation})"
         center_coords = pretty_coords(self.center)
+        drift_dist = f"{self.drift_dist:5.3f}" if self.drift_dist else "N.A."
         lines = [" -- defect structure info",
                  f"Defect type: {self.defect_type}",
                  f"Site symmetry: {sym_transition}",
                  f"Has same configuration from initial structure: "
                  f"{self.same_config_from_init}",
-                 f"Drift distance: {self.drift_dist:5.3f}",
+                 f"Drift distance: {drift_dist}",
                  f"Defect center: {center_coords}"]
 
         def _site_info(header: str, site_info: List[SiteInfo]):
