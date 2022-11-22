@@ -86,9 +86,8 @@ def test_num_hole_in_vbm(mocker):
     assert actual == pytest.approx(expected)
 
 
-def test_make_band_edge_state(p_edge_state, orb_infos):
-    actual = make_band_edge_states(orb_infos, p_edge_state)
-
+@pytest.fixture
+def band_edge_states():
     vbm_info = EdgeInfo(band_idx=9, kpt_coord=(0.0, 0.0, 0.0),
                         orbital_info=OrbitalInfo(
                             energy=-0.9, orbitals={"Mn": [0.5, 0.7, 0.0, 0.0],
@@ -107,7 +106,7 @@ def test_make_band_edge_state(p_edge_state, orb_infos):
         band_idx=11, ave_energy=1.0, occupation=0.05,
         orbitals={"Mn": [0.5, 0.8, 0.0, 0.0], "O": [0.0, 0.0, 0.0, 0.0]},
         participation_ratio=0.1)
-    expected = BandEdgeStates(
+    return BandEdgeStates(
         states=[BandEdgeState(vbm_info=vbm_info,
                               cbm_info=cbm_info,
                               vbm_orbital_diff=0.09999999999999998,
@@ -117,7 +116,11 @@ def test_make_band_edge_state(p_edge_state, orb_infos):
                               vbm_hole_occupation=0.0,
                               cbm_electron_occupation=0.03
                               )])
-    assert actual == expected
+
+
+def test_make_band_edge_state(p_edge_state, orb_infos, band_edge_states):
+    actual = make_band_edge_states(orb_infos, p_edge_state)
+    assert actual == band_edge_states
 
 
 def test_make_band_edge_state_w_defect_charge_info(p_edge_state, orb_infos, mocker):
@@ -132,7 +135,16 @@ def test_make_band_edge_state_w_defect_charge_info(p_edge_state, orb_infos, mock
     assert actual.states[0].vbm_info == expected
 
 
-def test_orbital_diff(mocker):
+def test_make_band_edge_state_wo_participation_ratio(
+        p_edge_state, orb_infos, band_edge_states):
+    # in-gap participation ratio is set to None
+    orb_infos.orbital_infos[0][0][2].participation_ratio = None
+    band_edge_states.states[0].localized_orbitals[0].participation_ratio = None
+    actual = make_band_edge_states(orb_infos, p_edge_state)
+    assert actual == band_edge_states
+
+
+def test_orbital_diff():
     orb_1 = {"Mn": [0.1, 0.0, 0.0, 0.0]}
     orb_2 = {"Mn": [0.0, 0.1, 0.0, 0.0]}
     assert orbital_diff(orb_1, orb_2) == 0.2

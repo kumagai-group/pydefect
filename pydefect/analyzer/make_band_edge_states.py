@@ -59,7 +59,10 @@ def get_localized_orbs(orb_info_by_spin: List[List[OrbitalInfo]],
     result = []
     for i, orbs_by_kpt in enumerate(orbs_by_band_by_kpt, loc_band_index_range[0]):
         def get_ave(key):
-            return sum([getattr(orb, key) * w for orb, w in zip(orbs_by_kpt, weights)])
+            try:
+                return sum([getattr(orb, key) * w for orb, w in zip(orbs_by_kpt, weights)])
+            except TypeError:
+                return None
 
         orbs = defaultdict(list)
         for orb, w in zip(orbs_by_kpt, weights):
