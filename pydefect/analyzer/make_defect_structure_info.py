@@ -11,8 +11,12 @@ from pydefect.analyzer.defect_structure_info import Displacement, \
     DefectStructureInfo, unique_point_group
 from pydefect.defaults import defaults
 from pymatgen.core import PeriodicSite, Structure
+from vise.util.logger import get_logger
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 from vise.util.typing import GenCoords
+
+
+logger = get_logger(__name__)
 
 
 def folded_coords(site: PeriodicSite,
@@ -93,6 +97,13 @@ class MakeDefectStructureInfo:
 
         self._anchor_atom_idx = int(np.argmax(distances))
         p_anchor_atom_idx = self._orig_comp.d_to_p[self._anchor_atom_idx]
+        if p_anchor_atom_idx is None:
+            logger.warning("The anchoring atom cannot be found, so the drift "
+                           "vector is set to zero.")
+            self._drift_distance = None
+            self._drift_vector = tuple([0.0]*3)
+            return
+
         d_site = self.final[self._anchor_atom_idx]
         p_coords = self.perfect[p_anchor_atom_idx].frac_coords
         self._drift_distance, image = \
