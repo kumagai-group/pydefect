@@ -138,6 +138,7 @@ def test_band_edge_orbital_infos(mocker):
         dirs=[Path("Va_O1_0"), Path("Va_O1_1")],
         p_state=mock_p_edge_state,
         y_range=[0.0, 1.0],
+        no_participation_ratio=False,
         verbose=True,
         func=parsed_args.func)
     assert parsed_args == expected

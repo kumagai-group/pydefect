@@ -185,6 +185,9 @@ def parse_args_main_vasp(args):
     parser_band_edge_orb_infos.add_argument(
         "-y", "--y_range", nargs=2, type=float,
         help="Energy range in y-axis for eigenvalue.pdf")
+    parser_band_edge_orb_infos.add_argument(
+        "--no_participation_ratio", action="store_true",
+        help="Set when structure_info.json is not available.")
 
     parser_band_edge_orb_infos.set_defaults(
         func=make_band_edge_orb_infos_and_eigval_plot)

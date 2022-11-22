@@ -138,6 +138,7 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
     supercell_cbm = args.p_state.cbm_info.energy
 
     file_name = "band_edge_orbital_infos.json"
+
     def _inner(_dir: Path):
         try:
             defect_entry = loadfn(_dir / "defect_entry.json")
@@ -146,13 +147,17 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
             title = "No name"
         procar = Procar(_dir / defaults.procar)
         vasprun = Vasprun(_dir / defaults.vasprun)
-        str_info = loadfn(_dir / "defect_structure_info.json")
-        band_edge_orb_chars = make_band_edge_orbital_infos(
+
+        str_info = None
+        if args.no_participation_ratio is False:
+            str_info = loadfn(_dir / "defect_structure_info.json")
+
+        band_edge_orb_infos = make_band_edge_orbital_infos(
             procar, vasprun, supercell_vbm, supercell_cbm, str_info)
-        band_edge_orb_chars.to_json_file(_dir / file_name)
+        band_edge_orb_infos.to_json_file(_dir / file_name)
 
         plotter = EigenvalueMplPlotter(
-            title=title, band_edge_orb_infos=band_edge_orb_chars,
+            title=title, band_edge_orb_infos=band_edge_orb_infos,
             supercell_vbm=supercell_vbm, supercell_cbm=supercell_cbm,
             y_range=args.y_range)
         plotter.construct_plot()

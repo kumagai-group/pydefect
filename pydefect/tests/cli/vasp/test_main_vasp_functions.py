@@ -216,6 +216,7 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
     args = Namespace(dirs=[Path("Va_O1_2")],
                      p_state=mock_p_state,
                      y_range=[0.0, 1.0],
+                     no_participation_ratio=False,
                      verbose=False)
     make_band_edge_orb_infos_and_eigval_plot(args)
 

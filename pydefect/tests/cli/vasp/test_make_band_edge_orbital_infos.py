@@ -94,3 +94,21 @@ def test_make_band_edge_orbital_infos(mocker):
     fermi_level=20.0)
     assert_dataclass_almost_equal(actual, expected, check_is_subclass=True)
 
+    actual = make_band_edge_orbital_infos(
+        mock_procar, mock_vasprun, vbm=0.0, cbm=5.0)
+
+    expected = BandEdgeOrbitalInfos(
+        orbital_infos=[[
+            [OrbitalInfo(energy=-2.9, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=1.0),
+             OrbitalInfo(energy=8.01, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0)],
+            [OrbitalInfo(energy=-2.99, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=1.0),
+             OrbitalInfo(energy=7.90, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0)]],
+            [[OrbitalInfo(energy=7.99, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0),
+              OrbitalInfo(energy=10.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0)],
+             [OrbitalInfo(energy=8.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0),
+              OrbitalInfo(energy=10.00, orbitals={"H": [1.0, 0.0, 0.0, 0.0], "He": [0.0, 0.0, 0.0, 0.0]}, occupation=0.0)]]],
+        kpt_coords=[(0.0, 0.0, 0.0)], kpt_weights=[1.0], lowest_band_index=1,
+        fermi_level=20.0)
+    assert_dataclass_almost_equal(actual, expected, check_is_subclass=True)
+
+
