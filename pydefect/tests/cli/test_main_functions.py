@@ -41,7 +41,9 @@ He: -2.0
     assert actual == expected
 
     actual = Path("relative_energies.yaml").read_text()
-    expected = """HHe: -1.0
+    expected = """H: 0.0
+HHe: -1.0
+He: 0.0
 """
     assert actual == expected
 
