@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 import string
+import sys
 from copy import deepcopy
 from dataclasses import dataclass, asdict
 from itertools import product
@@ -213,8 +214,9 @@ class ChemPotDiagMaker:
             try:
                 assert target in relative_energies.keys()
             except AssertionError:
-                print(f"Target {target} is not in relative energy compounds.")
-                raise
+                logger.warning(f"Target {target} is not in relative energy "
+                               f"compounds, so stop here.")
+                sys.exit()
         self.target = target
 
     def _calc_vertices(self):
