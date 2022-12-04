@@ -9,6 +9,7 @@ from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
     target_element_chem_pot, change_element_sequence, UnstableTargetError
 from pymatgen.analysis.phase_diagram import PDEntry
 from pymatgen.core import Composition
+from tabulate import tabulate
 from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
 
@@ -130,9 +131,9 @@ def test_relative_energies_phase_diagram():
                       PDEntry(Composition("O"), 0.0): 0.5},
                      4.0)}
     assert rel_energies.unstable_compounds == expected
-    expected = """|        |   composition | E above hull   | decompose to (ratio)   |
-|--------+---------------+----------------+------------------------|
-| Mg1 O3 |             4 | Mg1 O1 (0.500) | O1 (0.500)             |"""
+    expected = """composition      E above hull  decompose to (ratio)
+-------------  --------------  -------------------------
+Mg1 O3                   4.00  Mg1 O1 (0.500) O1 (0.500)"""
     assert rel_energies.unstable_comp_info == expected
 
 
