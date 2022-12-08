@@ -2,10 +2,10 @@
 #  Copyright (c) 2022 Kumagai group.
 from pydefect.analyzer.defect_energy import DefectEnergySummary, DefectEnergies, \
     DefectEnergy
-from pydefect.analyzer.pinning_levels import show_pinning_levels
+from pydefect.analyzer.pinning_levels import pinning_levels_from_charge_energies
 
 
-def test_show_pinning_levels():
+def test_pinning_levels_from_charge_energies():
     defect_energies = DefectEnergies(
             atom_io={"O": -1},
             charges=[0, 1, 2],
@@ -23,7 +23,7 @@ def test_show_pinning_levels():
                                                             allow_shallow=True,
                                                             with_corrections=True,
                                                             e_range=(0, cbm))
-    actual = show_pinning_levels(charge_energies=charge_energies)
+    actual = pinning_levels_from_charge_energies(charge_energies=charge_energies)
     expected = """defect    hole pinning          electron pinning
 --------  --------------------  ------------------
 Va_O      charge 1, level 1.00  -"""

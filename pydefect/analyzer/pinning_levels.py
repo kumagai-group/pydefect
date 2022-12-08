@@ -4,7 +4,7 @@ from pydefect.analyzer.defect_energy import ChargeEnergies
 from tabulate import tabulate
 
 
-def show_pinning_levels(charge_energies: ChargeEnergies):
+def pinning_levels_from_charge_energies(charge_energies: ChargeEnergies):
 
     result = []
     for name, charge_energy in charge_energies.charge_energies_dict.items():
