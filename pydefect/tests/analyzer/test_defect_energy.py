@@ -176,8 +176,12 @@ def test_charge_energies_energy_range(charge_energies):
 
 def test_charge_energies_pinning_level(single_charge_energies):
     assert single_charge_energies.pinning_level(1.0, 6.0) == (None, None)
-    ce = SingleChargeEnergies(charge_energies=[(0, 6.0), (1, 3.0)])
-    assert ce.pinning_level(-4.0, 6.0) == ((-3.0, 1), None)
+
+    ce_1 = SingleChargeEnergies(charge_energies=[(0, 6.0), (1, 3.0)])
+    assert ce_1.pinning_level(-4.0, 6.0) == ((-3.0, 1), None)
+
+    ce_2 = SingleChargeEnergies(charge_energies=[(1, -1.0), (2, 0.0)])
+    assert ce_2.pinning_level(0, 2.0) == ((1.0, 1), None)
 
 
 def test_charge_energies_energy_at_ef(single_charge_energies):

@@ -251,7 +251,7 @@ class SingleChargeEnergies(MSONable):
             pinning = - energy / charge
             if charge > 0 and pinning > lower_pinning:
                 lower_pinning, lower_charge = pinning, charge
-            elif pinning < upper_pinning:
+            elif charge < 0 and pinning < upper_pinning:
                 upper_pinning, upper_charge = pinning, charge
 
         if lower_charge is None or lower_pinning < e_min:
@@ -262,7 +262,7 @@ class SingleChargeEnergies(MSONable):
         if upper_charge is None or upper_pinning > e_max:
             upper = None
         else:
-            upper = (lower_pinning, lower_charge)
+            upper = (upper_pinning, upper_charge)
         return lower, upper
 
     def energy_at_ef(self, ef: float) -> Tuple[float, int]:
