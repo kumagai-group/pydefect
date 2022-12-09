@@ -54,9 +54,18 @@ def make_composition_energies(args):
         outcar = Outcar(_dir / defaults.outcar)
         composition = Structure.from_file(_dir / defaults.contcar).composition
         energy = float(outcar.final_energy)  # original type is FloatWithUnit
-        return composition, CompositionEnergy(energy, "local")
+        return composition, CompositionEnergy(energy, str(_dir))
 
     for c, ce in parse_dirs(args.dirs, _inner, args.verbose):
+        if c in composition_energies:
+            original_energy = composition_energies[c].energy
+            original_source = composition_energies[c].source
+            if ce.energy > original_energy:
+                logger.info(
+                    f"Energy in {ce.source} is higher than that of "
+                    f"{original_source} ({ce.energy} vs {original_energy}), "
+                    f"so skip it.")
+                continue
         composition_energies[c] = ce
 
     composition_energies.to_yaml_file()

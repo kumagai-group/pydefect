@@ -62,7 +62,9 @@ def test_make_competing_phase_dirs(mocker):
 def test_make_composition_energies(mocker, tmpdir):
     def side_effect(key):
         mock_outcar = mocker.Mock()
-        if key == Path("Mg") / defaults.outcar:
+        if key == Path("Mg1") / defaults.outcar:
+            mock_outcar.final_energy = -15
+        elif key == Path("Mg2") / defaults.outcar:
             mock_outcar.final_energy = -10
         elif key == Path("O") / defaults.outcar:
             mock_outcar.final_energy = -20
@@ -72,7 +74,9 @@ def test_make_composition_energies(mocker, tmpdir):
 
     def side_effect_structure(key):
         mock_structure = mocker.Mock()
-        if key == Path("Mg") / defaults.contcar:
+        if key == Path("Mg1") / defaults.contcar:
+            mock_structure.composition = Composition("Mg2")
+        elif key == Path("Mg2") / defaults.contcar:
             mock_structure.composition = Composition("Mg2")
         elif key == Path("O") / defaults.contcar:
             mock_structure.composition = Composition("O2")
@@ -86,15 +90,15 @@ def test_make_composition_energies(mocker, tmpdir):
                         side_effect=side_effect)
     mock_str = mocker.patch("pydefect.cli.vasp.main_vasp_functions.Structure.from_file",
                             side_effect=side_effect_structure)
-    args = Namespace(yaml_file=None, dirs=[Path("Mg"), Path("O")], verbose=False)
+    args = Namespace(yaml_file=None, dirs=[Path("Mg1"), Path("Mg2"), Path("O")], verbose=False)
     make_composition_energies(args)
     actual = Path("composition_energies.yaml").read_text()
     expected = """Mg2:
-  energy: -10.0
-  source: local
+  energy: -15.0
+  source: Mg1
 O2:
   energy: -20.0
-  source: local
+  source: O
 """
     assert actual == expected
 
