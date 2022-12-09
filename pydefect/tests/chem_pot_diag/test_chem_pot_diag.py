@@ -69,6 +69,18 @@ def test_composition_energies_std_rel_energies(composition_energies):
     assert actual[1] == expected_rel
 
 
+def test_to_phase_diagram(composition_energies):
+    actual = composition_energies.to_phase_diagram().all_entries_hulldata
+    expected = np.array(
+        [[0.,         1.,          1.,       ],
+         [0.5,        0.5,         1.5,      ],
+         [0.33333333, 0.66666667,  1.,       ],
+         [1.,         0.,         12.,       ],
+         [0.,         0.,          0.,       ],
+         [0.,         0.33333333, -0.66666667]])
+    np.testing.assert_array_almost_equal(actual, expected)
+
+
 @pytest.fixture
 def standard_energies():
     return StandardEnergies({"Mg": 1.0, "O": 2.0})
