@@ -130,7 +130,7 @@ def parse_args_main(args):
         help=" yaml file name.")
     parser_cv.add_argument(
         # this must be string as keys of RelativeEnergies are strings.
-        "-t", "--target", type=str, required=True,
+        "-t", "--target", type=str,
         help="Target composition, e.g., MgO.")
     parser_cv.add_argument(
         "-e", "--elements", type=str, nargs="+",

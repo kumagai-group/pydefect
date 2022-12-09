@@ -86,7 +86,8 @@ def make_cpd_and_vertices(args):
     cpd_maker = ChemPotDiagMaker(rel_energies, elements, args.target)
     cpd = cpd_maker.chem_pot_diag
     cpd.to_json_file()
-    cpd.to_target_vertices.to_yaml_file()
+    if args.target:
+        cpd.to_target_vertices.to_yaml_file()
 
 
 def plot_chem_pot_diag(args):
