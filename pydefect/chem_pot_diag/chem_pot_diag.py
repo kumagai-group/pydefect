@@ -256,8 +256,8 @@ class ChemPotDiagMaker:
     @property
     def chem_pot_diag(self):
         self._calc_vertices()
-        elem_energies = {element: 0.0 for element in self.elements}
-        host_energies = dict(**self.host_composition_energies, **elem_energies)
+        host_energies = dict(**self.host_composition_energies)
+        host_energies.update({element: 0.0 for element in self.elements})
 
         polygons = {}
         for comp, energy in host_energies.items():
