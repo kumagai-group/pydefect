@@ -11,7 +11,7 @@ from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergies, \
     CompositionEnergy
 from pydefect.cli.main_util_functions import composition_energies_from_mp, \
     make_gkfo_correction_from_vasp, add_interstitials_from_local_extrema, \
-    make_defect_vesta_file, show_u_values
+    make_defect_vesta_file, show_u_values, show_pinning_levels
 from pydefect.corrections.efnv_correction import ExtendedFnvCorrection
 from pymatgen.core import Composition
 
@@ -41,6 +41,14 @@ def test_show_u_values(defect_energy_summary):
                      with_corrections=True,
                      allow_shallow=True)
     show_u_values(args)
+
+
+def test_show_pinning_levels(defect_energy_summary):
+    args = Namespace(defect_energy_summary=defect_energy_summary,
+                     chem_pot_label="A",
+                     with_corrections=True,
+                     allow_shallow=True)
+    show_pinning_levels(args)
 
 
 def test_add_interstitials_from_local_extrema(mocker):

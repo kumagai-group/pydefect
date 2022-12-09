@@ -9,7 +9,7 @@ from monty.serialization import loadfn
 from pydefect.cli.main import description, epilog, add_sub_parser
 from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp, \
     composition_energies_from_mp, add_interstitials_from_local_extrema, \
-    make_defect_vesta_file, show_u_values
+    make_defect_vesta_file, show_u_values, show_pinning_levels
 from pydefect.defaults import defaults
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
@@ -52,6 +52,17 @@ def parse_args_main_util(args):
         aliases=['u'])
 
     parser_show_u_values.set_defaults(func=show_u_values)
+
+    # -- show pinning levels ------------------------------------------
+    parser_show_pinning_levels = subparsers.add_parser(
+        name="show_pinning_levels",
+        description="Show defect pinning levels.",
+        parents=[add_sub_parser(argparse, "defect_energy_label"),
+                 add_sub_parser(argparse, "defect_energy_summary")],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['pl'])
+
+    parser_show_pinning_levels.set_defaults(func=show_pinning_levels)
 
     # -- add interstitials from local extrema ----------------------------------
     parser_ai = subparsers.add_parser(
