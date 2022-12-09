@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from copy import copy
 
+import numpy as np
 import pytest
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
     CompositionEnergy, CompositionEnergies, StandardEnergies, \
@@ -9,7 +10,6 @@ from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
     target_element_chem_pot, change_element_sequence, UnstableTargetError
 from pymatgen.analysis.phase_diagram import PDEntry
 from pymatgen.core import Composition
-from tabulate import tabulate
 from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
 
@@ -59,7 +59,7 @@ def test_composition_energies_elements(composition_energies):
     assert composition_energies.elements == ["Cl", "H", "O"]
 
 
-def test_std_rel_energies(composition_energies):
+def test_composition_energies_std_rel_energies(composition_energies):
     actual = composition_energies.std_rel_energies
     expected_ref = StandardEnergies({"H": 0.0, "O": 1.0, "Cl": 12.0})
     expected_rel = RelativeEnergies({"H": 0.0, "O": 0.0, "Cl": 0.0,
@@ -128,8 +128,7 @@ def test_relative_energies_phase_diagram():
                                      "O": 0.0})
     expected = {PDEntry(Composition("MgO3"), energy=-4.0):
                     ({PDEntry(Composition("MgO"), -20.0): 0.5,
-                      PDEntry(Composition("O"), 0.0): 0.5},
-                     4.0)}
+                      PDEntry(Composition("O"), 0.0): 0.5}, 4.0)}
     assert rel_energies.unstable_compounds == expected
     expected = """composition      E above hull  decompose to (ratio)
 -------------  --------------  -------------------------
