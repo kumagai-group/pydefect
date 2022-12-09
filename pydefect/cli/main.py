@@ -78,6 +78,10 @@ def add_sub_parser(_argparse, name: str):
         result.add_argument(
             "--no_corrections", dest="with_corrections", action="store_false",
             help="Set when corrections are switched off.")
+    elif name == "defect_energy_label":
+        result.add_argument(
+            "-l", "--label", type=str, required=True,
+            help="Label in the chemical potential diagram")
     else:
         raise ValueError
     return result
@@ -97,7 +101,8 @@ def parse_args_main(args):
     pcr_parser = add_sub_parser(argparse, name="perfect_calc_results")
     pbes_parser = add_sub_parser(argparse, name="perfect_band_edge_state")
     no_calc_results = add_sub_parser(argparse, name="no_calc_results_check")
-    defect_e_sum_parser = add_sub_parser(argparse, "defect_energy_summary")
+    defect_e_sum_parser = add_sub_parser(argparse, name="defect_energy_summary")
+    defect_e_label = add_sub_parser(argparse, name="defect_energy_label")
 
     # -- make_standard_and_relative_energies -----------------------------------
     parser_make_standard_and_relative_energies = subparsers.add_parser(
@@ -312,12 +317,10 @@ def parse_args_main(args):
     parser_plot_energy = subparsers.add_parser(
         name="plot_defect_formation_energy",
         description="Show and plot defect formation energies.",
-        parents=[defect_e_sum_parser],
+        parents=[defect_e_label, defect_e_sum_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pe'])
 
-    parser_plot_energy.add_argument(
-        "-l", "--label", type=str, help="Label", required=True)
     parser_plot_energy.add_argument(
         "-y", "--y_range", nargs=2, type=float,
         help="Energy range in y-axis")
