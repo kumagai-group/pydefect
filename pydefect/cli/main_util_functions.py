@@ -29,7 +29,8 @@ def composition_energies_from_mp(args) -> None:
 def show_u_values(args) -> None:
     defect_energies = args.defect_energy_summary.defect_energies
     u_values = u_values_from_defect_energies(defect_energies,
-                                             args.with_corrections)
+                                             args.with_corrections,
+                                             args.allow_shallow)
     result = []
     for name, u_vas in u_values.items():
         for charges, u_val in u_vas.items():
