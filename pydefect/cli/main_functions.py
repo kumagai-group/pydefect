@@ -25,8 +25,10 @@ from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
 from pydefect.input_maker.append_interstitial import append_interstitial
 from pydefect.input_maker.defect_set_maker import DefectSetMaker
 from pydefect.input_maker.supercell_maker import SupercellMaker
+from pymatgen.analysis.phase_diagram import PDPlotter
 from pymatgen.core import Composition
 from vise.util.logger import get_logger
+from matplotlib import pyplot as plt
 
 logger = get_logger(__name__)
 
@@ -57,6 +59,17 @@ def make_standard_and_relative_energies(args):
     std_energies, rel_energies = comp_energies.std_rel_energies
     std_energies.to_yaml_file()
     rel_energies.to_yaml_file()
+    try:
+        pd = comp_energies.to_phase_diagram()
+        plotter = PDPlotter(pd, backend="matplotlib", show_unstable=float("inf"))
+        plotter.get_plot(plt=plt)
+        plt.savefig("convex_hull.pdf")
+        plotter = PDPlotter(pd, show_unstable=float("inf"))
+        plotter.show()
+
+    except:
+        pass
+
     if rel_energies.unstable_compounds:
         logger.info("The unstable compound information is shown below.")
         print(rel_energies.unstable_comp_info)
