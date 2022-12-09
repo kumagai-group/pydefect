@@ -86,9 +86,13 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
             for band_idx in range(min_idx, max_idx):
                 actual_band_idx = band_idx + self.lowest_band_index + 1
                 for kpt_idx, orb_info in enumerate(t_orb_info[band_idx], 1):
+
                     energy = f"{orb_info.energy :5.2f}"
                     occupation = f"{orb_info.occupation:4.1f}"
-                    p_ratio = f"{orb_info.participation_ratio:4.1f}"
+                    if orb_info.participation_ratio:
+                        p_ratio = f"{orb_info.participation_ratio:4.1f}"
+                    else:
+                        p_ratio = "N.A."
                     orbs = pretty_orbital(orb_info.orbitals)
                     band_block.append([actual_band_idx, kpt_idx, energy,
                                        occupation, p_ratio, orbs])
