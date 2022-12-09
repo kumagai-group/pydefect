@@ -45,7 +45,7 @@ def test_show_u_values(defect_energy_summary):
 
 def test_show_pinning_levels(defect_energy_summary):
     args = Namespace(defect_energy_summary=defect_energy_summary,
-                     chem_pot_label="A",
+                     label="A",
                      with_corrections=True,
                      allow_shallow=True)
     show_pinning_levels(args)
