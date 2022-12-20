@@ -65,7 +65,8 @@ def parse_dirs(dirs: List[Path],
     if failed_directories:
         failed_dir_string = '\n'.join(failed_directories)
         logger.warning(f"Failed directories are:\n{failed_dir_string}")
-        logger.warning(f"To see details, try to run with --verbose")
+        if verbose is False:
+            logger.warning(f"To see details, try to run with --verbose")
     else:
         logger.info("Parsing all the directories succeeded.")
 
