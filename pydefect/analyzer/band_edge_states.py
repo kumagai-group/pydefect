@@ -265,9 +265,10 @@ class BandEdgeState(MSONable):
 
     @staticmethod
     def _show_edge_info(edge_info: EdgeInfo, orb_diff: float):
+        p_ratio = f"{edge_info.p_ratio:5.2f}" if edge_info.p_ratio else "None"
         return [edge_info.band_idx + 1,
                 f"{edge_info.energy:7.3f}",
-                f"{edge_info.p_ratio:5.2f}",
+                p_ratio,
                 f"{edge_info.occupation:5.2f}",
                 f"{orb_diff:5.2f}",
                 pretty_orbital(edge_info.orbital_info.orbitals),
