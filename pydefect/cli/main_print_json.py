@@ -6,8 +6,10 @@ from monty.serialization import loadfn
 
 
 def main():
-    lines = [loadfn(filename).__str__() for filename in sys.argv[1:]]
-    print("\n\n".join(lines))
+    for filename in sys.argv[1:]:
+        print("-"*80)
+        print(f"file: {filename}")
+        print(loadfn(filename))
 
 
 if __name__ == "__main__":
