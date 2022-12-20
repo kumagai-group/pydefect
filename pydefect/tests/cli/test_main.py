@@ -230,7 +230,7 @@ def test_defect_energy_summary(mocker):
     mock_unitcell = mocker.patch("pydefect.cli.main.Unitcell")
 
     def side_effect(filename):
-        if filename == "perfect/calc_results.json":
+        if filename == "perfect/perfect_band_edge_state.json":
             return mock_pbes
         else:
             print(filename)
@@ -239,7 +239,7 @@ def test_defect_energy_summary(mocker):
     mocker.patch("pydefect.cli.main.loadfn", side_effect=side_effect)
     parsed_args = parse_args_main(["des",
                                    "-d", "Va_O1_0", "Va_O1_1",
-                                   "-p", "perfect/calc_results.json",
+                                   "-p", "perfect/perfect_band_edge_state.json",
                                    "-u", "unitcell.json",
                                    "-t", "target_vertices.yaml"])
     expected = Namespace(
