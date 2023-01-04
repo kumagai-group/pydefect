@@ -5,8 +5,12 @@ from typing import List
 from pydefect.defaults import defaults
 from pymatgen.core import Element
 from pymatgen.ext.matproj import MPRester
+from vise.util.logger import get_logger
 
 elements = [e.name for e in Element]
+
+
+logger = get_logger(__name__)
 
 
 class MpQuery:
@@ -19,13 +23,22 @@ class MpQuery:
                               "total_magnetization", "magnetic_type"]
         properties = properties or default_properties
         excluded = list(set(elements) - set(element_list))
-        criteria = ({"elements": {"$in": element_list, "$nin": excluded},
-                     "e_above_hull": {"$lte": e_above_hull}})
         # API key is parsed via .pmgrc.yaml
         with MPRester() as m:
             # Due to mp_decode=True by default, class objects are restored.
-            self.materials = m.query(criteria=criteria,
-                                     properties=properties)
+            try:
+                criteria = (
+                    {"elements": {"$in": element_list, "$nin": excluded},
+                     "e_above_hull": {"$lte": e_above_hull}})
+                self.materials = m.query(criteria=criteria,
+                                         properties=properties)
+            except NotImplementedError:
+                logger.info("Note that you're using the newer MPRester.")
+                self.materials = m.summary.search(
+                    elements=element_list,
+                    exclude_elements=excluded,
+                    energy_above_hull=[-1e-5, e_above_hull],
+                    fields=properties)
 
 
 class MpEntries:
