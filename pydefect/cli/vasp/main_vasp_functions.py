@@ -97,7 +97,7 @@ def make_defect_entries(args):
     try:
         perfect.mkdir()
         logger.info("Making perfect dir...")
-        supercell_info.structure.to(filename=perfect / "POSCAR")
+        supercell_info.structure.to(filename=str(perfect / "POSCAR"))
     except FileExistsError:
         logger.info(f"perfect dir exists, so skipped...")
 
@@ -110,12 +110,15 @@ def make_defect_entries(args):
             dir_path.mkdir()
             logger.info(f"Making {dir_path} dir...")
             if defect_entry.perturbed_structure:
-                defect_entry.perturbed_structure.to(filename=dir_path / "POSCAR")
+                defect_entry.perturbed_structure.to(
+                    filename=str(dir_path / "POSCAR"))
             else:
-                defect_entry.structure.to(filename=dir_path / "POSCAR")
+                defect_entry.structure.to(filename=str(dir_path / "POSCAR"))
 
-            defect_entry.to_json_file(filename=dir_path / "defect_entry.json")
-            defect_entry.to_prior_info(filename=dir_path / "prior_info.yaml")
+            defect_entry.to_json_file(
+                filename=str(dir_path / "defect_entry.json"))
+            defect_entry.to_prior_info(
+                filename=str(dir_path / "prior_info.yaml"))
         except FileExistsError:
             logger.info(f"{dir_path} dir exists, so skipped...")
 
