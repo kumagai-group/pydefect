@@ -9,7 +9,7 @@ from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
     RelativeEnergies, ChemPotDiagMaker, TargetVertices, TargetVertex, \
     target_element_chem_pot, change_element_sequence, UnstableTargetError
 from pymatgen.analysis.phase_diagram import PDEntry
-from pymatgen.core import Composition
+from pymatgen.core import Composition, Element
 from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
 
@@ -71,13 +71,12 @@ def test_composition_energies_std_rel_energies(composition_energies):
 
 def test_to_phase_diagram(composition_energies):
     actual = composition_energies.to_phase_diagram().all_entries_hulldata
-    expected = np.array(
-        [[0.,         1.,          1.,       ],
-         [0.5,        0.5,         1.5,      ],
-         [0.33333333, 0.66666667,  1.,       ],
-         [1.,         0.,         12.,       ],
-         [0.,         0.,          0.,       ],
-         [0.,         0.33333333, -0.66666667]])
+    expected = [[ 0.        , 0.        , 1.        ],
+                [ 0.        , 0.5       , 1.5       ],
+                [ 0.        , 0.33333333, 1.        ],
+                [ 0.        , 1.        ,12.        ],
+                [ 1.        , 0.        , 0.        ],
+                [ 0.66666667, 0.        ,-0.66666667]]
     np.testing.assert_array_almost_equal(actual, expected)
 
 

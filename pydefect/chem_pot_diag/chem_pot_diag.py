@@ -103,7 +103,11 @@ class CompositionEnergies(ToYamlFileMixIn, dict):
         entries = []
         for k, v in self.items():
             entries.append(PDEntry(k, v.energy))
-        return PhaseDiagram(entries=entries, elements=elements)
+        if elements is None:
+            elements = set()
+            for k in self:
+                elements.update(k.elements)
+        return PhaseDiagram(entries=entries, elements=list(elements))
 
 
 class CpdAbstractEnergies(ToYamlFileMixIn, dict):
