@@ -11,12 +11,11 @@ def test_elements():
     assert elements[-1] == "Og"
 
 
-@pytest.mark.skip()
 def test_mp_actual_query():
     element_list = ["Mg", "O"]
     mp_query = MpQuery(element_list=element_list,
                        properties=["formula_pretty", "structure"])
-    print(mp_query.materials[0].formula_pretty)
+    print([m.formula_pretty for m in mp_query.materials])
 
     mp_query = MpQuery(element_list=element_list)
     print(mp_query.materials)

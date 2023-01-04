@@ -38,7 +38,6 @@ class MpQuery:
                                   "symmetry", "band_gap", "total_magnetization",
                                   "types_of_magnetic_species"]
                 self.materials = m.summary.search(
-                    elements=element_list,
                     exclude_elements=excluded,
                     energy_above_hull=[-1e-5, e_above_hull],
                     fields=properties or default_fields)
