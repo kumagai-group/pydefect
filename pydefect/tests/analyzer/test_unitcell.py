@@ -22,6 +22,11 @@ def test_unitcell(unitcell):
     np.testing.assert_array_almost_equal(unitcell.dielectric_constant, expected)
 
 
+def test_average_diele_const(unitcell):
+    assert unitcell.ave_ele_diele == (1.0 + 5.0 + 9.0) / 3
+    assert unitcell.ave_diele == (11.0 + 55.0 + 99.0) / 3
+
+
 def test_yaml_roundtrip(unitcell, tmpdir):
     expected_text = """system: MgAl2O4
 vbm: -1.5053

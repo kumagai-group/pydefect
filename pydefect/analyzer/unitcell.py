@@ -28,6 +28,16 @@ class Unitcell(MSONable):
     ion_dielectric_const: List[List[float]]
 
     @property
+    def ave_ele_diele(self):
+        matrix = np.array(self.ele_dielectric_const)
+        return np.average(matrix.diagonal())
+
+    @property
+    def ave_diele(self):
+        matrix = np.array(self.dielectric_constant)
+        return np.average(matrix.diagonal())
+
+    @property
     def dielectric_constant(self):
         total = (np.array(self.ele_dielectric_const)
                  + np.array(self.ion_dielectric_const))
