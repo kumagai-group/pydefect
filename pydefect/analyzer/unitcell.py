@@ -26,6 +26,8 @@ class Unitcell(MSONable):
     cbm: float
     ele_dielectric_const: List[List[float]]
     ion_dielectric_const: List[List[float]]
+    electron_mass: List[List[float]] = None
+    hole_mass: List[List[float]] = None
 
     @property
     def ave_ele_diele(self):
@@ -35,6 +37,16 @@ class Unitcell(MSONable):
     @property
     def ave_diele(self):
         matrix = np.array(self.dielectric_constant)
+        return np.average(matrix.diagonal())
+
+    @property
+    def ave_ele_mass(self):
+        matrix = np.array(self.electron_mass)
+        return np.average(matrix.diagonal())
+
+    @property
+    def ave_hole_mass(self):
+        matrix = np.array(self.hole_mass)
         return np.average(matrix.diagonal())
 
     @property
