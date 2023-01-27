@@ -29,13 +29,14 @@ class SupercellMaker:
 
         self.primitive_structure = primitive_structure
         self.symmetrizer = StructureSymmetrizer(primitive_structure,
-                                           symprec=symprec,
-                                           angle_tolerance=angle_tolerance)
+                                                symprec=symprec,
+                                                angle_tolerance=angle_tolerance)
         if primitive_structure != self.symmetrizer.primitive:
             logger.warning(
                 "The input structure is different from the primitive one,"
                 "which might be due to the difference of symprec used in"
-                "the pydefect and unitcell conversion.")
+                "the pydefect and unitcell conversion. Please construct"
+                "the unitcell using vise.")
             logger.warning("\n".join([
                 "Input lattice:",
                 f"{primitive_structure.lattice}", "",

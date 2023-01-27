@@ -49,9 +49,9 @@ class OrbitalInfo(MSONable):
 @dataclass
 class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     orbital_infos: List[List[List["OrbitalInfo"]]]  # [spin, k-idx, band-idx]
-    kpt_coords: List[Coords]
+    kpt_coords: List[GenCoords]
     kpt_weights: List[float]
-    lowest_band_index: int
+    lowest_band_index: int  # python convention starting from 0.
     fermi_level: float
 
     def kpt_idx(self, kpt_coord):
@@ -197,8 +197,8 @@ class BandEdgeState(MSONable):
     vbm_orbital_diff: float  # Difference from those of perfect supercell.
     cbm_orbital_diff: float
     localized_orbitals: List[LocalizedOrbital]
-    vbm_hole_occupation: float = None
-    cbm_electron_occupation: float = None
+    vbm_hole_occupation: float
+    cbm_electron_occupation: float
 
     @property
     def is_shallow(self):
