@@ -6,7 +6,6 @@ from monty.serialization import loadfn
 from pydefect.analyzer.defect_energy import DefectEnergySummary
 from pydefect.analyzer.defect_energy_util import u_values_from_defect_energies
 from pydefect.analyzer.pinning_levels import pinning_levels_from_charge_energies
-from pydefect.analyzer.transition_levels import make_transition_levels
 from pydefect.cli.main_tools import parse_dirs
 from pydefect.cli.make_defect_vesta_file import MakeDefectVestaFile
 from pydefect.cli.vasp.make_composition_energies_from_mp import \

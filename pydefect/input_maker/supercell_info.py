@@ -39,7 +39,8 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
 
     def coords(self, name):
         site = self.sites[name]
-        coord = list(self.structure[site.equivalent_atoms[0]].frac_coords)
+        site_idx = site.equivalent_atoms[0]
+        coord = list(self.structure[site_idx].frac_coords)
         distances = Distances(self.structure, coord)
         return distances.coordination()
 

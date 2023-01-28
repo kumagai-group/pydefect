@@ -44,7 +44,8 @@ class Supercells:
             if det(matrix) > max_det:
                 break
             if det(matrix) > min_det:
-                self.supercells.append(Supercell(input_structure, matrix))
+                self.supercells.append(Supercell(input_structure,
+                                                 matrix.tolist()))
             matrix = self.incremented_matrix(matrix)
 
     def incremented_matrix(self, matrix: np.ndarray):
