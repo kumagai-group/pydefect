@@ -48,6 +48,8 @@ def test_make_supercell_wo_options(mocker):
         matrix=None,
         min_num_atoms=50,
         max_num_atoms=300,
+        analyze_symmetry=True,
+        sites_yaml_filename=None,
         func=parsed_args.func)
     assert parsed_args == expected
 
@@ -57,6 +59,8 @@ def test_make_supercell_w_options(mocker):
     parsed_args = parse_args_main(["s",
                                    "-p", "POSCAR-tmp",
                                    "--matrix", "1", "2", "3",
+                                   "--no_symmetry_analysis",
+                                   "-s", "sites.yaml",
                                    "--min_atoms", "1000",
                                    "--max_atoms", "2000"])
     # func is a pointer so need to point the same address.
@@ -65,6 +69,8 @@ def test_make_supercell_w_options(mocker):
         matrix=[1, 2, 3],
         min_num_atoms=1000,
         max_num_atoms=2000,
+        analyze_symmetry=False,
+        sites_yaml_filename="sites.yaml",
         func=parsed_args.func)
     assert parsed_args == expected
     mock.from_file.assert_called_once_with("POSCAR-tmp")

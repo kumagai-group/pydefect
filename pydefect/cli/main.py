@@ -170,6 +170,13 @@ def parse_args_main(args):
     parser_supercell.add_argument(
         "--max_atoms", dest="max_num_atoms", default=300, type=int,
         help="Maximum number of atoms")
+    parser_supercell.add_argument(
+        "--no_symmetry_analysis", dest="analyze_symmetry", action="store_false",
+        help="Set if symmetry is not analyzed. If set, sites.yaml file is "
+             "required.")
+    parser_supercell.add_argument(
+        "-s", "--sites_yaml_filename", type=str,
+        help="e.g., sites.yaml")
 
     parser_supercell.set_defaults(func=make_supercell)
 

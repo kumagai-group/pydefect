@@ -90,6 +90,8 @@ def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
     tmpdir.chdir()
     matrix = [2, 1, 1]
     args = Namespace(unitcell=simple_cubic, matrix=matrix,
+                     analyze_symmetry=True,
+                     sites_yaml_filename=None,
                      min_num_atoms=None, max_num_atoms=None)
     make_supercell(args)
     info = loadfn("supercell_info.json")
@@ -101,9 +103,31 @@ def test_make_supercell_from_matrix(simple_cubic, simple_cubic_2x1x1, tmpdir):
 def test_make_recommended_supercell(simple_cubic, simple_cubic_2x2x2, tmpdir):
     tmpdir.chdir()
     args = Namespace(unitcell=simple_cubic, matrix=None,
+                     analyze_symmetry=True,
+                     sites_yaml_filename=None,
                      min_num_atoms=8, max_num_atoms=8)
     make_supercell(args)
     info = loadfn("supercell_info.json")
+    assert IStructure.from_file("SPOSCAR") == simple_cubic_2x2x2
+    assert info.structure == simple_cubic_2x2x2
+    assert info.transformation_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
+
+
+def test_make_recommended_supercell2(simple_cubic, simple_cubic_2x2x2, tmpdir):
+    tmpdir.chdir()
+    Path("sites.yaml").write_text("""
+H1:
+  element: H
+  site_index: 0
+  site_symmetry: P1
+""")
+    args = Namespace(unitcell=simple_cubic, matrix=None,
+                     analyze_symmetry=False,
+                     sites_yaml_filename="sites.yaml",
+                     min_num_atoms=8, max_num_atoms=8)
+    make_supercell(args)
+    info = loadfn("supercell_info.json")
+    print(info)
     assert IStructure.from_file("SPOSCAR") == simple_cubic_2x2x2
     assert info.structure == simple_cubic_2x2x2
     assert info.transformation_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]

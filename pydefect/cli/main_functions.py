@@ -24,6 +24,8 @@ from pydefect.cli.vasp.make_efnv_correction import make_efnv_correction
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
 from pydefect.input_maker.append_interstitial import append_interstitial
 from pydefect.input_maker.defect_set_maker import DefectSetMaker
+from pydefect.input_maker.manual_supercell_maker import ManualSupercellMaker, \
+    make_sites_from_yaml_file
 from pydefect.input_maker.supercell_maker import SupercellMaker
 from pymatgen.analysis.phase_diagram import PDPlotter
 from pymatgen.core import Composition
@@ -107,16 +109,22 @@ def plot_chem_pot_diag(args):
 
 
 def make_supercell(args):
+    kwargs = {}
+    if args.analyze_symmetry:
+        supercell_maker = SupercellMaker
+    else:
+        supercell_maker = ManualSupercellMaker
+        kwargs["sites"] = make_sites_from_yaml_file(args.sites_yaml_filename)
+
     if args.matrix:
         matrix = sanitize_matrix(args.matrix)
-        maker = SupercellMaker(args.unitcell, matrix)
+        maker = supercell_maker(args.unitcell, matrix)
     else:
-        kwargs = {}
         if args.min_num_atoms:
             kwargs["min_num_atoms"] = args.min_num_atoms
         if args.max_num_atoms:
             kwargs["max_num_atoms"] = args.max_num_atoms
-        maker = SupercellMaker(args.unitcell, **kwargs)
+        maker = supercell_maker(args.unitcell, **kwargs)
 
     maker.supercell.structure.to(filename="SPOSCAR")
     maker.supercell_info.to_json_file()

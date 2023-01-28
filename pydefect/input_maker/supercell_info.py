@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List, Dict, Optional, Union
 
 from monty.json import MSONable
 from numpy.linalg import det
@@ -18,8 +18,24 @@ logger = get_logger(__name__)
 @dataclass(frozen=True)
 class Interstitial(MSONable):
     frac_coords: List[float]
-    site_symmetry: str
+    site_symmetry: str = None
     info: str = None
+
+
+@dataclass
+class SimpleSite(MSONable):
+    element: str
+    site_index: int
+    site_symmetry: str = None
+    wyckoff_letter: str = None
+
+    @property
+    def pprint_equiv_atoms(self):
+        return None
+
+    @property
+    def equivalent_atoms(self):
+        return [self.site_index]
 
 
 @dataclass(frozen=True)
@@ -27,7 +43,7 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
     structure: IStructure
     space_group: str
     transformation_matrix: List[List[int]]
-    sites: Dict[str, Site]
+    sites: Dict[str, Union[Site, SimpleSite]]
     interstitials: List[Interstitial] = field(default_factory=list)
     unitcell_structure: IStructure = None
 

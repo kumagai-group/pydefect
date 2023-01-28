@@ -4,7 +4,8 @@
 import pytest
 from pydefect.defaults import defaults
 
-from pydefect.input_maker.supercell_info import Interstitial, SupercellInfo
+from pydefect.input_maker.supercell_info import Interstitial, SupercellInfo, \
+    SimpleSite
 from pydefect.util.structure_tools import Coordination
 from vise.tests.helpers.assertion import assert_msonable, assert_json_roundtrip
 
@@ -78,6 +79,43 @@ Fractional coordinates: 0.0000000  0.0000000  0.0000000
          Site symmetry: mmm
          Cutoff radius: 4.25
           Coordination: {'H': [2.5, 3.0, 3.5], 'He': [3.91]}
+      Equivalent atoms: 4..7
+Fractional coordinates: 0.0000000  0.0000000  0.5000000
+     Electronegativity: None
+       Oxidation state: 0
+
+-- interstitials
+#1
+                  Info: test
+Fractional coordinates: 0.2500000  0.2500000  0.2500000
+         Site symmetry: yy
+          Coordination: {'H': [2.62, 2.62, 2.62, 2.62], 'He': [2.62, 2.62, 2.62, 2.62]}
+"""
+    assert str(supercell_info) == expected
+
+
+def test_supercell_info_wo_symmetry_info(supercell_info: SupercellInfo):
+    supercell_info.sites["H1"] = SimpleSite("H", 0)
+    print(supercell_info)
+    expected = """Space group: Fmmm
+Transformation matrix: [1, 0, 0]  [0, 1, 0]  [0, 0, 1]
+Cell multiplicity: 1
+
+   Irreducible element: H1
+        Wyckoff letter: None
+         Site symmetry: None
+         Cutoff radius: 3.25
+          Coordination: {'He': [2.5, 3.0]}
+      Equivalent atoms: None
+Fractional coordinates: 0.0000000  0.0000000  0.0000000
+     Electronegativity: 2.2
+       Oxidation state: 1
+
+   Irreducible element: He1
+        Wyckoff letter: b
+         Site symmetry: mmm
+         Cutoff radius: 3.25
+          Coordination: {'H': [2.5, 3.0]}
       Equivalent atoms: 4..7
 Fractional coordinates: 0.0000000  0.0000000  0.5000000
      Electronegativity: None
