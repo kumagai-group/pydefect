@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pytest
 from pydefect.input_maker.manual_supercell_maker import ManualSupercellMaker, \
-    make_sites_from_yaml_file
+    make_sites_from_yaml_file, IncorrectSiteYamlFileError, \
+    check_site_structure_consistency
 from pydefect.input_maker.supercell_info import SimpleSite, SupercellInfo
 
 
@@ -52,3 +53,16 @@ H1:
 """)
     with pytest.raises(TypeError):
         make_sites_from_yaml_file("sites.yaml")
+
+
+def test_check_site_structure_consistency(simple_cubic):
+    sites = {"H": SimpleSite("H", 0)}
+    assert check_site_structure_consistency(sites, simple_cubic) is None
+
+    sites = {"He": SimpleSite("He", 0)}
+    with pytest.raises(IncorrectSiteYamlFileError):
+        check_site_structure_consistency(sites, simple_cubic)
+
+    sites = {"H": SimpleSite("H", 1)}
+    with pytest.raises(IncorrectSiteYamlFileError):
+        check_site_structure_consistency(sites, simple_cubic)

@@ -9,7 +9,7 @@ from pydefect.defaults import defaults
 from pydefect.input_maker.supercell import Supercell, Supercells
 from pydefect.input_maker.supercell_info import SupercellInfo, SimpleSite, \
     stripe_numbers
-from pymatgen.core import IStructure
+from pymatgen.core import IStructure, Structure
 from vise.util.logger import get_logger
 from vise.util.structure_symmetrizer import StructureSymmetrizer
 
@@ -25,6 +25,8 @@ class ManualSupercellMaker:
                  symprec: float = defaults.symmetry_length_tolerance,
                  angle_tolerance: float = defaults.symmetry_angle_tolerance,
                  **supercell_kwargs):
+
+        check_site_structure_consistency(sites, input_structure)
 
         symmetrizer = StructureSymmetrizer(input_structure,
                                            symprec=symprec,
@@ -63,3 +65,23 @@ def make_sites_from_yaml_file(filename: str):
     for k, v in d.items():
         result[k] = SimpleSite(element=stripe_numbers(k), **v)
     return result
+
+
+def check_site_structure_consistency(sites: Dict[str, SimpleSite],
+                                     structure: Structure):
+    for name, site in sites.items():
+        try:
+            x = structure[site.site_index]
+            if x.specie.name != site.element:
+                raise IncorrectSiteYamlFileError(
+                    f"The site element {site.element} for {name} is different "
+                    f"from that of {x.specie.name} in the given structure."
+                )
+        except IndexError:
+            raise IncorrectSiteYamlFileError(
+                f"The site index {site.site_index} is out of atom indices in "
+                f"the given structure.")
+
+
+class IncorrectSiteYamlFileError(Exception):
+    pass
