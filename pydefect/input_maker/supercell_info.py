@@ -78,17 +78,13 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
         frac_coords = self.structure[repr_atom_idx].frac_coords
         return "{0[0]:9.7f}  {0[1]:9.7f}  {0[2]:9.7f}".format(frac_coords)
 
-    @staticmethod
-    def _stripe_numbers(name):
-        return ''.join([i for i in name if i.isalpha()])
-
     def __str__(self):
         lines = [f"Space group: {self.space_group}",
                  f"Transformation matrix: {self._transform_matrix_str}",
                  f"Cell multiplicity: {self.multiplicity}", ""]
 
         for name, site in self.sites.items():
-            elem = self._stripe_numbers(name)
+            elem = stripe_numbers(name)
             coordination = self.coords(name).distance_dict
             lines.append(f"   Irreducible element: {name}")
             lines.append(f"        Wyckoff letter: {site.wyckoff_letter}")
@@ -117,3 +113,7 @@ class SupercellInfo(MSONable, ToJsonFileMixIn):
             lines.append("")
 
         return "\n".join(lines)
+
+
+def stripe_numbers(name):
+    return ''.join([i for i in name if i.isalpha()])

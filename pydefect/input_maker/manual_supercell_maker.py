@@ -7,7 +7,8 @@ import yaml
 from numpy.linalg import det
 from pydefect.defaults import defaults
 from pydefect.input_maker.supercell import Supercell, Supercells
-from pydefect.input_maker.supercell_info import SupercellInfo, SimpleSite
+from pydefect.input_maker.supercell_info import SupercellInfo, SimpleSite, \
+    stripe_numbers
 from pymatgen.core import IStructure
 from vise.util.logger import get_logger
 from vise.util.structure_symmetrizer import StructureSymmetrizer
@@ -57,4 +58,8 @@ def make_sites_from_yaml_file(filename: str):
     except TypeError:
         logger.warning("Yaml file format for creating site info is incorrect.")
         raise TypeError
-    return {k: SimpleSite(**v) for k, v in d.items()}
+
+    result = {}
+    for k, v in d.items():
+        result[k] = SimpleSite(element=stripe_numbers(k), **v)
+    return result

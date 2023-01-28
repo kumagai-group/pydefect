@@ -36,7 +36,6 @@ def test_make_sites_from_yaml(tmpdir):
     tmpdir.chdir()
     Path("sites.yaml").write_text("""
 H1:
-  element: H
   site_index: 1
   site_symmetry: P1
 """)
