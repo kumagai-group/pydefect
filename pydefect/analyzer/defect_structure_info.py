@@ -170,7 +170,7 @@ class DefectStructureInfo(MSONable, ToJsonFileMixIn):
                 if d is not None]
         table = [["Elem", "Dist", "Displace", "Angle", "Index",
                   "Initial site", "", "Final site", "Neighbor"]]
-        print(self.neighbor_atom_indices)
+
         for final_idx, d in sorted(idxs,
                                    key=lambda y: y[1].distance_from_defect):
             is_neighbor = "T" if final_idx in self.neighbor_atom_indices else ""

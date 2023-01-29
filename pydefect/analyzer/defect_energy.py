@@ -235,6 +235,11 @@ class ChargeEnergies:
 
 @dataclass
 class SingleChargeEnergies(MSONable):
+    """
+    charge_energies store the energy at each charge state at the E_F=0 in the
+    situation where the VBM is set to 0.
+
+    """
     charge_energies: List[Tuple[int, float]]
 
     def pinning_level(self, e_min, e_max
