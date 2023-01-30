@@ -6,10 +6,11 @@ import sys
 import warnings
 
 from monty.serialization import loadfn
-from pydefect.cli.main import description, epilog, add_sub_parser
+from pydefect.cli.main import description, epilog, add_sub_parser, dirs_parsers
 from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp, \
     composition_energies_from_mp, add_interstitials_from_local_extrema, \
-    make_defect_vesta_file, show_u_values, show_pinning_levels
+    make_defect_vesta_file, show_u_values, show_pinning_levels, \
+    make_degeneracies
 from pydefect.defaults import defaults
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
@@ -25,6 +26,7 @@ def parse_args_main_util(args):
     dirs_parser = add_sub_parser(argparse, name="dirs")
     unitcell_parser = add_sub_parser(argparse, name="unitcell")
     si_parser = add_sub_parser(argparse, name="supercell_info")
+    no_calc_results = add_sub_parser(argparse, name="no_calc_results_check")
 
     # -- composition energies from mp ------------------------------------------
     parser_comp_es_from_mp = subparsers.add_parser(
@@ -124,6 +126,17 @@ def parse_args_main_util(args):
         help="Charge difference of final state from initial state.")
 
     parser_gkfo.set_defaults(func=make_gkfo_correction_from_vasp)
+
+    # -- make degeneracies ---------------------------------------------------
+    parser_make_degeneracies = subparsers.add_parser(
+        name="make_degeneracies",
+        description="",
+        parents=dirs_parsers + [si_parser, no_calc_results],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['md'])
+
+    parser_make_degeneracies.set_defaults(
+        func=make_degeneracies)
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
 

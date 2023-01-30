@@ -3,9 +3,12 @@
 from pathlib import Path
 
 from monty.serialization import loadfn
-from pydefect.analyzer.defect_energy import DefectEnergySummary
+from pydefect.analyzer.concentration.degeneracy import MakeDegeneracy
+from pydefect.analyzer.defect_energy import DefectEnergySummary, \
+    DefectEnergyInfo
 from pydefect.analyzer.defect_energy_util import u_values_from_defect_energies
 from pydefect.analyzer.pinning_levels import pinning_levels_from_charge_energies
+from pydefect.cli.main_functions import get_calc_results
 from pydefect.cli.main_tools import parse_dirs
 from pydefect.cli.make_defect_vesta_file import MakeDefectVestaFile
 from pydefect.cli.vasp.make_composition_energies_from_mp import \
@@ -86,4 +89,17 @@ def make_gkfo_correction_from_vasp(args):
     plotter.plt.savefig(fname="gkfo_correction.pdf")
     plotter.plt.clf()
 
+
+def make_degeneracies(args):
+    make_deg = MakeDegeneracy(args.supercell_info.space_group)
+
+    def _inner(_dir: Path):
+        energy_info = DefectEnergyInfo.from_yaml(str(_dir / "defect_energy_info.yaml"))
+        calc_results = get_calc_results(_dir, args.check_calc_results)
+        defect_str_info = loadfn(_dir / "defect_structure_info.json")
+        make_deg.add_degeneracy(energy_info, calc_results, defect_str_info)
+
+    parse_dirs(args.dirs, _inner)
+
+    make_deg.degeneracies.to_yaml_file()
 
