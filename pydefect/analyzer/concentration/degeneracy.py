@@ -17,8 +17,8 @@ from vise.util.structure_symmetrizer import num_symmetry_operation
 class Degeneracy(MSONable):
     site: int
     spin: int
-    initial_site_sym: str
-    final_site_sym: str
+    initial_site_sym: str = None
+    final_site_sym: str = None
 
     @property
     def degeneracy(self) -> int:
@@ -58,7 +58,11 @@ class Degeneracies(MutableMapping, ToYamlFileMixIn):
 
     @classmethod
     def from_dict(cls, d):
-        return cls(d)
+        result = cls(d)
+        for k, v in result.items():
+            for kk, vv in v.items():
+                result[k][kk] = Degeneracy.from_dict(vv)
+        return result
 
 
 class MakeDegeneracy:
@@ -77,10 +81,10 @@ class MakeDegeneracy:
         site = (self._primitive_num_sym_opt
                 / num_symmetry_operation(structure_info.final_site_sym))
 
-        deg = Degeneracy(int(site), spin,
-                         structure_info.initial_site_sym,
-                         structure_info.final_site_sym)
-        self._deg_dict[energy_info.name][energy_info.charge] = deg
+        degeneracy = Degeneracy(int(site), spin,
+                                structure_info.initial_site_sym,
+                                structure_info.final_site_sym)
+        self._deg_dict[energy_info.name][energy_info.charge] = degeneracy
 
     def mag_to_spin_degeneracy(self, mag: float) -> int:
         rounded_mag = round(mag)

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2023 Kumagai group.
+from pathlib import Path
+
 import pytest
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.concentration.degeneracy import Degeneracies, Degeneracy, \
     MakeDegeneracy
 from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo
-from vise.tests.helpers.assertion import assert_yaml_roundtrip
 
 degeneracies = Degeneracies({"Va_O1": {0: Degeneracy(1, 1, "1", "1")}})
 
@@ -16,6 +17,7 @@ def test_degeneracies():
 
 
 def test_degeneracies_yaml_round_trip(tmpdir):
+    tmpdir.chdir()
     text = """Va_O1:
   0:
     final_site_sym: '1'
@@ -23,8 +25,9 @@ def test_degeneracies_yaml_round_trip(tmpdir):
     site: 1
     spin: 1
 """
-    assert_yaml_roundtrip(degeneracies, tmpdir, text)
-
+    Path("degeneracies.yaml").write_text(text)
+    actual = Degeneracies.from_yaml("degeneracies.yaml")
+    assert isinstance(actual["Va_O1"][0], Degeneracy)
 
 
 def test_make_degeneracy(mocker):
@@ -49,5 +52,3 @@ def test_make_degeneracy(mocker):
     assert make_deg.degeneracies["Va_O1"][0] == Degeneracy(12, 3, "4mmm", "2mm")
 
 
-# def test_make_degeneracy():
-#     make_degeneracy([])
