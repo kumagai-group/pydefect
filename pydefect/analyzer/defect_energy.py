@@ -235,6 +235,16 @@ class ChargeEnergies:
             candidates.extend(cp.t_all_sorted_points[1])
         return [min(candidates) - space, max(candidates) + space]
 
+    @property
+    def pinning_levels(self) -> Dict[str, List[float]]:
+        result = {}
+        for k, v in self.charge_energies_dict.items():
+            pl = v.pinning_level(self.e_min, self.e_max)
+            lower = pl[0][0] if pl[0] else None
+            upper = pl[1][0] if pl[1] else None
+            result[k] = [lower, upper]
+        return result
+
 
 @dataclass
 class SingleChargeEnergies(MSONable):
@@ -272,6 +282,15 @@ class SingleChargeEnergies(MSONable):
         else:
             upper = (upper_pinning, upper_charge)
         return lower, upper
+
+    def charge_energies_at_ef(self, ef: float) -> List[Tuple[int, float]]:
+        """
+        :return: (Lowest energy, its charge)
+        """
+        result = []
+        for charge, energy in self.charge_energies:
+            result.append((charge, energy + charge * ef))
+        return result
 
     def energy_at_ef(self, ef: float) -> Tuple[float, int]:
         """

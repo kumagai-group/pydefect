@@ -145,6 +145,14 @@ def test_cross_points_e_max_energies_dicts():
     assert actual == expected
 
 
+def test_charge_energies_pinning_levels():
+    charge_energies = ChargeEnergies(
+        charge_energies_dict=
+        {"Va_O1": SingleChargeEnergies([(1, -1), (-1, 1.5)])},
+        e_min=0.0, e_max=2.0)
+    assert charge_energies.pinning_levels == {"Va_O1": [1.0, 1.5]}
+
+
 def test_defect_energy_summary_latexified_title(defect_energy_summary):
     actual = defect_energy_summary.latexified_title
     expected = "MgAl$_{2}$O$_{4}$"
