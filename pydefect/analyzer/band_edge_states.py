@@ -137,6 +137,13 @@ class LocalizedOrbital(MSONable):
     radius: Optional[float] = None
     center: Optional[GenCoords] = None
 
+    @property
+    def band_index(self):
+        return self.band_idx
+
+    @property
+    def eigenvalue(self):
+        return self.ave_energy
 
 @dataclass
 class EdgeInfo(MSONable):
