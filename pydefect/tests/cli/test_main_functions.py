@@ -117,7 +117,6 @@ def test_make_recommended_supercell2(simple_cubic, simple_cubic_2x2x2, tmpdir):
     tmpdir.chdir()
     Path("sites.yaml").write_text("""
 H1:
-  element: H
   site_index: 0
   site_symmetry: P1
 """)

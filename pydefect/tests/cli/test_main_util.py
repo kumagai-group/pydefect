@@ -38,12 +38,14 @@ def test_show_u_values(mocker):
     parsed_args = parse_args_main_util(["u",
                                         "-d", "defect_energy_summary.json",
                                         "--allow_shallow",
-                                        "--no_corrections"])
+                                        "--no_corrections",
+                                        "--label", "A"])
 
     expected = Namespace(
         defect_energy_summary=mock_summary,
         allow_shallow=True,
         with_corrections=False,
+        label="A",
         func=parsed_args.func)
     assert parsed_args == expected
 

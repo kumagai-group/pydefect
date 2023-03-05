@@ -55,8 +55,7 @@ def test_concentration_by_fermi_level_msonable():
 
 
 def test_make_carrier_concentrations():
-    dos_data = TotalDos(fermi_level=0.5,
-                        energies=list(np.linspace(-3.0, 3.0, 7)),
+    dos_data = TotalDos(energies=list(np.linspace(-3.0, 3.0, 7)),
                         dos=[1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0],
                         volume=10**24,
                         vbm=0.0,

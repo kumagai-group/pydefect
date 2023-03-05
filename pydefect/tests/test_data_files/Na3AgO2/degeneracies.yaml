@@ -1,0 +1,205 @@
+Ag_Na1:
+  0:
+    final_site_sym: '2'
+    initial_site_sym: '2'
+    site: 8
+    spin: 1
+Ag_Na2:
+  0:
+    final_site_sym: '222'
+    initial_site_sym: '222'
+    site: 4
+    spin: 1
+Ag_i1:
+  -1:
+    final_site_sym: m
+    initial_site_sym: '1'
+    site: 8
+    spin: 1
+  0:
+    final_site_sym: m
+    initial_site_sym: '1'
+    site: 8
+    spin: 1
+  1:
+    final_site_sym: m
+    initial_site_sym: '1'
+    site: 8
+    spin: 1
+Ag_i2:
+  -1:
+    final_site_sym: '1'
+    initial_site_sym: 2/m
+    site: 16
+    spin: 1
+  0:
+    final_site_sym: '-1'
+    initial_site_sym: 2/m
+    site: 8
+    spin: 1
+  1:
+    final_site_sym: '1'
+    initial_site_sym: 2/m
+    site: 16
+    spin: 1
+Ag_split:
+  -1:
+    final_site_sym: '222'
+    initial_site_sym: '222'
+    site: 4
+    spin: 1
+  0:
+    final_site_sym: '222'
+    initial_site_sym: '222'
+    site: 4
+    spin: 3
+Na_Ag1:
+  0:
+    final_site_sym: 2/m
+    initial_site_sym: 2/m
+    site: 4
+    spin: 1
+Na_i1:
+  -1:
+    final_site_sym: '1'
+    initial_site_sym: '1'
+    site: 16
+    spin: 1
+  0:
+    final_site_sym: '1'
+    initial_site_sym: '1'
+    site: 16
+    spin: 3
+  1:
+    final_site_sym: '1'
+    initial_site_sym: '1'
+    site: 16
+    spin: 1
+Na_i2:
+  -1:
+    final_site_sym: '1'
+    initial_site_sym: 2/m
+    site: 16
+    spin: 1
+  0:
+    final_site_sym: '1'
+    initial_site_sym: 2/m
+    site: 16
+    spin: 1
+  1:
+    final_site_sym: '1'
+    initial_site_sym: 2/m
+    site: 16
+    spin: 1
+Na_split:
+  -1:
+    final_site_sym: '222'
+    initial_site_sym: '222'
+    site: 4
+    spin: 1
+  0:
+    final_site_sym: '222'
+    initial_site_sym: '222'
+    site: 4
+    spin: 3
+  1:
+    final_site_sym: '222'
+    initial_site_sym: '222'
+    site: 4
+    spin: 5
+O_i1:
+  -2:
+    final_site_sym: m
+    initial_site_sym: '1'
+    site: 8
+    spin: 1
+  -1:
+    final_site_sym: m
+    initial_site_sym: '1'
+    site: 8
+    spin: 3
+  0:
+    final_site_sym: m
+    initial_site_sym: '1'
+    site: 8
+    spin: 1
+O_i2:
+  -2:
+    final_site_sym: m
+    initial_site_sym: 2/m
+    site: 8
+    spin: 1
+  -1:
+    final_site_sym: m
+    initial_site_sym: 2/m
+    site: 8
+    spin: 1
+  0:
+    final_site_sym: m
+    initial_site_sym: 2/m
+    site: 8
+    spin: 1
+Va_Ag1:
+  -1:
+    final_site_sym: 2/m
+    initial_site_sym: 2/m
+    site: 4
+    spin: 1
+  0:
+    final_site_sym: 2/m
+    initial_site_sym: 2/m
+    site: 4
+    spin: 3
+  1:
+    final_site_sym: 2/m
+    initial_site_sym: 2/m
+    site: 4
+    spin: 5
+Va_Na1:
+  -1:
+    final_site_sym: '2'
+    initial_site_sym: '2'
+    site: 8
+    spin: 1
+  0:
+    final_site_sym: '2'
+    initial_site_sym: '2'
+    site: 8
+    spin: 3
+  1:
+    final_site_sym: '2'
+    initial_site_sym: '2'
+    site: 8
+    spin: 1
+Va_Na2:
+  -1:
+    final_site_sym: '222'
+    initial_site_sym: '222'
+    site: 4
+    spin: 1
+  0:
+    final_site_sym: '222'
+    initial_site_sym: '222'
+    site: 4
+    spin: 3
+  1:
+    final_site_sym: '222'
+    initial_site_sym: '222'
+    site: 4
+    spin: 1
+Va_O1:
+  0:
+    final_site_sym: m
+    initial_site_sym: m
+    site: 8
+    spin: 1
+  1:
+    final_site_sym: m
+    initial_site_sym: m
+    site: 8
+    spin: 3
+  2:
+    final_site_sym: m
+    initial_site_sym: m
+    site: 8
+    spin: 1
