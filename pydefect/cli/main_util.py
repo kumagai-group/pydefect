@@ -132,7 +132,8 @@ def parse_args_main_util(args):
     # -- make degeneracies ---------------------------------------------------
     parser_make_degeneracies = subparsers.add_parser(
         name="make_degeneracies",
-        description="",
+        description="Make degeneracy.json file that is used for evaluating "
+                    "defect concentrations.",
         parents=dirs_parsers + [si_parser, no_calc_results],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['md'])
@@ -143,7 +144,8 @@ def parse_args_main_util(args):
     # -- calc carrier concentrations  ------------------------------------------
     parser_calc_carrier_concentrations = subparsers.add_parser(
         name="calc_carrier_concentrations",
-        description="",
+        description="Calculate carrier concentrations as functions of "
+                    "temperature and fermi level.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['ccc'])
     parser_calc_carrier_concentrations.add_argument(
@@ -159,7 +161,7 @@ def parse_args_main_util(args):
     # -- calc defect concentrations  -------------------------------------------
     parser_calc_defect_concentrations = subparsers.add_parser(
         name="calc_defect_concentrations",
-        description="",
+        description="Calculate the defect concentrations.",
         parents=[defect_e_sum_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['cdc'])

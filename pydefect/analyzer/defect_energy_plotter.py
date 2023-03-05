@@ -79,6 +79,7 @@ class DefectEnergyPlotter:
         charge_energies = defect_energy_summary.charge_energies(
             chem_pot_label, allow_shallow, with_corrections, self._x_range,
             name_style)
+        self.charge_energies = charge_energies
         self.with_corrections = with_corrections
         self._cross_points = charge_energies.cross_point_dicts
         self._e_min_max_energies_dict = charge_energies.e_min_max_energies_dict
