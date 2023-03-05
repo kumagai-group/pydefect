@@ -24,7 +24,12 @@ def make_defect_energy_summary(
         name, atom_io = grouped_es[0].name, grouped_es[0].atom_io
         charges, des = [], []
         for es in grouped_es:
-            assert atom_io == es.atom_io
+            try:
+                assert sorted(atom_io) == sorted(es.atom_io)
+            except AssertionError:
+                print(atom_io, es.atom_io)
+                raise
+
             charges.append(es.charge)
             des.append(es.defect_energy)
         defect_energies[name] = DefectEnergies(atom_io, charges, des)
