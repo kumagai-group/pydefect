@@ -4,14 +4,17 @@ from argparse import Namespace
 from pathlib import Path
 
 import pytest
+from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.concentration.degeneracy import Degeneracies
 from pydefect.analyzer.defect_energy import DefectEnergySummary, DefectEnergies, \
     DefectEnergy
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergies, \
     CompositionEnergy
 from pydefect.cli.main_util_functions import composition_energies_from_mp, \
     make_gkfo_correction_from_vasp, add_interstitials_from_local_extrema, \
-    make_defect_vesta_file, show_u_values, show_pinning_levels
+    make_defect_vesta_file, show_u_values, show_pinning_levels, \
+    calc_defect_concentrations
 from pydefect.corrections.efnv_correction import ExtendedFnvCorrection
 from pymatgen.core import Composition
 
@@ -118,3 +121,17 @@ def test_make_gkfo_correction_from_vasp(tmpdir, mocker):
         ion_clamped_diele_tensor=mock_unitcell.ele_dielectric_const)
 
 
+def test_calc_defect_concentrations(tmpdir, test_data_files):
+    tmpdir.chdir()
+    test_dir = test_data_files / "Na3AgO2"
+    summary = loadfn(test_dir / "defect_energy_summary.json")
+    degeneracies = Degeneracies.from_yaml(test_dir / "degeneracies.yaml")
+    args = Namespace(defect_energy_summary=summary,
+                     label="A",
+                     allow_shallow=False,
+                     with_corrections=True,
+                     total_dos=loadfn(test_dir / "total_dos.json"),
+                     degeneracies=degeneracies,
+                     T=300,
+                     con_by_Ef=None)
+    calc_defect_concentrations(args)

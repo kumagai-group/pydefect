@@ -12,10 +12,11 @@ from pydefect.cli.main import epilog, description, add_sub_parser
 from pydefect.cli.vasp.main_vasp_util_functions import \
     make_parchg_dir, make_refine_defect_poscar, \
     calc_charge_state, make_defect_entry_main, calc_grids, \
-    make_defect_charge_info_main
+    make_defect_charge_info_main, make_total_dos
 from pymatgen.core import Structure
-from pymatgen.io.vasp import Chgcar
+from pymatgen.io.vasp import Chgcar, Vasprun, Outcar
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
+from vise.defaults import defaults
 
 warnings.simplefilter('ignore', UnknownPotcarWarning)
 
@@ -27,6 +28,7 @@ def parse_args_main_vasp_util(args):
 
     subparsers = parser.add_subparsers()
     dir_parser = add_sub_parser(argparse, name="dir")
+    vasprun_parser = add_sub_parser(argparse, name="dir")
 
     # -- calc charge state -----------------------------------------------------
     parser_calc_charge_state = subparsers.add_parser(
@@ -111,6 +113,20 @@ def parse_args_main_vasp_util(args):
 
     parser_calc_def_charge_info.set_defaults(func=make_defect_charge_info_main)
 
+    # -- make total dos for defect and carrier density -------------------------
+    parser_make_total_dos = subparsers.add_parser(
+        name="make_total_dos",
+        description="make total dos for defect and carrier density.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['mtd'])
+    parser_make_total_dos.add_argument(
+        "-v", "--vasprun", type=Vasprun, default=defaults.vasprun,
+        help="vasprun.xml file name.")
+    parser_make_total_dos.add_argument(
+        "-o", "--outcar", type=Outcar, default=defaults.outcar,
+        help="OUTCAR file name.")
+    parser_make_total_dos.set_defaults(func=make_total_dos)
+    # ----------------------------------------------------------------
     return parser.parse_args(args)
 
 

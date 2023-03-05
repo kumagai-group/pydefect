@@ -5,13 +5,16 @@ from pathlib import Path
 
 from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults
+from pydefect.analyzer.concentration.make_concentration import TotalDos
 from pydefect.analyzer.grids import Grids
 from pydefect.analyzer.refine_defect_structure import refine_defect_structure
 from pydefect.cli.vasp.make_defect_charge_info import make_defect_charge_info
 from pydefect.cli.vasp.get_defect_charge_state import get_defect_charge_state
 from pydefect.input_maker.defect_entry import make_defect_entry
 from pymatgen.core import Structure
+from pymatgen.electronic_structure.core import Spin
 from pymatgen.io.vasp import Chgcar
+from vise.analyzer.vasp.band_edge_properties import VaspBandEdgeProperties
 from vise.input_set.incar import ViseIncar
 from vise.util.file_transfer import FileLink
 from vise.util.logger import get_logger
@@ -95,3 +98,14 @@ def make_defect_charge_info_main(args):
     plt.savefig("dist.pdf")
 
 
+def make_total_dos(args):
+    if Spin.down in args.vasprun.complete_dos.densities:
+        raise ValueError("Spin polarization is not supported yet.")
+    band_edge = VaspBandEdgeProperties(args.vasprun, args.outcar)
+    vbm, cbm = band_edge.vbm_info.energy, band_edge.cbm_info.energy
+
+    total_dos = TotalDos(args.vasprun.complete_dos.energies.tolist(),
+                         args.vasprun.complete_dos.densities[Spin.up].tolist(),
+                         args.vasprun.structures[0].volume,
+                         vbm, cbm)
+    total_dos.to_json_file()

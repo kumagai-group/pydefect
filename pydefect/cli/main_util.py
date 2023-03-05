@@ -6,11 +6,13 @@ import sys
 import warnings
 
 from monty.serialization import loadfn
+from pydefect.analyzer.concentration.degeneracy import Degeneracies
 from pydefect.cli.main import description, epilog, add_sub_parser, dirs_parsers
 from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp, \
     composition_energies_from_mp, add_interstitials_from_local_extrema, \
     make_defect_vesta_file, show_u_values, show_pinning_levels, \
-    make_degeneracies
+    make_degeneracies, calc_defect_concentrations, calc_carrier_concentrations, \
+    plot_carrier_concentrations, plot_defect_concentrations
 from pydefect.defaults import defaults
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
@@ -137,7 +139,80 @@ def parse_args_main_util(args):
 
     parser_make_degeneracies.set_defaults(
         func=make_degeneracies)
+
+    # -- calc carrier concentrations  ------------------------------------------
+    parser_calc_carrier_concentrations = subparsers.add_parser(
+        name="calc_carrier_concentrations",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['ccc'])
+    parser_calc_carrier_concentrations.add_argument(
+        "-t", "--total_dos", required=True, type=loadfn,
+        help="total_dos.json")
+    parser_calc_carrier_concentrations.add_argument(
+        "-T", "--T", type=float, default=300,
+        help="Temperature in K.")
+
+    parser_calc_carrier_concentrations.set_defaults(
+        func=calc_carrier_concentrations)
+
+    # -- calc defect concentrations  -------------------------------------------
+    parser_calc_defect_concentrations = subparsers.add_parser(
+        name="calc_defect_concentrations",
+        description="",
+        parents=[defect_e_sum_parser],
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['cdc'])
+    parser_calc_defect_concentrations.add_argument(
+        "--degeneracies", required=True, type=Degeneracies.from_yaml,
+        help="degeneracies.yaml")
+    parser_calc_defect_concentrations.add_argument(
+        "-t", "--total_dos", required=True, type=loadfn,
+        help="total_dos.json")
+    parser_calc_defect_concentrations.add_argument(
+        "-T", "--T", type=float, default=300,
+        help="Temperature in K.")
+    parser_calc_defect_concentrations.add_argument(
+        "--con_by_Ef", type=loadfn, default=None,
+        help="con_by_Ef.json file.")
+
+    parser_calc_defect_concentrations.set_defaults(
+        func=calc_defect_concentrations)
+
+    # -- plot carrier concentrations  ------------------------------------------
+    parser_plot_carrier_concentrations = subparsers.add_parser(
+        name="plot_carrier_concentrations",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['pcc'])
+    parser_plot_carrier_concentrations.add_argument(
+        "-c", "--con_by_Ef", required=True, type=loadfn, nargs="+",
+        help="con_by_Ef.json file name")
+    parser_plot_carrier_concentrations.add_argument(
+        "-cr", "--concentration_ranges", type=float, nargs="+",
+        help="Concentration ranges. Set the exponents. E.g., 10**2 -> 2")
+    parser_plot_carrier_concentrations.add_argument(
+        "-er", "--energy_ranges", type=float, nargs="+",
+        help="Energy ranges.")
+
+    parser_plot_carrier_concentrations.set_defaults(
+        func=plot_carrier_concentrations)
+
+    # -- plot defect concentrations  ------------------------------------------
+    parser_plot_defect_concentrations = subparsers.add_parser(
+        name="plot_defect_concentrations",
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['pdc'])
+    parser_plot_defect_concentrations.add_argument(
+        "-c", "--con_by_Ef", required=True, type=loadfn,
+        help="con_by_Ef.json file name")
+
+    parser_plot_defect_concentrations.set_defaults(
+        func=plot_defect_concentrations)
+
     # ------------------------------------------------------------------------
+
     return parser.parse_args(args)
 
 

@@ -23,6 +23,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 
 
 @pytest.fixture(scope="session")
+def test_data_files():
+    return Path(__file__).parent / "test_data_files"
+
+
+@pytest.fixture(scope="session")
 def vasp_files():
     return Path(__file__).parent / "cli" / "vasp" / "vasp_files"
 

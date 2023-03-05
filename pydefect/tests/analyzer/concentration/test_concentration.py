@@ -3,8 +3,9 @@
 
 import pytest
 from numpy.testing import assert_almost_equal
-from pydefect.analyzer.concentration.concentration import CarrierConcentration, \
-    DefectConcentration, Concentration, ConcentrationByFermiLevel
+from pydefect.analyzer.concentration.concentration import \
+    CarrierConcentration, DefectConcentration, Concentration, \
+    ConcentrationByFermiLevel
 
 
 @pytest.fixture
@@ -70,12 +71,26 @@ def con_by_Ef(concentration):
     c4 = Concentration(3.0, CarrierConcentration(0.0, 2.0), [va_o1])
     return ConcentrationByFermiLevel(
         T=300, concentrations=[c1, c2, c3, c4],
-        equilibrium_concentration=concentration)
+        equilibrium_concentration=concentration,
+        pinning_levels={"Va_O1": [float("-inf"), 1.0]})
 
 
 def test_concentration_by_fermi_level(con_by_Ef):
     assert con_by_Ef.most_neutral_concentration == con_by_Ef.concentrations[1]
-    assert con_by_Ef.next_Ef_to_neutral_concentration(3) == [1.25, 1.5, 1.75]
+
+
+def test_next_Ef_to_neutral_concentration(con_by_Ef):
+    actual = con_by_Ef.next_Ef_to_neutral_concentration(3)
+    assert actual == [1.0, 1.25, 1.5, 1.75, 2.0]
+
+
+def test_pinning_level(concentration):
+    con_by_Ef = ConcentrationByFermiLevel(
+        T=1, concentrations=[],
+        equilibrium_concentration=concentration,
+        pinning_levels={"Va_O1": [float("-inf"), 1.0],
+                        "Va_Mg1": [-1.0, 0.5]})
+    assert con_by_Ef.pinning_level == [-1.0, 0.5]
 
 
 def test_con_by_Ef_str(con_by_Ef):
