@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import Union
 
+from matplotlib import pyplot as plt
 from monty.serialization import loadfn
 from pydefect.analyzer.calc_results import CalcResults, NoElectronicConvError, \
     NoIonicConvError
@@ -30,7 +31,6 @@ from pydefect.input_maker.supercell_maker import SupercellMaker
 from pymatgen.analysis.phase_diagram import PDPlotter
 from pymatgen.core import Composition
 from vise.util.logger import get_logger
-from matplotlib import pyplot as plt
 
 logger = get_logger(__name__)
 
@@ -277,5 +277,6 @@ def plot_defect_energy(args):
         label_line=args.label_line,
         add_charges=args.add_charges,
         add_thin_lines=args.plot_all_energies)
+
     plotter.construct_plot()
     plotter.plt.savefig(f"energy_{args.label}.pdf")

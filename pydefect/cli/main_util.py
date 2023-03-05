@@ -27,6 +27,7 @@ def parse_args_main_util(args):
     unitcell_parser = add_sub_parser(argparse, name="unitcell")
     si_parser = add_sub_parser(argparse, name="supercell_info")
     no_calc_results = add_sub_parser(argparse, name="no_calc_results_check")
+    defect_e_sum_parser = add_sub_parser(argparse, name="defect_energy_summary")
 
     # -- composition energies from mp ------------------------------------------
     parser_comp_es_from_mp = subparsers.add_parser(
@@ -49,7 +50,7 @@ def parse_args_main_util(args):
     parser_show_u_values = subparsers.add_parser(
         name="show_u_values",
         description="Show U values for defects.",
-        parents=[add_sub_parser(argparse, "defect_energy_summary")],
+        parents=[defect_e_sum_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['u'])
 
@@ -59,8 +60,7 @@ def parse_args_main_util(args):
     parser_show_pinning_levels = subparsers.add_parser(
         name="show_pinning_levels",
         description="Show defect pinning levels.",
-        parents=[add_sub_parser(argparse, "defect_energy_label"),
-                 add_sub_parser(argparse, "defect_energy_summary")],
+        parents=[defect_e_sum_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pl'])
 

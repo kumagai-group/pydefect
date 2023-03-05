@@ -78,7 +78,6 @@ def add_sub_parser(_argparse, name: str):
         result.add_argument(
             "--no_corrections", dest="with_corrections", action="store_false",
             help="Set when corrections are switched off.")
-    elif name == "defect_energy_label":
         result.add_argument(
             "-l", "--label", type=str, required=True,
             help="Label in the chemical potential diagram")
@@ -102,7 +101,6 @@ def parse_args_main(args):
     pbes_parser = add_sub_parser(argparse, name="perfect_band_edge_state")
     no_calc_results = add_sub_parser(argparse, name="no_calc_results_check")
     defect_e_sum_parser = add_sub_parser(argparse, name="defect_energy_summary")
-    defect_e_label = add_sub_parser(argparse, name="defect_energy_label")
 
     # -- make_standard_and_relative_energies -----------------------------------
     parser_make_standard_and_relative_energies = subparsers.add_parser(
@@ -324,7 +322,7 @@ def parse_args_main(args):
     parser_plot_energy = subparsers.add_parser(
         name="plot_defect_formation_energy",
         description="Show and plot defect formation energies.",
-        parents=[defect_e_label, defect_e_sum_parser],
+        parents=[defect_e_sum_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pe'])
 
@@ -339,7 +337,7 @@ def parse_args_main(args):
         help="Set the charges not to appear.")
     parser_plot_energy.add_argument(
         "--plot_all_energies", dest="plot_all_energies", action="store_true",
-        help="Set the charges not to appear.")
+        help="Plot energies of all charge states including unstable ones.")
     parser_plot_energy.set_defaults(func=plot_defect_energy)
     # ------------------------------------------------------------------------
     return parser.parse_args(args)
