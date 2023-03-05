@@ -164,8 +164,11 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
             logger.warning(f"No defect data is available. Try to switch on "
                            f"allow_shallow flag.")
 
-        return ChargeEnergies(prettify_names(charge_energies_dict, name_style),
-                              e_range[0], e_range[1])
+        if name_style is not False:
+            charge_energies_dict = \
+                prettify_names(charge_energies_dict, name_style)
+
+        return ChargeEnergies(charge_energies_dict, e_range[0], e_range[1])
 
     @property
     def latexified_title(self):
