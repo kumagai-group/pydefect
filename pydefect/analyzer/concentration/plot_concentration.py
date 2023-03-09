@@ -15,7 +15,7 @@ def plot_multiple_pns(ccs: List[ConcentrationByFermiLevel],
                       energy_ranges: List[float] = None):
     from matplotlib import pyplot as plt
     ax = plt.gca()
-    for cc, style in zip(ccs, ["-", "-."]):
+    for cc, style in zip(ccs, ["-", "-.", "--", ":"]):
         plot_pn(cc, ax, style)
 
     if concentration_ranges:
