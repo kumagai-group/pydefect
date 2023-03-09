@@ -177,6 +177,9 @@ def parse_args_main_util(args):
     parser_calc_defect_concentrations.add_argument(
         "--con_by_Ef", type=loadfn, default=None,
         help="con_by_Ef.json file.")
+    parser_calc_defect_concentrations.add_argument(
+        "--net_abs_ratio", type=float, default=1e-5,
+        help="Ratio to determine the convergence.")
 
     parser_calc_defect_concentrations.set_defaults(
         func=calc_defect_concentrations)

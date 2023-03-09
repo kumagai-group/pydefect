@@ -133,5 +133,6 @@ def test_calc_defect_concentrations(tmpdir, test_data_files):
                      total_dos=loadfn(test_dir / "total_dos.json"),
                      degeneracies=degeneracies,
                      T=300,
-                     con_by_Ef=None)
+                     con_by_Ef=None,
+                     net_abs_ratio=0.001)
     calc_defect_concentrations(args)

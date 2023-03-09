@@ -135,7 +135,8 @@ def calc_defect_concentrations(args):
     Efs: list = np.linspace(e_min, e_max, 100, True).tolist()
     con_by_Ef = make_concentrations.make_concentrations_by_fermi_level(Efs)
     con_by_Ef.equilibrium_concentration = \
-        equilibrium_concentration(make_concentrations, Efs[0], Efs[-1])
+        equilibrium_concentration(make_concentrations, Efs[0], Efs[-1],
+                                  net_abs_ratio=args.net_abs_ratio)
 
     filename = f"con_by_Ef_{args.label}_{args.T}K"
     if args.con_by_Ef:
