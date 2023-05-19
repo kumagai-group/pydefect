@@ -37,7 +37,7 @@ def test_create_supercell_raise_not_primitive_error(bcc):
 
 def test_create_supercell_matrix(a_centered_orthorhombic):
     matrix = [[2, 0, 0], [0, 1, 0], [0, 0, 1]]
-    cs = SupercellMaker(a_centered_orthorhombic, matrix_to_conv_cell=matrix)
+    cs = SupercellMaker(a_centered_orthorhombic, matrix=matrix)
     actual = cs.supercell.matrix
     np.testing.assert_array_equal(actual, matrix)
 
@@ -46,7 +46,7 @@ def test_create_supercell_matrix(a_centered_orthorhombic):
 
 
 def test_create_supercell_generate_supercell_info(simple_cubic):
-    cs = SupercellMaker(simple_cubic, matrix_to_conv_cell=[[2, 0, 0], [0, 2, 0], [0, 0, 2]])
+    cs = SupercellMaker(simple_cubic, matrix=[[2, 0, 0], [0, 2, 0], [0, 0, 2]])
     info = cs.supercell_info
     assert info.transformation_matrix == [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
     assert info.sites["H1"].wyckoff_letter == "a"
@@ -106,12 +106,12 @@ direct
 0.000000 0.000000 0.000000 Si
 0.500000 0.500000 0.500000 Si""", fmt="poscar")
 
-    matrix_to_conv_cell = [[3, 0, 0], [0, 3, 0], [0, 0, 2]]
+    matrix = [[3, 0, 0], [0, 3, 0], [0, 0, 2]]
     sm = SupercellMaker(structure,
-                        matrix_to_conv_cell=matrix_to_conv_cell,
+                        matrix=matrix,
                         symprec=0.01)
     actual = structure * sm.transformation_matrix
-    expected = conv_structure * matrix_to_conv_cell
+    expected = conv_structure * matrix
     assert_structure_almost_same(actual, expected)
 
 
