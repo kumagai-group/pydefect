@@ -12,18 +12,17 @@ from tabulate import tabulate
 @dataclass
 class ExtendedFnvCorrection(Correction):
     """
-    species: Species except for the defect. e.g., ["Mg", "Mg", ..., "O", ..]
-    atomic_coords: Fractional coordinates except for the defect.
-    pc_pot (list of float):
-        List of point-charge potential from the defect for all the
-        atomic sites.
+    charge: Defect charge
+    point_charge_correction: Correction energy for point charge interactions
     defect_region_radius (float):
         Maximum radius of a sphere touching to the lattice plane, used
         for defining the outside region of the defect.
+    sites: Site potentials
+    defect_coords: Position of defect site in fractional coordinates
 
     Add units of length and potential
     """
-    charge: int
+    charge: float
     point_charge_correction: float
     defect_region_radius: float
     sites: List["PotentialSite"]

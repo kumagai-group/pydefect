@@ -30,6 +30,12 @@ class Unitcell(MSONable):
     hole_mass: List[List[float]] = None
 
     @property
+    def effective_ionic_diele_const(self):
+        e_inf = np.array(self.ele_dielectric_const)
+        e_sum = np.array(self.dielectric_constant)
+        return np.nan_to_num((e_sum * e_inf) / (e_sum - e_inf)).tolist()
+
+    @property
     def ave_ele_diele(self):
         matrix = np.array(self.ele_dielectric_const)
         return np.average(matrix.diagonal())

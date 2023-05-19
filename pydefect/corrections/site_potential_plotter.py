@@ -56,7 +56,8 @@ class SitePotentialPlotter:
                  defect_region_radius: float,
                  ave_pot_diff: float,
                  x_unit: Optional[str] = "Å",
-                 y_unit: Optional[str] = "V"):
+                 y_unit: Optional[str] = "V",
+                 **kwargs):
         self._title = title
         self.sites = sites
         self.defect_region_radius = defect_region_radius
@@ -70,12 +71,13 @@ class SitePotentialPlotter:
                        title,
                        efnv_correction: ExtendedFnvCorrection,
                        x_unit: Optional[str] = "Å",
-                       y_unit: Optional[str] = "V"):
+                       y_unit: Optional[str] = "V",
+                       **kwargs):
         return cls(title=title,
                    sites=efnv_correction.sites,
                    defect_region_radius=efnv_correction.defect_region_radius,
                    ave_pot_diff=efnv_correction.average_potential_diff,
-                   x_unit=x_unit, y_unit=y_unit)
+                   x_unit=x_unit, y_unit=y_unit, **kwargs)
 
     @classmethod
     def from_gkfo_corr(cls,
