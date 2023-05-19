@@ -19,7 +19,9 @@ from pydefect.input_maker.supercell_info import Site, SupercellInfo, \
 from pymatgen.core import Lattice, IStructure, Structure
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
-# Need the following the share the fixture
+
+
+# Need the following to share the fixture
 
 
 @pytest.fixture(scope="session")
