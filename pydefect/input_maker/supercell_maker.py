@@ -21,7 +21,8 @@ logger = get_logger(__name__)
 class SupercellMaker:
     def __init__(self,
                  primitive_structure: IStructure,
-                 matrix_to_conv_cell: Optional[List[List[int]]] = None,
+                 # matrix_to_conv_cell
+                 matrix: Optional[List[List[int]]] = None,
                  symprec: float = defaults.symmetry_length_tolerance,
                  angle_tolerance: float = defaults.symmetry_angle_tolerance,
                  raise_error: bool = True,
@@ -57,7 +58,7 @@ class SupercellMaker:
         self.conv_multiplicity = centering.conv_multiplicity
         self.conv_trans_mat = centering.primitive_to_conv
 
-        self._matrix = matrix_to_conv_cell
+        self._matrix = matrix
         self._supercell_kwargs = supercell_kwargs
 
         self._generate_supercell(crystal_system)
