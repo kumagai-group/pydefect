@@ -128,7 +128,7 @@ def make_calc_results(args):
 
     def _inner(_dir: Path):
         calc_results = make_calc_results_from_vasp(
-            vasprun=Vasprun(_dir / defaults.vasprun),
+            vasprun=Vasprun(_dir / defaults.vasprun, parse_potcar_file=False),
             outcar=Outcar(_dir / defaults.outcar))
         calc_results.to_json_file(str(_dir / file_name))
 
@@ -137,7 +137,7 @@ def make_calc_results(args):
 
 def make_perfect_band_edge_state(args):
     procar = Procar(args.dir / defaults.procar)
-    vasprun = Vasprun(args.dir / defaults.vasprun)
+    vasprun = Vasprun(args.dir / defaults.vasprun, parse_potcar_file=False)
     outcar = Outcar(args.dir / defaults.outcar)
     perfect_band_edge_state = \
         make_perfect_band_edge_state_from_vasp(procar, vasprun, outcar)
@@ -158,7 +158,7 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
         except FileNotFoundError:
             title = "No name"
         procar = Procar(_dir / defaults.procar)
-        vasprun = Vasprun(_dir / defaults.vasprun)
+        vasprun = Vasprun(_dir / defaults.vasprun, parse_potcar_file=False)
 
         str_info = None
         if args.no_participation_ratio is False:

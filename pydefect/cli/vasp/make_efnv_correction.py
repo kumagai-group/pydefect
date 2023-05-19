@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from typing import Optional
 
 import numpy as np
 from numpy import dot, cross
@@ -14,15 +15,16 @@ from pydefect.corrections.ewald import Ewald
 from pydefect.defaults import defaults
 from pydefect.util.error_classes import SupercellError
 from vise.util.logger import get_logger
-
+from vise.util.typing import Coords
 
 logger = get_logger(__name__)
 
 
-def make_efnv_correction(charge: int,
+def make_efnv_correction(charge: float,
                          calc_results: CalcResults,
                          perfect_calc_results: CalcResults,
                          dielectric_tensor: np.array,
+                         defect_coords: Optional[Coords] = None,
                          accuracy: float = defaults.ewald_accuracy,
                          unit_conversion: float = 180.95128169876497):
     """
@@ -39,7 +41,8 @@ def make_efnv_correction(charge: int,
 
     structure_analyzer = DefectStructureComparator(
         calc_results.structure, perfect_calc_results.structure)
-    defect_coords = structure_analyzer.defect_center_coord
+    if defect_coords is None:
+        defect_coords = structure_analyzer.defect_center_coord
     lattice = calc_results.structure.lattice
     ewald = Ewald(lattice.matrix, dielectric_tensor, accuracy=accuracy)
     point_charge_correction = \

@@ -118,7 +118,7 @@ def make_supercell(args):
 
     if args.matrix:
         matrix = sanitize_matrix(args.matrix)
-        maker = supercell_maker(args.unitcell, matrix)
+        maker = supercell_maker(args.unitcell, matrix=matrix, **kwargs)
     else:
         if args.min_num_atoms:
             kwargs["min_num_atoms"] = args.min_num_atoms
