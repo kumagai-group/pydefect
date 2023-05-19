@@ -6,7 +6,7 @@ from pymatgen.io.vasp import Vasprun, Outcar
 
 
 def test_make_calc_results_from_vasp_results(vasp_files):
-    vasprun = Vasprun(vasp_files / "MgO_conv_Va_O_0" / "vasprun.xml")
+    vasprun = Vasprun(vasp_files / "MgO_conv_Va_O_0" / "vasprun.xml", parse_potcar_file=False)
     outcar = Outcar(vasp_files / "MgO_conv_Va_O_0" / "OUTCAR")
     results = make_calc_results_from_vasp(vasprun, outcar)
 

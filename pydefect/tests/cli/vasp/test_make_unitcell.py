@@ -24,7 +24,7 @@ def test_unitcell(vasp_files):
 
     path = vasp_files / "unitcell_Ne_solid"
     unitcell = make_unitcell_from_vasp(
-        vasprun_band=Vasprun(path / "vasprun-band.xml"),
+        vasprun_band=Vasprun(path / "vasprun-band.xml", parse_potcar_file=False),
         outcar_band=Outcar(path / "OUTCAR-band"),
         outcar_dielectric_clamped=Outcar(path / "OUTCAR-dielectric"),
         outcar_dielectric_ionic=Outcar(path / "OUTCAR-dielectric"),

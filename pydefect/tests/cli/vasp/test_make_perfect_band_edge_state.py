@@ -9,7 +9,7 @@ from pymatgen.io.vasp import Procar, Vasprun, Outcar
 
 def test_make_perfect_band_edge_state_from_vasp(vasp_files):
     procar = Procar(vasp_files / "MgO_2x2x2_perfect" / "PROCAR")
-    vasprun = Vasprun(vasp_files / "MgO_2x2x2_perfect" / "vasprun.xml")
+    vasprun = Vasprun(vasp_files / "MgO_2x2x2_perfect" / "vasprun.xml", parse_potcar_file=False)
     outcar = Outcar(vasp_files / "MgO_2x2x2_perfect" / "OUTCAR")
     actual = make_perfect_band_edge_state_from_vasp(procar, vasprun, outcar)
 

@@ -162,7 +162,8 @@ def test_make_calc_results(tmpdir, mocker):
     args = Namespace(dirs=[Path("a")], verbose=False)
     make_calc_results(args)
 
-    mock_vasprun.assert_called_with(Path("a") / defaults.vasprun)
+    mock_vasprun.assert_called_with(Path("a") / defaults.vasprun,
+                                    parse_potcar_file=False)
     mock_outcar.assert_called_with(Path("a") / defaults.outcar)
     mock.assert_called_with(vasprun=mock_vasprun.return_value,
                             outcar=mock_outcar.return_value)
@@ -179,7 +180,8 @@ def test_make_perfect_band_edge_state(mocker):
     args = Namespace(dir=Path("perfect"))
     make_perfect_band_edge_state(args)
 
-    mock_vasprun.assert_called_with(Path("perfect") / defaults.vasprun)
+    mock_vasprun.assert_called_with(Path("perfect") / defaults.vasprun,
+                                    parse_potcar_file=False)
     mock_procar.assert_called_with(Path("perfect") / defaults.procar)
     mock_outcar.assert_called_with(Path("perfect") / defaults.outcar)
     mock_make_perf_be_state.assert_called_with(mock_procar.return_value,
@@ -225,7 +227,8 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
     make_band_edge_orb_infos_and_eigval_plot(args)
 
     mock_procar.assert_called_with(Path("Va_O1_2") / defaults.procar)
-    mock_vasprun.assert_called_with(Path("Va_O1_2") / defaults.vasprun)
+    mock_vasprun.assert_called_with(Path("Va_O1_2") / defaults.vasprun,
+                                    parse_potcar_file=False)
 
     mock_make_orbital_infos.assert_called_with(
         mock_procar.return_value, mock_vasprun.return_value, 10, 20,
