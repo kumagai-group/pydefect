@@ -128,6 +128,17 @@ def test_defect_energy_summary_charge_energies(defect_energy_summary):
     assert actual == expected
 
 
+def test_defect_energy_summary_exclude_defects(defect_energy_summary):
+    actual = defect_energy_summary.screened_defect_energies(
+        allow_shallow=True, excluded_defects=["Va_O1_2"])
+    expected = {"Va_O1":
+                    DefectEnergies(
+                        {"O": -1}, charges=[0, 1],
+                        defect_energies=[DefectEnergy(1.0, {"corr": 2.0}, is_shallow=False),
+                                         DefectEnergy(2.0, {"corr": 2.0}, is_shallow=False)])}
+    assert actual == expected
+
+
 def test_cross_points_e_max_energies_dicts():
     charge_energies = ChargeEnergies(
         charge_energies_dict={"Va_Mg": SingleChargeEnergies([(0, 2.0)]),

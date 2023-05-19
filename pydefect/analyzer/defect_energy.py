@@ -93,16 +93,20 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
             logger.warning(f"Supercell CBM {self.supercell_cbm} is lower in "
                            f"energy than the unitcell CBM {self.cbm}")
 
-    def screened_defect_energies(self, allow_shallow: bool
+    def screened_defect_energies(self,
+                                 allow_shallow: bool,
+                                 excluded_defects: List[str] = None
                                  ) -> Dict[str, DefectEnergies]:
         result = {}
         for name, des in self.defect_energies.items():
             charges, defect_energies = [], []
-            for c, de in zip(des.charges, des.defect_energies):
-                if allow_shallow or \
-                        (allow_shallow is False and de.is_shallow is False):
-                    charges.append(c)
-                    defect_energies.append(de)
+            for charge, de in zip(des.charges, des.defect_energies):
+                if allow_shallow is False and de.is_shallow is True:
+                    continue
+                if excluded_defects and f"{name}_{charge}" in excluded_defects:
+                    continue
+                charges.append(charge)
+                defect_energies.append(de)
             result[name] = DefectEnergies(des.atom_io, charges, defect_energies)
         return result
 
