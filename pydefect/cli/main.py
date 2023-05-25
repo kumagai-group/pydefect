@@ -174,7 +174,15 @@ def parse_args_main(args):
              "required.")
     parser_supercell.add_argument(
         "-s", "--sites_yaml_filename", type=str,
-        help="e.g., sites.yaml")
+        help="""sites.yaml. An example is 
+Mg1:
+  site_index: 0  
+  site_symmetry: Pm-3m
+  wyckoff_letter: b
+O1:
+  site_index: 32
+  site_symmetry: Pm-3m
+""")
 
     parser_supercell.set_defaults(func=make_supercell)
 
