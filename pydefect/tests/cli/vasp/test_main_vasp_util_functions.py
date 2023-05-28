@@ -76,7 +76,7 @@ def test_make_parchg_dir(tmpdir, mocker):
             raise ValueError
 
     mock_loadfn = mocker.patch(f"{_filepath}.loadfn", side_effect=side_effect)
-    args = Namespace(dir=Path(tmpdir))
+    args = Namespace(dir=Path(tmpdir), ibands=None)
 
     with pytest.raises(FileNotFoundError):
         make_parchg_dir(args)

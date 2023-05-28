@@ -30,9 +30,10 @@ def test_make_defect_entry(mocker):
 
 def test_make_parchg_dir():
     parsed_args = parse_args_main_vasp_util(
-        ["pd", "-d", "Va_O1_0"])
+        ["pd", "-d", "Va_O1_0", "-i", "1"])
     expected = Namespace(
         dir=Path("Va_O1_0"),
+        ibands=[1],
         func=parsed_args.func)
     assert parsed_args == expected
 

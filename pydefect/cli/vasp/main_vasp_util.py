@@ -67,6 +67,9 @@ def parse_args_main_vasp_util(args):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['pd'])
 
+    parser_make_parchg_dir.add_argument(
+        "-i", "--ibands", type=int, nargs="+",
+        help="Band indices to be drawn, which start from 1.")
     parser_make_parchg_dir.set_defaults(func=make_parchg_dir)
 
     # -- make refine defect poscar ---------------------------------------------

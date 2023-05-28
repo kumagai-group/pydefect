@@ -61,7 +61,10 @@ def make_parchg_dir(args):
     # Increment index by 1 as VASP band index begins from 1.
     incar = ViseIncar.from_file("INCAR")
     band_edge_states = loadfn("band_edge_states.json")
-    iband = [i + 1 for i in band_edge_states.band_indices_from_vbm_to_cbm]
+    if args.ibands:
+        iband = args.ibands
+    else:
+        iband = [i + 1 for i in band_edge_states.band_indices_from_vbm_to_cbm]
     incar.update({"LPARD": True, "LSEPB": True, "KPAR": 1, "IBAND": iband})
 
     parchg = Path("parchg")
