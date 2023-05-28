@@ -47,7 +47,8 @@ def test_plot_wo_spin():
         fermi_level=0.5)
     plotter = EigenvalueMplPlotter(title="test",
                                    band_edge_orb_infos=be_orbital_info,
-                                   supercell_vbm=0.1, supercell_cbm=0.9)
+                                   supercell_vbm=0.1, supercell_cbm=0.9,
+                                   y_range=[-1, 2])
     plotter.construct_plot()
     plotter.plt.show()
 

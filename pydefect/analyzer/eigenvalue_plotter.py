@@ -184,6 +184,7 @@ class EigenvalueMplPlotter(EigenvaluePlotter):
         self._add_xticks()
         self._add_band_edges()
         self._set_x_range()
+        self._set_y_range()
         self._set_labels()
         self._set_title()
         self._set_formatter()
@@ -224,6 +225,11 @@ class EigenvalueMplPlotter(EigenvaluePlotter):
     def _set_x_range(self):
         for ax in self.axs:
             ax.set_xlim(-0.5, len(self._kpt_coords) - 0.5)
+
+    def _set_y_range(self):
+        if self._y_range:
+            for ax in self.axs:
+                ax.set_ylim(self._y_range)
 
     def _set_labels(self):
         self.fig.text(0.5, 0, "K-point coords", ha='center',
