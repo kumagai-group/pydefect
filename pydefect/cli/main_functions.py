@@ -22,6 +22,7 @@ from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DMplPlotter, \
     ChemPotDiag3DMplPlotter
 from pydefect.cli.main_tools import sanitize_matrix, parse_dirs
 from pydefect.cli.vasp.make_efnv_correction import make_efnv_correction
+from pydefect.corrections.no_correction import NoCorrection
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
 from pydefect.input_maker.append_interstitial import append_interstitial
 from pydefect.input_maker.defect_set_maker import DefectSetMaker
@@ -226,7 +227,13 @@ def make_defect_energy_infos_main_func(args):
     def _inner(_dir: Path):
         calc_results = get_calc_results(_dir, args.check_calc_results)
         defect_entry = loadfn(_dir / "defect_entry.json")
-        correction = loadfn(_dir / "correction.json")
+        try:
+            correction = loadfn(_dir / "correction.json")
+        except FileNotFoundError:
+            logger.warning(
+                "Since correction.json file does not exist, no correction is"
+                "applied.")
+            correction = NoCorrection()
         try:
             band_edge_states = loadfn(_dir / "band_edge_states.json")
         except FileNotFoundError:
