@@ -180,8 +180,9 @@ Mg1:
   site_symmetry: Pm-3m
   wyckoff_letter: b
 O1:
-  site_index: 32
+  site_index: 1 
   site_symmetry: Pm-3m
+Here site_index is based on the given structure.
 """)
 
     parser_supercell.set_defaults(func=make_supercell)
