@@ -31,7 +31,7 @@ def defect_energy_info(defect_energy):
 @pytest.fixture
 def defect_energy_info2():
     energy = DefectEnergy(formation_energy=0.0,
-                          energy_corrections={"no correction": 0.0})
+                          energy_corrections={})
     return DefectEnergyInfo(name="hole polaron", charge=1, atom_io={},
                             defect_energy=energy)
 
@@ -55,7 +55,6 @@ charge: 1
 formation_energy: 0.0
 atom_io:
 energy_corrections:
-  no correction: 0.0
 is_shallow: """
     assert_yaml_roundtrip(defect_energy_info2, tmpdir, expected_text)
 

@@ -25,7 +25,9 @@ class DefectEnergy(MSONable):
 
     @property
     def total_correction(self) -> float:
-        return sum([v for v in self.energy_corrections.values()])
+        if self.energy_corrections:
+            return sum([v for v in self.energy_corrections.values()])
+        return 0.0
 
     def energy(self, with_correction):
         if with_correction:
@@ -63,6 +65,8 @@ class DefectEnergyInfo(MSONable, ToYamlFileMixIn):
         d = loadfn(filename)
         if d["atom_io"] is None:
             d["atom_io"] = {}
+        if d["energy_corrections"] is None:
+            d["energy_corrections"] = {}
         return cls(d.pop("name"), d.pop("charge"), d.pop("atom_io"),
                    DefectEnergy(**d))
 
