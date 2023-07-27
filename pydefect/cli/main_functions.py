@@ -231,7 +231,7 @@ def make_defect_energy_infos_main_func(args):
             correction = loadfn(_dir / "correction.json")
         except FileNotFoundError:
             logger.warning(
-                "Since correction.json file does not exist, no correction is"
+                "Since correction.json file does not exist, no correction is "
                 "applied.")
             correction = NoCorrection()
         try:

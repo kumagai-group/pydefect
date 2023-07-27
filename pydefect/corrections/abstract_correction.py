@@ -24,5 +24,5 @@ class Correction(ABC, MSONable):
 
     @property
     @abstractmethod
-    def correction_dict(self) -> float:
+    def correction_dict(self) -> Dict[str, float]:
         pass
