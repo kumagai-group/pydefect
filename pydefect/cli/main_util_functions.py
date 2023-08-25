@@ -77,7 +77,7 @@ def make_defect_vesta_file(args) -> None:
         make_vesta_file.initial_vesta.write_file(_dir / "defect_initial.vesta")
         make_vesta_file.final_vesta.write_file(_dir / "defect.vesta")
 
-    parse_dirs(args.dirs, _inner)
+    parse_dirs(args.dirs, _inner, args.verbose)
 
 
 def make_gkfo_correction_from_vasp(args):
@@ -106,7 +106,7 @@ def make_degeneracies(args):
         defect_str_info = loadfn(_dir / "defect_structure_info.json")
         make_deg.add_degeneracy(energy_info, calc_results, defect_str_info)
 
-    parse_dirs(args.dirs, _inner)
+    parse_dirs(args.dirs, _inner, args.verbose)
 
     make_deg.degeneracies.to_yaml_file()
 
