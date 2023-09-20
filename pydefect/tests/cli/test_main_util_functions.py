@@ -87,6 +87,7 @@ def test_make_defect_vesta_file(mocker):
         cutoff=1.0,
         min_displace_w_arrows=2.0,
         arrow_factor=3.0,
+        verbose=True,
         title=None)
     make_defect_vesta_file(args)
     mock_make_vesta_file.assert_called_once_with(mock_defect_structure_info,

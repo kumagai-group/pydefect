@@ -94,6 +94,7 @@ def test_defect_vesta_file_w_options():
         min_displace_w_arrows=2.0,
         arrow_factor=10.0,
         title="title",
+        verbose=False,
         func=parsed_args.func)
     assert parsed_args == expected
 

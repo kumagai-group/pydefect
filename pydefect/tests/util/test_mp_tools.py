@@ -15,7 +15,7 @@ def test_mp_actual_query():
     element_list = ["Mg", "O"]
     mp_query = MpQuery(element_list=element_list,
                        properties=["formula_pretty", "structure"])
-    print([m.formula_pretty for m in mp_query.materials])
+    print(mp_query.materials)
 
     mp_query = MpQuery(element_list=element_list)
     print(mp_query.materials)
