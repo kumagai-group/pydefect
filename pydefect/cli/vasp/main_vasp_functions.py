@@ -144,6 +144,19 @@ def make_perfect_band_edge_state(args):
     perfect_band_edge_state.to_json_file(
         args.dir / "perfect_band_edge_state.json")
 
+    vbm = perfect_band_edge_state.vbm_info.energy
+    cbm = perfect_band_edge_state.cbm_info.energy
+    band_edge_orb_infos = make_band_edge_orbital_infos(
+        procar, vasprun, vbm, cbm)
+    band_edge_orb_infos.to_json_file(args.dir / "band_edge_orbital_infos.json")
+
+    plotter = EigenvalueMplPlotter(
+        title="perfect", band_edge_orb_infos=band_edge_orb_infos,
+        supercell_vbm=vbm, supercell_cbm=cbm)
+    plotter.construct_plot()
+    plotter.plt.savefig(fname=args.dir / "eigenvalues.pdf")
+    plotter.plt.clf()
+
 
 def make_band_edge_orb_infos_and_eigval_plot(args):
     supercell_vbm = args.p_state.vbm_info.energy
