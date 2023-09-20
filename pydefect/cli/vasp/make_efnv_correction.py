@@ -35,40 +35,22 @@ def make_efnv_correction(charge: float,
         elementary_charge * 1e10 / epsilon_0 = 180.95128169876497
         to make potential in V.
     """
-    if calc_results.structure.lattice != perfect_calc_results.structure.lattice:
-        raise SupercellError("The lattice constants for defect and perfect "
-                             "models are different")
+    sites, rel_coords, defect_coords = \
+        make_sites(calc_results, perfect_calc_results, defect_coords)
 
-    structure_analyzer = DefectStructureComparator(
-        calc_results.structure, perfect_calc_results.structure)
-    if defect_coords is None:
-        defect_coords = structure_analyzer.defect_center_coord
     lattice = calc_results.structure.lattice
     ewald = Ewald(lattice.matrix, dielectric_tensor, accuracy=accuracy)
     point_charge_correction = \
         0.0 if not charge else - ewald.lattice_energy * charge ** 2
-
     defect_region_radius = calc_max_sphere_radius(lattice.matrix)
 
-    sites = []
-    for d, p in structure_analyzer.atom_mapping.items():
-        specie = str(calc_results.structure[d].specie)
-        frac_coords = calc_results.structure[d].frac_coords
-        distance, _ = lattice.get_distance_and_image(defect_coords, frac_coords)
-        pot = calc_results.potentials[d] - perfect_calc_results.potentials[p]
-
-        coord = calc_results.structure[d].frac_coords
-        rel_coord = [x - y for x, y in zip(coord, defect_coords)]
-        if distance <= defect_region_radius:
-            pc_potential = None
-        else:
+    for site, rel_coord in zip(sites, rel_coords):
+        if site.distance > defect_region_radius:
             if charge == 0:
-                pc_potential = 0
+                site.pc_potential = 0
             else:
-                pc_potential = ewald.atomic_site_potential(rel_coord) * charge
-                pc_potential *= unit_conversion
-
-        sites.append(PotentialSite(specie, distance, pot, pc_potential))
+                site.pc_potential = (ewald.atomic_site_potential(rel_coord)
+                                     * charge * unit_conversion)
 
     return ExtendedFnvCorrection(
         charge=charge,
@@ -76,6 +58,29 @@ def make_efnv_correction(charge: float,
         defect_region_radius=defect_region_radius,
         sites=sites,
         defect_coords=tuple(defect_coords))
+
+
+def make_sites(calc_results, perfect_calc_results, defect_coords):
+    if calc_results.structure.lattice != perfect_calc_results.structure.lattice:
+        raise SupercellError("The lattice constants for defect and perfect "
+                             "models are different")
+    structure_analyzer = DefectStructureComparator(
+        calc_results.structure, perfect_calc_results.structure)
+    if defect_coords is None:
+        defect_coords = structure_analyzer.defect_center_coord
+    lattice = calc_results.structure.lattice
+    sites, rel_coords = [], []
+
+    for d, p in structure_analyzer.atom_mapping.items():
+        specie = str(calc_results.structure[d].specie)
+        frac_coords = calc_results.structure[d].frac_coords
+        distance, _ = lattice.get_distance_and_image(defect_coords, frac_coords)
+        pot = calc_results.potentials[d] - perfect_calc_results.potentials[p]
+        sites.append(PotentialSite(specie, distance, pot, None))
+        coord = calc_results.structure[d].frac_coords
+        rel_coords.append([x - y for x, y in zip(coord, defect_coords)])
+
+    return sites, rel_coords, defect_coords
 
 
 def calc_max_sphere_radius(lattice_matrix) -> float:
