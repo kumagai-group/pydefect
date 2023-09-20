@@ -17,12 +17,12 @@ class Correction(ABC, MSONable):
     def from_json_file(cls, filename: str = "correction.json"):
         return loadfn(filename)
 
-    @property
-    @abstractmethod
-    def correction_energy(self) -> float:
-        pass
+    # @property
+    # @abstractmethod
+    # def correction_energy(self) -> float:
+    #     pass
 
-    @property
-    @abstractmethod
-    def correction_dict(self) -> Dict[str, float]:
-        pass
+    # @property
+    # @abstractmethod
+    # def correction_dict(self) -> Dict[str, float]:
+    #     pass
