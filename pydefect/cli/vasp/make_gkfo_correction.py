@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import numpy as np
+from vise.util.logger import get_logger
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.corrections.efnv_correction import \
@@ -9,6 +10,9 @@ from pydefect.corrections.efnv_correction import \
 from pydefect.corrections.ewald import Ewald
 from pydefect.corrections.gkfo_correction import GkfoCorrection
 from pydefect.defaults import defaults
+
+
+logger = get_logger(__name__)
 
 
 def make_gkfo_correction(efnv_correction: ExtendedFnvCorrection,
@@ -20,7 +24,11 @@ def make_gkfo_correction(efnv_correction: ExtendedFnvCorrection,
                          accuracy: float = defaults.ewald_accuracy,
                          unit_conversion: float = 180.95128169876497
                          ) -> GkfoCorrection:
-    assert final_calc_results.structure == initial_calc_results.structure
+    try:
+        assert final_calc_results.structure == initial_calc_results.structure
+    except AssertionError:
+        logger.warning("The initial and final structures might be different. "
+                       "I hope you know this different.")
     assert abs(additional_charge) == 1
 
     defect_coords = efnv_correction.defect_coords
