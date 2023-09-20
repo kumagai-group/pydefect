@@ -53,8 +53,8 @@ class SitePotentialPlotter:
     def __init__(self,
                  title: str,
                  sites: List[PotentialSite],
-                 defect_region_radius: float,
-                 ave_pot_diff: float,
+                 defect_region_radius: Optional[float] = None,
+                 ave_pot_diff: Optional[float] = None,
                  x_unit: Optional[str] = "Å",
                  y_unit: Optional[str] = "V",
                  **kwargs):
@@ -135,11 +135,12 @@ class SitePotentialPlotlyPlotter(SitePotentialPlotter):
         min_y = min(all_potentials + pc_potentials + potential_diffs) - 0.4
         max_y = max(all_potentials + pc_potentials + potential_diffs) + 0.4
         max_x = max(all_distances) + 0.4
-        fig.add_shape(dict(type="line",
-                           x0=self.defect_region_radius,
-                           x1=self.defect_region_radius,
-                           y0=min_y, y1=max_y,
-                           line=dict(color="royalblue", width=1.5, dash="dot")))
+        if self.defect_region_radius:
+            fig.add_shape(dict(type="line",
+                               x0=self.defect_region_radius,
+                               x1=self.defect_region_radius,
+                               y0=min_y, y1=max_y,
+                               line=dict(color="royalblue", width=1.5, dash="dot")))
         fig["layout"]["xaxis"]["range"] = [0, max_x]
         fig["layout"]["yaxis"]["range"] = [min_y, max_y]
 
@@ -150,11 +151,12 @@ class SitePotentialPlotlyPlotter(SitePotentialPlotter):
                                  name="Diff", marker_symbol="cross",
                                  **common))
 
-        fig.add_shape(dict(type="line",
-                           x0=self.defect_region_radius, x1=max_x,
-                           y0=self.ave_pot_diff, y1=self.ave_pot_diff,
-                           line=dict(color="red", width=1.5, dash="dot"),
-                           name="alignment"))
+        if self.defect_region_radius and self.ave_pot_diff:
+            fig.add_shape(dict(type="line",
+                               x0=self.defect_region_radius, x1=max_x,
+                               y0=self.ave_pot_diff, y1=self.ave_pot_diff,
+                               line=dict(color="red", width=1.5, dash="dot"),
+                               name="alignment"))
 
         return fig
 
@@ -210,11 +212,13 @@ class SitePotentialMplPlotter(SitePotentialPlotter):
                         borderaxespad=0, fontsize=8)
 
     def _add_lines(self):
-        self.plt.axvline(x=self.defect_region_radius,
-                         **self._mpl_defaults.vline)
-        self.plt.plot([self.defect_region_radius, self._max_distance * 1.1],
-                      [self.ave_pot_diff, self.ave_pot_diff],
-                      **self._mpl_defaults.hline)
+        if self.defect_region_radius:
+            self.plt.axvline(x=self.defect_region_radius,
+                             **self._mpl_defaults.vline)
+        if self.defect_region_radius and self.ave_pot_diff:
+            self.plt.plot([self.defect_region_radius, self._max_distance * 1.1],
+                          [self.ave_pot_diff, self.ave_pot_diff],
+                          **self._mpl_defaults.hline)
         self.plt.axhline(y=0, **self._mpl_defaults.zero_line)
 
     def _set_x_range(self):
