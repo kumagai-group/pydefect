@@ -25,7 +25,6 @@ def parse_args_main_util(args):
     This command provide some utilities related to the VASP calculations""")
 
     subparsers = parser.add_subparsers()
-    dirs_parser = add_sub_parser(argparse, name="dirs")
     unitcell_parser = add_sub_parser(argparse, name="unitcell")
     si_parser = add_sub_parser(argparse, name="supercell_info")
     no_calc_results = add_sub_parser(argparse, name="no_calc_results_check")
@@ -88,7 +87,7 @@ def parse_args_main_util(args):
     parser_dvf = subparsers.add_parser(
         name="defect_vesta_file",
         description="Generate VESTA file for visualizing defect structure.",
-        parents=[dirs_parser],
+        parents=dirs_parsers,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['dvf'])
     parser_dvf.add_argument(
