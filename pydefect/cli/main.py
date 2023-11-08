@@ -276,6 +276,13 @@ Here site_index is based on the given structure.
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         aliases=['efnv'])
 
+    parser_efnv.add_argument(
+        "-r", "--radius",
+        help="Set spherical radius of defect region. The average of potential "
+             "alignment term is calculated at sites outside the sphere.")
+    parser_efnv.add_argument(
+        "--calc_all_sites", action="store_true",
+        help="Set if one wants to calculate the potential at all the sites.")
     parser_efnv.set_defaults(func=make_efnv_correction_main_func)
 
     # -- band edge states ------------------------------------------------

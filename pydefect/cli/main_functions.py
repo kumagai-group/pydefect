@@ -194,7 +194,9 @@ def make_efnv_correction_main_func(args):
         efnv = make_efnv_correction(defect_entry.charge,
                                     calc_results,
                                     args.perfect_calc_results,
-                                    args.unitcell.dielectric_constant)
+                                    args.unitcell.dielectric_constant,
+                                    defect_region_radius=args.radius,
+                                    calc_all_sites=args.calc_all_sites)
         efnv.to_json_file(_dir / file_name)
 
         title = defect_entry.full_name

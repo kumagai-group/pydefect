@@ -250,7 +250,9 @@ def test_make_efnv_correction_from_vasp(mocker):
                      check_calc_results=True,
                      perfect_calc_results=mock_perfect_calc_results,
                      unitcell=mock_unitcell,
-                     verbose=False)
+                     verbose=False,
+                     radius=None,
+                     calc_all_sites=False)
 
     make_efnv_correction_main_func(args)
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
@@ -258,7 +260,9 @@ def test_make_efnv_correction_from_vasp(mocker):
 
     mock_make_efnv.assert_called_with(
         mock_defect_entry.charge, mock_calc_results, mock_perfect_calc_results,
-        mock_unitcell.dielectric_constant)
+        mock_unitcell.dielectric_constant,
+        defect_region_radius=None,
+        calc_all_sites=False)
     mock_efnv.to_json_file.assert_called_with(
         Path("Va_O1_2") / "correction.json")
 

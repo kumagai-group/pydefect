@@ -26,6 +26,8 @@ def make_efnv_correction(charge: float,
                          dielectric_tensor: np.array,
                          defect_coords: Optional[Coords] = None,
                          accuracy: float = defaults.ewald_accuracy,
+                         defect_region_radius: float = None,
+                         calc_all_sites: bool = False,
                          unit_conversion: float = 180.95128169876497):
     """
     Notes:
@@ -42,10 +44,11 @@ def make_efnv_correction(charge: float,
     ewald = Ewald(lattice.matrix, dielectric_tensor, accuracy=accuracy)
     point_charge_correction = \
         0.0 if not charge else - ewald.lattice_energy * charge ** 2
-    defect_region_radius = calc_max_sphere_radius(lattice.matrix)
+    if defect_region_radius is None:
+        defect_region_radius = calc_max_sphere_radius(lattice.matrix)
 
     for site, rel_coord in zip(sites, rel_coords):
-        if site.distance > defect_region_radius:
+        if calc_all_sites is True or site.distance > defect_region_radius:
             if charge == 0:
                 site.pc_potential = 0
             else:

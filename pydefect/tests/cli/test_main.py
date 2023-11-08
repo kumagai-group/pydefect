@@ -186,6 +186,8 @@ def test_efnv_correction(mocker):
         perfect_calc_results=mock_calc_results,
         unitcell=mock_unitcell.from_yaml.return_value,
         verbose=False,
+        radius=None,
+        calc_all_sites=False,
         func=parsed_args.func)
     assert parsed_args == expected
 
