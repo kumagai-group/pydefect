@@ -60,7 +60,8 @@ def make_efnv_correction(charge: float,
 
     if has_calculated_sites is False:
         raise NoCalculatedPotentialSiteError(
-            "Change the spherical radius of defect region manually.")
+            "Change the spherical radius of defect region manually. "
+            f"Now {defect_region_radius:4.2f}Å is set.")
 
     return ExtendedFnvCorrection(
         charge=charge,
