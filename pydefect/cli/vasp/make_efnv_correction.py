@@ -13,7 +13,8 @@ from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.ewald import Ewald
 from pydefect.defaults import defaults
-from pydefect.util.error_classes import SupercellError
+from pydefect.util.error_classes import SupercellError, \
+    NoCalculatedPotentialSiteError
 from vise.util.logger import get_logger
 from vise.util.typing import Coords
 
@@ -47,13 +48,18 @@ def make_efnv_correction(charge: float,
     if defect_region_radius is None:
         defect_region_radius = calc_max_sphere_radius(lattice.matrix)
 
+    has_calculated_sites = False
     for site, rel_coord in zip(sites, rel_coords):
         if calc_all_sites is True or site.distance > defect_region_radius:
+            has_calculated_sites = True
             if charge == 0:
                 site.pc_potential = 0
             else:
                 site.pc_potential = (ewald.atomic_site_potential(rel_coord)
                                      * charge * unit_conversion)
+
+    if has_calculated_sites is False:
+        raise NoCalculatedPotentialSiteError
 
     return ExtendedFnvCorrection(
         charge=charge,

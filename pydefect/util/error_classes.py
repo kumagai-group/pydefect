@@ -14,5 +14,9 @@ class NotPrimitiveError(PydefectError):
     pass
 
 
+class NoCalculatedPotentialSiteError(PydefectError):
+    pass
+
+
 class CpdNotSupportedError(Exception):
     pass
