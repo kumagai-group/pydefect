@@ -77,6 +77,7 @@ def test_defect_vesta_file_wo_options():
         min_displace_w_arrows=0.1,
         arrow_factor=3.0,
         title=None,
+        verbose=False,
         func=parsed_args.func)
     assert parsed_args == expected
 
