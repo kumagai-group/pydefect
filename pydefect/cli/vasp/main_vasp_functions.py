@@ -176,9 +176,15 @@ def make_band_edge_orb_infos_and_eigval_plot(args):
         str_info = None
         if args.no_participation_ratio is False:
             str_info = loadfn(_dir / "defect_structure_info.json")
+        try:
+            eigval_shift_yaml = loadfn(_dir / "eigenvalue_shift.yaml")
+            eigval_shift = eigval_shift_yaml["shift_value"]
+        except FileNotFoundError:
+            eigval_shift = 0.0
 
         band_edge_orb_infos = make_band_edge_orbital_infos(
-            procar, vasprun, supercell_vbm, supercell_cbm, str_info)
+            procar, vasprun, supercell_vbm, supercell_cbm, str_info,
+            eigval_shift=eigval_shift)
         band_edge_orb_infos.to_json_file(_dir / file_name)
 
         plotter = EigenvalueMplPlotter(

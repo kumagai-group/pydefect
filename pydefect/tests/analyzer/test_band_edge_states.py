@@ -48,7 +48,8 @@ def band_edge_orbital_infos(orbital_info):
                                 kpt_coords=[(0.0, 0.0, 0.0)],
                                 kpt_weights=[1.0],
                                 lowest_band_index=10,
-                                fermi_level=0.5)
+                                fermi_level=0.5,
+                                eigval_shift=1.0)
 
 
 def test_kpt_idx(band_edge_orbital_infos):
@@ -61,7 +62,7 @@ def test_band_edge_orbital_info_json_roundtrip(band_edge_orbital_infos, tmpdir):
 
 def test_band_edge_orbital_info_energies_occupations(band_edge_orbital_infos):
     actual = band_edge_orbital_infos.energies_and_occupations
-    expected = [[[[1.0, 1.0]]]]
+    expected = [[[[2.0, 1.0]]]]
     assert actual == expected
 
 
@@ -82,7 +83,8 @@ def test_band_edge_orbital_info_repr():
                              kpt_coords=[(0.0, 0.0, 0.0)],
                              kpt_weights=[1.0],
                              lowest_band_index=10,
-                             fermi_level=0.5)
+                             fermi_level=0.5,
+                             eigval_shift=1.0)
 
     actual = band_edge_orbital_infos.__str__()
     print(actual)
@@ -92,10 +94,10 @@ Index  Coords                    Weight
 1      ( 0.000,  0.000,  0.000)  1.000
 
 Band info near band edges
-Index  Kpoint index  Energy  Occupation  P-ratio  Orbital
-11     1             1.23    1.0         0.1      Mn-s: 0.50, Mn-p: 0.40
+Index  Kpoint index  Energy  Shifted  Occupation  P-ratio  Orbital
+11     1             1.23    2.23     1.0         0.1      Mn-s: 0.50, Mn-p: 0.40
 --
-12     1             2.35    0.0         0.2
+12     1             2.35    3.35     0.0         0.2
 --
 """
     assert actual == expected

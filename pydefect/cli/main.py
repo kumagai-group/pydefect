@@ -277,7 +277,7 @@ Here site_index is based on the given structure.
         aliases=['efnv'])
 
     parser_efnv.add_argument(
-        "-r", "--radius",
+        "-r", "--radius", type=float,
         help="Set spherical radius of defect region. The average of potential "
              "alignment term is calculated at sites outside the sphere.")
     parser_efnv.add_argument(

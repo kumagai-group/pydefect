@@ -5,11 +5,15 @@ from typing import List, Dict, Tuple, Optional, Set
 
 import numpy as np
 from monty.json import MSONable
+from vise.util.logger import get_logger
+
 from pydefect.defaults import defaults
 from pydefect.util.coords import pretty_coords
 from tabulate import tabulate
 from vise.util.mix_in import ToJsonFileMixIn
 from vise.util.typing import Coords, GenCoords
+
+logger = get_logger(__name__)
 
 printed_orbital_weight_threshold = 0.1
 
@@ -53,6 +57,7 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     kpt_weights: List[float]
     lowest_band_index: int  # python convention starting from 0.
     fermi_level: float
+    eigval_shift: float = 0.0
 
     def kpt_idx(self, kpt_coord):
         for i, orig_kpt in enumerate(self.kpt_coords):
@@ -63,10 +68,14 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     @property
     def energies_and_occupations(self) -> List[List[List[List[float]]]]:
         result = np.zeros(np.shape(self.orbital_infos) + (2,))
+        if self.eigval_shift:
+            logger.info(
+                f"The eigenvalues are shifted by {self.eigval_shift:4.2f}")
         for i, x in enumerate(self.orbital_infos):
             for j, y in enumerate(x):
                 for k, z in enumerate(y):
-                    result[i][j][k] = [z.energy, z.occupation]
+                    result[i][j][k] = \
+                        [z.energy + self.eigval_shift, z.occupation]
         return result.tolist()
 
     def __str__(self):
@@ -81,6 +90,9 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     def _band_block(self):
         band_block = [["Index", "Kpoint index", "Energy", "Occupation",
                        "P-ratio", "Orbital"]]
+        if self.eigval_shift:
+            band_block[0].insert(3, "Shifted")
+
         for orbital_info in self.orbital_infos:
             max_idx, min_idx, t_orb_info = self._band_idx_range(orbital_info)
             for band_idx in range(min_idx, max_idx):
@@ -94,8 +106,12 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
                     else:
                         p_ratio = "N.A."
                     orbs = pretty_orbital(orb_info.orbitals)
-                    band_block.append([actual_band_idx, kpt_idx, energy,
-                                       occupation, p_ratio, orbs])
+                    data = [actual_band_idx, kpt_idx, energy, occupation,
+                            p_ratio, orbs]
+                    if self.eigval_shift:
+                        shifted = f"{orb_info.energy + self.eigval_shift :5.2f}"
+                        data.insert(3, shifted)
+                    band_block.append(data)
                 band_block.append(["--"])
             band_block.append("")
         return tabulate(band_block, tablefmt="plain")

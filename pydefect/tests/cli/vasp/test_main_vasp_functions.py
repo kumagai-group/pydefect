@@ -213,6 +213,8 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
             return mock_defect_entry
         elif str(key) == "Va_O1_2/defect_structure_info.json":
             return mock_structure_info
+        elif str(key) == "Va_O1_2/eigenvalue_shift.yaml":
+            return {"shift_value": 1.0}
         else:
             raise ValueError
 
@@ -232,7 +234,8 @@ def test_make_band_edge_orb_infos_and_eigval_plot(mocker):
 
     mock_make_orbital_infos.assert_called_with(
         mock_procar.return_value, mock_vasprun.return_value, 10, 20,
-        mock_structure_info)
+        mock_structure_info,
+        eigval_shift=1.0)
 
     mock_loadfn.assert_any_call(Path("Va_O1_2") / "defect_entry.json")
 

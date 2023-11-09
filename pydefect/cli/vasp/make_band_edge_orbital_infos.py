@@ -15,7 +15,8 @@ from pymatgen.io.vasp import Procar, Vasprun
 def make_band_edge_orbital_infos(procar: Procar,
                                  vasprun: Vasprun,
                                  vbm: float, cbm: float,
-                                 str_info: DefectStructureInfo = None):
+                                 str_info: DefectStructureInfo = None,
+                                 eigval_shift: float = 0.0):
     eigval_range = defaults.eigval_range
     kpt_coords = [tuple(coord) for coord in vasprun.actual_kpoints]
     max_energy_by_spin, min_energy_by_spin = [], []
@@ -53,7 +54,8 @@ def make_band_edge_orbital_infos(procar: Procar,
         kpt_weights=vasprun.actual_kpoints_weights,
         # need to convert numpy.int64 to int for mongoDB.
         lowest_band_index=int(lower_idx),
-        fermi_level=vasprun.efermi)
+        fermi_level=vasprun.efermi,
+        eigval_shift=eigval_shift)
 
 
 def calc_participation_ratio(orbitals: Dict[Spin, np.ndarray],
