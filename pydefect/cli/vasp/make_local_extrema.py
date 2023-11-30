@@ -233,7 +233,7 @@ class ChargeDensityAnalyzer:
             from skimage.feature import peak_local_max
         except ImportError:
             logger.warning("To find the extrema of the coordinates, "
-                           "install skimage.")
+                           "install scikit-image.")
             raise
 
         sign, extrema_type = 1, "local maxima"
