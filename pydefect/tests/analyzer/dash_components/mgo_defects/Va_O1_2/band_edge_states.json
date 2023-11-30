@@ -1,1 +1,0 @@
-{"@module": "pydefect.analyzer.band_edge_states", "@class": "BandEdgeStates", "@version": null, "states": [{"@module": "pydefect.analyzer.band_edge_states", "@class": "EdgeState", "value": "In-gap state"}, {"@module": "pydefect.analyzer.band_edge_states", "@class": "EdgeState", "value": "In-gap state"}]}

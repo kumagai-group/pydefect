@@ -4,9 +4,7 @@ from fractions import Fraction
 from itertools import cycle
 from typing import Optional, List
 
-import plotly.graph_objects as go
 from matplotlib import pyplot as plt
-from plotly.subplots import make_subplots
 from pydefect.analyzer.band_edge_states import BandEdgeOrbitalInfos
 from pydefect.defaults import defaults
 from vise.util.matplotlib import float_to_int_formatter
@@ -84,87 +82,6 @@ class EigenvaluePlotter:
             else:
                 result.append(line_break.join(x_label))
         return result
-
-
-class EigenvaluePlotlyPlotter(EigenvaluePlotter):
-    def create_figure(self):
-        fig = make_subplots(rows=1,
-                            cols=2,
-                            shared_yaxes=True,
-                            horizontal_spacing=0.01,
-                            subplot_titles=["up", "down"],
-#                            x_title="K-points",
-                            )
-        for i in fig['layout']['annotations']:
-            i['font'] = dict(size=24)
-
-        fig.update_layout(
-            title="Eigenvalues",
-            yaxis_title="Energy (eV)",
-            title_font_size=30,
-            font_size=24, width=700, height=700,
-            showlegend=False)
-
-        common = {"mode": "markers", "marker_size": 10}
-
-        for spin_idx, eo_by_spin in \
-                enumerate(self._energies_and_occupations, 1):
-            occupied = [[], [], [], []]
-            partially_occupied = [[], [], [], []]
-            unoccupied = [[], [], [], []]
-            for kpt_idx, eo_by_k_idx in enumerate(eo_by_spin):
-                for band_idx, (energy, occup) \
-                        in enumerate(eo_by_k_idx, self._lowest_band_idx):
-                    if occup > defaults.state_unoccupied_threshold:
-                        occupied[0].append(kpt_idx)
-                        occupied[1].append(energy)
-                        occupied[2].append(band_idx + 1)
-                        occupied[3].append(occup)
-                    elif occup < defaults.state_occupied_threshold:
-                        unoccupied[0].append(kpt_idx)
-                        unoccupied[1].append(energy)
-                        unoccupied[2].append(band_idx + 1)
-                        unoccupied[3].append(occup)
-                    else:
-                        partially_occupied[0].append(kpt_idx)
-                        partially_occupied[1].append(energy)
-                        partially_occupied[2].append(band_idx + 1)
-                        partially_occupied[3].append(occup)
-
-            fig.add_shape(type="line",
-                          x0=-0.5,
-                          x1=len(eo_by_spin) - 0.5,
-                          y0=self._supercell_vbm,
-                          y1=self._supercell_vbm,
-                          line=dict(color="MediumPurple", width=4, dash="dot"),
-                          row=1, col=spin_idx)
-            fig.add_shape(type="line",
-                          x0=-0.5,
-                          x1=len(eo_by_spin) - 0.5,
-                          y0=self._supercell_cbm,
-                          y1=self._supercell_cbm,
-                          line=dict(color="MediumPurple", width=4, dash="dot"),
-                          row=1, col=spin_idx)
-
-            hover_template = '<i>band index</i>: %{text}<br><b>Energy</b>: ' \
-                             '%{y:.2f}<br><b>Occupation</b>: %{customdata:.2f}'
-            for points, color, name in \
-                    zip([occupied, partially_occupied, unoccupied],
-                        ["blue", "green", "red"],
-                        ["occupied", "partial", "unoccupied"]):
-                fig.add_trace(go.Scatter(x=points[0], y=points[1],
-                                         text=points[2],
-                                         customdata=points[3],
-                                         hovertemplate=hover_template,
-                                         marker_color=color, name=name,
-                                         **common),
-                              row=1, col=spin_idx)
-
-                fig.update_xaxes(tickvals=list(range(len(self._kpt_coords))),
-                                 ticktext=self._x_labels(line_break="<br>"),
-                                 tickfont_size=24,
-                                 row=1, col=spin_idx)
-        return fig
 
 
 class EigenvalueMplPlotter(EigenvaluePlotter):

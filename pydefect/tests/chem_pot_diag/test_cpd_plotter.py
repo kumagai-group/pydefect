@@ -2,21 +2,11 @@
 
 import numpy as np
 import pytest
-from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, TargetVertices, \
+from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag, \
     TargetVertex
 from pydefect.chem_pot_diag.cpd_plotter import (
     ChemPotDiag2DMplPlotter, transpose, sort_coords,
-    ChemPotDiag3DMplPlotter, ChemPotDiag2DPlotlyPlotter,
-    ChemPotDiag3DPlotlyPlotter)
-from pymatgen.core.composition import Composition
-from vise.util.dash_helper import show_png
-
-
-try:
-    import psutil
-    PSUTIL_NOT_PRESENT = False
-except ModuleNotFoundError:
-    PSUTIL_NOT_PRESENT = True
+    ChemPotDiag3DMplPlotter)
 
 
 @pytest.fixture
@@ -72,19 +62,3 @@ def test_sort_coords():
     coords = np.array([[3, 2, -1], [-1, 2, 0], [-6, -1, 4], [1, -3, 3]])
     expected = np.array([[1, -3, 3], [-6, -1, 4], [-1, 2, 0], [3, 2, -1]])
     np.testing.assert_array_equal(sort_coords(coords), expected)
-
-
-@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
-def test_plotly_2d(cpd_2d):
-    plotter = ChemPotDiag2DPlotlyPlotter(cpd_2d)
-    fig = plotter.figure
-    # fig.show()
-    show_png(fig)
-
-
-@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
-def test_plotly_3d(cpd_3d):
-    plotter = ChemPotDiag3DPlotlyPlotter(cpd_3d)
-    fig = plotter.figure
-    # fig.show()
-    show_png(fig)

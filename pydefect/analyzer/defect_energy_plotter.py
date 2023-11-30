@@ -3,7 +3,6 @@
 from itertools import cycle
 from typing import List, Optional, Tuple
 
-import plotly.graph_objects as go
 from adjustText import adjust_text
 from labellines import labelLines
 from matplotlib import pyplot as plt
@@ -89,58 +88,6 @@ class DefectEnergyPlotter:
         self._y_unit = y_unit
         self._defect_energies \
             = defect_energy_summary.screened_defect_energies(allow_shallow)
-
-
-class DefectEnergyPlotlyPlotter(DefectEnergyPlotter):
-    def __init__(self, **kwargs):
-        super().__init__(name_style="plotly", **kwargs)
-
-    def create_figure(self):
-        fig = go.Figure()
-        fig.update_layout(
-            title=f"Defect formation energy in {self._title}",
-            xaxis_title=f"Fermi level ({self._x_unit})",
-            yaxis_title=f"Energy ({self._y_unit})",
-            title_font_size=30,
-            font_size=24,
-            width=900, height=700)
-
-        for name, cp in self._cross_points.items():
-            xs, ys = cp.t_all_sorted_points
-            fig.add_trace(go.Scatter(x=xs, y=ys, name=name,
-                                     text=cp.charge_list,
-                                     hovertemplate=
-                                     f'{name}<br>' +
-                                     'Charges %{text}<br>' +
-                                     'Energy: %{y:.2f}',
-                                     line_width=3,
-                                     marker_size=15))
-
-        fig["layout"]["xaxis"]["range"] = [self._x_range[0] - 0.1,
-                                           self._x_range[1] + 0.1]
-        fig["layout"]["yaxis"]["range"] = self._y_range
-
-        kwargs = dict(y=self._y_range + [None] + self._y_range,
-                      line=dict(width=2, dash="dash"),
-                      line_color="black")
-        name = "unitcell"
-        fig.add_trace(go.Scatter(
-            x=[self._x_range[0]]*2 + [None] + [self._x_range[1]]*2,
-            name=name, showlegend=True, **kwargs))
-
-        x = [None] * 5
-        if self._supercell_vbm > self._vline_threshold:
-            x[0], x[1] = self._supercell_vbm, self._supercell_vbm
-        if self._supercell_cbm < self._x_range[1] - self._vline_threshold:
-            x[3], x[4] = self._supercell_cbm, self._supercell_cbm
-
-        if len(set(x)) > 1:
-            kwargs["name"] = "supercell"
-            kwargs["line_color"] = "blue"
-            kwargs["line"]["dash"] = "dot"
-            fig.add_trace(go.Scatter(x=x, showlegend=True, **kwargs))
-
-        return fig
 
 
 class DefectEnergyMplPlotter(DefectEnergyPlotter):

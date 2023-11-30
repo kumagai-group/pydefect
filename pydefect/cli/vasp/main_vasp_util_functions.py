@@ -43,7 +43,7 @@ def make_defect_entry_main(args):
                                      charge=charge_state,
                                      perfect_structure=args.perfect,
                                      defect_structure=structure)
-    defect_entry.to_json_file()
+    defect_entry.to_json_file(args.dir / "defect_entry.json")
 
 
 def make_parchg_dir(args):

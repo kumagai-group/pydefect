@@ -67,8 +67,8 @@ def make_standard_and_relative_energies(args):
         plotter = PDPlotter(pd, backend="matplotlib", show_unstable=float("inf"))
         plotter.get_plot(plt=plt)
         plt.savefig("convex_hull.pdf")
-        plotter = PDPlotter(pd, show_unstable=float("inf"))
-        plotter.show()
+        # plotter = PDPlotter(pd, show_unstable=float("inf"))
+        # plotter.show()
 
     except:
         pass

@@ -75,10 +75,10 @@ Development notes
 Please use the [Issue Tracker](https://github.com/kumagai-group/pydefect/issues) to report bugs, request features.
 
 ### Code contributions
-Although pydefect is free to use, we sinserely appreciate if you help us to improve this library. 
+Although pydefect is free to use, we sincerely appreciate if you help us to improve this library. 
 The simplest but most valuable contribution is to send the feature requests and bug reports.
 
-Please report any bugs and issues at PyDefect's [Github Issues page](https://github.com/oba-group/pydefect).
+Please report any bugs and issues at PyDefect's [GitHub Issues page](https://github.com/kumagai-group/pydefect).
 Please use the ["Fork and Pull"](https://guides.github.com/activities/forking/) workflow to make contributions and stick as closely as possible to the following:
 
 - Code style follows [PEP8](http://www.python.org/dev/peps/pep-0008) and [Google's writing style](https://google.github.io/styleguide/pyguide.html).
@@ -86,7 +86,7 @@ Please use the ["Fork and Pull"](https://guides.github.com/activities/forking/) 
 
 ### Tests
 Run the tests using `pytest pydefect`.
-We also use integrated testing on Github via circleCI.
+We also use integrated testing on GitHub via circleCI.
 
 Citing pydefect
 ---------------
@@ -100,7 +100,7 @@ Phys. Rev. Materials 5, 123803 (2021)
 Contact info
 --------------
 Yu Kumagai<br>
-yuuukuma@gmail.com<br>
+yukumagai@tohoku.ac.jp<br>
 
 Tohoku University (Japan)
 

@@ -58,13 +58,3 @@ def test_plot_wo_spin():
 #                                    supercell_vbm=0.5, supercell_cbm=2.6)
 #     plotter.construct_plot()
 #     plotter.plt.show()
-
-
-# @pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
-# def test_plotly_with_actual_file():
-#     eig = loadfn(Path(__file__).parent / "band_edge_eigenvalues.json")
-#     plotter = EigenvaluePlotlyPlotter(title="test", band_edge_eigenvalues=eig,
-#                                       supercell_vbm=0.5, supercell_cbm=2.6)
-#     fig = plotter.create_figure()
-#     # fig.show()
-#     show_png(fig)

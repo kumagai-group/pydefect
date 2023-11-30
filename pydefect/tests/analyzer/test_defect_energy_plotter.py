@@ -5,7 +5,7 @@ import pytest
 from pydefect.analyzer.defect_energy import DefectEnergy, DefectEnergies, \
     DefectEnergySummary
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter, \
-    DefectEnergiesMplSettings, DefectEnergyPlotlyPlotter
+    DefectEnergiesMplSettings
 from pydefect.defaults import defaults
 from vise.util.dash_helper import show_png
 
@@ -49,17 +49,6 @@ def test_defect_energies_mpl_plot(defect_energy_summary):
         add_thin_lines=True)
     plotter.construct_plot()
     plotter.plt.show()
-
-
-@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
-def test_defect_energies_plotly_plot(defect_energy_summary):
-    plotter = DefectEnergyPlotlyPlotter(
-        defect_energy_summary=defect_energy_summary,
-        chem_pot_label="A",
-        allow_shallow=False,
-        with_corrections=True)
-    fig = plotter.create_figure()
-    show_png(fig)
 
 
 """

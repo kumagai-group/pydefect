@@ -7,8 +7,7 @@ from monty.serialization import loadfn
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.site_potential_plotter import \
-    SitePotentialMplPlotter, SitePotentialPlotlyPlotter
-from vise.util.dash_helper import show_png
+    SitePotentialMplPlotter
 
 try:
     import psutil
@@ -48,13 +47,6 @@ def test_site_potential_plotter_with_actual_file():
         title="NaCl Va_Na_-1", efnv_correction=efnv_cor)
     plotter.construct_plot()
     plotter.plt.show()
-
-
-@pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="psutil does not exist")
-def test_defect_energies_plotly_actual_plot(efnv_cor):
-    fig = SitePotentialPlotlyPlotter.from_efnv_corr(
-        title="ZnO Va_O1_2", efnv_correction=efnv_cor).create_figure()
-    show_png(fig)
 
 
 @pytest.mark.skipif(PSUTIL_NOT_PRESENT, reason="skipped for circle CI")

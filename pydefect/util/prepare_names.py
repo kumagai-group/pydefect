@@ -39,21 +39,6 @@ def defect_mpl_name(name: str) -> str:
     return f"${in_name}_{out_name}$"
 
 
-def defect_plotly_name(name: str) -> str:
-    """ "Va_O1" -> "<i>V</i><sub>O1</sub>" """
-    in_name, out_name = name.split("_")
-    if in_name == "Va":
-        in_name = "<i>V</i>"
-    out_name = f"<sub>{out_name}</sub>"
-    return f"{in_name}{out_name}"
-
-
-def defect_plotly_full_name(fullname: str) -> str:
-    """ "Va_O1_1" -> "<i>V</i><sub>O1</sub><sup>1</sup>" """
-    name, charge = fullname.rsplit('_', 1)
-    return f"{defect_plotly_name(name)}<sup>{charge}</sup>"
-
-
 def typical_defect_name(name: str) -> bool:
     x = name.split("_")
     if len(x) == 2:
@@ -78,11 +63,8 @@ def prettify_names(d: Dict[str, Any], style) -> Dict[str, Any]:
             pass
         elif style == "mpl":
             _name = defect_mpl_name(_name)
-        elif style == "plotly":
-            _name = defect_plotly_name(_name)
         else:
-            raise ValueError(f"Style {style} is not adequate. Choose from mpl"
-                             f"or plotly.")
+            raise ValueError(f"Style {style} is not adequate. Set mpl or None.")
         result[_name] = v
     return result
 
