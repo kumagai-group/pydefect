@@ -7,7 +7,6 @@ from pydefect.analyzer.defect_energy import DefectEnergy, DefectEnergies, \
 from pydefect.analyzer.defect_energy_plotter import DefectEnergyMplPlotter, \
     DefectEnergiesMplSettings
 from pydefect.defaults import defaults
-from vise.util.dash_helper import show_png
 
 try:
     import psutil

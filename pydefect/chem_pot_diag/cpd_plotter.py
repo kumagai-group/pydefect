@@ -3,11 +3,15 @@ from abc import abstractmethod, ABC
 from typing import Optional, List
 
 import numpy as np
+from numpy import concatenate, clip, dot, arctan2
+from numpy.linalg import det
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from vise.util.sort_coords import sort_coords
+
 from pydefect.chem_pot_diag.chem_pot_diag import ChemPotDiag
-from vise.util.plotly_util import sort_coords, make_triangles
 from vise.util.string import latexify
+
 
 
 class CpdMplSettings:
