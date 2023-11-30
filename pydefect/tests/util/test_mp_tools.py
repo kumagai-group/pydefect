@@ -17,9 +17,6 @@ def test_mp_actual_query():
                        properties=["formula_pretty", "structure"])
     print(mp_query.materials)
 
-    mp_query = MpQuery(element_list=element_list)
-    print(mp_query.materials)
-
 
 def test_mp_query(mocker):
     mock = mocker.patch("pydefect.util.mp_tools.MPRester")

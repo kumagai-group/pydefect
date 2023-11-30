@@ -4,7 +4,7 @@ from typing import List
 
 from pydefect.defaults import defaults
 from pymatgen.core import Element
-from pymatgen.ext.matproj import MPRester
+from pymatgen.ext.matproj import MPRester, MPRestError
 from vise.util.logger import get_logger
 
 elements = [e.name for e in Element]
@@ -18,7 +18,6 @@ class MpQuery:
                  element_list: List[str],
                  e_above_hull: float = defaults.e_above_hull,
                  properties: List[str] = None):
-        excluded = list(set(elements) - set(element_list))
         # API key is parsed via .pmgrc.yaml
         with MPRester() as m:
             # Due to mp_decode=True by default, class objects are restored.
@@ -26,20 +25,21 @@ class MpQuery:
                 default_properties = ["task_id", "full_formula", "final_energy",
                                       "structure", "spacegroup", "band_gap",
                                       "total_magnetization", "magnetic_type"]
+                excluded = list(set(elements) - set(element_list))
                 criteria = (
                     {"elements": {"$in": element_list, "$nin": excluded},
                      "e_above_hull": {"$lte": e_above_hull}})
                 self.materials = m.query(
                     criteria=criteria,
                     properties=properties or default_properties)
-            except NotImplementedError:
+            except NotImplementedError or MPRestError:
                 logger.info("Note that you're using the newer MPRester.")
                 default_fields = ["material_id", "formula_pretty", "structure",
                                   "symmetry", "band_gap", "total_magnetization",
                                   "types_of_magnetic_species"]
-                self.materials = m.summary.search(
-                    exclude_elements=excluded,
-                    energy_above_hull=[-1e-5, e_above_hull],
+                self.materials = m.materials.summary.search(
+                    chemsys=tuple(element_list),
+                    energy_above_hull=(-1e-5, e_above_hull),
                     fields=properties or default_fields)
 
 
