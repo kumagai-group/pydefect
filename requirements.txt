@@ -1,10 +1,6 @@
 numpy
 monty
 pymatgen
-fire
 vise
-scikit-learn
-scikit-image
 tabulate
 adjustText
-matplotlib-label-lines
