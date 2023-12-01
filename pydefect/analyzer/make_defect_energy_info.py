@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020 Kumagai group.
+from collections import defaultdict
 from typing import Dict
 
 from pydefect.analyzer.band_edge_states import BandEdgeStates
@@ -40,8 +41,9 @@ def make_defect_energy_info(defect_entry: DefectEntry,
 def num_atom_differences(structure: IStructure,
                          ref_structure: IStructure,
                          ) -> Dict[str, int]:
-    target_composition = structure.composition.as_dict()
-    reference_composition = ref_structure.composition.as_dict()
+    target_composition = defaultdict(float, **structure.composition.as_dict())
+    reference_composition = defaultdict(float,
+                                        **ref_structure.composition.as_dict())
     result = {}
     for k in set(target_composition.keys()) | set(reference_composition.keys()):
         n_atom_diff = int(target_composition[k] - reference_composition[k])
