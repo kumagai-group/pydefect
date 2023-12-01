@@ -5,7 +5,6 @@ from shutil import copyfile
 from typing import List, Union
 
 import yaml
-from emmet.core.summary import SummaryDoc
 from pydefect.cli.vasp.molecules.molecules import MOLECULE_DATA
 from pymatgen.core import Composition
 from vise.util.logger import get_logger
@@ -15,7 +14,7 @@ mol_dir = Path(__file__).parent / "molecules"
 logger = get_logger(__name__)
 
 
-def make_poscars_from_query(materials_query: List[Union[dict, SummaryDoc]],
+def make_poscars_from_query(materials_query: List[Union[dict, "SummaryDoc"]],
                             path: Path) -> None:
     for query in materials_query:
         try:
@@ -31,7 +30,7 @@ def make_poscars_from_query(materials_query: List[Union[dict, SummaryDoc]],
 
 
 def _make_solid_directory(path: Path, reduced_formula: str,
-                          query: Union[dict, SummaryDoc]):
+                          query: Union[dict, "SummaryDoc"]):
     try:
         task_id = query['task_id']
     except TypeError:
