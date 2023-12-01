@@ -6,6 +6,7 @@ from pydefect.defaults import defaults
 from pymatgen.core import Element
 from pymatgen.ext.matproj import MPRester, MPRestError
 from vise.util.logger import get_logger
+from itertools import combinations, chain
 
 elements = [e.name for e in Element]
 
@@ -37,8 +38,12 @@ class MpQuery:
                 default_fields = ["material_id", "formula_pretty", "structure",
                                   "symmetry", "band_gap", "total_magnetization",
                                   "types_of_magnetic_species"]
+                chem_systems = ["-".join(x) for x in
+                               [*chain(*(combinations(element_list, n + 1)
+                                    for n in range(len(element_list))))]]
                 self.materials = m.materials.summary.search(
-                    chemsys=tuple(element_list),
+                    chemsys=chem_systems,
+                    # exclude_elements=excluded,
                     energy_above_hull=(-1e-5, e_above_hull),
                     fields=properties or default_fields)
 
