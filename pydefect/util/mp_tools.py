@@ -22,30 +22,27 @@ class MpQuery:
         # API key is parsed via .pmgrc.yaml
         with MPRester() as m:
             # Due to mp_decode=True by default, class objects are restored.
+            excluded = list(set(elements) - set(element_list))
             try:
                 default_properties = ["task_id", "full_formula", "final_energy",
                                       "structure", "spacegroup", "band_gap",
                                       "total_magnetization", "magnetic_type"]
-                excluded = list(set(elements) - set(element_list))
                 criteria = (
                     {"elements": {"$in": element_list, "$nin": excluded},
                      "e_above_hull": {"$lte": e_above_hull}})
                 self.materials = m.query(
                     criteria=criteria,
                     properties=properties or default_properties)
-            except NotImplementedError or MPRestError:
+            except:
                 logger.info("Note that you're using the newer MPRester.")
                 default_fields = ["material_id", "formula_pretty", "structure",
                                   "symmetry", "band_gap", "total_magnetization",
                                   "types_of_magnetic_species"]
-                chem_systems = ["-".join(x) for x in
-                               [*chain(*(combinations(element_list, n + 1)
-                                    for n in range(len(element_list))))]]
+                properties = properties or default_fields
                 self.materials = m.materials.summary.search(
-                    chemsys=chem_systems,
-                    # exclude_elements=excluded,
+                    exclude_elements=excluded,
                     energy_above_hull=(-1e-5, e_above_hull),
-                    fields=properties or default_fields)
+                    fields=properties)
 
 
 class MpEntries:
