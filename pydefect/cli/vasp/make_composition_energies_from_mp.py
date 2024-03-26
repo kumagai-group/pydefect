@@ -35,10 +35,10 @@ def make_composition_energies_from_mp(elements: List[str],
 
     for e in entries:
         key = e.composition
-        energy = e.energy
+        energy = e.energy_per_atom
         for k, v in key.as_dict().items():
             energy += diff[k] * v
-        comp_es[key] = CompositionEnergy(energy, e.entry_id)
+        comp_es[key] = CompositionEnergy(energy, e.material_id)
     comp_es = remove_higher_energy_comp(comp_es)
     return CompositionEnergies(comp_es)
 
