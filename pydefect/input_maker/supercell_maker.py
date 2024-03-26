@@ -25,7 +25,7 @@ class SupercellMaker:
                  matrix: Optional[List[List[int]]] = None,
                  symprec: float = defaults.symmetry_length_tolerance,
                  angle_tolerance: float = defaults.symmetry_angle_tolerance,
-                 raise_error: bool = True,
+                 raise_error: bool = False,
                  **supercell_kwargs):
 
         self.primitive_structure = primitive_structure
@@ -34,10 +34,10 @@ class SupercellMaker:
                                                 angle_tolerance=angle_tolerance)
         if primitive_structure != self.symmetrizer.primitive:
             logger.warning(
-                "The input structure is different from the primitive one,"
-                "which might be due to the difference of symprec used in"
-                "the pydefect and unitcell conversion. Please construct"
-                "the unitcell using vise.")
+                "The input structure differs from the primitive one, possibly "
+                "due to the symprec value used in pydefect and during the unit "
+                "cell conversion. Please reconstruct the unit cell using vise. "
+                "Proceed only if you understand the implications.")
             logger.warning("\n".join([
                 "Input lattice:",
                 f"{primitive_structure.lattice}", "",
