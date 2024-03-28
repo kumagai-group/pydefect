@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from itertools import combinations
 from typing import List
 
 from mp_api.client import MPRester
@@ -25,8 +25,19 @@ class MpQuery:
                               "types_of_magnetic_species"]
             properties = properties or default_fields
             self.materials = m.materials.summary.search(
-                chemsys=element_list,
+                chemsys=chemsys(element_list),
+                num_elements=(1, len(element_list)),
                 energy_above_hull=(-1e-5, e_above_hull),
                 fields=properties)
+
+
+def chemsys(element_list: list):
+    result = []
+    for i in range(1, len(element_list)+1):
+        for comb in combinations(element_list, i):
+            result.append('-'.join(comb))
+
+    return result
+
 
 
