@@ -13,7 +13,7 @@ from pymatgen.entries.computed_entries import ComputedEntry
 @pytest.fixture
 def mp_query_mock(mocker):
     mock = mocker.patch(
-        "pydefect.cli.vasp.make_composition_energies_from_mp.MpEntries")
+        "pydefect.cli.vasp.make_composition_energies_from_mp.MpQuery")
     mock.return_value.materials = \
         [ComputedEntry(Composition("O8"), -39.58364375, entry_id="mp-1"),
          ComputedEntry(Composition("Mg3"), -4.79068775, entry_id="mp-2"),

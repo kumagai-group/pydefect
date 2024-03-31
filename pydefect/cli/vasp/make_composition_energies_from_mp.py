@@ -7,7 +7,7 @@ from typing import List, Optional, Dict
 from monty.serialization import loadfn
 from pydefect.chem_pot_diag.chem_pot_diag import CompositionEnergy, \
     CompositionEnergies
-from pydefect.util.mp_tools import MpQuery, MpEntries
+from pydefect.util.mp_tools import MpQuery
 from pymatgen.core import Composition
 from pymatgen.entries.computed_entries import ComputedEntry
 from vise.atom_energies.atom_energy import mp_energies
@@ -25,7 +25,7 @@ def make_composition_energies_from_mp(elements: List[str],
     When the atom_energy_yaml is provided, the total energies are aligned
     via atom energies.
     """
-    entries: List[ComputedEntry] = MpEntries(elements).materials
+    entries: List[ComputedEntry] = MpQuery(elements).materials
     comp_es = {}
     if atom_energy_yaml:
         energies = loadfn(atom_energy_yaml)
@@ -35,10 +35,10 @@ def make_composition_energies_from_mp(elements: List[str],
 
     for e in entries:
         key = e.composition
-        energy = e.energy_per_atom
+        energy = e.energy
         for k, v in key.as_dict().items():
             energy += diff[k] * v
-        comp_es[key] = CompositionEnergy(energy, e.material_id)
+        comp_es[key] = CompositionEnergy(energy, e.entry_id)
     comp_es = remove_higher_energy_comp(comp_es)
     return CompositionEnergies(comp_es)
 
