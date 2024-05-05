@@ -26,7 +26,6 @@ class MpQuery:
             properties = properties or default_fields
             self.materials = m.materials.summary.search(
                 chemsys=chemsys(element_list),
-                num_elements=(1, len(element_list)),
                 energy_above_hull=(-1e-5, e_above_hull),
                 fields=properties)
 
