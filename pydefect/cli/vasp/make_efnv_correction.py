@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 from numpy import dot, cross
@@ -15,10 +15,9 @@ from pydefect.corrections.ewald import Ewald
 from pydefect.defaults import defaults
 from pydefect.util.error_classes import SupercellError, \
     NoCalculatedPotentialSiteError
-from vise.util.logger import get_logger
-from vise.util.typing import Coords
 
-logger = get_logger(__name__)
+
+Coords = Tuple[float, float, float]
 
 
 def make_efnv_correction(charge: float,
