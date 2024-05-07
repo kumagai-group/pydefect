@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2023 Kumagai group.
-from collections import Iterable
+try:
+    from collections import Iterable
+except ImportError:
+    from collections.abc import Iterable
+
 from dataclasses import dataclass
 from typing import List, Dict, Optional, Iterator
 

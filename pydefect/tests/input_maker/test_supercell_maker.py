@@ -32,7 +32,7 @@ def test_create_supercell(a_centered_orthorhombic):
 
 def test_create_supercell_raise_not_primitive_error(bcc):
     with pytest.raises(NotPrimitiveError):
-        SupercellMaker(primitive_structure=bcc)
+        SupercellMaker(primitive_structure=bcc, raise_error=True)
 
 
 def test_create_supercell_matrix(a_centered_orthorhombic):
