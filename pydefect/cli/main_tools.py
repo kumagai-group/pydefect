@@ -58,7 +58,11 @@ def parse_dirs(dirs: List[Path],
             if verbose:
                 print(traceback.print_exc())
             else:
-                print(e.args[1])
+                try:
+                    print(e.args[1])
+                except IndexError:
+                    pass
+
             logger.warning(f"Failing parsing {_dir} ...")
             failed_directories.append(str(_dir))
             continue

@@ -37,21 +37,21 @@ logger = get_logger(__name__)
 
 
 def get_calc_results(d: Path, check: bool) -> Union[CalcResults, bool]:
-    if check:
-        try:
-            calc_results = loadfn(d / "calc_results.json")
-        except FileNotFoundError:
-            logger.warning(f"calc_results.json doesn't exist in {d}.")
-            raise
-
-        if calc_results.electronic_conv is False:
-            logger.warning(f"SCF in {d} is not reached.")
-            raise NoElectronicConvError
-        elif calc_results.ionic_conv is False:
-            logger.warning(f"Ionic convergence in {d} is not reached.")
-            raise NoIonicConvError
-    else:
+    try:
         calc_results = loadfn(d / "calc_results.json")
+    except FileNotFoundError:
+        logger.warning(f"calc_results.json doesn't exist in {d}.")
+        raise
+
+    if calc_results.electronic_conv is False:
+        logger.warning(f"SCF in {d} is not reached.")
+        if check:
+            raise NoElectronicConvError
+
+    elif calc_results.ionic_conv is False:
+        logger.warning(f"Ionic convergence in {d} is not reached.")
+        if check:
+            raise NoIonicConvError
 
     return calc_results
 

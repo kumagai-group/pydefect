@@ -124,7 +124,7 @@ class DefectEnergySummary(MSONable, ToJsonFileMixIn):
         lines.append('\n'.join(chem_pot))
         lines.append(f"vbm: 0.00, cbm: {self.cbm:.2f}, "
                      f"supercell vbm: {self.supercell_vbm:.2f}, "
-                     f"supercell_cbm: {self.supercell_cbm:.2f}")
+                     f"supercell cbm: {self.supercell_cbm:.2f}")
         lines.append("")
 
         defects = []
