@@ -43,6 +43,11 @@ class SimpleDefect(Defect):
     def out_atom(self):
         return self.name.split("_")[1]
 
+    @classmethod
+    def from_dict(cls, d):
+        _d = {k: v for k, v in d.items() if "@" not in k}
+        return cls(**_d)
+
 
 def screen_simple_defect(defect: SimpleDefect, keywords: List[str]
                          ) -> Optional[SimpleDefect]:
