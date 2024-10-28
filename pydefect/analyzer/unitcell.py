@@ -9,7 +9,7 @@ import numpy as np
 from monty.json import MSONable
 from monty.serialization import loadfn
 from ruamel.yaml import add_constructor, resolver, YAML
-
+from vise.util.mix_in import ToYamlFileMixIn
 
 # courtesy of https://qiita.com/konomochi/items/f5f53ba8efa07ec5089b
 add_constructor(resolver.BaseResolver.DEFAULT_MAPPING_TAG,
@@ -20,12 +20,12 @@ yaml.default_flow_style = False
 
 
 @dataclass
-class Unitcell(MSONable):
-    system: str
-    vbm: float
-    cbm: float
-    ele_dielectric_const: List[List[float]]
-    ion_dielectric_const: List[List[float]]
+class Unitcell(MSONable, ToYamlFileMixIn):
+    system: str = None
+    vbm: float = None
+    cbm: float = None
+    ele_dielectric_const: List[List[float]] = None
+    ion_dielectric_const: List[List[float]] = None
     electron_mass: List[List[float]] = None
     hole_mass: List[List[float]] = None
 
