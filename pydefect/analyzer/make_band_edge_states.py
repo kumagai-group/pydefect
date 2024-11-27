@@ -69,10 +69,10 @@ def get_localized_orbs(orb_info_by_spin: List[List[OrbitalInfo]],
             for elem, contrb in orb.orbitals.items():
                 for y, c in enumerate(contrb):
                     try:
-                        orbs[elem][y] += c
+                        orbs[elem][y] += c*w
                     except IndexError:
                         orbs[elem].append(0.0)
-                        orbs[elem][y] += c
+                        orbs[elem][y] += c*w
 
         result.append(LocalizedOrbital(
             band_idx=i,
