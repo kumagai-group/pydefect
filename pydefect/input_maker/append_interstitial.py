@@ -42,7 +42,7 @@ def append_interstitial(supercell_info: SupercellInfo,
         us = Structure.from_dict(unitcell_structure.as_dict())
         us.append(species=Element.H, coords=fcoord)
         symmetrizer = StructureSymmetrizer(us)
-        site_symm = symmetrizer.spglib_sym_data["site_symmetry_symbols"][-1]
+        site_symm = symmetrizer.spglib_sym_data.site_symmetry_symbols[-1]
 
         inv_matrix = inv(np.array(supercell_info.transformation_matrix))
         new_coords = np.dot(fcoord, inv_matrix).tolist()

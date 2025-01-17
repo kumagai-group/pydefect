@@ -47,7 +47,7 @@ class ManualSupercellMaker:
 
         self.supercell_info = SupercellInfo(
             structure=self.supercell.structure,
-            space_group=symmetrizer.spglib_sym_data["international"],
+            space_group=symmetrizer.spglib_sym_data.international,
             transformation_matrix=self.supercell.matrix,
             sites=sites,
             unitcell_structure=input_structure)

@@ -50,7 +50,7 @@ class SupercellMaker:
             if raise_error:
                 raise NotPrimitiveError
 
-        self.sg_symbol = self.symmetrizer.spglib_sym_data["international"]
+        self.sg_symbol = self.symmetrizer.spglib_sym_data.international
         self.conv_structure = self.symmetrizer.conventional
         crystal_system, center = str(self.symmetrizer.bravais)
 
