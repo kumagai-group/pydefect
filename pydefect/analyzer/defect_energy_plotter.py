@@ -47,7 +47,7 @@ class DefectEnergiesMplSettings:
 class DefectEnergyPlotter:
     def __init__(self,
                  defect_energy_summary: DefectEnergySummary,
-                 chem_pot_label: "str",
+                 chem_pot_label: str,
                  allow_shallow: bool,
                  with_corrections: bool,
                  name_style: Optional[str],
