@@ -56,7 +56,7 @@ def find_inequivalent_coords(structure: Structure,
 
     sym_data = symmetrizer.spglib_sym_data
     _indices = [i for i in range(start_index, end_index)]
-    repr_atom_pairs = zip(sym_data["equivalent_atoms"][_indices], _indices)
+    repr_atom_pairs = zip(sym_data.equivalent_atoms[_indices], _indices)
 
     key = lambda x: x[0]
     for _, equiv_sites in groupby(sorted(repr_atom_pairs, key=key), key=key):
@@ -67,7 +67,7 @@ def find_inequivalent_coords(structure: Structure,
             key = "ave_value" if "ave_value" in df else "value"
             quantity.append(df[key][atom_idx - start_index])
             if repr_idx == atom_idx:
-                site_sym = sym_data["site_symmetry_symbols"][atom_idx]
+                site_sym = sym_data.site_symmetry_symbols[atom_idx]
                 distances = Distances(structure, fcoord)
                 coordination = distances.coordination()
 
