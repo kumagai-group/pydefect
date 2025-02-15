@@ -2,6 +2,7 @@
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
 
 import pytest
+from vise.tests.helpers.assertion import assert_msonable
 
 from pydefect.input_maker.defect_set import DefectSet, screen_defect_set
 from pydefect.input_maker.defect_set_maker import charge_set
@@ -22,6 +23,10 @@ def test_defect_set(defect_set):
     # test iterable
     for defect in defect_set:
         defect
+
+
+def test_defect_set_msonable(defect_set):
+    assert_msonable(defect_set)
 
 
 def test_to_yaml(defect_set, tmpdir):

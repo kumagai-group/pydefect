@@ -5,11 +5,12 @@ from pathlib import Path
 from typing import Iterator, List, Set as typeSet
 
 import yaml
+from monty.json import MSONable
 from monty.serialization import loadfn
 from pydefect.input_maker.defect import screen_simple_defect, SimpleDefect
 
 
-class DefectSet(Set):
+class DefectSet(MSONable, Set):
     def __init__(self, defects: typeSet[SimpleDefect]):
         self.defects = defects
 
