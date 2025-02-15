@@ -84,7 +84,7 @@ def test_defect_energy_summary_str():
 rel_chem_pots:
  -A O: -1.00
  -B O: -2.00
-vbm: 0.00, cbm: 2.00, supercell vbm: -1.00, supercell_cbm: 3.00
+vbm: 0.00, cbm: 2.00, supercell vbm: -1.00, supercell cbm: 3.00
 
 name    atom_io      charge    energy    correction  is_shallow
 ------  ---------  --------  --------  ------------  ------------
