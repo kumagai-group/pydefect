@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 @dataclass
 class DefectEnergy(MSONable):
     formation_energy: float
-    energy_corrections: Dict[str, float]
+    energy_corrections: Dict[str, float] = None
     is_shallow: Optional[bool] = None
 
     @property
