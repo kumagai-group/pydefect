@@ -149,9 +149,9 @@ and type the following command in each directory:
 
 ::
 
-    vise vs -x pbesol -t band -d ../structure_opt
-    vise vs -x pbesol -t dos -d ../structure_opt -uis LVTOT True LAECHG True KPAR 1
-    vise vs -x pbesol -t dielectric_dfpt -d ../structure_opt
+    vise vs -x pbesol -t band -pd ../structure_opt
+    vise vs -x pbesol -t dos -pd ../structure_opt -uis LVTOT True LAECHG True KPAR 1
+    vise vs -x pbesol -t dielectric_dfpt -pd ../structure_opt
 
 The additional user_incar_settings (=uis) in the :code:`dos` directory are for creating volumetric
 data of electrostatic potential and all electron charge density.

@@ -1,87 +1,45 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" data-content_root="./" lang="en">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta content="width=device-width, initial-scale=1" name="viewport" />
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Tutorial for calculation of vertical transition level &mdash; pydefect  documentation</title>
-  
+      <link href="_static/pygments.css?v=b86133f3" rel="stylesheet" type="text/css" />
+      <link href="_static/css/theme.css?v=e59714d7" rel="stylesheet" type="text/css" />
 
   
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Change log" href="change_log.html" />
     <link rel="prev" title="Tips for first-principles calculations for point defects" href="first_principles_calc.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pydefect
           
-
-          
+          <a class="icon icon-home" href="index.html">
+            pydefect
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input aria-label="Search docs" name="q" placeholder="Search docs" type="text" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial of pydefect</a></li>
 <li class="toctree-l1"><a class="reference internal" href="first_principles_calc.html">Tips for first-principles calculations for point defects</a></li>
@@ -89,71 +47,32 @@
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change log</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pydefect</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div aria-label="Page navigation" role="navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Tutorial for calculation of vertical transition level</li>
-    
-    
+      <li><a aria-label="Home" class="icon icon-home" href="index.html"></a></li>
+      <li class="breadcrumb-item active">Tutorial for calculation of vertical transition level</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/vertical_transition_level.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="tutorial-for-calculation-of-vertical-transition-level">
-<h1>Tutorial for calculation of vertical transition level<a class="headerlink" href="#tutorial-for-calculation-of-vertical-transition-level" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="tutorial-for-calculation-of-vertical-transition-level">
+<h1>Tutorial for calculation of vertical transition level<a class="headerlink" href="#tutorial-for-calculation-of-vertical-transition-level" title="Link to this heading">¶</a></h1>
 <p>We here illustrate how to calculate the vertical transition level (VTL)
 with an example of an oxygen vacancy in MgAl2O4.
 For the calculation of the VTL, we need to apply special correction scheme,
@@ -219,62 +138,37 @@ Therefore, the absorption energy is</p>
 <img alt="_images/eigenvalues_final.png" src="_images/eigenvalues_final.png" />
 <p>and the initial <code class="code docutils literal notranslate"><span class="pre">eigenvalues.pdf</span></code> looks as</p>
 <img alt="_images/eigenvalues_initial.png" src="_images/eigenvalues_initial.png" />
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="change_log.html" class="btn btn-neutral float-right" title="Change log" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="first_principles_calc.html" class="btn btn-neutral float-left" title="Tips for first-principles calculations for point defects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+        <a accesskey="p" class="btn btn-neutral float-left" href="first_principles_calc.html" rel="prev" title="Tips for first-principles calculations for point defects"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a accesskey="n" class="btn btn-neutral float-right" href="change_log.html" rel="next" title="Change log">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2020, Yu Kumagai
-
-    </p>
+    <p>&#169; Copyright 2020, Yu Kumagai.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
