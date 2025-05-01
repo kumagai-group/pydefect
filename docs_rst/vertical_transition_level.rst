@@ -1,21 +1,21 @@
 Tutorial for calculation of vertical transition level
 -----------------------------------------------------
 
-We here illustrate how to calculate the vertical transition level (VTL)
-with an example of an oxygen vacancy in MgAl2O4.
-For the calculation of the VTL, we need to apply special correction scheme,
-here we call it the GKFO correction.
-Please read
-`T. Gake, Y. Kumagai*, C. Freysoldt, and F. Oba, Phys. Rev. B, 101, 020102(R) (2020).
-<link.aps.org/doi/10.1103/PhysRevB.101.020102>`_
-for details.
+Here, we illustrate how to calculate the vertical transition level (VTL)
+using the example of an oxygen vacancy in MgAl₂O₄.
+To calculate the VTL, we apply a specific correction scheme,
+here referred to as the GKFO correction.
+For further details, please refer to:
 
-Assuming that the defect calculations in MgAl2O4 based on the PBEsol functional
-have been done already as introduced in the tutorial
-and one further wants to calculate the photo-absorption energy caused by excitation
-of an oxygen vacancy localized state in the neutral charge state to the CBM.
+`T. Gake, Y. Kumagai*, C. Freysoldt, and F. Oba, Phys. Rev. B, 101, 020102(R) (2020) <https://link.aps.org/doi/10.1103/PhysRevB.101.020102>`_
 
-We here assume the following directory structure.
+We assume that defect calculations for MgAl₂O₄ using the PBEsol functional
+have already been performed as introduced in the tutorial,
+and we now aim to compute the photo-absorption energy
+corresponding to the excitation of a localized state
+associated with a neutral oxygen vacancy to the CBM.
+
+The following directory structure is assumed:
 
 ::
 
@@ -26,32 +26,32 @@ We here assume the following directory structure.
      └ defects/ ── perfect/
                  └ Va_O1_0/ ── absorption/
 
-Firstly, we create the :code:`absorption/` directory at the :code:`Va_O1_0/`
-and copy the vasp input files from :code:`Va_O1_0/`.
-Then, edit :code:`INCAR` to change :code:`NSW` to 1 and add the :code:`NELECT` tag with
-reducing it by 1 from the neutral one.
-Or one can type:
+First, create the :code:`absorption/` directory inside :code:`Va_O1_0/`
+and copy the VASP input files from :code:`Va_O1_0/`.
+Then, edit the :code:`INCAR` file by setting :code:`NSW = 1` and reducing the
+:code:`NELECT` value by 1 from the neutral state.
+Alternatively, use the following command:
 
 ::
 
     vise vs -uis NSW 1 --options charge 1 -d ../ -t defect
 
-After running vasp, we then create :code:`calc_results.json`
-using the following command in the :code:`absorption/` directory.
+After running VASP, generate :code:`calc_results.json`
+within the :code:`absorption/` directory by executing:
 
 ::
 
     pydefect cr -d .
 
-
-And, wee obtain :code:`gkfo_correction.pdf` and :code:`gkfo_correction.json` files with the following command.
+Then, generate the :code:`gkfo_correction.pdf` and :code:`gkfo_correction.json`
+files using the following command:
 
 ::
 
     pydefect_util gkfo -u ../../../unitcell/unitcell.yaml -iefnv ../correction.json -icr ../calc_results.json -fcr calc_results.json -cd 1
 
-With the :code:`pydefect_print` command, the correction energy is shown as follows:
-
+You can check the correction energy using the :code:`pydefect_print` command,
+which yields output like the following:
 
 ::
 
@@ -66,30 +66,28 @@ With the :code:`pydefect_print` command, the correction energy is shown as follo
     | correction energy  |  0.61685   |
     +--------------------+------------+
 
-
-The :code:`gkfo_correction.pdf` shows the potential profile caused by addition/removal
-of the electron and its alignment term.
+The :code:`gkfo_correction.pdf` shows the potential profile
+resulting from the addition/removal of an electron,
+along with its alignment contributions.
 
 .. image:: gkfo_correction.png
 
-
-For the absorption energy, one needs to know the conduction band minimum position,
-which is now 9.2376 eV in MgAl2O4. And, the total energies of initial and final states are
--405.739 and -411.920 eV, respectively.
-Therefore, the absorption energy is
+To compute the absorption energy, we need the conduction band minimum (CBM),
+which is 9.2376 eV for MgAl₂O₄.
+Assuming the total energies of the initial and final states are
+-405.739 eV and -411.920 eV, respectively,
+the absorption energy is computed as:
 
 ::
 
-    -411.920 + 405.739 + 9.2376 + 0.61685 =  3.67345 eV
+    -411.920 + 405.739 + 9.2376 + 0.61685 = 3.67345 eV
 
-It is also worthwhile to check the eigenvalues of initial and final states.
+It is also informative to inspect the eigenvalues of the initial and final states.
 
-We can obtain the :code:`eigenvalues.pdf`, which looks as
+You can visualize these using :code:`eigenvalues.pdf`, which appear as:
 
 .. image:: eigenvalues_final.png
 
-and the initial :code:`eigenvalues.pdf` looks as
+And for the initial state:
 
 .. image:: eigenvalues_initial.png
-
-

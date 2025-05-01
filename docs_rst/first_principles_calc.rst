@@ -4,21 +4,21 @@ Tips for first-principles calculations for point defects
 ----------------------------------
 1. Symmetrization of point defects
 ----------------------------------
-As mentioned in the :doc:`tutorial`, the neighboring atoms near the defect are
-initially slightly perturbed to break the symmetry.
-However, some defects tend to move back to the symmetric configuration
-or recover a part of symmetry operations during the structure optimization.
+As mentioned in the :doc:`tutorial`, the atoms neighboring a defect
+are initially slightly displaced to break the symmetry.
+However, some defects tend to relax back to a symmetric configuration,
+or partially recover symmetry operations during structure optimization.
 
-Even in these cases, the relaxed structures are not obviously symmetric.
-:code:`Pydefect` provides the :code:`refine_defect_poscar` (= :code:`rdp`) sub-command
-that allows for symmetrizing the defect structure.
-It is used as:
+Even in such cases, the relaxed structures are not obviously symmetric.
+:code:`Pydefect` provides the :code:`refine_defect_poscar` (= :code:`rdp`) sub-command,
+which enables symmetrization of the defect structure.
+It is used as follows:
 
 ::
 
      pydefect_vasp_util rdp -p Va_Mg1_0/CONTCAR-finish -d Va_Mg1_0/defect_entry.json -n POSCAR_new
 
-which creates the POSCAR_new file as follows.
+This command creates the :code:`POSCAR_new` file, as shown below:
 
 ::
 
@@ -32,81 +32,33 @@ which creates the POSCAR_new file as follows.
     direct
     0.749726 0.749738 0.249693 Mg
     0.749726 0.249738 0.749693 Mg
-    0.249726 0.749738 0.749693 Mg
-    0.003191 0.003203 0.003158 Mg
-    0.496261 0.496273 0.003158 Mg
-    0.496261 0.003203 0.496228 Mg
-    0.003191 0.496273 0.496228 Mg
-    0.625112 0.373467 0.373422 Al
-    0.125997 0.874352 0.373422 Al
-    0.125997 0.373467 0.874307 Al
-    0.624659 0.874804 0.874760 Al
-    0.624659 0.624671 0.624626 Al
-    0.125997 0.126009 0.625079 Al
-    0.125997 0.625124 0.125964 Al
-    0.625112 0.126009 0.125964 Al
-    0.373455 0.625124 0.373422 Al
-    0.874340 0.126009 0.373422 Al
-    0.874792 0.624671 0.874760 Al
-    0.373455 0.126009 0.874307 Al
-    0.373455 0.373467 0.625079 Al
-    0.874792 0.874804 0.624626 Al
-    0.874340 0.373467 0.125964 Al
-    0.373455 0.874352 0.125964 Al
-    0.862178 0.862190 0.862145 O
-    0.361441 0.361453 0.859833 O
-    0.361441 0.859878 0.361408 O
-    0.859866 0.361453 0.361408 O
-    0.388922 0.611788 0.611743 O
-    0.887676 0.110542 0.611743 O
-    0.887676 0.611788 0.110497 O
-    0.393711 0.105752 0.105707 O
-    0.611776 0.611788 0.388889 O
-    0.105740 0.105752 0.393678 O
-    0.110530 0.611788 0.887643 O
-    0.611776 0.110542 0.887643 O
-    0.611776 0.388934 0.611743 O
-    0.110530 0.887688 0.611743 O
-    0.105740 0.393723 0.105707 O
-    0.611776 0.887688 0.110497 O
-    0.637273 0.637285 0.862145 O
-    0.138011 0.138023 0.859833 O
-    0.138011 0.639597 0.361408 O
-    0.639585 0.138023 0.361408 O
-    0.637273 0.862190 0.637241 O
-    0.138011 0.361453 0.639552 O
-    0.138011 0.859878 0.137978 O
-    0.639585 0.361453 0.137978 O
-    0.393711 0.393723 0.393678 O
-    0.887676 0.887688 0.388889 O
-    0.887676 0.388934 0.887643 O
-    0.388922 0.887688 0.887643 O
-    0.862178 0.637285 0.637241 O
-    0.361441 0.138023 0.639552 O
-    0.361441 0.639597 0.137978 O
-    0.859866 0.138023 0.137978 O
+    ...
+    (truncated for brevity)
+    ...
 
 ------------------------------------------
 2. Tips for hybrid functional calculations
 ------------------------------------------
-Hybrid functionals, namely the HSE06 functional,
-and those with different exchange mixing parameters and/or screening distances,
-have been regularly used for point-defect calculations recently.
+Hybrid functionals—such as the HSE06 functional—
+and their variants with different exchange mixing parameters or screening lengths
+have recently become standard tools for point-defect calculations.
 
-Usually, their calculations are a few tens more expensive
-than those with a functional based on the local or semilocal density approximations.
-Therefore, we need to take a little ingenuity to reduce their computational costs.
+These calculations are typically tens of times more computationally expensive
+than those based on local or semilocal density functional approximations.
+Thus, some ingenuity is needed to reduce their computational cost.
 
-For this purpose, we regularly prepare the WAVECAR files obtained using a GGA functional.
-(Relaxation of the atomic positions using GGA beforehand could be inappropriate for point-defect calculations,
-because site symmetry of a defect calculated by GGA could be different from that by hybrid functionals,
-and once the symmetry is increased by GGA, it never be decreased by hybrid functionals.)
+To address this, it is common to prepare a :code:`WAVECAR` file
+from a GGA-based calculation beforehand.
+(Note that relaxing atomic positions using GGA may be inappropriate for point-defect calculations,
+as the site symmetry of a defect calculated by GGA can differ from that of a hybrid functional.
+If the symmetry is increased by GGA, a hybrid functional calculation will not reduce it again.)
 
-One can create the INCAR file for generating WAVECAR files using the GGA with the following command, for instance,
+You can generate an :code:`INCAR` file for creating the :code:`WAVECAR`
+using GGA with the following command:
 
 ::
 
     grep -v LHFCALC INCAR | grep -v ALGO | sed s/"NSW     =  50"/"NSW     =   1"/ > INCAR-pre
 
-
-and, then, move the WAVECAR file to the directory for the hybrid functional calculation.
+Then, move the resulting :code:`WAVECAR` file to the directory
+where the hybrid functional calculation will be performed.

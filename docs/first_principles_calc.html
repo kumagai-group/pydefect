@@ -1,96 +1,264 @@
+<!doctype html>
+<html class="no-js" data-content_root="./" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <meta content="light dark" name="color-scheme"><meta content="width=device-width, initial-scale=1" name="viewport" />
+<link href="genindex.html" rel="index" title="Index" /><link href="search.html" rel="search" title="Search" /><link href="vertical_transition_level.html" rel="next" title="Tutorial for calculation of vertical transition level" /><link href="tutorial.html" rel="prev" title="Tutorial of pydefect" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>Tips for first-principles calculations for point defects - pydefect documentation</title>
+      <link href="_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css" />
+    <link href="_static/styles/furo.css?v=354aac6f" rel="stylesheet" type="text/css" />
+    <link href="_static/styles/furo-extensions.css?v=302659d7" rel="stylesheet" type="text/css" />
+    
+    
 
 
-<!DOCTYPE html>
-<html class="writer-html5" data-content_root="./" lang="en">
-<head>
-  <meta charset="utf-8" /><meta content="width=device-width, initial-scale=1" name="viewport" />
-
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Tips for first-principles calculations for point defects &mdash; pydefect  documentation</title>
-      <link href="_static/pygments.css?v=b86133f3" rel="stylesheet" type="text/css" />
-      <link href="_static/css/theme.css?v=e59714d7" rel="stylesheet" type="text/css" />
-
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
   
-      <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tutorial for calculation of vertical transition level" href="vertical_transition_level.html" />
-    <link rel="prev" title="Tutorial of pydefect" href="tutorial.html" /> 
-</head>
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg fill="currentColor" stroke="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg class="feather-menu" fill="none" stroke="currentColor" stroke-linecap="round"
+      stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <line x1="3" x2="21" y1="12" y2="12"></line>
+      <line x1="3" x2="21" y1="6" y2="6"></line>
+      <line x1="3" x2="21" y1="18" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg class="feather-chevron-right" fill="none" stroke="currentColor" stroke-linecap="round"
+      stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg class="feather-sun" fill="none" stroke="currentColor" stroke-linecap="round"
+      stroke-linejoin="round" stroke-width="1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" x2="12" y1="1" y2="3"></line>
+      <line x1="12" x2="12" y1="21" y2="23"></line>
+      <line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+      <line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+      <line x1="1" x2="3" y1="12" y2="12"></line>
+      <line x1="21" x2="23" y1="12" y2="12"></line>
+      <line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+      <line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg class="icon-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round"
+      stroke-linejoin="round" stroke-width="1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round"
+      stroke-linejoin="round" stroke-width="1" viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg">
+      <path d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z" style="opacity: 50%"/>
+      <line x1="14.5" x2="14.5" y1="3.25" y2="1.25"/>
+      <line x1="14.5" x2="14.5" y1="15.85" y2="17.85"/>
+      <line x1="10.044" x2="8.63" y1="5.094" y2="3.68"/>
+      <line x1="19" x2="20.414" y1="14.05" y2="15.464"/>
+      <line x1="8.2" x2="6.2" y1="9.55" y2="9.55"/>
+      <line x1="20.8" x2="22.8" y1="9.55" y2="9.55"/>
+      <line x1="10.044" x2="8.63" y1="14.006" y2="15.42"/>
+      <line x1="19" x2="20.414" y1="5.05" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round"
+      stroke-linejoin="round" stroke-width="1" viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" x2="18" y1="3.705" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" x2="18" y1="11.295" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" x2="14.464" y1="4.816" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" x2="21.563" y1="10.212" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" x2="13.001" y1="7.5" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" x2="23" y1="7.5" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" x2="14.464" y1="10.184" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" x2="21.563" y1="4.789" y2="3.937"/>
+      <circle cx="18" cy="7.5" r="2.169" style="opacity: 50%"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg class="icon-tabler-pencil-code" fill="none" stroke="currentColor" stroke-linecap="round"
+      stroke-linejoin="round" stroke-width="1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg class="icon-tabler-eye-code" fill="none" stroke="currentColor" stroke-linecap="round"
+      stroke-linejoin="round" stroke-width="1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
 
-          
-          
-          <a class="icon icon-home" href="index.html">
-            pydefect
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input aria-label="Search docs" name="q" placeholder="Search docs" type="text" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
-              <ul class="current">
+<input class="sidebar-toggle" id="__navigation" name="__navigation" type="checkbox">
+<input class="sidebar-toggle" id="__toc" name="__toc" type="checkbox">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">pydefect  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">pydefect  documentation</span>
+  
+</a><form action="search.html" class="sidebar-search-container" method="get" role="search">
+  <input aria-label="Search" class="sidebar-search" name="q" placeholder="Search">
+  <input name="check_keywords" type="hidden" value="yes">
+  <input name="area" type="hidden" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial of pydefect</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tips for first-principles calculations for point defects</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#symmetrization-of-point-defects">1. Symmetrization of point defects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tips-for-hybrid-functional-calculations">2. Tips for hybrid functional calculations</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Tips for first-principles calculations for point defects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vertical_transition_level.html">Tutorial for calculation of vertical transition level</a></li>
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change log</a></li>
 </ul>
 
-        </div>
-      </div>
-    </nav>
-
-    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">pydefect</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div aria-label="Page navigation" role="navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a aria-label="Home" class="icon icon-home" href="index.html"></a></li>
-      <li class="breadcrumb-item active">Tips for first-principles calculations for point defects</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/first_principles_calc.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <section id="tips-for-first-principles-calculations-for-point-defects">
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a class="back-to-top muted-link" href="#">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/first_principles_calc.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article id="furo-main-content" role="main">
+          <section id="tips-for-first-principles-calculations-for-point-defects">
 <h1>Tips for first-principles calculations for point defects<a class="headerlink" href="#tips-for-first-principles-calculations-for-point-defects" title="Link to this heading">¶</a></h1>
 <section id="symmetrization-of-point-defects">
 <h2>1. Symmetrization of point defects<a class="headerlink" href="#symmetrization-of-point-defects" title="Link to this heading">¶</a></h2>
-<p>As mentioned in the <a class="reference internal" href="tutorial.html"><span class="doc">Tutorial of pydefect</span></a>, the neighboring atoms near the defect are
-initially slightly perturbed to break the symmetry.
-However, some defects tend to move back to the symmetric configuration
-or recover a part of symmetry operations during the structure optimization.</p>
-<p>Even in these cases, the relaxed structures are not obviously symmetric.
-<code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> provides the <code class="code docutils literal notranslate"><span class="pre">refine_defect_poscar</span></code> (= <code class="code docutils literal notranslate"><span class="pre">rdp</span></code>) sub-command
-that allows for symmetrizing the defect structure.
-It is used as:</p>
+<p>As mentioned in the <a class="reference internal" href="tutorial.html"><span class="doc">Tutorial of pydefect</span></a>, the atoms neighboring a defect
+are initially slightly displaced to break the symmetry.
+However, some defects tend to relax back to a symmetric configuration,
+or partially recover symmetry operations during structure optimization.</p>
+<p>Even in such cases, the relaxed structures are not obviously symmetric.
+<code class="code docutils literal notranslate"><span class="pre">Pydefect</span></code> provides the <code class="code docutils literal notranslate"><span class="pre">refine_defect_poscar</span></code> (= <code class="code docutils literal notranslate"><span class="pre">rdp</span></code>) sub-command,
+which enables symmetrization of the defect structure.
+It is used as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydefect_vasp_util</span> <span class="n">rdp</span> <span class="o">-</span><span class="n">p</span> <span class="n">Va_Mg1_0</span><span class="o">/</span><span class="n">CONTCAR</span><span class="o">-</span><span class="n">finish</span> <span class="o">-</span><span class="n">d</span> <span class="n">Va_Mg1_0</span><span class="o">/</span><span class="n">defect_entry</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">n</span> <span class="n">POSCAR_new</span>
 </pre></div>
 </div>
-<p>which creates the POSCAR_new file as follows.</p>
+<p>This command creates the <code class="code docutils literal notranslate"><span class="pre">POSCAR_new</span></code> file, as shown below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Mg7</span> <span class="n">Al16</span> <span class="n">O32</span>
 <span class="mf">1.0</span>
 <span class="mf">8.105607</span> <span class="mf">0.000000</span> <span class="mf">0.000000</span>
@@ -101,111 +269,107 @@ It is used as:</p>
 <span class="n">direct</span>
 <span class="mf">0.749726</span> <span class="mf">0.749738</span> <span class="mf">0.249693</span> <span class="n">Mg</span>
 <span class="mf">0.749726</span> <span class="mf">0.249738</span> <span class="mf">0.749693</span> <span class="n">Mg</span>
-<span class="mf">0.249726</span> <span class="mf">0.749738</span> <span class="mf">0.749693</span> <span class="n">Mg</span>
-<span class="mf">0.003191</span> <span class="mf">0.003203</span> <span class="mf">0.003158</span> <span class="n">Mg</span>
-<span class="mf">0.496261</span> <span class="mf">0.496273</span> <span class="mf">0.003158</span> <span class="n">Mg</span>
-<span class="mf">0.496261</span> <span class="mf">0.003203</span> <span class="mf">0.496228</span> <span class="n">Mg</span>
-<span class="mf">0.003191</span> <span class="mf">0.496273</span> <span class="mf">0.496228</span> <span class="n">Mg</span>
-<span class="mf">0.625112</span> <span class="mf">0.373467</span> <span class="mf">0.373422</span> <span class="n">Al</span>
-<span class="mf">0.125997</span> <span class="mf">0.874352</span> <span class="mf">0.373422</span> <span class="n">Al</span>
-<span class="mf">0.125997</span> <span class="mf">0.373467</span> <span class="mf">0.874307</span> <span class="n">Al</span>
-<span class="mf">0.624659</span> <span class="mf">0.874804</span> <span class="mf">0.874760</span> <span class="n">Al</span>
-<span class="mf">0.624659</span> <span class="mf">0.624671</span> <span class="mf">0.624626</span> <span class="n">Al</span>
-<span class="mf">0.125997</span> <span class="mf">0.126009</span> <span class="mf">0.625079</span> <span class="n">Al</span>
-<span class="mf">0.125997</span> <span class="mf">0.625124</span> <span class="mf">0.125964</span> <span class="n">Al</span>
-<span class="mf">0.625112</span> <span class="mf">0.126009</span> <span class="mf">0.125964</span> <span class="n">Al</span>
-<span class="mf">0.373455</span> <span class="mf">0.625124</span> <span class="mf">0.373422</span> <span class="n">Al</span>
-<span class="mf">0.874340</span> <span class="mf">0.126009</span> <span class="mf">0.373422</span> <span class="n">Al</span>
-<span class="mf">0.874792</span> <span class="mf">0.624671</span> <span class="mf">0.874760</span> <span class="n">Al</span>
-<span class="mf">0.373455</span> <span class="mf">0.126009</span> <span class="mf">0.874307</span> <span class="n">Al</span>
-<span class="mf">0.373455</span> <span class="mf">0.373467</span> <span class="mf">0.625079</span> <span class="n">Al</span>
-<span class="mf">0.874792</span> <span class="mf">0.874804</span> <span class="mf">0.624626</span> <span class="n">Al</span>
-<span class="mf">0.874340</span> <span class="mf">0.373467</span> <span class="mf">0.125964</span> <span class="n">Al</span>
-<span class="mf">0.373455</span> <span class="mf">0.874352</span> <span class="mf">0.125964</span> <span class="n">Al</span>
-<span class="mf">0.862178</span> <span class="mf">0.862190</span> <span class="mf">0.862145</span> <span class="n">O</span>
-<span class="mf">0.361441</span> <span class="mf">0.361453</span> <span class="mf">0.859833</span> <span class="n">O</span>
-<span class="mf">0.361441</span> <span class="mf">0.859878</span> <span class="mf">0.361408</span> <span class="n">O</span>
-<span class="mf">0.859866</span> <span class="mf">0.361453</span> <span class="mf">0.361408</span> <span class="n">O</span>
-<span class="mf">0.388922</span> <span class="mf">0.611788</span> <span class="mf">0.611743</span> <span class="n">O</span>
-<span class="mf">0.887676</span> <span class="mf">0.110542</span> <span class="mf">0.611743</span> <span class="n">O</span>
-<span class="mf">0.887676</span> <span class="mf">0.611788</span> <span class="mf">0.110497</span> <span class="n">O</span>
-<span class="mf">0.393711</span> <span class="mf">0.105752</span> <span class="mf">0.105707</span> <span class="n">O</span>
-<span class="mf">0.611776</span> <span class="mf">0.611788</span> <span class="mf">0.388889</span> <span class="n">O</span>
-<span class="mf">0.105740</span> <span class="mf">0.105752</span> <span class="mf">0.393678</span> <span class="n">O</span>
-<span class="mf">0.110530</span> <span class="mf">0.611788</span> <span class="mf">0.887643</span> <span class="n">O</span>
-<span class="mf">0.611776</span> <span class="mf">0.110542</span> <span class="mf">0.887643</span> <span class="n">O</span>
-<span class="mf">0.611776</span> <span class="mf">0.388934</span> <span class="mf">0.611743</span> <span class="n">O</span>
-<span class="mf">0.110530</span> <span class="mf">0.887688</span> <span class="mf">0.611743</span> <span class="n">O</span>
-<span class="mf">0.105740</span> <span class="mf">0.393723</span> <span class="mf">0.105707</span> <span class="n">O</span>
-<span class="mf">0.611776</span> <span class="mf">0.887688</span> <span class="mf">0.110497</span> <span class="n">O</span>
-<span class="mf">0.637273</span> <span class="mf">0.637285</span> <span class="mf">0.862145</span> <span class="n">O</span>
-<span class="mf">0.138011</span> <span class="mf">0.138023</span> <span class="mf">0.859833</span> <span class="n">O</span>
-<span class="mf">0.138011</span> <span class="mf">0.639597</span> <span class="mf">0.361408</span> <span class="n">O</span>
-<span class="mf">0.639585</span> <span class="mf">0.138023</span> <span class="mf">0.361408</span> <span class="n">O</span>
-<span class="mf">0.637273</span> <span class="mf">0.862190</span> <span class="mf">0.637241</span> <span class="n">O</span>
-<span class="mf">0.138011</span> <span class="mf">0.361453</span> <span class="mf">0.639552</span> <span class="n">O</span>
-<span class="mf">0.138011</span> <span class="mf">0.859878</span> <span class="mf">0.137978</span> <span class="n">O</span>
-<span class="mf">0.639585</span> <span class="mf">0.361453</span> <span class="mf">0.137978</span> <span class="n">O</span>
-<span class="mf">0.393711</span> <span class="mf">0.393723</span> <span class="mf">0.393678</span> <span class="n">O</span>
-<span class="mf">0.887676</span> <span class="mf">0.887688</span> <span class="mf">0.388889</span> <span class="n">O</span>
-<span class="mf">0.887676</span> <span class="mf">0.388934</span> <span class="mf">0.887643</span> <span class="n">O</span>
-<span class="mf">0.388922</span> <span class="mf">0.887688</span> <span class="mf">0.887643</span> <span class="n">O</span>
-<span class="mf">0.862178</span> <span class="mf">0.637285</span> <span class="mf">0.637241</span> <span class="n">O</span>
-<span class="mf">0.361441</span> <span class="mf">0.138023</span> <span class="mf">0.639552</span> <span class="n">O</span>
-<span class="mf">0.361441</span> <span class="mf">0.639597</span> <span class="mf">0.137978</span> <span class="n">O</span>
-<span class="mf">0.859866</span> <span class="mf">0.138023</span> <span class="mf">0.137978</span> <span class="n">O</span>
+<span class="o">...</span>
+<span class="p">(</span><span class="n">truncated</span> <span class="k">for</span> <span class="n">brevity</span><span class="p">)</span>
+<span class="o">...</span>
 </pre></div>
 </div>
 </section>
 <section id="tips-for-hybrid-functional-calculations">
 <h2>2. Tips for hybrid functional calculations<a class="headerlink" href="#tips-for-hybrid-functional-calculations" title="Link to this heading">¶</a></h2>
-<p>Hybrid functionals, namely the HSE06 functional,
-and those with different exchange mixing parameters and/or screening distances,
-have been regularly used for point-defect calculations recently.</p>
-<p>Usually, their calculations are a few tens more expensive
-than those with a functional based on the local or semilocal density approximations.
-Therefore, we need to take a little ingenuity to reduce their computational costs.</p>
-<p>For this purpose, we regularly prepare the WAVECAR files obtained using a GGA functional.
-(Relaxation of the atomic positions using GGA beforehand could be inappropriate for point-defect calculations,
-because site symmetry of a defect calculated by GGA could be different from that by hybrid functionals,
-and once the symmetry is increased by GGA, it never be decreased by hybrid functionals.)</p>
-<p>One can create the INCAR file for generating WAVECAR files using the GGA with the following command, for instance,</p>
+<p>Hybrid functionals—such as the HSE06 functional—
+and their variants with different exchange mixing parameters or screening lengths
+have recently become standard tools for point-defect calculations.</p>
+<p>These calculations are typically tens of times more computationally expensive
+than those based on local or semilocal density functional approximations.
+Thus, some ingenuity is needed to reduce their computational cost.</p>
+<p>To address this, it is common to prepare a <code class="code docutils literal notranslate"><span class="pre">WAVECAR</span></code> file
+from a GGA-based calculation beforehand.
+(Note that relaxing atomic positions using GGA may be inappropriate for point-defect calculations,
+as the site symmetry of a defect calculated by GGA can differ from that of a hybrid functional.
+If the symmetry is increased by GGA, a hybrid functional calculation will not reduce it again.)</p>
+<p>You can generate an <code class="code docutils literal notranslate"><span class="pre">INCAR</span></code> file for creating the <code class="code docutils literal notranslate"><span class="pre">WAVECAR</span></code>
+using GGA with the following command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">LHFCALC</span> <span class="n">INCAR</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">ALGO</span> <span class="o">|</span> <span class="n">sed</span> <span class="n">s</span><span class="o">/</span><span class="s2">&quot;NSW     =  50&quot;</span><span class="o">/</span><span class="s2">&quot;NSW     =   1&quot;</span><span class="o">/</span> <span class="o">&gt;</span> <span class="n">INCAR</span><span class="o">-</span><span class="n">pre</span>
 </pre></div>
 </div>
-<p>and, then, move the WAVECAR file to the directory for the hybrid functional calculation.</p>
+<p>Then, move the resulting <code class="code docutils literal notranslate"><span class="pre">WAVECAR</span></code> file to the directory
+where the hybrid functional calculation will be performed.</p>
 </section>
 </section>
 
-
-           </div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="vertical_transition_level.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Tutorial for calculation of vertical transition level</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="tutorial.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Tutorial of pydefect</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2020, Yu Kumagai
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
           </div>
-          <footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
-        <a accesskey="p" class="btn btn-neutral float-left" href="tutorial.html" rel="prev" title="Tutorial of pydefect"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
-        <a accesskey="n" class="btn btn-neutral float-right" href="vertical_transition_level.html" rel="next" title="Tutorial for calculation of vertical transition level">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
     </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Tips for first-principles calculations for point defects</a><ul>
+<li><a class="reference internal" href="#symmetrization-of-point-defects">1. Symmetrization of point defects</a></li>
+<li><a class="reference internal" href="#tips-for-hybrid-functional-calculations">2. Tips for hybrid functional calculations</a></li>
+</ul>
+</li>
+</ul>
 
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2020, Yu Kumagai.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+          </div>
         </div>
       </div>
-    </section>
+      
+      
+    </aside>
   </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
 </html>
