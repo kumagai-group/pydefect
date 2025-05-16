@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from typing import Dict, MutableMapping
 
 from monty.json import MSONable
+from ruamel.yaml.scalarint import ScalarInt
+
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_energy import DefectEnergyInfo
 from pydefect.analyzer.defect_structure_info import DefectStructureInfo
@@ -53,6 +55,8 @@ class Degeneracies(MutableMapping, ToYamlFileMixIn):
                 vvv.pop("@class")
                 vvv.pop("@module")
                 vvv.pop("@version")
+                if isinstance(kk, ScalarInt):
+                    kk = int(kk)
                 result[k][kk] = vvv
         return result
 
