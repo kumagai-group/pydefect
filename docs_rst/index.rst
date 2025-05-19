@@ -10,6 +10,7 @@ Welcome to pydefect documentation!
    :maxdepth: 2
 
    tutorial
+   concentrations
    first_principles_calc
    vertical_transition_level
    change_log

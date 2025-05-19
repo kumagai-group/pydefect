@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta content="width=device-width,initial-scale=1" name="viewport"/>
     <meta content="light dark" name="color-scheme"><meta content="width=device-width, initial-scale=1" name="viewport" />
-<link href="genindex.html" rel="index" title="Index" /><link href="search.html" rel="search" title="Search" /><link href="first_principles_calc.html" rel="next" title="Tips for first-principles calculations for point defects" /><link href="index.html" rel="prev" title="Welcome to pydefect documentation!" />
+<link href="genindex.html" rel="index" title="Index" /><link href="search.html" rel="search" title="Search" /><link href="concentrations.html" rel="next" title="Tutorial of how to calculate carrier and defect concentration using pydefect" /><link href="index.html" rel="prev" title="Welcome to pydefect documentation!" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>Tutorial of pydefect - pydefect documentation</title>
@@ -200,6 +200,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Tutorial of pydefect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concentrations.html">Tutorial of how to calculate carrier and defect concentration using pydefect</a></li>
 <li class="toctree-l1"><a class="reference internal" href="first_principles_calc.html">Tips for first-principles calculations for point defects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vertical_transition_level.html">Tutorial for calculation of vertical transition level</a></li>
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change log</a></li>
@@ -1094,6 +1095,28 @@ using the <code class="code docutils literal notranslate"><span class="pre">plot
 <img alt="_images/energy_A.pdf" src="_images/energy_A.pdf" />
 <p>To change the chemical potential condition—i.e., select a different vertex from the chemical potential diagram—use the <code class="code docutils literal notranslate"><span class="pre">-l</span></code> option.</p>
 </section>
+<section id="calculate-the-carrier-and-defect-concentrations">
+<h2>14. Calculate the carrier and defect concentrations<a class="headerlink" href="#calculate-the-carrier-and-defect-concentrations" title="Link to this heading">¶</a></h2>
+<p>Once we obtain the formation energies of dominant defects,
+we can estimate the carrier and defect concentrations can be estimated from the charge neutrality condition.</p>
+<p>The equilibrium $epsilon_F$ ,
+begin{align}</p>
+<blockquote>
+<div><p>p-n+sum qC[D^q]=0.
+label{eq:charge_neutrality}</p>
+</div></blockquote>
+<p>end{align}
+We describe $ef$ satisfying the condition as $ef^text{CN}$.
+Since the left side of Eq.~eqref{eq:charge_neutrality} is monotonically increased as increasing $ef$,
+$ef^text{CN}$ is determined numerically.</p>
+<p>When the growth temperature exceeds room temperature,
+we typically calculate $ef$ at room temperature, assuming
+that defect concentrations are quenched from the growth temperature.
+Subsequently, the defects are assumed to adopt various charge states
+in proportions determined by the Boltzmann distribution.</p>
+<p>An example is shown in Fig. xx.
+When the</p>
+</section>
 </section>
 
         </article>
@@ -1101,12 +1124,12 @@ using the <code class="code docutils literal notranslate"><span class="pre">plot
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="first_principles_calc.html">
+          <a class="next-page" href="concentrations.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Tips for first-principles calculations for point defects</div>
+                <div class="title">Tutorial of how to calculate carrier and defect concentration using pydefect</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -1165,6 +1188,7 @@ using the <code class="code docutils literal notranslate"><span class="pre">plot
 <li><a class="reference internal" href="#check-defect-structures">11. Check defect structures</a></li>
 <li><a class="reference internal" href="#check-defect-eigenvalues-and-band-edge-states-in-supercell-calculations">12. Check defect eigenvalues and band-edge states in supercell calculations</a></li>
 <li><a class="reference internal" href="#plot-defect-formation-energies">13. Plot defect formation energies</a></li>
+<li><a class="reference internal" href="#calculate-the-carrier-and-defect-concentrations">14. Calculate the carrier and defect concentrations</a></li>
 </ul>
 </li>
 </ul>
