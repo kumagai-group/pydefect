@@ -63,7 +63,7 @@ class Distances:
 
         distance_dict = {}
         for element, distances in unsorted_distances.items():
-            distance_dict[element] = sorted(distances)
+            distance_dict[element] = [float(d) for d in sorted(distances)]
 
         return Coordination(distance_dict, round(cutoff, 3),
                             neighboring_atom_indices)
