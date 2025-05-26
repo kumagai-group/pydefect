@@ -1234,28 +1234,3 @@ This generates a plot like the following:
 
 To change the chemical potential condition—i.e., select a different vertex from the chemical potential diagram—use the :code:`-l` option.
 
-===================================================
-14. Calculate the carrier and defect concentrations
-===================================================
-
-Once we obtain the formation energies of dominant defects,
-we can estimate the carrier and defect concentrations can be estimated from the charge neutrality condition.
-
-The equilibrium $\epsilon_F$ ,
-\begin{align}
-    p-n+\sum qC[D^q]=0.
-    \label{eq:charge_neutrality}
-\end{align}
-We describe $\ef$ satisfying the condition as $\ef^\text{CN}$.
-Since the left side of Eq.~\eqref{eq:charge_neutrality} is monotonically increased as increasing $\ef$,
-$\ef^\text{CN}$ is determined numerically.
-
-When the growth temperature exceeds room temperature,
-we typically calculate $\ef$ at room temperature, assuming
-that defect concentrations are quenched from the growth temperature.
-Subsequently, the defects are assumed to adopt various charge states
-in proportions determined by the Boltzmann distribution.
-
-An example is shown in Fig. xx.
-When the
-
