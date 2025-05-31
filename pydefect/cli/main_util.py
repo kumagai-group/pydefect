@@ -175,7 +175,9 @@ def parse_args_main_util(args):
         help="Temperature in K.")
     parser_calc_defect_concentrations.add_argument(
         "--con_by_Ef", type=loadfn, default=None,
-        help="con_by_Ef.json file.")
+        help="""We can calculate the carrier concentrations on the premise that total defect concentrations are fixed, 
+        while the defects can occupy different charge states in the ratio determined by the Boltzmann distribution.
+        For this, we can give the defect concentrations by designating the con_by_Ef.json filename.""")
     parser_calc_defect_concentrations.add_argument(
         "--net_abs_ratio", type=float, default=1e-5,
         help="Ratio to determine the convergence.")

@@ -114,7 +114,7 @@ class Concentration(MSONable):
 class ConcentrationByFermiLevel(MSONable, ToJsonFileMixIn):
     """Concentration per cell"""
     T: float
-    concentrations: List[Concentration]
+    concentrations: List[Concentration]  # /cm3
     # Ex: pinning_levels[specie_name] = [float("-inf"), 1.0]
     # The VBM is set to zero.
     pinning_levels: Dict[str, List[Optional[float]]] = None
