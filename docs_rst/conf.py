@@ -30,8 +30,12 @@ author = 'Yu Kumagai'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.githubpages",
-              'sphinxcontrib.seqdiag']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',   # Google/NumPy スタイル docstring をサポート
+    'sphinx.ext.viewcode',
+    "sphinx.ext.githubpages",
+    'sphinxcontrib.seqdiag']
 
 # Fontpath for seqdiag (truetype font)
 seqdiag_fontpath = '/usr/share/fonts/truetype/ipafont/ipagp.ttf'
