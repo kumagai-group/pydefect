@@ -3,6 +3,8 @@
 from pathlib import Path
 
 import pytest
+from ruamel.yaml.scalarint import ScalarInt
+
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.concentration.degeneracy import Degeneracies, Degeneracy, \
     MakeDegeneracy
@@ -30,7 +32,7 @@ def test_degeneracies_yaml_round_trip(tmpdir):
     assert isinstance(actual["Va_O1"][0], Degeneracy)
 
 
-def test_make_degeneracy(mocker):
+def test_make_degeneracy(mocker, tmpdir):
     make_deg = MakeDegeneracy("Pm-3m")
     assert make_deg.mag_to_spin_degeneracy(mag=0.09) == 1
     assert make_deg.mag_to_spin_degeneracy(mag=-1.0) == 3
@@ -38,7 +40,7 @@ def test_make_degeneracy(mocker):
         make_deg.mag_to_spin_degeneracy(mag=0.89)
 
     m_energy_info = mocker.Mock(DefectEnergyInfo)
-    m_energy_info.name, m_energy_info.charge = "Va_O1", 0
+    m_energy_info.name, m_energy_info.charge = "Va_O1", ScalarInt(0)
 
     m_calc_results = mocker.Mock(CalcResults)
     m_calc_results.magnetization = 1.0
@@ -50,5 +52,3 @@ def test_make_degeneracy(mocker):
     assert make_deg.degeneracies == Degeneracies({})
     make_deg.add_degeneracy(m_energy_info, m_calc_results, m_structure_info)
     assert make_deg.degeneracies["Va_O1"][0] == Degeneracy(12, 3, "4mmm", "2mm")
-
-

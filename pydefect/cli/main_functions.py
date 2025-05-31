@@ -253,15 +253,25 @@ def make_defect_energy_infos_main_func(args):
     parse_dirs(args.dirs, _inner, args.verbose, file_name)
 
 
-def make_defect_energy_summary_main_func(args):
+def make_defect_energy_summary_main(
+        dirs, verbose, target_vertices_yaml, unitcell, p_state):
+
     def _inner(_dir: Path):
         return DefectEnergyInfo.from_yaml(str(_dir / "defect_energy_info.yaml"))
 
-    energy_infos = parse_dirs(args.dirs, _inner, args.verbose)
-    target_vertices = TargetVertices.from_yaml(args.target_vertices_yaml)
+    energy_infos = parse_dirs(dirs, _inner, verbose)
+    target_vertices = TargetVertices.from_yaml(target_vertices_yaml)
     defect_energy_summary = make_defect_energy_summary(
-        energy_infos, target_vertices, args.unitcell, args.p_state)
+        energy_infos, target_vertices, unitcell, p_state)
     defect_energy_summary.to_json_file()
+
+
+def make_defect_energy_summary_main_func(args):
+    make_defect_energy_summary_main(args.dirs,
+                                    args.verbose,
+                                    args.target_vertices_yaml,
+                                    args.unitcell,
+                                    args.p_state)
 
 
 def make_calc_summary_main_func(args):
