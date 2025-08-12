@@ -12,7 +12,7 @@ from pydefect.cli.main_util_functions import make_gkfo_correction_from_vasp, \
     composition_energies_from_mp, add_interstitials_from_local_extrema, \
     make_defect_vesta_file, show_u_values, show_pinning_levels, \
     make_degeneracies, calc_defect_concentrations, calc_carrier_concentrations, \
-    plot_carrier_concentrations, plot_defect_concentrations
+    plot_carrier_concentrations, plot_defect_concentrations, calc_ccd_correction
 from pydefect.defaults import defaults
 from pymatgen.io.vasp.inputs import UnknownPotcarWarning
 
@@ -217,6 +217,32 @@ def parse_args_main_util(args):
     parser_plot_defect_concentrations.set_defaults(
         func=plot_defect_concentrations)
 
+    # -- calc ccd corrections  ------------------------------------------
+    parser_calc_ccd_correction = subparsers.add_parser(
+        name="calc_ccd_correction",
+        description="Calc config coordinate correction energy.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        aliases=['ccc'])
+    parser_calc_ccd_correction.add_argument(
+        "-c", "--charge_diff", required=True, type=loadfn,
+        help="Assuming the charge is +3 and the reference charge is +2,"
+             "the charge diff is +1.")
+    parser_calc_ccd_correction.add_argument(
+        "-d", "--disp_ratio", required=True, type=loadfn,
+        help="Displacement ratio of the fixed structure "
+             "from the relaxed structure to the reference relaxed structure. ")
+    parser_calc_ccd_correction.add_argument(
+        "-c", "--calc_results", required=True, type=loadfn,
+        help="calc_results.json file at the fixed structure.")
+    parser_calc_ccd_correction.add_argument(
+        "-ndc", "--no_disp_calc_results", required=True, type=loadfn,
+        help="calc_results.json file at the relaxed structure.")
+    parser_calc_ccd_correction.add_argument(
+        "-ndde", "--no_disp_defect_entry", required=True, type=loadfn,
+        help="defect_entry.json file at the relaxed structure.")
+
+    parser_calc_ccd_correction.set_defaults(
+        func=calc_ccd_correction)
     # ------------------------------------------------------------------------
 
     return parser.parse_args(args)

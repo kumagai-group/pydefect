@@ -5,6 +5,10 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 from monty.serialization import loadfn
+from tabulate import tabulate
+from vise.util.logger import get_logger
+
+from cli.vasp.make_efnv_correction import make_efnv_correction
 from pydefect.analyzer.concentration.concentration import \
     ConcentrationByFermiLevel
 from pydefect.analyzer.concentration.degeneracy import MakeDegeneracy
@@ -23,8 +27,6 @@ from pydefect.cli.vasp.make_composition_energies_from_mp import \
     make_composition_energies_from_mp
 from pydefect.cli.vasp.make_gkfo_correction import make_gkfo_correction
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
-from tabulate import tabulate
-from vise.util.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -164,3 +166,14 @@ def plot_defect_concentrations(args):
     plotter = DefectConcentrationMplPlotter(args.con_by_Ef)
     plotter.construct_plot()
     plt.savefig("defect_concentration.pdf")
+
+
+def calc_ccd_correction(args):
+    effective_charge = args.charge_diff * args.disp_ratio
+    ccd_correction \
+        = make_efnv_correction(effective_charge,
+                               args.calc_results,
+                               args.no_disp_calc_results,
+                               args.unitcell.effective_ionic_diele_const,
+                               args.no_disp_defect_entry.defect_center)
+    ccd_correction.to_json_file("ccd_correction.json")
