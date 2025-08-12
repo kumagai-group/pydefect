@@ -221,14 +221,15 @@ def parse_args_main_util(args):
     parser_calc_ccd_correction = subparsers.add_parser(
         name="calc_ccd_correction",
         description="Calc config coordinate correction energy.",
+        parents=[unitcell_parser],
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        aliases=['ccc'])
+        aliases=['cccdc'])
     parser_calc_ccd_correction.add_argument(
-        "-c", "--charge_diff", required=True, type=loadfn,
+        "-cd", "--charge_diff", required=True, type=int,
         help="Assuming the charge is +3 and the reference charge is +2,"
              "the charge diff is +1.")
     parser_calc_ccd_correction.add_argument(
-        "-d", "--disp_ratio", required=True, type=loadfn,
+        "-d", "--disp_ratio", required=True, type=float,
         help="Displacement ratio of the fixed structure "
              "from the relaxed structure to the reference relaxed structure. ")
     parser_calc_ccd_correction.add_argument(

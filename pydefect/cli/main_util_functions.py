@@ -8,7 +8,7 @@ from monty.serialization import loadfn
 from tabulate import tabulate
 from vise.util.logger import get_logger
 
-from cli.vasp.make_efnv_correction import make_efnv_correction
+from pydefect.cli.vasp.make_efnv_correction import make_efnv_correction
 from pydefect.analyzer.concentration.concentration import \
     ConcentrationByFermiLevel
 from pydefect.analyzer.concentration.degeneracy import MakeDegeneracy
@@ -177,3 +177,9 @@ def calc_ccd_correction(args):
                                args.unitcell.effective_ionic_diele_const,
                                args.no_disp_defect_entry.defect_center)
     ccd_correction.to_json_file("ccd_correction.json")
+
+    plotter = SitePotentialMplPlotter.from_efnv_corr(
+        title="ccd correction", efnv_correction=ccd_correction)
+    plotter.construct_plot()
+    plotter.plt.savefig(fname="ccd_correction.pdf")
+    plotter.plt.clf()
