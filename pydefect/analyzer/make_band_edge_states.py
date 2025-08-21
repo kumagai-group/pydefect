@@ -117,7 +117,9 @@ def make_band_edge_states(orbital_infos: BandEdgeOrbitalInfos,
 
     states = []
     lowest_idx = orbital_infos.lowest_band_index
-    for spin_idx, orb_info_by_spin in enumerate(orbital_infos.orbital_infos):
+
+    for spin_idx, orb_info_by_spin \
+            in enumerate(orbital_infos.shifted_orbital_infos):
         if defect_charge_info:
             localized_orbs = defect_charge_info.localized_orbitals()[spin_idx]
             localized_orbs = [i - lowest_idx for i in localized_orbs]

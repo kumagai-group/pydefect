@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2020. Distributed under the terms of the MIT License.
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional, Set
 
@@ -57,7 +58,18 @@ class BandEdgeOrbitalInfos(MSONable, ToJsonFileMixIn):
     kpt_weights: List[float]
     lowest_band_index: int  # python convention starting from 0.
     fermi_level: float
-    eigval_shift: float = 0.0
+    eigval_shift: float = 0.0  # add this value to the energies.
+
+    @property
+    def shifted_orbital_infos(self) -> List[List[List[OrbitalInfo]]]:
+        """Return new orbital_infos with energy shifted by eigval_shift."""
+        new_orbital_infos = deepcopy(self.orbital_infos)
+        for spin_idx in range(len(new_orbital_infos)):
+            for k_idx in range(len(new_orbital_infos[spin_idx])):
+                for band_idx in range(len(new_orbital_infos[spin_idx][k_idx])):
+                    new_orbital_infos[spin_idx][k_idx][band_idx].energy \
+                        += self.eigval_shift
+        return new_orbital_infos
 
     def kpt_idx(self, kpt_coord):
         for i, orig_kpt in enumerate(self.kpt_coords):
