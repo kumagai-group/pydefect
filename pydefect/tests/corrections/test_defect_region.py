@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from pydefect.corrections.defect_region import calc_max_sphere_radius, \
-    FixedDistanceDefectRegion, HalfMinFaceDistanceDefectRegion
+    FixedDistanceDefectRegion, HalfMaxFaceDistanceDefectRegion
 
 
 def test_calc_max_sphere_radius_simple_cubic():
@@ -44,7 +44,7 @@ def test_fixed_distance_defect_region_returns_radius():
 def test_half_min_face_distance_defect_region_cube_lattice():
     lattice = np.array([[2.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 2.0]])
     ratio = 0.5
-    region = HalfMinFaceDistanceDefectRegion(ratio)
+    region = HalfMaxFaceDistanceDefectRegion(ratio)
 
     expected = calc_max_sphere_radius(lattice) * ratio
     assert region.defect_region_radius(lattice) == pytest.approx(expected)

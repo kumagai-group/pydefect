@@ -7,7 +7,7 @@ import numpy as np
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
-from pydefect.corrections.defect_region import HalfMinFaceDistanceDefectRegion, DefectRegion
+from pydefect.corrections.defect_region import HalfMaxFaceDistanceDefectRegion, DefectRegion
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.ewald import Ewald
@@ -37,7 +37,7 @@ def make_efnv_correction(charge: float,
         to make potential in V.
     """
     if defect_region is None:
-        defect_region = HalfMinFaceDistanceDefectRegion(sample_radius_ratio=1.0)
+        defect_region = HalfMaxFaceDistanceDefectRegion(sample_radius_ratio=1.0)
 
     sites, rel_coords, defect_coords = \
         make_sites(calc_results, perfect_calc_results, defect_coords)
