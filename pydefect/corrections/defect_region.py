@@ -36,7 +36,7 @@ class FixedDistanceDefectRegion(DefectRegion):
         return self.radius
 
 
-class MaxFaceDistanceDefectRegion(DefectRegion):
+class HalfMinFaceDistanceDefectRegion(DefectRegion):
     def __init__(self, sample_radius_ratio: float):
         self.sample_radius_ratio = sample_radius_ratio
 
