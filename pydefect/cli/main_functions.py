@@ -22,6 +22,7 @@ from pydefect.chem_pot_diag.cpd_plotter import ChemPotDiag2DMplPlotter, \
     ChemPotDiag3DMplPlotter
 from pydefect.cli.main_tools import sanitize_matrix, parse_dirs
 from pydefect.cli.vasp.make_efnv_correction import make_efnv_correction
+from pydefect.corrections.defect_region import FixedDistanceDefectRegion
 from pydefect.corrections.no_correction import NoCorrection
 from pydefect.corrections.site_potential_plotter import SitePotentialMplPlotter
 from pydefect.input_maker.append_interstitial import append_interstitial
@@ -191,11 +192,12 @@ def make_efnv_correction_main_func(args):
     def _inner(_dir: Path):
         calc_results = get_calc_results(_dir, args.check_calc_results)
         defect_entry = loadfn(_dir / "defect_entry.json")
+        defect_region = FixedDistanceDefectRegion if args.radius else None
         efnv = make_efnv_correction(defect_entry.charge,
                                     calc_results,
                                     args.perfect_calc_results,
                                     args.unitcell.dielectric_constant,
-                                    defect_region_radius=args.radius,
+                                    defect_region=defect_region,
                                     calc_all_sites=args.calc_all_sites)
         efnv.to_json_file(_dir / file_name)
 

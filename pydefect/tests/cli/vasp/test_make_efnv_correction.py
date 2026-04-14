@@ -4,7 +4,8 @@
 import numpy as np
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.cli.vasp.make_efnv_correction import \
-    calc_max_sphere_radius, make_efnv_correction
+    make_efnv_correction
+from pydefect.corrections.defect_region import calc_max_sphere_radius
 from pydefect.corrections.efnv_correction import PotentialSite
 from pymatgen.core import IStructure, Lattice
 

@@ -6,7 +6,7 @@ import numpy as np
 from pydefect.analyzer.defect_charge_info import DefectChargeInfo, \
     AveChargeDensityDist
 from pydefect.analyzer.grids import Grids
-from pydefect.cli.vasp.make_efnv_correction import calc_max_sphere_radius
+from pydefect.corrections.defect_region import calc_max_sphere_radius
 from pymatgen.io.vasp import Chgcar
 from vise.analyzer.vasp.handle_volumetric_data import make_spin_charges
 

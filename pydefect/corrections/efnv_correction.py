@@ -5,6 +5,8 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 from monty.json import MSONable
+
+from pydefect.corrections.defect_region import DefectRegion
 from pydefect.corrections.abstract_correction import Correction
 from tabulate import tabulate
 
@@ -27,6 +29,7 @@ class ExtendedFnvCorrection(Correction):
     defect_region_radius: float
     sites: List["PotentialSite"]
     defect_coords: Tuple[float, float, float]
+    defect_region: DefectRegion = None
 
     def __str__(self):
         d = [["charge", self.charge],

@@ -3,12 +3,11 @@
 from typing import Optional, Tuple
 
 import numpy as np
-from numpy import dot, cross
-from numpy.linalg import norm
 
 from pydefect.analyzer.calc_results import CalcResults
 from pydefect.analyzer.defect_structure_comparator import \
     DefectStructureComparator
+from pydefect.corrections.defect_region import MaxFaceDistanceDefectRegion, DefectRegion
 from pydefect.corrections.efnv_correction import \
     ExtendedFnvCorrection, PotentialSite
 from pydefect.corrections.ewald import Ewald
@@ -26,7 +25,7 @@ def make_efnv_correction(charge: float,
                          dielectric_tensor: np.array,
                          defect_coords: Optional[Coords] = None,
                          accuracy: float = defaults.ewald_accuracy,
-                         defect_region_radius: float = None,
+                         defect_region: DefectRegion = None,
                          calc_all_sites: bool = False,
                          unit_conversion: float = 180.95128169876497):
     """
@@ -37,19 +36,23 @@ def make_efnv_correction(charge: float,
         elementary_charge * 1e10 / epsilon_0 = 180.95128169876497
         to make potential in V.
     """
+    if defect_region is None:
+        defect_region = MaxFaceDistanceDefectRegion(sample_radius_ratio=1.0)
+
     sites, rel_coords, defect_coords = \
         make_sites(calc_results, perfect_calc_results, defect_coords)
 
     lattice = calc_results.structure.lattice
+
+    radius = defect_region.defect_region_radius(lattice.matrix)
+
     ewald = Ewald(lattice.matrix, dielectric_tensor, accuracy=accuracy)
     point_charge_correction = \
         0.0 if not charge else - ewald.lattice_energy * charge ** 2
-    if defect_region_radius is None:
-        defect_region_radius = calc_max_sphere_radius(lattice.matrix)
 
     has_calculated_sites = False
     for site, rel_coord in zip(sites, rel_coords):
-        if calc_all_sites is True or site.distance > defect_region_radius:
+        if calc_all_sites is True or site.distance > radius:
             has_calculated_sites = True
             if charge == 0:
                 site.pc_potential = 0
@@ -59,13 +62,14 @@ def make_efnv_correction(charge: float,
 
     if has_calculated_sites is False:
         raise NoCalculatedPotentialSiteError(
-            "Change the spherical radius of defect region manually. "
-            f"Now {defect_region_radius:4.2f}Å is set.")
+            "Change the spherical radius of defect region. "
+            f"Now {radius:4.2f}Å is set.")
 
     return ExtendedFnvCorrection(
         charge=charge,
         point_charge_correction=point_charge_correction * unit_conversion,
-        defect_region_radius=defect_region_radius,
+        defect_region_radius=radius,
+        defect_region=defect_region,
         sites=sites,
         defect_coords=tuple(defect_coords))
 
@@ -93,14 +97,4 @@ def make_sites(calc_results, perfect_calc_results, defect_coords):
     return sites, rel_coords, defect_coords
 
 
-def calc_max_sphere_radius(lattice_matrix) -> float:
-    """Calculate Maximum radius of a sphere fitting inside the unit cell.
 
-    Calculate three distances between two parallel planes using
-    (a_i x a_j) . a_k / |a_i . a_j| """
-    distances = np.zeros(3, dtype=float)
-    for i in range(3):
-        a_i_a_j = cross(lattice_matrix[i - 2], lattice_matrix[i - 1])
-        a_k = lattice_matrix[i]
-        distances[i] = abs(dot(a_i_a_j, a_k)) / norm(a_i_a_j)
-    return max(distances) / 2.0
